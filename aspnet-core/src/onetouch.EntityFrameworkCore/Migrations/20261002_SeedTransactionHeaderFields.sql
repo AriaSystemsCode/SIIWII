@@ -23,6 +23,7 @@ IF (SELECT COUNT(*) FROM dbo.SysObjectTypes WHERE Code = N'ENTITY' AND IsDeleted
 DECLARE @entityTypeId bigint = (SELECT Id FROM dbo.SysObjectTypes WHERE Code = N'ENTITY' AND IsDeleted = 0);
 DECLARE @dataTypeId bigint = (SELECT Id FROM dbo.SysObjectTypes WHERE Code = N'DATA' AND IsDeleted = 0);
 DECLARE @entityId bigint;
+DECLARE @transactionEntityTypeId bigint;
 DECLARE @headerId bigint;
 DECLARE @baseEntityId bigint;
 DECLARE @appEntityId bigint;
@@ -43,6 +44,11 @@ IF NOT EXISTS (SELECT 1 FROM dbo.SydObjects WHERE Code = N'TRANSACTION' AND IsDe
 IF (SELECT COUNT(*) FROM dbo.SydObjects WHERE Code = N'TRANSACTION' AND IsDeleted = 0) <> 1
     THROW 51061, 'Expected one Transaction object.', 1;
 SELECT @entityId = Id FROM dbo.SydObjects WHERE Code = N'TRANSACTION' AND IsDeleted = 0;
+SELECT @transactionEntityTypeId = Id FROM dbo.SycEntityObjectTypes
+WHERE ObjectId = @entityId AND Code = N'TRANSACTION'
+  AND ParentId IS NULL AND IsDeleted = 0;
+IF @transactionEntityTypeId IS NULL
+    THROW 51099, 'Apply the entity object type migration before seeding transaction fields.', 1;
 
 IF EXISTS (SELECT 1 FROM dbo.SydObjects
     WHERE (Code = N'BASEENTITY' OR Name = N'BaseEntity')
@@ -176,7 +182,6 @@ CREATE TABLE #SeedFields
     TrackingNo nvarchar(100) COLLATE DATABASE_DEFAULT NULL,
     CurrentRevisionNo nvarchar(10) COLLATE DATABASE_DEFAULT NOT NULL,
     IsStandard bit NOT NULL,
-    IsCustom bit NOT NULL,
     IsExtraField bit NOT NULL,
     IsHidden bit NOT NULL,
     AllowNull bit NOT NULL,
@@ -194,52 +199,52 @@ CREATE TABLE #SeedFields
 );
 INSERT #SeedFields
 (FieldCode, FieldName, Description, FieldTypeId, FieldLevelCode, FieldStatusCode,
- TrackingNo, CurrentRevisionNo, IsStandard, IsCustom, IsExtraField, IsHidden, AllowNull,
+ TrackingNo, CurrentRevisionNo, IsStandard, IsExtraField, IsHidden, AllowNull,
  [Length], Decimals, DefaultValue, DateFormat, TimeFormat, AllowMultiSelect, Required,
  Visible, Editable, LegacyMetadataJson, AssignmentKind)
 VALUES
-    (N'INSID__0001', N'Id', N'AppTransactionHeaders primary key', 829, N'System', N'Proposed', NULL, N'00', 1, 0, 0, 0, 0, NULL, 0, NULL, NULL, NULL, 0, 1, 0, 0, NULL, 0),
-    (N'STSENTE0001', N'EnteredUserByRole', N'Role of user who entered the transaction', 831, N'System', N'Proposed', NULL, N'00', 1, 0, 0, 0, 1, 50, NULL, NULL, NULL, NULL, 0, 0, 1, 1, NULL, 0),
-    (N'STSBUYE0002', N'BuyerCompanySSIN', N'Buyer company SSIN', 831, N'System', N'Proposed', NULL, N'00', 1, 0, 0, 0, 1, 50, NULL, NULL, NULL, NULL, 0, 0, 1, 1, NULL, 0),
-    (N'STSBUYE0003', N'BuyerContactSSIN', N'Buyer Contact SSIN', 831, N'System', N'Proposed', NULL, N'00', 1, 0, 0, 0, 1, 50, NULL, NULL, NULL, NULL, 0, 0, 1, 1, NULL, 0),
-    (N'STSSELL0004', N'SellerCompanySSIN', N'Seller Company SSIN', 831, N'System', N'Proposed', NULL, N'00', 1, 0, 0, 0, 1, 50, NULL, NULL, NULL, NULL, 0, 0, 1, 1, NULL, 0),
-    (N'STSSELL0005', N'SellerContactSSIN', N'Seller Contact SSIN', 831, N'System', N'Proposed', NULL, N'00', 1, 0, 0, 0, 1, 50, NULL, NULL, NULL, NULL, 0, 0, 1, 1, NULL, 0),
-    (N'STSSELL0006', N'SellerContactName', N'Seller Contact Name', 831, N'System', N'Proposed', NULL, N'00', 1, 0, 0, 0, 1, 50, NULL, NULL, NULL, NULL, 0, 0, 1, 1, NULL, 0),
-    (N'STSBUYE0007', N'BuyerContactEMailAddress', N'Buyer Contact Email Address', 831, N'System', N'Proposed', NULL, N'00', 1, 0, 0, 0, 1, 100, NULL, NULL, NULL, NULL, 0, 0, 1, 1, NULL, 0),
-    (N'LDSLANG0001', N'LanguageId', N'Language ID', 830, N'System', N'Proposed', NULL, N'00', 1, 0, 0, 0, 1, NULL, NULL, NULL, NULL, NULL, 0, 0, 0, 0, NULL, 0),
-    (N'STSLANG0008', N'LanguageCode', N'Language Code', 831, N'System', N'Proposed', NULL, N'00', 1, 0, 0, 0, 1, 50, NULL, NULL, NULL, NULL, 0, 0, 1, 1, NULL, 0),
-    (N'LDSCURR0002', N'CurrencyId', N'Currency ID', 830, N'System', N'Proposed', NULL, N'00', 1, 0, 0, 0, 1, NULL, NULL, NULL, NULL, NULL, 0, 0, 0, 0, NULL, 0),
-    (N'STSCURR0009', N'CurrencyCode', N'Currency Code', 831, N'System', N'Proposed', NULL, N'00', 1, 0, 0, 0, 1, 50, NULL, NULL, NULL, NULL, 0, 0, 1, 1, NULL, 0),
-    (N'STSSELL0010', N'SellerContactEMailAddress', N'Seller Contact Email Address', 831, N'System', N'Proposed', NULL, N'00', 1, 0, 0, 0, 1, 100, NULL, NULL, NULL, NULL, 0, 0, 1, 1, NULL, 0),
-    (N'STSBUYE0011', N'BuyerContactPhoneNumber', N'Buyer Contact Phone Number', 831, N'System', N'Proposed', NULL, N'00', 1, 0, 0, 0, 1, 20, NULL, NULL, NULL, NULL, 0, 0, 1, 1, NULL, 0),
-    (N'STSSELL0012', N'SellerContactPhoneNumber', N'Seller Contact Phone Number', 831, N'System', N'Proposed', NULL, N'00', 1, 0, 0, 0, 1, 20, NULL, NULL, NULL, NULL, 0, 0, 1, 1, NULL, 0),
-    (N'STSBUYE0013', N'BuyerCompanyName', N'Buyer Company Name', 831, N'System', N'Proposed', NULL, N'00', 1, 0, 0, 0, 1, 50, NULL, NULL, NULL, NULL, 0, 0, 1, 1, NULL, 0),
-    (N'STSBUYE0014', N'BuyerContactName', N'Buyer Contact Name', 831, N'System', N'Proposed', NULL, N'00', 1, 0, 0, 0, 1, 50, NULL, NULL, NULL, NULL, 0, 0, 1, 1, NULL, 0),
-    (N'STSSELL0015', N'SellerCompanyName', N'Seller Company Name', 831, N'System', N'Proposed', NULL, N'00', 1, 0, 0, 0, 1, 50, NULL, NULL, NULL, NULL, 0, 0, 1, 1, NULL, 0),
-    (N'STSPRIC0016', N'PriceLevel', N'Price Level', 831, N'System', N'Proposed', NULL, N'00', 1, 0, 0, 0, 1, NULL, NULL, NULL, NULL, NULL, 0, 0, 1, 1, NULL, 0),
-    (N'DPSCOMP0001', N'CompleteDate', N'Complete Date', 827, N'System', N'Proposed', NULL, N'00', 1, 0, 0, 0, 0, NULL, NULL, NULL, N'yyyy-MM-dd', NULL, 0, 1, 1, 1, NULL, 0),
-    (N'DPSAVAI0002', N'AvailableDate', N'Available Date', 827, N'System', N'Proposed', NULL, N'00', 1, 0, 0, 0, 0, NULL, NULL, N'0001-01-01T00:00:00.0000000', N'yyyy-MM-dd', NULL, 0, 1, 1, 1, NULL, 0),
-    (N'STSBUYE0017', N'BuyerDepartment', N'Buyer Department', 831, N'System', N'Proposed', NULL, N'00', 1, 0, 0, 0, 1, 50, NULL, NULL, NULL, NULL, 0, 0, 1, 1, NULL, 0),
-    (N'STSPAYM0018', N'PaymentTermsCode', N'Payment Terms Code', 831, N'System', N'Proposed', NULL, N'00', 1, 0, 0, 0, 1, 50, NULL, NULL, NULL, NULL, 0, 0, 1, 1, NULL, 0),
-    (N'LDSPAYM0003', N'PaymentTermsId', N'Payment Terms ID', 830, N'System', N'Proposed', NULL, N'00', 1, 0, 0, 0, 1, NULL, NULL, NULL, NULL, NULL, 0, 0, 0, 0, NULL, 0),
-    (N'STSSHIP0019', N'ShipViaCode', N'Ship Via Code', 831, N'System', N'Proposed', NULL, N'00', 1, 0, 0, 0, 1, 50, NULL, NULL, NULL, NULL, 0, 0, 1, 1, NULL, 0),
-    (N'LDSSHIP0004', N'ShipViaId', N'Ship Via ID', 830, N'System', N'Proposed', NULL, N'00', 1, 0, 0, 0, 1, NULL, NULL, NULL, NULL, NULL, 0, 0, 0, 0, NULL, 0),
-    (N'DPSSTAR0003', N'StartDate', N'Start Date', 827, N'System', N'Proposed', NULL, N'00', 1, 0, 0, 0, 0, NULL, NULL, N'0001-01-01T00:00:00.0000000', N'yyyy-MM-dd', NULL, 0, 1, 1, 1, NULL, 0),
-    (N'ICSCURR0001', N'CurrencyExchangeRate', N'Currency Exchange Rate', 828, N'System', N'Proposed', NULL, N'00', 1, 0, 0, 0, 0, NULL, 2, N'0', NULL, NULL, 0, 1, 1, 1, NULL, 0),
-    (N'STSBUYE0020', N'BuyerStore', N'Buyer Store', 831, N'System', N'Proposed', NULL, N'00', 1, 0, 0, 0, 1, NULL, NULL, NULL, NULL, NULL, 0, 0, 1, 1, NULL, 0),
-    (N'ICSTOTA0002', N'TotalAmount', N'Total Amount', 828, N'System', N'Proposed', NULL, N'00', 1, 0, 0, 0, 0, NULL, 2, N'0', NULL, NULL, 0, 1, 1, 1, NULL, 0),
-    (N'INSTOTA0002', N'TotalQuantity', N'Total Quantity', 829, N'System', N'Proposed', NULL, N'00', 1, 0, 0, 0, 0, NULL, 0, N'0', NULL, NULL, 0, 1, 1, 1, NULL, 0),
-    (N'STSPAYM0021', N'PaymentTermsName', N'Payment Terms Name', 831, N'System', N'Proposed', NULL, N'00', 1, 0, 0, 0, 1, NULL, NULL, NULL, NULL, NULL, 0, 0, 1, 1, NULL, 0),
-    (N'STSSHIP0022', N'ShipViaName', N'Ship Via Name', 831, N'System', N'Proposed', NULL, N'00', 1, 0, 0, 0, 1, NULL, NULL, NULL, NULL, NULL, 0, 0, 1, 1, NULL, 0),
-    (N'STSREFE0023', N'Reference', N'Reference', 831, N'System', N'Proposed', NULL, N'00', 1, 0, 0, 0, 1, 50, NULL, NULL, NULL, NULL, 0, 0, 1, 1, NULL, 0),
-    (N'DPSENTE0004', N'EnteredDate', N'Entered Date', 827, N'System', N'Proposed', NULL, N'00', 1, 0, 0, 0, 0, NULL, NULL, N'0001-01-01T00:00:00.0000000', N'yyyy-MM-dd', NULL, 0, 1, 1, 1, NULL, 0),
-    (N'DPSORDE0005', N'OrderConfirmationTimeStamp', N'Order Confirmation Timestamp', 827, N'System', N'Proposed', NULL, N'00', 1, 0, 0, 0, 0, NULL, NULL, N'0001-01-01T00:00:00.0000000', N'yyyy-MM-dd', N'HH:mm:ss', 0, 1, 1, 1, NULL, 0),
-    (N'DPSTIME0006', N'TimeStamp', N'Timestamp', 827, N'System', N'Proposed', NULL, N'00', 1, 0, 0, 0, 0, NULL, NULL, N'0001-01-01T00:00:00.0000000', N'yyyy-MM-dd', N'HH:mm:ss', 0, 1, 1, 1, NULL, 0),
-    (N'BOSAPPR0001', N'Approved', N'Approved', 826, N'System', N'Proposed', NULL, N'00', 1, 0, 1, 0, 1, 1, 0, NULL, NULL, NULL, 0, 0, 1, 1, N'{"sourceEntityObjectTypeId":723,"sourceAttributeId":1111,"sourceDataType":"boolean","usage":"Order Approval","isLookup":false,"allowAddNew":false,"acceptMultipleValues":false,"isVariation":false,"isAdvancedSearch":true}', 1),
-    (N'STSAPPR0024', N'ApprovalNumber', N'Approval Number', 831, N'System', N'Proposed', NULL, N'00', 1, 0, 1, 0, 1, 50, 0, NULL, NULL, NULL, 0, 0, 1, 1, N'{"sourceEntityObjectTypeId":723,"sourceAttributeId":1112,"sourceDataType":"string","usage":"Order Approval","isLookup":false,"allowAddNew":false,"acceptMultipleValues":false,"isVariation":false,"isAdvancedSearch":true}', 1),
-    (N'ICSAPPR0003', N'Approved Amount', N'Approved Amount', 828, N'System', N'Proposed', NULL, N'00', 1, 0, 1, 0, 1, 15, 2, NULL, NULL, NULL, 0, 0, 1, 1, N'{"sourceEntityObjectTypeId":723,"sourceAttributeId":1113,"sourceDataType":"Numeric","usage":"Order Approval","isLookup":false,"allowAddNew":false,"acceptMultipleValues":false,"isVariation":false,"isAdvancedSearch":true}', 1),
-    (N'DPSAPPR0007', N'Approved Date', N'Approved Date', 827, N'System', N'Proposed', NULL, N'00', 1, 0, 1, 0, 1, NULL, 0, NULL, N'yyyy-MM-dd', N'HH:mm:ss', 0, 0, 1, 1, N'{"sourceEntityObjectTypeId":723,"sourceAttributeId":1114,"sourceDataType":"Datetime","usage":"Order Approval","isLookup":false,"allowAddNew":false,"acceptMultipleValues":false,"isVariation":false,"isAdvancedSearch":false}', 1),
-    (N'STSAPPR0025', N'Approval Reason', N'Approval Reason', 831, N'System', N'Proposed', NULL, N'00', 1, 0, 1, 0, 1, 50, 0, NULL, NULL, NULL, 0, 0, 1, 1, N'{"sourceEntityObjectTypeId":723,"sourceAttributeId":1115,"sourceDataType":"string","usage":"Order Approval","isLookup":true,"allowAddNew":true,"acceptMultipleValues":false,"isVariation":false,"isAdvancedSearch":false,"entityObjectTypeCode":"APPROVALR"}', 1);
+    (N'INSID__0001', N'Id', N'AppTransactionHeaders primary key', 829, N'System', N'Proposed', NULL, N'00', 1, 0, 0, 0, NULL, 0, NULL, NULL, NULL, 0, 1, 0, 0, NULL, 0),
+    (N'STSENTE0001', N'EnteredUserByRole', N'Role of user who entered the transaction', 831, N'System', N'Proposed', NULL, N'00', 1, 0, 0, 1, 50, NULL, NULL, NULL, NULL, 0, 0, 1, 1, NULL, 0),
+    (N'STSBUYE0002', N'BuyerCompanySSIN', N'Buyer company SSIN', 831, N'System', N'Proposed', NULL, N'00', 1, 0, 0, 1, 50, NULL, NULL, NULL, NULL, 0, 0, 1, 1, NULL, 0),
+    (N'STSBUYE0003', N'BuyerContactSSIN', N'Buyer Contact SSIN', 831, N'System', N'Proposed', NULL, N'00', 1, 0, 0, 1, 50, NULL, NULL, NULL, NULL, 0, 0, 1, 1, NULL, 0),
+    (N'STSSELL0004', N'SellerCompanySSIN', N'Seller Company SSIN', 831, N'System', N'Proposed', NULL, N'00', 1, 0, 0, 1, 50, NULL, NULL, NULL, NULL, 0, 0, 1, 1, NULL, 0),
+    (N'STSSELL0005', N'SellerContactSSIN', N'Seller Contact SSIN', 831, N'System', N'Proposed', NULL, N'00', 1, 0, 0, 1, 50, NULL, NULL, NULL, NULL, 0, 0, 1, 1, NULL, 0),
+    (N'STSSELL0006', N'SellerContactName', N'Seller Contact Name', 831, N'System', N'Proposed', NULL, N'00', 1, 0, 0, 1, 50, NULL, NULL, NULL, NULL, 0, 0, 1, 1, NULL, 0),
+    (N'STSBUYE0007', N'BuyerContactEMailAddress', N'Buyer Contact Email Address', 831, N'System', N'Proposed', NULL, N'00', 1, 0, 0, 1, 100, NULL, NULL, NULL, NULL, 0, 0, 1, 1, NULL, 0),
+    (N'LDSLANG0001', N'LanguageId', N'Language ID', 830, N'System', N'Proposed', NULL, N'00', 1, 0, 0, 1, NULL, NULL, NULL, NULL, NULL, 0, 0, 0, 0, NULL, 0),
+    (N'STSLANG0008', N'LanguageCode', N'Language Code', 831, N'System', N'Proposed', NULL, N'00', 1, 0, 0, 1, 50, NULL, NULL, NULL, NULL, 0, 0, 1, 1, NULL, 0),
+    (N'LDSCURR0002', N'CurrencyId', N'Currency ID', 830, N'System', N'Proposed', NULL, N'00', 1, 0, 0, 1, NULL, NULL, NULL, NULL, NULL, 0, 0, 0, 0, NULL, 0),
+    (N'STSCURR0009', N'CurrencyCode', N'Currency Code', 831, N'System', N'Proposed', NULL, N'00', 1, 0, 0, 1, 50, NULL, NULL, NULL, NULL, 0, 0, 1, 1, NULL, 0),
+    (N'STSSELL0010', N'SellerContactEMailAddress', N'Seller Contact Email Address', 831, N'System', N'Proposed', NULL, N'00', 1, 0, 0, 1, 100, NULL, NULL, NULL, NULL, 0, 0, 1, 1, NULL, 0),
+    (N'STSBUYE0011', N'BuyerContactPhoneNumber', N'Buyer Contact Phone Number', 831, N'System', N'Proposed', NULL, N'00', 1, 0, 0, 1, 20, NULL, NULL, NULL, NULL, 0, 0, 1, 1, NULL, 0),
+    (N'STSSELL0012', N'SellerContactPhoneNumber', N'Seller Contact Phone Number', 831, N'System', N'Proposed', NULL, N'00', 1, 0, 0, 1, 20, NULL, NULL, NULL, NULL, 0, 0, 1, 1, NULL, 0),
+    (N'STSBUYE0013', N'BuyerCompanyName', N'Buyer Company Name', 831, N'System', N'Proposed', NULL, N'00', 1, 0, 0, 1, 50, NULL, NULL, NULL, NULL, 0, 0, 1, 1, NULL, 0),
+    (N'STSBUYE0014', N'BuyerContactName', N'Buyer Contact Name', 831, N'System', N'Proposed', NULL, N'00', 1, 0, 0, 1, 50, NULL, NULL, NULL, NULL, 0, 0, 1, 1, NULL, 0),
+    (N'STSSELL0015', N'SellerCompanyName', N'Seller Company Name', 831, N'System', N'Proposed', NULL, N'00', 1, 0, 0, 1, 50, NULL, NULL, NULL, NULL, 0, 0, 1, 1, NULL, 0),
+    (N'STSPRIC0016', N'PriceLevel', N'Price Level', 831, N'System', N'Proposed', NULL, N'00', 1, 0, 0, 1, NULL, NULL, NULL, NULL, NULL, 0, 0, 1, 1, NULL, 0),
+    (N'DPSCOMP0001', N'CompleteDate', N'Complete Date', 827, N'System', N'Proposed', NULL, N'00', 1, 0, 0, 0, NULL, NULL, NULL, N'yyyy-MM-dd', NULL, 0, 1, 1, 1, NULL, 0),
+    (N'DPSAVAI0002', N'AvailableDate', N'Available Date', 827, N'System', N'Proposed', NULL, N'00', 1, 0, 0, 0, NULL, NULL, N'0001-01-01T00:00:00.0000000', N'yyyy-MM-dd', NULL, 0, 1, 1, 1, NULL, 0),
+    (N'STSBUYE0017', N'BuyerDepartment', N'Buyer Department', 831, N'System', N'Proposed', NULL, N'00', 1, 0, 0, 1, 50, NULL, NULL, NULL, NULL, 0, 0, 1, 1, NULL, 0),
+    (N'STSPAYM0018', N'PaymentTermsCode', N'Payment Terms Code', 831, N'System', N'Proposed', NULL, N'00', 1, 0, 0, 1, 50, NULL, NULL, NULL, NULL, 0, 0, 1, 1, NULL, 0),
+    (N'LDSPAYM0003', N'PaymentTermsId', N'Payment Terms ID', 830, N'System', N'Proposed', NULL, N'00', 1, 0, 0, 1, NULL, NULL, NULL, NULL, NULL, 0, 0, 0, 0, NULL, 0),
+    (N'STSSHIP0019', N'ShipViaCode', N'Ship Via Code', 831, N'System', N'Proposed', NULL, N'00', 1, 0, 0, 1, 50, NULL, NULL, NULL, NULL, 0, 0, 1, 1, NULL, 0),
+    (N'LDSSHIP0004', N'ShipViaId', N'Ship Via ID', 830, N'System', N'Proposed', NULL, N'00', 1, 0, 0, 1, NULL, NULL, NULL, NULL, NULL, 0, 0, 0, 0, NULL, 0),
+    (N'DPSSTAR0003', N'StartDate', N'Start Date', 827, N'System', N'Proposed', NULL, N'00', 1, 0, 0, 0, NULL, NULL, N'0001-01-01T00:00:00.0000000', N'yyyy-MM-dd', NULL, 0, 1, 1, 1, NULL, 0),
+    (N'ICSCURR0001', N'CurrencyExchangeRate', N'Currency Exchange Rate', 828, N'System', N'Proposed', NULL, N'00', 1, 0, 0, 0, NULL, 2, N'0', NULL, NULL, 0, 1, 1, 1, NULL, 0),
+    (N'STSBUYE0020', N'BuyerStore', N'Buyer Store', 831, N'System', N'Proposed', NULL, N'00', 1, 0, 0, 1, NULL, NULL, NULL, NULL, NULL, 0, 0, 1, 1, NULL, 0),
+    (N'ICSTOTA0002', N'TotalAmount', N'Total Amount', 828, N'System', N'Proposed', NULL, N'00', 1, 0, 0, 0, NULL, 2, N'0', NULL, NULL, 0, 1, 1, 1, NULL, 0),
+    (N'INSTOTA0002', N'TotalQuantity', N'Total Quantity', 829, N'System', N'Proposed', NULL, N'00', 1, 0, 0, 0, NULL, 0, N'0', NULL, NULL, 0, 1, 1, 1, NULL, 0),
+    (N'STSPAYM0021', N'PaymentTermsName', N'Payment Terms Name', 831, N'System', N'Proposed', NULL, N'00', 1, 0, 0, 1, NULL, NULL, NULL, NULL, NULL, 0, 0, 1, 1, NULL, 0),
+    (N'STSSHIP0022', N'ShipViaName', N'Ship Via Name', 831, N'System', N'Proposed', NULL, N'00', 1, 0, 0, 1, NULL, NULL, NULL, NULL, NULL, 0, 0, 1, 1, NULL, 0),
+    (N'STSREFE0023', N'Reference', N'Reference', 831, N'System', N'Proposed', NULL, N'00', 1, 0, 0, 1, 50, NULL, NULL, NULL, NULL, 0, 0, 1, 1, NULL, 0),
+    (N'DPSENTE0004', N'EnteredDate', N'Entered Date', 827, N'System', N'Proposed', NULL, N'00', 1, 0, 0, 0, NULL, NULL, N'0001-01-01T00:00:00.0000000', N'yyyy-MM-dd', NULL, 0, 1, 1, 1, NULL, 0),
+    (N'DPSORDE0005', N'OrderConfirmationTimeStamp', N'Order Confirmation Timestamp', 827, N'System', N'Proposed', NULL, N'00', 1, 0, 0, 0, NULL, NULL, N'0001-01-01T00:00:00.0000000', N'yyyy-MM-dd', N'HH:mm:ss', 0, 1, 1, 1, NULL, 0),
+    (N'DPSTIME0006', N'TimeStamp', N'Timestamp', 827, N'System', N'Proposed', NULL, N'00', 1, 0, 0, 0, NULL, NULL, N'0001-01-01T00:00:00.0000000', N'yyyy-MM-dd', N'HH:mm:ss', 0, 1, 1, 1, NULL, 0),
+    (N'BOSAPPR0001', N'Approved', N'Approved', 826, N'System', N'Proposed', NULL, N'00', 1, 1, 0, 1, 1, 0, NULL, NULL, NULL, 0, 0, 1, 1, N'{"sourceEntityObjectTypeId":723,"sourceAttributeId":1111,"sourceDataType":"boolean","usage":"Order Approval","isLookup":false,"allowAddNew":false,"acceptMultipleValues":false,"isVariation":false,"isAdvancedSearch":true}', 1),
+    (N'STSAPPR0024', N'ApprovalNumber', N'Approval Number', 831, N'System', N'Proposed', NULL, N'00', 1, 1, 0, 1, 50, 0, NULL, NULL, NULL, 0, 0, 1, 1, N'{"sourceEntityObjectTypeId":723,"sourceAttributeId":1112,"sourceDataType":"string","usage":"Order Approval","isLookup":false,"allowAddNew":false,"acceptMultipleValues":false,"isVariation":false,"isAdvancedSearch":true}', 1),
+    (N'ICSAPPR0003', N'Approved Amount', N'Approved Amount', 828, N'System', N'Proposed', NULL, N'00', 1, 1, 0, 1, 15, 2, NULL, NULL, NULL, 0, 0, 1, 1, N'{"sourceEntityObjectTypeId":723,"sourceAttributeId":1113,"sourceDataType":"Numeric","usage":"Order Approval","isLookup":false,"allowAddNew":false,"acceptMultipleValues":false,"isVariation":false,"isAdvancedSearch":true}', 1),
+    (N'DPSAPPR0007', N'Approved Date', N'Approved Date', 827, N'System', N'Proposed', NULL, N'00', 1, 1, 0, 1, NULL, 0, NULL, N'yyyy-MM-dd', N'HH:mm:ss', 0, 0, 1, 1, N'{"sourceEntityObjectTypeId":723,"sourceAttributeId":1114,"sourceDataType":"Datetime","usage":"Order Approval","isLookup":false,"allowAddNew":false,"acceptMultipleValues":false,"isVariation":false,"isAdvancedSearch":false}', 1),
+    (N'STSAPPR0025', N'Approval Reason', N'Approval Reason', 831, N'System', N'Proposed', NULL, N'00', 1, 1, 0, 1, 50, 0, NULL, NULL, NULL, 0, 0, 1, 1, N'{"sourceEntityObjectTypeId":723,"sourceAttributeId":1115,"sourceDataType":"string","usage":"Order Approval","isLookup":true,"allowAddNew":true,"acceptMultipleValues":false,"isVariation":false,"isAdvancedSearch":false,"entityObjectTypeCode":"APPROVALR"}', 1);
 
 IF (SELECT COUNT(*) FROM #SeedFields) <> 42 OR
    (SELECT COUNT(*) FROM #SeedFields WHERE AssignmentKind = 0) <> 37 OR
@@ -261,8 +266,9 @@ JOIN dbo.SycEntityObjectTypes t ON t.ObjectId = @fieldObjectId
     AND t.Code = CASE LEFT(s.FieldCode, 2)
         WHEN N'BO' THEN N'BOOLEAN' ELSE LEFT(s.FieldCode, 2) END;
 IF EXISTS (SELECT 1 FROM #SeedFields s JOIN dbo.AppFields f
-    ON f.SycObjectId = @headerId AND f.FieldName = s.FieldName
-       AND f.TenantId IS NULL AND f.IsDeleted = 0
+    ON f.FieldName = s.FieldName AND f.TenantId IS NULL AND f.IsDeleted = 0
+       AND EXISTS (SELECT 1 FROM dbo.AppTableFields a WHERE a.SourceAppFieldId = f.Id
+                   AND a.SycObjectId = @headerId)
     GROUP BY s.FieldName HAVING COUNT(*) > 1)
     THROW 51069, 'More than one active header definition has the same field name.', 1;
 
@@ -270,16 +276,19 @@ IF EXISTS (SELECT 1 FROM #SeedFields s JOIN dbo.AppFields f
 -- an earlier run. A new field gets the next sequence when its sample code is taken.
 UPDATE s SET FieldCode = f.FieldCode
 FROM #SeedFields s
-JOIN dbo.AppFields f ON f.SycObjectId = @headerId AND f.FieldName = s.FieldName
-    AND f.TenantId IS NULL AND f.IsDeleted = 0;
+JOIN dbo.AppFields f ON f.FieldName = s.FieldName
+    AND f.TenantId IS NULL AND f.IsDeleted = 0
+    AND EXISTS (SELECT 1 FROM dbo.AppTableFields a WHERE a.SourceAppFieldId = f.Id
+                AND a.SycObjectId = @headerId);
 ;WITH Collisions AS
 (
     SELECT s.FieldName, s.FieldTypeId,
         ROW_NUMBER() OVER (PARTITION BY s.FieldTypeId ORDER BY s.FieldName) AS Ordinal
     FROM #SeedFields s
     WHERE NOT EXISTS (SELECT 1 FROM dbo.AppFields own
-        WHERE own.SycObjectId = @headerId AND own.FieldName = s.FieldName
-          AND own.TenantId IS NULL AND own.IsDeleted = 0)
+        WHERE own.FieldName = s.FieldName AND own.TenantId IS NULL AND own.IsDeleted = 0
+          AND EXISTS (SELECT 1 FROM dbo.AppTableFields a WHERE a.SourceAppFieldId = own.Id
+                      AND a.SycObjectId = @headerId))
       AND EXISTS (SELECT 1 FROM dbo.AppFields used
         WHERE used.FieldCode = s.FieldCode AND used.TenantId IS NULL AND used.IsDeleted = 0)
 ), SequenceBase AS
@@ -310,27 +319,31 @@ IF EXISTS (SELECT 1 FROM #SeedFields
     THROW 51068, 'An order approval field has invalid source metadata.', 1;
 IF EXISTS (
     SELECT 1 FROM #SeedFields AS s JOIN dbo.AppFields AS f ON f.TenantId IS NULL AND f.IsDeleted=0 AND f.FieldCode=s.FieldCode
-    WHERE f.FieldName<>s.FieldName OR f.FieldTypeId<>s.FieldTypeId OR f.SycObjectId<>@headerId
+    WHERE f.FieldName<>s.FieldName OR f.FieldTypeId<>s.FieldTypeId
+       OR NOT EXISTS (SELECT 1 FROM dbo.AppTableFields a WHERE a.SourceAppFieldId = f.Id
+                      AND a.SycObjectId = @headerId)
 )
     THROW 51065, 'An existing field code conflicts with the sample.', 1;
 IF EXISTS (
     SELECT 1 FROM #SeedFields AS s JOIN dbo.AppFields AS f ON f.TenantId IS NULL AND f.IsDeleted=0 AND f.FieldName=s.FieldName
-    WHERE f.FieldCode<>s.FieldCode AND f.SycObjectId=@headerId
+    WHERE f.FieldCode<>s.FieldCode AND EXISTS
+          (SELECT 1 FROM dbo.AppTableFields a WHERE a.SourceAppFieldId = f.Id
+           AND a.SycObjectId = @headerId)
 )
     THROW 51066, 'An existing field name has a different code.', 1;
 
 INSERT dbo.AppFields
 (TenantId, SourceFieldId, SycObjectId, EntitySycObjectId, FieldCode, FieldName,
  Description, FieldTypeId, WidgetTypeId, FieldLevelId, FieldStatusId, FieldLevelCode,
- FieldStatusCode, TrackingNo, CurrentRevisionNo, IsStandard, IsCustom, IsExtraField,
+ FieldStatusCode, TrackingNo, CurrentRevisionNo, IsStandard, IsExtraField,
  IsHidden, AllowNull, [Length], Decimals, DefaultValue, DateFormat, TimeFormat,
  AllowMultiSelect, Required, Visible, Editable, SourceAttributeId, SourceDataType,
  SourceEntityObjectTypeId, EntityObjectTypeCode, Usage, IsLookup, IsVariation,
  IsAdvancedSearch, AcceptMultipleValues, AllowAddNew, CreationTime, CreatorUserId,
  LastModificationTime, LastModifierUserId, IsDeleted, DeleterUserId, DeletionTime)
-SELECT NULL, NULL, @headerId, @entityId, s.FieldCode, s.FieldName,
+SELECT NULL, NULL, NULL, NULL, s.FieldCode, s.FieldName,
  s.Description, s.FieldTypeId, NULL, NULL, NULL, s.FieldLevelCode,
- s.FieldStatusCode, s.TrackingNo, s.CurrentRevisionNo, s.IsStandard, s.IsCustom, s.IsExtraField,
+ s.FieldStatusCode, s.TrackingNo, s.CurrentRevisionNo, s.IsStandard, s.IsExtraField,
  s.IsHidden, s.AllowNull, s.[Length], s.Decimals, s.DefaultValue, s.DateFormat, s.TimeFormat,
  s.AllowMultiSelect, s.Required, s.Visible, s.Editable,
  TRY_CONVERT(bigint, JSON_VALUE(s.LegacyMetadataJson, '$.sourceAttributeId')),
@@ -367,7 +380,7 @@ INSERT dbo.AppTableFields
      SycEntityObjectTypeId, SourceAppFieldId, FieldTenantId, SourceFieldId,
      DefinitionSycObjectId, EntitySycObjectId, FieldName, Description,
      FieldTypeId, WidgetTypeId, FieldLevelId, FieldStatusId, FieldLevelCode,
-     FieldStatusCode, TrackingNo, IsStandard, IsCustom, IsExtraField, IsHidden,
+     FieldStatusCode, TrackingNo, IsStandard, IsExtraField, IsHidden,
      AllowNull, [Length], Decimals, DefaultValue, DateFormat, TimeFormat,
      AllowMultiSelect, Required, Visible, Editable, SourceAttributeId,
      SourceDataType, SourceEntityObjectTypeId, EntityObjectTypeCode, Usage,
@@ -380,7 +393,7 @@ SELECT f.TenantId, f.FieldDefinitionKey, f.FieldCode, f.CurrentRevisionNo,
        f.SourceFieldId, f.SycObjectId, f.EntitySycObjectId, f.FieldName,
        f.Description, f.FieldTypeId, f.WidgetTypeId, f.FieldLevelId,
        f.FieldStatusId, f.FieldLevelCode, f.FieldStatusCode, f.TrackingNo,
-       f.IsStandard, f.IsCustom, f.IsExtraField, f.IsHidden, f.AllowNull,
+       f.IsStandard, f.IsExtraField, f.IsHidden, f.AllowNull,
        f.[Length], f.Decimals, f.DefaultValue, f.DateFormat, f.TimeFormat,
        f.AllowMultiSelect, f.Required, f.Visible, f.Editable,
        f.SourceAttributeId, f.SourceDataType, f.SourceEntityObjectTypeId,
@@ -391,7 +404,7 @@ SELECT f.TenantId, f.FieldDefinitionKey, f.FieldCode, f.CurrentRevisionNo,
        SYSUTCDATETIME(), NULL
 FROM #SeedAssignments target
 JOIN dbo.AppFields f ON f.FieldCode = target.FieldCode
-    AND f.TenantId IS NULL AND f.SycObjectId = @headerId AND f.IsDeleted = 0
+    AND f.TenantId IS NULL AND f.SycObjectId IS NULL AND f.IsDeleted = 0
 WHERE NOT EXISTS (SELECT 1 FROM dbo.AppTableFields a
     WHERE a.TenantId IS NULL AND a.FieldDefinitionKey = f.FieldDefinitionKey
       AND a.SycObjectId = @headerId
@@ -413,12 +426,13 @@ SET @historySql = N'INSERT dbo.AppFieldsHistory
 SELECT f.Id, f.CurrentRevisionNo, N''Create'', SYSUTCDATETIME(), ' + @historyValues + N'
 FROM dbo.AppFields f
 JOIN #SeedFields s ON s.FieldCode = f.FieldCode
-WHERE f.SycObjectId = @objectId AND f.TenantId IS NULL AND f.IsDeleted = 0
+WHERE f.SycObjectId IS NULL AND f.TenantId IS NULL AND f.IsDeleted = 0
   AND NOT EXISTS (SELECT 1 FROM dbo.AppFieldsHistory h
       WHERE h.AppFieldId = f.Id AND h.RevisionNo = f.CurrentRevisionNo);';
 EXEC sys.sp_executesql @historySql, N'@objectId bigint', @objectId = @headerId;
 
-SELECT (SELECT COUNT(*) FROM dbo.AppFields WHERE TenantId IS NULL AND IsDeleted=0 AND SycObjectId=@headerId) AS HeaderFieldDefinitions,
+SELECT (SELECT COUNT(*) FROM dbo.AppFields f JOIN #SeedFields s ON s.FieldCode=f.FieldCode
+        WHERE f.TenantId IS NULL AND f.IsDeleted=0) AS HeaderFieldDefinitions,
        (SELECT COUNT(*) FROM dbo.AppTableFields WHERE TenantId IS NULL AND SycObjectId=@headerId AND SycEntityObjectTypeId IS NULL) AS SharedHeaderAssignments,
        (SELECT COUNT(*) FROM dbo.AppTableFields WHERE TenantId IS NULL AND SycObjectId=@headerId AND SycEntityObjectTypeId=@salesId) AS SalesSpecificAssignments;
 DROP TABLE #SeedAssignments;

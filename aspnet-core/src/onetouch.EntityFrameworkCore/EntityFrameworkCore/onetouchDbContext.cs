@@ -264,10 +264,12 @@ namespace onetouch.EntityFrameworkCore
             {
                 field.HasMany(x => x.DropdownOptions).WithOne().HasForeignKey(x => x.AppFieldId)
                     .OnDelete(DeleteBehavior.Cascade);
+                field.HasMany(x => x.SettingValues).WithOne().HasForeignKey(x => x.AppFieldId)
+                    .OnDelete(DeleteBehavior.Cascade);
                 field.Property(x => x.FieldDefinitionKey).HasDefaultValueSql("newid()");
                 field.HasOne<SydObject>().WithMany().HasForeignKey(x => x.SycObjectId)
                     .OnDelete(DeleteBehavior.Restrict);
-                field.HasOne<SydObject>().WithMany().HasForeignKey(x => x.EntitySycObjectId)
+                field.HasOne<SycEntityObjectType>().WithMany().HasForeignKey(x => x.EntitySycObjectId)
                     .OnDelete(DeleteBehavior.Restrict);
                 field.HasOne<SycEntityObjectType>().WithMany().HasForeignKey(x => x.FieldTypeId)
                     .OnDelete(DeleteBehavior.Restrict);
@@ -289,6 +291,8 @@ namespace onetouch.EntityFrameworkCore
             {
                 history.HasMany(x => x.DropdownOptions).WithOne().HasForeignKey(x => x.AppFieldHistoryId)
                     .OnDelete(DeleteBehavior.Cascade);
+                history.HasMany(x => x.SettingValues).WithOne().HasForeignKey(x => x.AppFieldHistoryId)
+                    .OnDelete(DeleteBehavior.Cascade);
                 history.HasOne<AppField>().WithMany().HasForeignKey(x => x.AppFieldId)
                     .OnDelete(DeleteBehavior.Restrict);
                 history.HasIndex(x => new { x.AppFieldId, x.RevisionNo }).IsUnique();
@@ -297,6 +301,8 @@ namespace onetouch.EntityFrameworkCore
             modelBuilder.Entity<AppTableField>(assignment =>
             {
                 assignment.HasMany(x => x.DropdownOptions).WithOne().HasForeignKey(x => x.AppTableFieldId)
+                    .OnDelete(DeleteBehavior.Cascade);
+                assignment.HasMany(x => x.SettingValues).WithOne().HasForeignKey(x => x.AppTableFieldId)
                     .OnDelete(DeleteBehavior.Cascade);
                 assignment.HasOne<SydObject>().WithMany().HasForeignKey(x => x.SycObjectId)
                     .OnDelete(DeleteBehavior.Restrict);
@@ -310,6 +316,35 @@ namespace onetouch.EntityFrameworkCore
             modelBuilder.Entity<AppFieldDropdownOption>().HasIndex(x => new { x.AppFieldId, x.SortOrder }).IsUnique();
             modelBuilder.Entity<AppFieldHistoryDropdownOption>().HasIndex(x => new { x.AppFieldHistoryId, x.SortOrder }).IsUnique();
             modelBuilder.Entity<AppTableFieldDropdownOption>().HasIndex(x => new { x.AppTableFieldId, x.SortOrder }).IsUnique();
+            modelBuilder.Entity<AppFieldsOption>(option =>
+            {
+                option.Property(x => x.IsActive).HasDefaultValue(true);
+                option.HasOne<AppField>().WithMany().HasForeignKey(x => x.SettingFieldId)
+                    .OnDelete(DeleteBehavior.Restrict);
+                option.HasIndex(x => new { x.SettingFieldId, x.Code }).IsUnique();
+            });
+            modelBuilder.Entity<AppFieldSettingValue>(value =>
+            {
+                value.ToTable(table => table.HasCheckConstraint("CK_AppFieldSettingValues_OneValue",
+                    "(CASE WHEN [AppFieldsOptionId] IS NULL THEN 0 ELSE 1 END) + " +
+                    "(CASE WHEN [ValueText] IS NULL THEN 0 ELSE 1 END) + " +
+                    "(CASE WHEN [ValueNumber] IS NULL THEN 0 ELSE 1 END) + " +
+                    "(CASE WHEN [ValueBoolean] IS NULL THEN 0 ELSE 1 END) + " +
+                    "(CASE WHEN [ValueDateTime] IS NULL THEN 0 ELSE 1 END) = 1"));
+                value.HasOne<AppField>().WithMany().HasForeignKey(x => x.SettingFieldId)
+                    .OnDelete(DeleteBehavior.Restrict);
+                value.HasOne<AppFieldsOption>().WithMany()
+                    .HasForeignKey(x => new { x.SettingFieldId, x.AppFieldsOptionId })
+                    .HasPrincipalKey(x => new { x.SettingFieldId, x.Id })
+                    .HasConstraintName("FK_AppFieldSettingValues_SettingOption")
+                    .OnDelete(DeleteBehavior.Restrict);
+                value.HasIndex(x => new { x.AppFieldId, x.SettingFieldId })
+                    .IsUnique().HasFilter("[AppFieldsOptionId] IS NULL");
+                value.HasIndex(x => new { x.AppFieldId, x.SettingFieldId, x.AppFieldsOptionId })
+                    .IsUnique().HasFilter("[AppFieldsOptionId] IS NOT NULL");
+            });
+            modelBuilder.Entity<AppFieldHistorySettingValue>().HasIndex(x => x.AppFieldHistoryId);
+            modelBuilder.Entity<AppTableFieldSettingValue>().HasIndex(x => x.AppTableFieldId);
             modelBuilder.Entity<SydObject>(entity =>
             {
                 entity.HasOne(x => x.BaseEntityFk).WithMany()

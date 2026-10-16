@@ -20,6 +20,7 @@ BEGIN TRY
         THROW 51201, 'Apply the current typed Field Manager migrations first.', 1;
 
     DECLARE @transactionId bigint;
+    DECLARE @transactionEntityTypeId bigint;
     DECLARE @appEntityId bigint;
     DECLARE @detailId bigint;
     DECLARE @fieldObjectId bigint;
@@ -35,6 +36,11 @@ BEGIN TRY
         THROW 51202, 'Seed Transaction and AppEntity objects first.', 1;
     SELECT @transactionId = Id FROM dbo.SydObjects
         WHERE Code = N'TRANSACTION' AND ObjectTypeCode = N'ENTITY' AND IsDeleted = 0;
+    SELECT @transactionEntityTypeId = Id FROM dbo.SycEntityObjectTypes
+        WHERE ObjectId = @transactionId AND Code = N'TRANSACTION'
+          AND ParentId IS NULL AND IsDeleted = 0;
+    IF @transactionEntityTypeId IS NULL
+        THROW 51217, 'Apply the entity object type migration before seeding detail fields.', 1;
     SELECT @appEntityId = Id FROM dbo.SydObjects
         WHERE Code = N'APPENTITY-DATA' AND ObjectTypeCode = N'DATA' AND IsDeleted = 0;
     SELECT @dataTypeId = Id FROM dbo.SysObjectTypes
@@ -155,19 +161,26 @@ BEGIN TRY
        AND t.Code = s.TypeCode AND t.IsDeleted = 0;
 
     IF EXISTS (SELECT 1 FROM #SeedFields s JOIN dbo.AppFields f
-        ON f.SycObjectId = @detailId AND f.FieldName = s.FieldName
-       AND f.TenantId IS NULL AND f.IsDeleted = 0
+        ON f.FieldName = s.FieldName AND f.TenantId IS NULL AND f.IsDeleted = 0
+       AND (f.Description = N'AppTransactionDetails.' + s.FieldName OR EXISTS
+           (SELECT 1 FROM dbo.AppTableFields a WHERE a.SourceAppFieldId = f.Id
+            AND a.SycObjectId = @detailId AND a.SycEntityObjectTypeId IS NULL))
         GROUP BY s.FieldName HAVING COUNT(*) > 1)
         THROW 51213, 'Duplicate active detail field definitions exist.', 1;
     IF EXISTS (SELECT 1 FROM #SeedFields s JOIN dbo.AppFields f
-        ON f.SycObjectId = @detailId AND f.FieldName = s.FieldName
-       AND f.TenantId IS NULL AND f.IsDeleted = 0
-        WHERE f.FieldTypeId <> s.FieldTypeId)
+        ON f.FieldName = s.FieldName AND f.TenantId IS NULL AND f.IsDeleted = 0
+       AND (f.Description = N'AppTransactionDetails.' + s.FieldName OR EXISTS
+           (SELECT 1 FROM dbo.AppTableFields a WHERE a.SourceAppFieldId = f.Id
+            AND a.SycObjectId = @detailId AND a.SycEntityObjectTypeId IS NULL))
+        WHERE f.FieldTypeId <> s.FieldTypeId OR f.SycObjectId IS NOT NULL
+           OR f.EntitySycObjectId IS NOT NULL)
         THROW 51214, 'An existing detail field has a different type.', 1;
     UPDATE s SET FieldCode = f.FieldCode
     FROM #SeedFields s JOIN dbo.AppFields f
-        ON f.SycObjectId = @detailId AND f.FieldName = s.FieldName
-       AND f.TenantId IS NULL AND f.IsDeleted = 0;
+        ON f.FieldName = s.FieldName AND f.TenantId IS NULL AND f.IsDeleted = 0
+       AND (f.Description = N'AppTransactionDetails.' + s.FieldName OR EXISTS
+           (SELECT 1 FROM dbo.AppTableFields a WHERE a.SourceAppFieldId = f.Id
+            AND a.SycObjectId = @detailId AND a.SycEntityObjectTypeId IS NULL));
 
     -- New codes follow the 2-char type + S + 4-char name + 4-digit sequence
     -- convention, with one sequence per Field type across all definitions.
@@ -198,31 +211,36 @@ BEGIN TRY
         OR EXISTS (SELECT FieldCode FROM #SeedFields GROUP BY FieldCode HAVING COUNT(*) > 1)
         OR EXISTS (SELECT 1 FROM #SeedFields s JOIN dbo.AppFields f
             ON f.FieldCode = s.FieldCode AND f.TenantId IS NULL
-           AND (f.SycObjectId <> @detailId OR f.FieldName <> s.FieldName))
+           AND (f.FieldName <> s.FieldName OR NOT
+               (f.Description = N'AppTransactionDetails.' + s.FieldName OR EXISTS
+                   (SELECT 1 FROM dbo.AppTableFields a WHERE a.SourceAppFieldId = f.Id
+                    AND a.SycObjectId = @detailId AND a.SycEntityObjectTypeId IS NULL))))
         THROW 51215, 'Could not allocate unique detail field codes.', 1;
 
     INSERT dbo.AppFields
         (TenantId, SourceFieldId, SycObjectId, EntitySycObjectId, FieldCode,
          FieldName, Description, FieldTypeId, WidgetTypeId, FieldLevelId,
          FieldStatusId, FieldLevelCode, FieldStatusCode, TrackingNo,
-         CurrentRevisionNo, IsStandard, IsCustom, IsExtraField, IsHidden,
+         CurrentRevisionNo, IsStandard, IsExtraField, IsHidden,
          AllowNull, [Length], Decimals, DefaultValue, DateFormat, TimeFormat,
          AllowMultiSelect, Required, Visible, Editable, SourceAttributeId,
          SourceDataType, SourceEntityObjectTypeId, EntityObjectTypeCode,
          Usage, IsLookup, IsVariation, IsAdvancedSearch, AcceptMultipleValues,
          AllowAddNew, CreationTime, CreatorUserId, LastModificationTime,
          LastModifierUserId, IsDeleted, DeleterUserId, DeletionTime)
-    SELECT NULL, NULL, @detailId, @transactionId, s.FieldCode,
+    SELECT NULL, NULL, NULL, NULL, s.FieldCode,
         s.FieldName, N'AppTransactionDetails.' + s.FieldName, s.FieldTypeId,
         NULL, NULL, NULL, N'System', N'Proposed', NULL, N'00',
-        1, 0, 0, 0, s.AllowNull, s.[Length], s.Decimals, NULL, NULL, NULL,
+        1, 0, 0, s.AllowNull, s.[Length], s.Decimals, NULL, NULL, NULL,
         0, s.Required, s.Visible, s.Editable, NULL, NULL, NULL, NULL,
         NULL, NULL, NULL, NULL, NULL, NULL, SYSUTCDATETIME(), NULL,
         NULL, NULL, 0, NULL, NULL
     FROM #SeedFields s
     WHERE NOT EXISTS (SELECT 1 FROM dbo.AppFields f
-        WHERE f.SycObjectId = @detailId AND f.FieldName = s.FieldName
-          AND f.TenantId IS NULL AND f.IsDeleted = 0);
+        WHERE f.FieldName = s.FieldName AND f.TenantId IS NULL AND f.IsDeleted = 0
+          AND (f.Description = N'AppTransactionDetails.' + s.FieldName OR EXISTS
+              (SELECT 1 FROM dbo.AppTableFields a WHERE a.SourceAppFieldId = f.Id
+               AND a.SycObjectId = @detailId AND a.SycEntityObjectTypeId IS NULL)));
 
     -- Shared detail fields are visible for Sales Order Detail through GetFields.
     -- No sales-only detail properties are defined by AppTransactionDetails.
@@ -231,7 +249,7 @@ BEGIN TRY
          SycEntityObjectTypeId, SourceAppFieldId, FieldTenantId, SourceFieldId,
          DefinitionSycObjectId, EntitySycObjectId, FieldName, Description,
          FieldTypeId, WidgetTypeId, FieldLevelId, FieldStatusId, FieldLevelCode,
-         FieldStatusCode, TrackingNo, IsStandard, IsCustom, IsExtraField, IsHidden,
+         FieldStatusCode, TrackingNo, IsStandard, IsExtraField, IsHidden,
          AllowNull, [Length], Decimals, DefaultValue, DateFormat, TimeFormat,
          AllowMultiSelect, Required, Visible, Editable, SourceAttributeId,
          SourceDataType, SourceEntityObjectTypeId, EntityObjectTypeCode, Usage,
@@ -243,8 +261,7 @@ BEGIN TRY
         @detailId, NULL, f.Id, f.TenantId, f.SourceFieldId, f.SycObjectId,
         f.EntitySycObjectId, f.FieldName, f.Description, f.FieldTypeId,
         f.WidgetTypeId, f.FieldLevelId, f.FieldStatusId, f.FieldLevelCode,
-        f.FieldStatusCode, f.TrackingNo, f.IsStandard, f.IsCustom,
-        f.IsExtraField, f.IsHidden, f.AllowNull, f.[Length], f.Decimals,
+        f.FieldStatusCode, f.TrackingNo, f.IsStandard, f.IsExtraField, f.IsHidden, f.AllowNull, f.[Length], f.Decimals,
         f.DefaultValue, f.DateFormat, f.TimeFormat, f.AllowMultiSelect,
         f.Required, f.Visible, f.Editable, f.SourceAttributeId,
         f.SourceDataType, f.SourceEntityObjectTypeId, f.EntityObjectTypeCode,
@@ -253,8 +270,10 @@ BEGIN TRY
         f.CreatorUserId, f.LastModificationTime, f.LastModifierUserId,
         f.IsDeleted, f.DeleterUserId, f.DeletionTime, SYSUTCDATETIME(), NULL
     FROM #SeedFields s JOIN dbo.AppFields f
-        ON f.FieldName = s.FieldName AND f.SycObjectId = @detailId
-       AND f.TenantId IS NULL AND f.IsDeleted = 0
+        ON f.FieldName = s.FieldName AND f.TenantId IS NULL AND f.IsDeleted = 0
+       AND (f.Description = N'AppTransactionDetails.' + s.FieldName OR EXISTS
+           (SELECT 1 FROM dbo.AppTableFields existing WHERE existing.SourceAppFieldId = f.Id
+            AND existing.SycObjectId = @detailId AND existing.SycEntityObjectTypeId IS NULL))
     WHERE NOT EXISTS (SELECT 1 FROM dbo.AppTableFields a
         WHERE a.TenantId IS NULL AND a.FieldDefinitionKey = f.FieldDefinitionKey
           AND a.SycObjectId = @detailId AND a.SycEntityObjectTypeId IS NULL);
@@ -275,7 +294,10 @@ BEGIN TRY
     SELECT f.Id, f.CurrentRevisionNo, N''Create'', SYSUTCDATETIME(), '
         + @historyValues + N'
     FROM dbo.AppFields f JOIN #SeedFields s ON s.FieldName = f.FieldName
-    WHERE f.SycObjectId = @objectId AND f.TenantId IS NULL AND f.IsDeleted = 0
+    WHERE f.TenantId IS NULL AND f.IsDeleted = 0
+      AND (f.Description = N''AppTransactionDetails.'' + s.FieldName OR EXISTS
+          (SELECT 1 FROM dbo.AppTableFields a WHERE a.SourceAppFieldId = f.Id
+           AND a.SycObjectId = @objectId AND a.SycEntityObjectTypeId IS NULL))
       AND NOT EXISTS (SELECT 1 FROM dbo.AppFieldsHistory h
           WHERE h.AppFieldId = f.Id AND h.RevisionNo = f.CurrentRevisionNo);';
     EXEC sys.sp_executesql @historySql, N'@objectId bigint', @objectId = @detailId;
@@ -285,7 +307,7 @@ BEGIN TRY
          WHERE Code = N'SALESORDERDETAIL' AND ObjectId = @detailId AND IsDeleted = 0)
             AS SalesOrderDetailTypeId,
         (SELECT COUNT(*) FROM dbo.AppFields
-         WHERE SycObjectId = @detailId AND TenantId IS NULL AND IsDeleted = 0)
+         WHERE Description LIKE N'AppTransactionDetails.%' AND TenantId IS NULL AND IsDeleted = 0)
             AS DetailDefinitions,
         (SELECT COUNT(*) FROM dbo.AppTableFields
          WHERE SycObjectId = @detailId AND TenantId IS NULL

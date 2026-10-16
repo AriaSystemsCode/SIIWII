@@ -49,5 +49,11 @@
     <EmbeddedResource Include="Migrations\20261002_SeedTransactionHeaderFields.sql" LogicalName="onetouch.Migrations.Seed.20261002_SeedTransactionHeaderFields.sql" />
     <EmbeddedResource Include="Migrations\20261013_SeedTransactionDetailFields.sql" LogicalName="onetouch.Migrations.Seed.20261013_SeedTransactionDetailFields.sql" />
     <EmbeddedResource Include="Migrations\20261014_SeedStringTextboxSettings.sql" LogicalName="onetouch.Migrations.Seed.20261014_SeedStringTextboxSettings.sql" />
+    <EmbeddedResource Include="Migrations\20261016_SeedDatePickerSettings.sql" LogicalName="onetouch.Migrations.Seed.20261016_SeedDatePickerSettings.sql" />
+    <EmbeddedResource Include="Migrations\20261016_SetDatePickerExtraAttributes.sql" LogicalName="onetouch.Migrations.Seed.20261016_SetDatePickerExtraAttributes.sql" />
+    <EmbeddedResource Include="Migrations\20261016_SeedRemainingFieldTypeSettings.sql" LogicalName="onetouch.Migrations.Seed.20261016_SeedRemainingFieldTypeSettings.sql" />
+    <EmbeddedResource Include="Migrations\20261016_RemapFieldEntityObjectTypes.sql" LogicalName="onetouch.Migrations.Seed.20261016_RemapFieldEntityObjectTypes.sql" />
+    <EmbeddedResource Include="Migrations\20261016_DynamicFieldSettings.sql" LogicalName="onetouch.Migrations.Seed.20261016_DynamicFieldSettings.sql" />
+    <EmbeddedResource Include="Migrations\20261016_SeedDateFormatOptions.sql" LogicalName="onetouch.Migrations.Seed.20261016_SeedDateFormatOptions.sql" />
   </ItemGroup>
 </Project>

@@ -159,10 +159,10 @@ public static class Program
 
 public static class SeedRelease
 {
-    // Increment only when the cumulative seed snapshot changes. Version 3 adds
-    // the String--Textbox Field Manager setting definitions and assignments.
+    // Increment only when the cumulative seed snapshot changes. Version 10
+    // adds Date picker format choices to the Field Manager settings.
     // This is not an EF schema version.
-    public const int RequiredVersion = 3;
+    public const int RequiredVersion = 10;
 }
 
 public sealed record Target(string Label, string ConnectionString, string Identity)

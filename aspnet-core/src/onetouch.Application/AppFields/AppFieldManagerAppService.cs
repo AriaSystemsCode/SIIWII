@@ -19,7 +19,7 @@ using onetouch.SystemObjects;
 
 namespace onetouch.AppFields
 {
-    public class AppFieldManagerAppService : onetouchAppServiceBase, IAppFieldManagerAppService
+    public partial class AppFieldManagerAppService : onetouchAppServiceBase, IAppFieldManagerAppService
     {
         private readonly IRepository<AppField, long> _fields;
         private readonly IRepository<AppFieldHistory, long> _history;
@@ -79,6 +79,14 @@ namespace onetouch.AppFields
             var types = await typeQuery
                 .Select(x => new { x.Id, x.ParentId, x.ObjectId, x.Code, x.Name })
                 .AsNoTracking().ToListAsync();
+
+            // These roots identify the entity behind existing field definitions;
+            // the entity object itself already occupies their place in the tree.
+            var syntheticEntityIds = objects.Where(x => x.ObjectTypeCode == "ENTITY" &&
+                    (x.Code == "TRANSACTION" || x.Code == "BASEENTITY"))
+                .Select(x => x.Id).ToHashSet();
+            types.RemoveAll(x => x.ParentId == null && syntheticEntityIds.Contains(x.ObjectId) &&
+                (x.Code == "TRANSACTION" || x.Code == "BASEENTITY"));
 
             // Older metadata has both generic order types and header-specific aliases.
             // The generic codes are the IDs used by transaction records and the field manager.
@@ -323,7 +331,7 @@ namespace onetouch.AppFields
                     TrackingNo = x.TrackingNo,
                     StandardOrCustom = x.IsStandard ? "Standard" : "Custom",
                     IsStandard = x.IsStandard,
-                    IsCustom = x.IsCustom,
+                    IsCustom = !x.IsStandard,
                     IsExtraField = x.IsExtraField,
                     IsHidden = x.IsHidden,
                     CanEdit = canEdit && archived.TryGetValue(x.FieldDefinitionKey, out var editableArchived) && !editableArchived,
@@ -435,7 +443,7 @@ namespace onetouch.AppFields
                 if ((await GetSuppressedHostKeys(tenantId)).Contains(input.FieldDefinitionKey))
                     throw new UserFriendlyException("Field was not found.");
                 var objectIds = await GetEffectiveObjectIds(input.SycObjectId);
-                var rows = await _tableFields.GetAll().Include(x => x.DropdownOptions).Where(x =>
+                var rows = await _tableFields.GetAll().Include(x => x.DropdownOptions).Include(x => x.SettingValues).Where(x =>
                     x.FieldDefinitionKey == input.FieldDefinitionKey && objectIds.Contains(x.SycObjectId) &&
                     (x.TenantId == null || x.TenantId == tenantId) &&
                     (x.SycEntityObjectTypeId == null ||
@@ -451,16 +459,12 @@ namespace onetouch.AppFields
         public async Task<FieldActionResultDto> AssignExistingField(AssignExistingFieldInput input)
         {
             if (input == null) throw new UserFriendlyException("Field assignment is required.");
-            if (!await _objects.GetAll().AnyAsync(x => x.Id == input.SycObjectId && !x.IsDeleted))
-                throw new UserFriendlyException("Select a valid object.");
-            if (input.SycEntityObjectTypeId.HasValue && !await _objectTypes.GetAll().AnyAsync(x =>
-                    x.Id == input.SycEntityObjectTypeId.Value && x.ObjectId == input.SycObjectId && !x.IsDeleted))
-                throw new UserFriendlyException("The selected object type does not belong to this object.");
+            await ValidateFieldAssignmentTarget(input.SycObjectId, input.SycEntityObjectTypeId);
 
             using (UnitOfWorkManager.Current.DisableFilter(AbpDataFilters.MayHaveTenant))
             {
-                var field = await VisibleFields().Include(x => x.DropdownOptions).FirstOrDefaultAsync(x => x.Id == input.AppFieldId &&
-                    !x.IsHidden && x.FieldStatusCode != "Discontinued");
+                var field = await VisibleFields().Include(x => x.DropdownOptions).Include(x => x.SettingValues).FirstOrDefaultAsync(x => x.Id == input.AppFieldId &&
+                    x.SycObjectId == null && !x.IsHidden && x.FieldStatusCode != "Discontinued");
                 if (field == null) throw new UserFriendlyException("Field was not found.");
                 var objectIds = await GetEffectiveObjectIds(input.SycObjectId);
                 var exists = await _tableFields.GetAll().AnyAsync(x => x.FieldDefinitionKey == field.FieldDefinitionKey &&
@@ -485,7 +489,7 @@ namespace onetouch.AppFields
                 var objectIds = await GetEffectiveObjectIds(input.TableId);
                 var linkedKeys = EffectiveTableAssignments(input.TableId, input.SycEntityObjectTypeId, objectIds)
                     .Select(x => x.FieldDefinitionKey);
-                var query = VisibleFields().Where(x => !x.IsHidden &&
+                var query = VisibleFields().Where(x => x.SycObjectId == null && !x.IsHidden &&
                     x.FieldStatusCode != "Discontinued" && !linkedKeys.Contains(x.FieldDefinitionKey));
                 if (!string.IsNullOrWhiteSpace(input.SearchText))
                 {
@@ -494,7 +498,7 @@ namespace onetouch.AppFields
                         (x.Description != null && x.Description.Contains(search)));
                 }
                 var count = await query.CountAsync();
-                var page = await SortFields(query.Include(x => x.DropdownOptions), input.Sorting).Skip(input.SkipCount)
+                var page = await SortFields(query.Include(x => x.DropdownOptions).Include(x => x.SettingValues), input.Sorting).Skip(input.SkipCount)
                     .Take(input.MaxResultCount).AsNoTracking().ToListAsync();
                 return new PagedResultDto<AppFieldDto>(count, page.Select(ToDto).ToList());
             }
@@ -511,7 +515,8 @@ namespace onetouch.AppFields
             var ids = input.AppFieldIds.Distinct().ToList();
             using (UnitOfWorkManager.Current.DisableFilter(AbpDataFilters.MayHaveTenant))
             {
-                var fields = await VisibleFields().Include(x => x.DropdownOptions).Where(x => ids.Contains(x.Id) && !x.IsHidden &&
+                var fields = await VisibleFields().Include(x => x.DropdownOptions).Include(x => x.SettingValues).Where(x => ids.Contains(x.Id) &&
+                    x.SycObjectId == null && !x.IsHidden &&
                     x.FieldStatusCode != "Discontinued").AsNoTracking().ToListAsync();
                 if (fields.Count != ids.Count)
                     throw new UserFriendlyException("One or more selected fields are unavailable.");
@@ -540,14 +545,14 @@ namespace onetouch.AppFields
         private async Task ValidateFieldAssignmentTarget(long tableId, long? objectTypeId)
         {
             if (tableId <= 0 || !await _objects.GetAll().AnyAsync(x => x.Id == tableId &&
-                !x.IsDeleted && x.ObjectTypeCode == "DATA"))
-                throw new UserFriendlyException("Select a valid data table.");
+                !x.IsDeleted && (x.ObjectTypeCode == "DATA" || x.ObjectTypeCode == "ENTITY")))
+                throw new UserFriendlyException("Select a valid data table or entity.");
             var tenantId = AbpSession.TenantId;
             if (objectTypeId.HasValue && (objectTypeId.Value <= 0 ||
                 !await _objectTypes.GetAll().AnyAsync(x => x.Id == objectTypeId.Value &&
                     x.ObjectId == tableId && !x.IsDeleted &&
                     (x.TenantId == null || x.TenantId == tenantId))))
-                throw new UserFriendlyException("The selected object type does not belong to this table.");
+                throw new UserFriendlyException("The selected object type does not belong to this table or entity.");
         }
 
         private IQueryable<AppTableField> EffectiveTableAssignments(long tableId, long? objectTypeId,
@@ -566,7 +571,7 @@ namespace onetouch.AppFields
             using (UnitOfWorkManager.Current.DisableFilter(AbpDataFilters.MayHaveTenant))
             using (UnitOfWorkManager.Current.DisableFilter(AbpDataFilters.SoftDelete))
             {
-                var field = await VisibleFields().Include(x => x.DropdownOptions).FirstOrDefaultAsync(x => x.Id == id);
+                var field = await VisibleFields().Include(x => x.DropdownOptions).Include(x => x.SettingValues).FirstOrDefaultAsync(x => x.Id == id);
                 if (field == null || (field.IsDeleted && !await _tableFields.GetAll().AnyAsync(x =>
                     x.FieldDefinitionKey == field.FieldDefinitionKey &&
                     (x.TenantId == null || x.TenantId == AbpSession.TenantId))))
@@ -594,7 +599,7 @@ namespace onetouch.AppFields
             var field = (await GetFieldForEdit(appFieldId)).Field;
             using (UnitOfWorkManager.Current.DisableFilter(AbpDataFilters.MayHaveTenant))
             {
-                var revisions = await _history.GetAll().Include(x => x.DropdownOptions)
+                var revisions = await _history.GetAll().Include(x => x.DropdownOptions).Include(x => x.SettingValues)
                     .Where(x => x.AppFieldId == appFieldId && x.TenantId == field.TenantId)
                     .OrderByDescending(x => x.ChangedAt)
                     .ThenByDescending(x => x.Id)
@@ -635,7 +640,7 @@ namespace onetouch.AppFields
 
             using (UnitOfWorkManager.Current.DisableFilter(AbpDataFilters.MayHaveTenant))
             {
-                var field = await VisibleFields().Include(x => x.DropdownOptions)
+                var field = await VisibleFields().Include(x => x.DropdownOptions).Include(x => x.SettingValues)
                     .SingleOrDefaultAsync(x => x.Id == input.AppFieldId && !x.IsDeleted && !x.IsHidden);
                 if (field == null) throw new UserFriendlyException("Field was not found.");
                 if (field.TenantId != AbpSession.TenantId)
@@ -643,7 +648,7 @@ namespace onetouch.AppFields
                 if (field.CurrentRevisionNo != input.ExpectedCurrentRevisionNo)
                     throw new UserFriendlyException("The field changed. Refresh its history before restoring.");
 
-                var revision = await _history.GetAll().Include(x => x.DropdownOptions)
+                var revision = await _history.GetAll().Include(x => x.DropdownOptions).Include(x => x.SettingValues)
                     .SingleOrDefaultAsync(x => x.Id == input.HistoryId && x.AppFieldId == field.Id &&
                         x.TenantId == field.TenantId && x.FieldDefinitionKey == field.FieldDefinitionKey);
                 if (revision == null) throw new UserFriendlyException("Field revision was not found.");
@@ -654,6 +659,14 @@ namespace onetouch.AppFields
                 ApplyHistoryRevision(revision, field);
                 field.CurrentRevisionNo = NextRevision(field.CurrentRevisionNo);
                 await _fields.UpdateAsync(field);
+                try
+                {
+                    await CurrentUnitOfWork.SaveChangesAsync();
+                }
+                catch (DbUpdateConcurrencyException)
+                {
+                    throw new UserFriendlyException("The field changed while you were restoring it. Refresh its history before saving.");
+                }
                 await RecordHistory(field, "Restore", revision.RevisionNo);
                 return await ToDtoForResponse(field);
             }
@@ -674,10 +687,12 @@ namespace onetouch.AppFields
                 }
 
                 await RequirePermission(AppPermissions.Pages_Administration_FieldManager_Edit);
-                var field = await VisibleFields().Include(x => x.DropdownOptions).FirstOrDefaultAsync(x => x.Id == input.Id.Value);
+                var field = await VisibleFields().Include(x => x.DropdownOptions).Include(x => x.SettingValues).FirstOrDefaultAsync(x => x.Id == input.Id.Value);
                 if (field == null) throw new UserFriendlyException("Field was not found.");
-                if (input.SycObjectId != field.SycObjectId)
-                    throw new UserFriendlyException("The field's source object cannot be changed. Assign it to another table instead.");
+                if (string.IsNullOrWhiteSpace(input.ExpectedCurrentRevisionNo))
+                    throw new UserFriendlyException("The current revision is required. Refresh the field before editing.");
+                if (field.CurrentRevisionNo != input.ExpectedCurrentRevisionNo)
+                    throw new UserFriendlyException("The field changed. Refresh it before saving.");
                 if (AbpSession.TenantId.HasValue && field.TenantId == null)
                 {
                     var copy = await CreateField(input, field.Id);
@@ -686,21 +701,34 @@ namespace onetouch.AppFields
 
                 if (!string.IsNullOrWhiteSpace(input.FieldCode) && input.FieldCode.Trim() != field.FieldCode)
                     throw new UserFriendlyException("Field code cannot be changed after creation.");
+                if (input.FieldTypeId != field.FieldTypeId && input.SettingValues == null)
+                    throw new UserFriendlyException("Provide the settings for the new field type.");
                 await ArchiveCurrentRevision(field);
                 Apply(input, field);
+                await ApplySettingValues(input, field);
                 field.CurrentRevisionNo = NextRevision(field.CurrentRevisionNo);
                 await _fields.UpdateAsync(field);
+                try
+                {
+                    await CurrentUnitOfWork.SaveChangesAsync();
+                }
+                catch (DbUpdateConcurrencyException)
+                {
+                    throw new UserFriendlyException("The field changed while you were editing. Refresh it before saving.");
+                }
+                await RecordHistory(field, "Edit");
                 return await ToDtoForResponse(field);
             }
         }
 
         [AbpAuthorize(AppPermissions.Pages_Administration_FieldManager)]
+        [UnitOfWork(IsolationLevel.Serializable)]
         public async Task<FieldActionResultDto> DeleteField(EntityDto<long> input)
         {
             await RequirePermission(AppPermissions.Pages_Administration_FieldManager_Delete);
             using (UnitOfWorkManager.Current.DisableFilter(AbpDataFilters.MayHaveTenant))
             {
-                var field = await VisibleFields().Include(x => x.DropdownOptions).FirstOrDefaultAsync(x => x.Id == input.Id);
+                var field = await VisibleFields().Include(x => x.DropdownOptions).Include(x => x.SettingValues).FirstOrDefaultAsync(x => x.Id == input.Id);
                 if (field == null) throw new UserFriendlyException("Field was not found.");
                 if (field.TenantId != AbpSession.TenantId)
                     throw new UserFriendlyException("A tenant cannot delete a host field.");
@@ -708,6 +736,14 @@ namespace onetouch.AppFields
                 field.CurrentRevisionNo = NextRevision(field.CurrentRevisionNo);
                 await RecordHistory(field, "Delete");
                 await _fields.DeleteAsync(field);
+                try
+                {
+                    await CurrentUnitOfWork.SaveChangesAsync();
+                }
+                catch (DbUpdateConcurrencyException)
+                {
+                    throw new UserFriendlyException("The field changed while you were deleting it. Refresh it before saving.");
+                }
                 return new FieldActionResultDto { Success = true, Message = "Field deleted." };
             }
         }
@@ -719,8 +755,10 @@ namespace onetouch.AppFields
             await RequirePermission(AppPermissions.Pages_Administration_FieldManager_Duplicate);
             using (UnitOfWorkManager.Current.DisableFilter(AbpDataFilters.MayHaveTenant))
             {
-                var source = await VisibleFields().Include(x => x.DropdownOptions).FirstOrDefaultAsync(x => x.Id == input.Id);
+                var source = await VisibleFields().Include(x => x.DropdownOptions).Include(x => x.SettingValues).FirstOrDefaultAsync(x => x.Id == input.Id);
                 if (source == null) throw new UserFriendlyException("Field was not found.");
+                if (source.SycObjectId.HasValue)
+                    throw new UserFriendlyException("Field type settings cannot be duplicated as ordinary fields.");
                 var copyInput = ToInput(source);
                 copyInput.Id = null;
                 copyInput.FieldStatusCode = "Proposed";
@@ -738,7 +776,8 @@ namespace onetouch.AppFields
             if (!AbpSession.TenantId.HasValue) throw new UserFriendlyException("Only a tenant can hide a host field.");
             using (UnitOfWorkManager.Current.DisableFilter(AbpDataFilters.MayHaveTenant))
             {
-                var field = await VisibleFields().Include(x => x.DropdownOptions).FirstOrDefaultAsync(x => x.Id == input.Id && x.TenantId == null);
+                var field = await VisibleFields().Include(x => x.DropdownOptions).Include(x => x.SettingValues)
+                    .FirstOrDefaultAsync(x => x.Id == input.Id && x.TenantId == null);
                 if (field == null) throw new UserFriendlyException("Host field was not found.");
                 await CreateField(ToInput(field), field.Id, isHidden: true);
             }
@@ -763,10 +802,17 @@ namespace onetouch.AppFields
                 SourceFieldId = sourceFieldId,
                 CurrentRevisionNo = "00",
                 IsStandard = !AbpSession.TenantId.HasValue,
-                IsCustom = AbpSession.TenantId.HasValue,
                 IsHidden = isHidden
             };
             Apply(input, field);
+            await ApplySettingValues(input, field, sourceFieldId);
+            if (sourceFieldId.HasValue)
+            {
+                var source = await _fields.GetAll().Where(x => x.Id == sourceFieldId.Value)
+                    .Select(x => new { x.SycObjectId, x.EntitySycObjectId }).SingleAsync();
+                field.SycObjectId = source.SycObjectId;
+                field.EntitySycObjectId = source.EntitySycObjectId;
+            }
             field.FieldCode = await NextFieldCode(field);
             if (!sourceFieldId.HasValue && !string.IsNullOrWhiteSpace(input.FieldCode) &&
                 !string.Equals(input.FieldCode.Trim(), field.FieldCode, StringComparison.Ordinal))
@@ -788,9 +834,9 @@ namespace onetouch.AppFields
                     await _tableFields.InsertAsync(CreateTableSnapshot(field, AbpSession.TenantId,
                         assignment.SycObjectId, assignment.SycEntityObjectTypeId));
             }
-            else
+            else if (input.SycObjectId.HasValue)
                 await _tableFields.InsertAsync(CreateTableSnapshot(field, AbpSession.TenantId,
-                    input.SycObjectId, input.SelectedObjectTypeId));
+                    input.SycObjectId.Value, input.SelectedObjectTypeId));
             await RecordHistory(field, "Create");
             return await ToDtoForResponse(field);
         }
@@ -803,7 +849,8 @@ namespace onetouch.AppFields
                 throw new UserFriendlyException("Select the table for this object type.");
             using (UnitOfWorkManager.Current.DisableFilter(AbpDataFilters.MayHaveTenant))
             {
-                var field = await VisibleFields().Include(x => x.DropdownOptions).SingleOrDefaultAsync(x => x.Id == input.AppFieldId && !x.IsHidden);
+                var field = await VisibleFields().Include(x => x.DropdownOptions).Include(x => x.SettingValues)
+                    .SingleOrDefaultAsync(x => x.Id == input.AppFieldId && !x.IsHidden);
                 if (field == null) throw new UserFriendlyException("Field was not found.");
                 if (field.TenantId != AbpSession.TenantId)
                     throw new UserFriendlyException("A tenant cannot sync a host field.");
@@ -813,7 +860,7 @@ namespace onetouch.AppFields
                 if (input.SycObjectId.HasValue)
                     query = query.Where(x => x.SycObjectId == input.SycObjectId.Value &&
                         x.SycEntityObjectTypeId == input.SycEntityObjectTypeId);
-                var snapshots = await query.Include(x => x.DropdownOptions).ToListAsync();
+                var snapshots = await query.Include(x => x.DropdownOptions).Include(x => x.SettingValues).ToListAsync();
                 if (snapshots.Count == 0) throw new UserFriendlyException("No table snapshot was found.");
                 foreach (var snapshot in snapshots)
                 {
@@ -848,12 +895,15 @@ namespace onetouch.AppFields
 
         private async Task ValidateFieldInput(CreateOrEditFieldInput input)
         {
-            if (input.SycObjectId <= 0 || !await _objects.GetAll().AnyAsync(x => x.Id == input.SycObjectId && !x.IsDeleted))
-                throw new UserFriendlyException("Select a valid object.");
-            if (input.EntitySycObjectId.HasValue && !await _objects.GetAll().AnyAsync(x => x.Id == input.EntitySycObjectId.Value && !x.IsDeleted))
-                throw new UserFriendlyException("Select a valid entity object.");
-            if (input.SelectedObjectTypeId.HasValue && !await _objectTypes.GetAll().AnyAsync(x =>
-                    x.Id == input.SelectedObjectTypeId.Value && x.ObjectId == input.SycObjectId && !x.IsDeleted))
+            if (input.SycObjectId.HasValue && (input.SycObjectId.Value <= 0 ||
+                !await _objects.GetAll().AnyAsync(x => x.Id == input.SycObjectId.Value && !x.IsDeleted &&
+                    (input.Id.HasValue || x.ObjectTypeCode == "DATA"))))
+                throw new UserFriendlyException("Select a valid data object.");
+            if (input.EntitySycObjectId.HasValue && !await _objectTypes.GetAll().AnyAsync(x => x.Id == input.EntitySycObjectId.Value && !x.IsDeleted))
+                throw new UserFriendlyException("Select a valid entity object type.");
+            if (input.SelectedObjectTypeId.HasValue && (!input.SycObjectId.HasValue ||
+                !await _objectTypes.GetAll().AnyAsync(x =>
+                    x.Id == input.SelectedObjectTypeId.Value && x.ObjectId == input.SycObjectId.Value && !x.IsDeleted)))
                 throw new UserFriendlyException("The selected object type does not belong to this data object.");
             await ValidateFieldType(input.FieldTypeId);
             var fieldObjectId = await _objects.GetAll().Where(x => x.Code == "FIELD" && !x.IsDeleted)
@@ -870,8 +920,6 @@ namespace onetouch.AppFields
 
         private void Apply(CreateOrEditFieldInput input, AppField field)
         {
-            field.SycObjectId = input.SycObjectId;
-            field.EntitySycObjectId = input.EntitySycObjectId;
             field.FieldTypeId = input.FieldTypeId;
             field.WidgetTypeId = input.WidgetTypeId;
             field.FieldLevelId = input.FieldLevelId;
@@ -882,21 +930,25 @@ namespace onetouch.AppFields
             field.FieldStatusCode = input.FieldStatusCode ?? "Proposed";
             field.TrackingNo = input.TrackingNo?.Trim();
             field.IsExtraField = input.IsExtraField;
-            field.AllowNull = input.AllowNull;
-            field.Length = input.Length;
-            field.Decimals = input.Decimals;
-            field.DefaultValue = input.DefaultValue;
-            field.DateFormat = input.DateFormat;
-            field.TimeFormat = input.TimeFormat;
-            field.AllowMultiSelect = input.AllowMultiSelect;
-            field.Required = input.Required;
-            field.Visible = input.Visible;
-            field.Editable = input.Editable;
+            if (field.Id == 0 || input.SettingValues != null)
+            {
+                field.AllowNull = input.AllowNull;
+                field.Length = input.Length;
+                field.Decimals = input.Decimals;
+                field.DefaultValue = input.DefaultValue;
+                field.DateFormat = input.DateFormat;
+                field.TimeFormat = input.TimeFormat;
+                field.AllowMultiSelect = input.AllowMultiSelect;
+                field.Required = input.Required;
+                field.Visible = input.Visible;
+                field.Editable = input.Editable;
+            }
             FieldExtraAttributesCodec.Apply(FieldExtraAttributesCodec.Parse(input.ExtraAttributes), field);
         }
 
         private static void ApplyHistoryRevision(AppFieldHistory revision, AppField field)
         {
+            field.SycObjectId = revision.SycObjectId;
             field.EntitySycObjectId = revision.EntitySycObjectId;
             field.FieldName = revision.FieldName;
             field.Description = revision.Description;
@@ -928,6 +980,9 @@ namespace onetouch.AppFields
             field.IsAdvancedSearch = revision.IsAdvancedSearch;
             field.AcceptMultipleValues = revision.AcceptMultipleValues;
             field.AllowAddNew = revision.AllowAddNew;
+            field.SettingValues.Clear();
+            foreach (var value in revision.SettingValues)
+                field.SettingValues.Add(CopyCurrentSettingValue(value, field.TenantId));
             field.DropdownOptions.Clear();
             foreach (var option in revision.DropdownOptions.OrderBy(x => x.SortOrder))
                 field.DropdownOptions.Add(new AppFieldDropdownOption
@@ -961,7 +1016,6 @@ namespace onetouch.AppFields
                 TrackingNo = field.TrackingNo,
                 CurrentRevisionNo = field.CurrentRevisionNo,
                 IsStandard = field.IsStandard,
-                IsCustom = field.IsCustom,
                 IsExtraField = field.IsExtraField,
                 IsHidden = field.IsHidden,
                 AllowNull = field.AllowNull,
@@ -989,6 +1043,7 @@ namespace onetouch.AppFields
                     {
                         SortOrder = x.SortOrder, Option = x.Option, Value = x.Value
                     }).ToList(),
+                SettingValues = field.SettingValues.Select(x => CopyHistorySettingValue(x)).ToList(),
                 CreationTime = field.CreationTime,
                 CreatorUserId = field.CreatorUserId,
                 LastModificationTime = field.LastModificationTime,
@@ -1154,30 +1209,34 @@ namespace onetouch.AppFields
             Length = x.Length, Decimals = x.Decimals, DefaultValue = x.DefaultValue,
             DateFormat = x.DateFormat, TimeFormat = x.TimeFormat, AllowMultiSelect = x.AllowMultiSelect,
             Required = x.Required, Visible = x.Visible, Editable = x.Editable,
-            ExtraAttributes = FieldExtraAttributesCodec.Serialize(x)
+            ExtraAttributes = FieldExtraAttributesCodec.Serialize(x),
+            SettingValues = x.SettingValues.Select(ToSettingDto).ToList()
         };
 
-        private static AppFieldDto ToDto(AppField x) => new AppFieldDto
+        private static AppFieldDto ToDto(AppField x) => OverlayLegacySettings(new AppFieldDto
         {
             Id = x.Id, FieldDefinitionKey = x.FieldDefinitionKey, TenantId = x.TenantId, SourceFieldId = x.SourceFieldId,
+            ExpectedCurrentRevisionNo = x.CurrentRevisionNo,
             SycObjectId = x.SycObjectId, EntitySycObjectId = x.EntitySycObjectId,
             FieldTypeId = x.FieldTypeId, WidgetTypeId = x.WidgetTypeId, FieldLevelId = x.FieldLevelId,
             FieldStatusId = x.FieldStatusId, FieldCode = x.FieldCode, FieldName = x.FieldName,
             Description = x.Description, FieldLevelCode = x.FieldLevelCode, FieldStatusCode = x.FieldStatusCode,
             TrackingNo = x.TrackingNo, CurrentRevisionNo = x.CurrentRevisionNo,
-            IsStandard = x.IsStandard, IsCustom = x.IsCustom, IsExtraField = x.IsExtraField, IsHidden = x.IsHidden,
+            IsStandard = x.IsStandard, IsCustom = !x.IsStandard, IsExtraField = x.IsExtraField, IsHidden = x.IsHidden,
             AllowNull = x.AllowNull, Length = x.Length, Decimals = x.Decimals, DefaultValue = x.DefaultValue,
             DateFormat = x.DateFormat, TimeFormat = x.TimeFormat, AllowMultiSelect = x.AllowMultiSelect,
             Required = x.Required, Visible = x.Visible, Editable = x.Editable,
             ExtraAttributes = FieldExtraAttributesCodec.Serialize(x),
+            SettingValues = x.SettingValues.Select(ToSettingDto).ToList(),
             CreationTime = x.CreationTime, CreatorUserId = x.CreatorUserId,
             LastModificationTime = x.LastModificationTime, LastModifierUserId = x.LastModifierUserId,
             IsDeleted = x.IsDeleted, DeleterUserId = x.DeleterUserId, DeletionTime = x.DeletionTime
-        };
+        });
 
-        private static AppFieldDto ToDto(AppFieldHistory x) => new AppFieldDto
+        private static AppFieldDto ToDto(AppFieldHistory x) => OverlayLegacySettings(new AppFieldDto
         {
             Id = x.AppFieldId, FieldDefinitionKey = x.FieldDefinitionKey, TenantId = x.TenantId,
+            ExpectedCurrentRevisionNo = x.CurrentRevisionNo,
             SourceFieldId = x.SourceFieldId, SycObjectId = x.SycObjectId,
             EntitySycObjectId = x.EntitySycObjectId, FieldCode = x.FieldCode,
             FieldName = x.FieldName, Description = x.Description, FieldTypeId = x.FieldTypeId,
@@ -1185,16 +1244,17 @@ namespace onetouch.AppFields
             FieldStatusId = x.FieldStatusId, FieldLevelCode = x.FieldLevelCode,
             FieldStatusCode = x.FieldStatusCode, TrackingNo = x.TrackingNo,
             CurrentRevisionNo = x.CurrentRevisionNo, IsStandard = x.IsStandard,
-            IsCustom = x.IsCustom, IsExtraField = x.IsExtraField, IsHidden = x.IsHidden,
+            IsCustom = !x.IsStandard, IsExtraField = x.IsExtraField, IsHidden = x.IsHidden,
             AllowNull = x.AllowNull, Length = x.Length, Decimals = x.Decimals,
             DefaultValue = x.DefaultValue, DateFormat = x.DateFormat, TimeFormat = x.TimeFormat,
             AllowMultiSelect = x.AllowMultiSelect, Required = x.Required,
             Visible = x.Visible, Editable = x.Editable,
             ExtraAttributes = FieldExtraAttributesCodec.Serialize(x),
+            SettingValues = x.SettingValues.Select(ToSettingDto).ToList(),
             CreationTime = x.CreationTime, CreatorUserId = x.CreatorUserId,
             LastModificationTime = x.LastModificationTime, LastModifierUserId = x.LastModifierUserId,
             IsDeleted = x.IsDeleted, DeleterUserId = x.DeleterUserId,
             DeletionTime = x.DeletionTime
-        };
+        });
     }
 }

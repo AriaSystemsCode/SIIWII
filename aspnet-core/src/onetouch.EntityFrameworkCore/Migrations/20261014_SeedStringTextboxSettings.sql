@@ -1,7 +1,14 @@
 -- Field Manager metadata for the String--Textbox field type.
--- Six reusable AppFields definitions, six type-specific AppTableFields snapshots.
--- Values of these settings remain columns on each actual AppFields record.
+-- Six type-owned AppFields definitions and six AppTableFields snapshots.
+-- Ordinary field values are backfilled into AppFieldSettingValues by the dynamic settings migration/seed.
 -- Rerunnable: existing definitions, revisions, and applied snapshots are preserved.
+SET ANSI_NULLS ON;
+SET QUOTED_IDENTIFIER ON;
+SET ANSI_PADDING ON;
+SET ANSI_WARNINGS ON;
+SET ARITHABORT ON;
+SET CONCAT_NULL_YIELDS_NULL ON;
+SET NUMERIC_ROUNDABORT OFF;
 SET XACT_ABORT ON;
 BEGIN TRY
     BEGIN TRANSACTION;
@@ -36,6 +43,32 @@ BEGIN TRY
         WHERE ObjectId = @fieldObjectId AND ParentId = @fieldRootId
           AND Code = N'ST' AND Name = N'String--Textbox' AND IsDeleted = 0);
 
+    -- Older seeds left these definitions unowned while assigning them to ST.
+    UPDATE f SET EntitySycObjectId = @stringTypeId
+    FROM dbo.AppFields AS f
+    JOIN dbo.AppTableFields AS a ON a.SourceAppFieldId = f.Id
+    WHERE a.SycObjectId = @fieldObjectId
+      AND a.SycEntityObjectTypeId = @stringTypeId
+      AND f.SycObjectId = @fieldObjectId AND f.TenantId IS NULL
+      AND f.EntitySycObjectId IS NULL AND f.IsDeleted = 0;
+
+    UPDATE h SET EntitySycObjectId = @stringTypeId
+    FROM dbo.AppFieldsHistory AS h
+    JOIN dbo.AppFields AS f ON f.Id = h.AppFieldId
+    JOIN dbo.AppTableFields AS a ON a.SourceAppFieldId = f.Id
+    WHERE a.SycObjectId = @fieldObjectId
+      AND a.SycEntityObjectTypeId = @stringTypeId
+      AND f.EntitySycObjectId = @stringTypeId
+      AND h.EntitySycObjectId IS NULL;
+
+    UPDATE a SET EntitySycObjectId = @stringTypeId
+    FROM dbo.AppTableFields AS a
+    JOIN dbo.AppFields AS f ON f.Id = a.SourceAppFieldId
+    WHERE a.SycObjectId = @fieldObjectId
+      AND a.SycEntityObjectTypeId = @stringTypeId
+      AND f.EntitySycObjectId = @stringTypeId
+      AND a.EntitySycObjectId IS NULL;
+
     CREATE TABLE #SeedStringTextboxSettings
     (
         Ordinal int NOT NULL PRIMARY KEY,
@@ -66,9 +99,11 @@ BEGIN TRY
         JOIN dbo.SycEntityObjectTypes t ON t.ObjectId = @fieldObjectId
             AND t.ParentId = @fieldRootId AND t.Code = s.TypeCode AND t.IsDeleted = 0
         JOIN dbo.AppFields f ON f.SycObjectId = @fieldObjectId
-            AND f.TenantId IS NULL AND f.FieldName = s.FieldName AND f.IsDeleted = 0
-        WHERE f.FieldTypeId <> t.Id OR f.FieldLevelCode <> N'System'
-           OR f.IsStandard <> 1 OR f.IsCustom <> 0 OR f.IsExtraField <> 0)
+            AND f.TenantId IS NULL AND f.FieldName = s.FieldName
+            AND f.FieldTypeId = t.Id AND f.EntitySycObjectId = @stringTypeId
+            AND f.IsDeleted = 0
+        WHERE f.FieldLevelCode <> N'System'
+           OR f.IsStandard <> 1 OR f.IsExtraField <> 0)
         THROW 51205, 'An existing Field Manager setting definition conflicts with the seed.', 1;
 
     ;WITH Missing AS
@@ -81,7 +116,8 @@ BEGIN TRY
             AND t.ParentId = @fieldRootId AND t.Code = s.TypeCode AND t.IsDeleted = 0
         WHERE NOT EXISTS (SELECT 1 FROM dbo.AppFields f
             WHERE f.SycObjectId = @fieldObjectId AND f.TenantId IS NULL
-              AND f.FieldName = s.FieldName AND f.IsDeleted = 0)
+              AND f.FieldName = s.FieldName AND f.FieldTypeId = t.Id
+              AND f.EntitySycObjectId = @stringTypeId AND f.IsDeleted = 0)
     )
     SELECT m.*,
            COALESCE((SELECT MAX(TRY_CONVERT(int, RIGHT(f.FieldCode, 4)))
@@ -99,30 +135,37 @@ BEGIN TRY
         (TenantId, SourceFieldId, SycObjectId, EntitySycObjectId, FieldCode, FieldName,
          Description, FieldTypeId, WidgetTypeId, FieldLevelId, FieldStatusId,
          FieldLevelCode, FieldStatusCode, TrackingNo, CurrentRevisionNo,
-         IsStandard, IsCustom, IsExtraField, IsHidden, AllowNull, [Length], Decimals,
+         IsStandard, IsExtraField, IsHidden, AllowNull, [Length], Decimals,
          DefaultValue, DateFormat, TimeFormat, AllowMultiSelect, Required, Visible,
          Editable, Usage, CreationTime, CreatorUserId, LastModificationTime,
          LastModifierUserId, IsDeleted, DeleterUserId, DeletionTime)
-    SELECT NULL, NULL, @fieldObjectId, NULL,
+    SELECT NULL, NULL, @fieldObjectId, @stringTypeId,
            LEFT(m.TypeCode, 2) + N'S' + LEFT(UPPER(m.FieldName) + N'____', 4)
                + RIGHT(N'0000' + CONVERT(nvarchar(10), m.NextSequence), 4),
            m.FieldName, N'Field Manager String--Textbox ' + m.[Section] + N' setting',
            m.FieldTypeId, NULL, NULL, NULL, N'System', N'Active', NULL, N'00',
-           1, 0, 0, 0, m.AllowNull, NULL, NULL, m.DefaultValue,
+           1, 0, 0, m.AllowNull, NULL, NULL, m.DefaultValue,
            NULL, NULL, 0, m.Required, 1, 1, N'FieldManager.' + m.[Section],
            SYSUTCDATETIME(), NULL, NULL, NULL, 0, NULL, NULL
     FROM #MissingStringTextboxSettings m;
 
     IF EXISTS (SELECT 1 FROM #SeedStringTextboxSettings s
+        JOIN dbo.SycEntityObjectTypes t ON t.ObjectId = @fieldObjectId
+            AND t.ParentId = @fieldRootId AND t.Code = s.TypeCode AND t.IsDeleted = 0
         OUTER APPLY (SELECT COUNT(*) AS Cnt FROM dbo.AppFields f
             WHERE f.SycObjectId = @fieldObjectId AND f.TenantId IS NULL
-              AND f.FieldName = s.FieldName AND f.IsDeleted = 0) matches
+              AND f.FieldName = s.FieldName AND f.FieldTypeId = t.Id
+              AND f.EntitySycObjectId = @stringTypeId AND f.IsDeleted = 0) matches
         WHERE matches.Cnt <> 1)
         THROW 51207, 'Expected one active Field Manager definition per String--Textbox setting.', 1;
 
     IF EXISTS (SELECT 1 FROM #SeedStringTextboxSettings s
+        JOIN dbo.SycEntityObjectTypes t ON t.ObjectId = @fieldObjectId
+            AND t.ParentId = @fieldRootId AND t.Code = s.TypeCode AND t.IsDeleted = 0
         JOIN dbo.AppFields f ON f.SycObjectId = @fieldObjectId
-            AND f.TenantId IS NULL AND f.FieldName = s.FieldName AND f.IsDeleted = 0
+            AND f.TenantId IS NULL AND f.FieldName = s.FieldName
+            AND f.FieldTypeId = t.Id AND f.EntitySycObjectId = @stringTypeId
+            AND f.IsDeleted = 0
         JOIN dbo.AppTableFields a ON a.SycObjectId = @fieldObjectId
             AND a.SycEntityObjectTypeId = @stringTypeId AND a.TenantId IS NULL
             AND a.FieldName = s.FieldName
@@ -134,7 +177,7 @@ BEGIN TRY
          SycEntityObjectTypeId, SourceAppFieldId, FieldTenantId, SourceFieldId,
          DefinitionSycObjectId, EntitySycObjectId, FieldName, Description,
          FieldTypeId, WidgetTypeId, FieldLevelId, FieldStatusId, FieldLevelCode,
-         FieldStatusCode, TrackingNo, IsStandard, IsCustom, IsExtraField, IsHidden,
+         FieldStatusCode, TrackingNo, IsStandard, IsExtraField, IsHidden,
          AllowNull, [Length], Decimals, DefaultValue, DateFormat, TimeFormat,
          AllowMultiSelect, Required, Visible, Editable, SourceAttributeId,
          SourceDataType, SourceEntityObjectTypeId, EntityObjectTypeCode, Usage,
@@ -147,7 +190,7 @@ BEGIN TRY
            f.SycObjectId, f.EntitySycObjectId, f.FieldName, f.Description,
            f.FieldTypeId, f.WidgetTypeId, f.FieldLevelId, f.FieldStatusId,
            f.FieldLevelCode, f.FieldStatusCode, f.TrackingNo, f.IsStandard,
-           f.IsCustom, f.IsExtraField, f.IsHidden, f.AllowNull, f.[Length],
+           f.IsExtraField, f.IsHidden, f.AllowNull, f.[Length],
            f.Decimals, f.DefaultValue, f.DateFormat, f.TimeFormat,
            f.AllowMultiSelect, f.Required, f.Visible, f.Editable,
            f.SourceAttributeId, f.SourceDataType, f.SourceEntityObjectTypeId,
@@ -157,8 +200,12 @@ BEGIN TRY
            f.LastModifierUserId, f.IsDeleted, f.DeleterUserId, f.DeletionTime,
            SYSUTCDATETIME(), NULL
     FROM #SeedStringTextboxSettings s
+    JOIN dbo.SycEntityObjectTypes t ON t.ObjectId = @fieldObjectId
+        AND t.ParentId = @fieldRootId AND t.Code = s.TypeCode AND t.IsDeleted = 0
     JOIN dbo.AppFields f ON f.SycObjectId = @fieldObjectId
-        AND f.TenantId IS NULL AND f.FieldName = s.FieldName AND f.IsDeleted = 0
+        AND f.TenantId IS NULL AND f.FieldName = s.FieldName
+        AND f.FieldTypeId = t.Id AND f.EntitySycObjectId = @stringTypeId
+        AND f.IsDeleted = 0
     WHERE NOT EXISTS (SELECT 1 FROM dbo.AppTableFields a
         WHERE a.TenantId IS NULL AND a.FieldDefinitionKey = f.FieldDefinitionKey
           AND a.SycObjectId = @fieldObjectId AND a.SycEntityObjectTypeId = @stringTypeId);
@@ -188,10 +235,15 @@ BEGIN TRY
     SELECT f.Id, f.CurrentRevisionNo, N''Create'', SYSUTCDATETIME(), '
         + @historyValues + N'
     FROM dbo.AppFields f JOIN #SeedStringTextboxSettings s ON s.FieldName = f.FieldName
-    WHERE f.SycObjectId = @objectId AND f.TenantId IS NULL AND f.IsDeleted = 0
+    JOIN dbo.SycEntityObjectTypes t ON t.ObjectId = @objectId
+        AND t.Code = s.TypeCode AND t.Id = f.FieldTypeId AND t.IsDeleted = 0
+    WHERE f.SycObjectId = @objectId AND f.EntitySycObjectId = @typeId
+      AND f.TenantId IS NULL AND f.IsDeleted = 0
       AND NOT EXISTS (SELECT 1 FROM dbo.AppFieldsHistory h
           WHERE h.AppFieldId = f.Id AND h.RevisionNo = f.CurrentRevisionNo);';
-    EXEC sys.sp_executesql @historySql, N'@objectId bigint', @objectId = @fieldObjectId;
+    EXEC sys.sp_executesql @historySql,
+        N'@objectId bigint, @typeId bigint',
+        @objectId = @fieldObjectId, @typeId = @stringTypeId;
 
     DROP TABLE #MissingStringTextboxSettings;
     DROP TABLE #SeedStringTextboxSettings;
@@ -202,9 +254,17 @@ BEGIN CATCH
     THROW;
 END CATCH;
 
-SELECT (SELECT COUNT(*) FROM dbo.AppFields f JOIN dbo.SydObjects o ON o.Id = f.SycObjectId
-        WHERE o.Code = N'FIELD' AND f.TenantId IS NULL AND f.IsDeleted = 0
-          AND f.FieldName IN (N'AllowNull', N'Length', N'DefaultValue', N'Required', N'Visible', N'Editable'))
+SELECT (SELECT COUNT(*) FROM dbo.AppFields f
+        JOIN dbo.SydObjects o ON o.Id = f.SycObjectId
+        JOIN dbo.SycEntityObjectTypes t ON t.Id = f.FieldTypeId
+        JOIN (VALUES (N'AllowNull',N'BOOLEAN'), (N'Length',N'IN'),
+                     (N'DefaultValue',N'ST'), (N'Required',N'BOOLEAN'),
+                     (N'Visible',N'BOOLEAN'), (N'Editable',N'BOOLEAN')) s(FieldName,TypeCode)
+          ON s.FieldName = f.FieldName AND s.TypeCode = t.Code
+        WHERE o.Code = N'FIELD' AND f.EntitySycObjectId =
+            (SELECT Id FROM dbo.SycEntityObjectTypes WHERE ObjectId = o.Id
+             AND Code = N'ST' AND Name = N'String--Textbox' AND IsDeleted = 0)
+          AND f.TenantId IS NULL AND f.IsDeleted = 0)
           AS SettingDefinitions,
        (SELECT COUNT(*) FROM dbo.AppTableFields a JOIN dbo.SydObjects o ON o.Id = a.SycObjectId
         JOIN dbo.SycEntityObjectTypes t ON t.Id = a.SycEntityObjectTypeId

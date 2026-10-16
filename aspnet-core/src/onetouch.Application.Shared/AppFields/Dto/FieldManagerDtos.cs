@@ -18,7 +18,8 @@ namespace onetouch.AppFields.Dto
     public class CreateOrEditFieldInput
     {
         public long? Id { get; set; }
-        public long SycObjectId { get; set; }
+        [StringLength(10)] public string ExpectedCurrentRevisionNo { get; set; }
+        public long? SycObjectId { get; set; }
         public long? EntitySycObjectId { get; set; }
         public long? SelectedObjectTypeId { get; set; }
         public long FieldTypeId { get; set; }
@@ -43,6 +44,50 @@ namespace onetouch.AppFields.Dto
         public bool Visible { get; set; } = true;
         public bool Editable { get; set; } = true;
         public string ExtraAttributes { get; set; }
+        // Null keeps existing settings on edit; an empty list clears them.
+        public List<FieldSettingValueDto> SettingValues { get; set; }
+    }
+
+    public class FieldSettingValueDto
+    {
+        public long SettingFieldId { get; set; }
+        public long? AppFieldsOptionId { get; set; }
+        [StringLength(2000)] public string ValueText { get; set; }
+        public decimal? ValueNumber { get; set; }
+        public bool? ValueBoolean { get; set; }
+        public DateTime? ValueDateTime { get; set; }
+        // Copied names are populated for applied fields and historical revisions.
+        public string SettingFieldCode { get; set; }
+        public string SettingFieldName { get; set; }
+        public string OptionCode { get; set; }
+        public string OptionName { get; set; }
+    }
+
+    public class FieldSettingOptionDto
+    {
+        public long Id { get; set; }
+        public string Code { get; set; }
+        public string Name { get; set; }
+        public int SortOrder { get; set; }
+    }
+
+    public class FieldSettingDefinitionDto
+    {
+        public long SettingFieldId { get; set; }
+        public string FieldCode { get; set; }
+        public string FieldName { get; set; }
+        public long ValueTypeId { get; set; }
+        public string ValueTypeCode { get; set; }
+        public string DefaultValue { get; set; }
+        public bool Required { get; set; }
+        public bool AllowMultiSelect { get; set; }
+        public List<FieldSettingOptionDto> Options { get; set; } = new List<FieldSettingOptionDto>();
+    }
+
+    public class SaveFieldSettingOptionsInput
+    {
+        public long SettingFieldId { get; set; }
+        public List<FieldSettingOptionDto> Options { get; set; } = new List<FieldSettingOptionDto>();
     }
 
     public class GetFieldsInput : PagedAndSortedResultRequestDto
@@ -146,7 +191,7 @@ namespace onetouch.AppFields.Dto
         public bool CanEdit { get; set; }
         public bool CanDelete { get; set; }
         public bool CanHide { get; set; }
-        public long SycObjectId { get; set; }
+        public long? SycObjectId { get; set; }
         public long? EntitySycObjectId { get; set; }
         public long? CreatorUserId { get; set; }
         public string CreatorUserName { get; set; }

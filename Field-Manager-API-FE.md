@@ -133,14 +133,14 @@ The previous assignment table did not record an applied revision, so migration b
 | `result.items[].trackingNo` | Tracking or iteration reference. |
 | `result.items[].standardOrCustom` | `Standard` or `Custom` display text. |
 | `result.items[].isStandard` | Field is host standard data. |
-| `result.items[].isCustom` | Field is tenant custom data. |
+| `result.items[].isCustom` | Field is tenant custom data; derived as the opposite of `isStandard`. |
 | `result.items[].isExtraField` | Field belongs in the Extra Fields view. |
 | `result.items[].isHidden` | Tenant copy is hidden. |
 | `result.items[].canEdit` | Current user may edit this row. |
 | `result.items[].canDelete` | Current user may delete this row. |
 | `result.items[].canHide` | Current tenant may hide this host field. |
-| `result.items[].sycObjectId` | Source `SydObject` ID. |
-| `result.items[].entitySycObjectId` | Related entity object's ID, if set. |
+| `result.items[].sycObjectId` | Definition owner `SydObjects.Id`; `null` for ordinary fields. Only Field type setting definitions have an owner. |
+| `result.items[].entitySycObjectId` | Owning `SycEntityObjectTypes.Id` for a Field type setting; `null` for ordinary fields. |
 | `result.items[].creatorUserId` | Creator user ID, if recorded. |
 | `result.items[].creatorUserName` | Creator's full name, if the user record is available. |
 | `result.items[].creationTime` | Creation date/time. |
@@ -148,7 +148,7 @@ The previous assignment table did not record an applied revision, so migration b
 
 ## 6. `AssignExistingField`
 
-**API description:** Copies the current visible, non-discontinued definition into an independent table snapshot for a base object or object type. A field already available from the object's `BaseEntityId` chain is treated as assigned; no duplicate row is added.
+**API description:** Copies a current visible, non-discontinued ordinary definition into an independent table snapshot for a base object or object type. Field type setting definitions are not assignable to business tables. A field already available from the object's `BaseEntityId` chain is treated as assigned; no duplicate row is added.
 
 **API request:** `POST /AssignExistingField` with a JSON body.
 
@@ -167,13 +167,13 @@ The previous assignment table did not record an applied revision, so migration b
 
 ### `GetUnlinkedFields`
 
-**API description:** Lists visible, active field definitions in `AppFields` that are not yet applied to a data table. Fields inherited from the table's `BaseEntityId` chain are treated as linked, as are base-table fields for an object-type node. Requires the Add Existing Field permission.
+**API description:** Lists visible, active ordinary field definitions in `AppFields` that are not yet applied to a data table or entity. Field type setting definitions are excluded. Fields inherited from the table's `BaseEntityId` chain are treated as linked, as are base-table fields for an object-type node. Requires the Add Existing Field permission.
 
 **API request:** `GET /GetUnlinkedFields?tableId=45&sycEntityObjectTypeId=123&skipCount=0&maxResultCount=10`. Omit `sycEntityObjectTypeId` for the base table.
 
 | Request parameter | Description |
 | --- | --- |
-| `tableId` (number, required) | `SydObjects.Id` of a `DATA` object, such as AppTransactionHeaders. |
+| `tableId` (number, required) | `SydObjects.Id` of a `DATA` or `ENTITY` object, such as AppTransactionHeaders or Address. |
 | `sycEntityObjectTypeId` (number or `null`, optional) | Object-type ID for Sales/Purchase or another subtype; must belong to `tableId`. |
 | `searchText` (string, optional) | Searches field code, name, and description. |
 | `skipCount` (number, optional) | Number of matching fields to skip. |
@@ -190,7 +190,7 @@ The previous assignment table did not record an applied revision, so migration b
 
 | Request parameter | Description |
 | --- | --- |
-| `tableId` (number, required) | `SydObjects.Id` of the target `DATA` object. |
+| `tableId` (number, required) | `SydObjects.Id` of the target `DATA` or `ENTITY` object. |
 | `sycEntityObjectTypeId` (number or `null`, optional) | Target subtype ID; omit or send `null` for the base table. |
 | `appFieldIds` (number array, required) | Positive `AppFields.Id` values to link; duplicates are counted once. |
 
@@ -224,16 +224,17 @@ The previous assignment table did not record an applied revision, so migration b
 
 ## 8. `CreateOrEditField`
 
-**API description:** Creates a field when `id` is absent, or edits one when `id` is present. A tenant edit of a host field creates a tenant copy. Create assigns the field to `sycObjectId` or its selected object type; edit keeps the existing assignments. The server generates and verifies the field code.
+**API description:** Creates an ownerless ordinary field definition when `id` is absent, or edits one when `id` is present. A tenant edit of a host field creates a tenant copy. On create, optional `sycObjectId` and `selectedObjectTypeId` also assign a snapshot; without them the definition remains unlinked. Edit keeps existing assignments. The server generates and verifies the field code.
 
 **API request:** `POST /CreateOrEditField` with a JSON body.
 
 | Request parameter | Description |
 | --- | --- |
 | `id` (number or `null`, optional) | Existing `AppFields` ID to edit; omit or send `null` to create. |
-| `sycObjectId` (number, required) | Source `SydObject` ID. Cannot change on edit. |
-| `entitySycObjectId` (number or `null`, optional) | Related entity `SydObject` ID. |
-| `selectedObjectTypeId` (number or `null`, optional) | On create, assign the field to this object type; must belong to `sycObjectId`. Omit for base-object assignment. Not used to change assignment on edit. |
+| `expectedCurrentRevisionNo` (string, required on edit) | Revision returned by `GetFieldForEdit`, for example `00`. A stale or missing value rejects the edit and asks the user to refresh. |
+| `sycObjectId` (number or `null`, optional) | Initial assignment target `SydObjects.Id` on create; not stored as the ordinary definition's owner. Omit to create an unlinked definition. Not used to change assignment on edit. |
+| `entitySycObjectId` (number or `null`, optional) | Legacy definition-owner input. Omit for ordinary fields; it is not saved when creating or editing them. |
+| `selectedObjectTypeId` (number or `null`, optional) | On create, assign the field to this object type; requires `sycObjectId` and must belong to it. Omit for an object-wide assignment. Not used to change assignment on edit. |
 | `fieldTypeId` (number, required) | ID of a valid field type under FIELD. |
 | `widgetTypeId` (number or `null`, optional) | ID of a widget type under the FIELD object. |
 | `fieldLevelId` (number or `null`, optional) | Numeric level ID, if available. The current metadata supplies level codes with `id: null`. |
@@ -257,7 +258,7 @@ The previous assignment table did not record an applied revision, so migration b
 | `editable` (boolean, optional; default `true`) | Field can be edited. |
 | `extraAttributes` (string, optional) | JSON-encoded extra configuration. Must contain valid JSON when supplied. |
 
-**API response:** `result` is the saved field. Every attribute is defined in the **AppFieldDto response attributes** table below. Editing archives the previous revision in `AppFieldsHistory`; existing table snapshots keep their applied revision.
+**API response:** `result` is the saved field. Every attribute is defined in the **AppFieldDto response attributes** table below. Editing saves the new revision in `AppFieldsHistory`; existing table snapshots keep their applied revision.
 
 ## 9. `DeleteField`
 
@@ -278,7 +279,7 @@ The previous assignment table did not record an applied revision, so migration b
 
 ## 10. `DuplicateField`
 
-**API description:** Creates a new Proposed field from an existing visible field, with a newly generated code and copied table assignments.
+**API description:** Creates a new Proposed ordinary field from an existing visible ordinary field, with a newly generated code and copied table assignments. Field type settings cannot be duplicated this way.
 
 **API request:** `POST /DuplicateField` with a JSON body.
 
@@ -363,8 +364,8 @@ This is the complete `result` field returned by `CreateOrEditField` and `Duplica
 | Response attribute | Description |
 | --- | --- |
 | `id` | `AppFields` record ID. |
-| `sycObjectId` | Source `SydObject` ID. |
-| `entitySycObjectId` | Related entity object's ID, if set. |
+| `sycObjectId` | Definition owner `SydObjects.Id`; `null` for ordinary fields. |
+| `entitySycObjectId` | Owning `SycEntityObjectTypes.Id` for a Field type setting; `null` for ordinary fields. |
 | `selectedObjectTypeId` | Currently `null` in this DTO; assignments are stored separately and this response does not populate it. |
 | `fieldTypeId` | Field-type ID. |
 | `widgetTypeId` | Widget-type ID, if assigned. |
@@ -392,8 +393,9 @@ This is the complete `result` field returned by `CreateOrEditField` and `Duplica
 | `fieldDefinitionKey` | Immutable logical key shared with applied table snapshots; no foreign key is required. |
 | `sourceFieldId` | Host field ID when this is a tenant copy; otherwise `null`. |
 | `currentRevisionNo` | Current revision number. |
+| `expectedCurrentRevisionNo` | Copy of the current revision to send when editing this definition. |
 | `isStandard` | Field is host standard data. |
-| `isCustom` | Field is tenant custom data. |
+| `isCustom` | Field is tenant custom data; derived as the opposite of `isStandard`. |
 | `isHidden` | Tenant copy is hidden. |
 | `creationTime` | Creation date/time. |
 | `creatorUserId` | Creator user ID, if recorded. |
@@ -402,3 +404,39 @@ This is the complete `result` field returned by `CreateOrEditField` and `Duplica
 | `isDeleted` | Whether this record is soft-deleted. |
 | `deleterUserId` | Deleting user ID, if deleted. |
 | `deletionTime` | Deletion date/time, if deleted. |
+
+## Dynamic settings (version 10)
+
+`GET /api/services/app/AppFieldManager/GetFieldTypeSettings?fieldTypeId=827`
+returns the type-owned setting definitions in `result[]`. Each definition has
+`settingFieldId`, `fieldCode`, `fieldName`, `valueTypeId`, `valueTypeCode`,
+`defaultValue`, `required`, `allowMultiSelect`, and `options[]`. Each option has
+`id`, `code`, `name`, and `sortOrder`. The options belong to the setting field,
+not to the ordinary field being edited.
+
+`CreateOrEditField` accepts `settingValues[]`. Each row has `settingFieldId`
+and exactly one of `valueText`, `valueNumber`, `valueBoolean`, `valueDateTime`,
+or `appFieldsOptionId`. For a multi-select setting, send one row per selected
+option. An explicit empty list clears optional settings; omitting the property
+preserves current settings on edit.
+On creation, omission maps the legacy typed request properties into applicable
+settings and uses setting defaults.
+The API rejects a setting from another field type, an option from another
+setting, wrong value types, duplicate options, and multiple selections on a
+single-select setting.
+
+`AppFieldDto.settingValues[]` returns the current values. The same structure
+is returned in `GetFieldForEdit`, `GetAppliedField`, and each history revision.
+Responses also include copied `settingFieldCode`, `settingFieldName`,
+`optionCode`, and `optionName` so applied and historical values remain readable
+after setting labels or options change.
+
+Host administrators can maintain the choices for a type-owned setting with
+`POST /api/services/app/AppFieldManager/SaveFieldSettingOptions` using
+`settingFieldId` and `options[]` (`id` is zero for a new choice). Omitted
+existing choices become inactive; existing field selections and snapshots
+remain stored. The deprecated top-level typed properties are retained in the
+API for compatibility; dynamic `settingValues[]` is the Field Manager source
+for ordinary fields.
+
+Date--Date picker DateFormat offers `yyyy-MM-dd`, `MM/dd/yyyy`, and `dd/MM/yyyy` through `GetFieldTypeSettings.options[]`. Send the selected `appFieldsOptionId` in `settingValues[]`. Matching existing current values are mapped to those options by the version 10 seed.

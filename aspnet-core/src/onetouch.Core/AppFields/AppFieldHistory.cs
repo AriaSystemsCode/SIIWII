@@ -22,7 +22,7 @@ namespace onetouch.AppFields
         // independently of the current AppFields row.
         public Guid FieldDefinitionKey { get; set; }
         public long? SourceFieldId { get; set; }
-        public long SycObjectId { get; set; }
+        public long? SycObjectId { get; set; }
         public long? EntitySycObjectId { get; set; }
 
         [Required, StringLength(11, MinimumLength = 11)]
@@ -52,7 +52,6 @@ namespace onetouch.AppFields
         public string CurrentRevisionNo { get; set; }
 
         public bool IsStandard { get; set; }
-        public bool IsCustom { get; set; }
         public bool IsExtraField { get; set; }
         public bool IsHidden { get; set; }
         public bool AllowNull { get; set; }
@@ -83,6 +82,7 @@ namespace onetouch.AppFields
         public bool? AcceptMultipleValues { get; set; }
         public bool? AllowAddNew { get; set; }
         public ICollection<AppFieldHistoryDropdownOption> DropdownOptions { get; set; } = new List<AppFieldHistoryDropdownOption>();
+        public ICollection<AppFieldHistorySettingValue> SettingValues { get; set; } = new List<AppFieldHistorySettingValue>();
 
         public DateTime CreationTime { get; set; }
         public long? CreatorUserId { get; set; }

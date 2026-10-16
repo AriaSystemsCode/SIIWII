@@ -7,7 +7,7 @@ It reuses the existing seed helper; translation generation is not changed.
 ## Release contract
 
 `SeedRelease.RequiredVersion` in `Program.cs` is the version-controlled required
-seed snapshot (version 3 adds String--Textbox setting definitions). Increment it whenever
+seed snapshot (version 10 adds DateFormat choices). Increment it whenever
 the cumulative seed routines or their assets change. It is not an arbitrary
 command-line value.
 Each database records successful snapshots in `dbo.__OneTouchSeedHistory`.
@@ -25,6 +25,45 @@ Version 3 also seeds six Field Manager setting definitions for String--Textbox
 (AllowNull, Length, DefaultValue, Required, Visible, Editable) and six applied
 snapshots scoped to that type. The script is idempotent, so databases moving
 directly from an older seed version can run the cumulative host seed safely.
+
+Version 4 adds Date--Date picker settings (AllowNull, DateFormat, DefaultValue,
+Required, Visible) and five applied snapshots scoped to that type. The current
+seed gives each type its own definitions: DateFormat is a string setting,
+DefaultValue is a date setting, and the Boolean settings are independent of
+String--Textbox. Existing shared assignments are remapped when reseeded.
+
+Version 5 adds the `inputmask` and `NoOfDecmials` XML attributes, the input mask
+AppFields definition and Date picker snapshot, and uses SycEntityObjectTypes
+IDs for `EntitySycObjectId` in new field definitions. The associated EF migration
+remaps existing definitions and snapshots before the cumulative seed runs.
+
+Version 6 replaces Date--Date picker XML with AllowNull, DateFormat,
+DefaultValue, Required, and Visible. The host seed no longer adds `inputmask`
+to that XML or seeds a new input-mask AppFields definition. Existing AppFields
+definitions and table snapshots are not removed by this seed.
+Version 6 also assigns setting definitions directly to their owning
+`SycEntityObjectTypes` rows, including separate Boolean definitions for the
+Date picker and String--Textbox.
+
+Version 7 seeds independent definitions, applied snapshots, history rows and
+type XML for Numeric input (6 settings), Currency (6), Dropdown (5), and
+Checkbox (3). The Numeric input XML replaces the old `NoOfDecmials` code with
+`Decimals`, preserving its attribute ID when possible. Existing matching
+snapshots retain their applied revision and values.
+
+Version 8 follows the `DetachOrdinaryFieldDefinitions` schema migration.
+Ordinary `AppFields` definitions have no `SycObjectId` or
+`EntitySycObjectId`; `AppTableFields.SycObjectId` still identifies the assigned
+data object. The six Field type setting groups retain their definition owner.
+
+Version 9 follows `20261016150000_DynamicFieldSettings`. It creates the
+setting-option and setting-value tables and backfills current fields, history,
+and table assignments from the legacy typed columns. Apply the schema migration
+before running the seeder; the cumulative seed reruns the idempotent backfill
+after all type-owned setting definitions are present.
+
+Version 10 adds three common DateFormat choices and maps matching current
+Date picker setting values to those options. The option seed is idempotent.
 
 Existing `Clients.IsSeeded` values are ignored and left untouched. Do not mark old
 databases version 1 merely because that flag is True: run the new seed baseline.

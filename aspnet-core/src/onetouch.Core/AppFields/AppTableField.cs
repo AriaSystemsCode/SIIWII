@@ -22,7 +22,7 @@ namespace onetouch.AppFields
         public long SourceAppFieldId { get; set; }
         public int? FieldTenantId { get; set; }
         public long? SourceFieldId { get; set; }
-        public long DefinitionSycObjectId { get; set; }
+        public long? DefinitionSycObjectId { get; set; }
         public long? EntitySycObjectId { get; set; }
         [Required, StringLength(250)] public string FieldName { get; set; }
         [StringLength(2000)] public string Description { get; set; }
@@ -34,7 +34,6 @@ namespace onetouch.AppFields
         [Required, StringLength(32)] public string FieldStatusCode { get; set; }
         [StringLength(100)] public string TrackingNo { get; set; }
         public bool IsStandard { get; set; }
-        public bool IsCustom { get; set; }
         public bool IsExtraField { get; set; }
         public bool IsHidden { get; set; }
         public bool AllowNull { get; set; }
@@ -58,6 +57,7 @@ namespace onetouch.AppFields
         public bool? AcceptMultipleValues { get; set; }
         public bool? AllowAddNew { get; set; }
         public ICollection<AppTableFieldDropdownOption> DropdownOptions { get; set; } = new List<AppTableFieldDropdownOption>();
+        public ICollection<AppTableFieldSettingValue> SettingValues { get; set; } = new List<AppTableFieldSettingValue>();
         public DateTime FieldCreationTime { get; set; }
         public long? FieldCreatorUserId { get; set; }
         public DateTime? FieldLastModificationTime { get; set; }
@@ -86,7 +86,6 @@ namespace onetouch.AppFields
             FieldStatusCode = field.FieldStatusCode;
             TrackingNo = field.TrackingNo;
             IsStandard = field.IsStandard;
-            IsCustom = field.IsCustom;
             IsExtraField = field.IsExtraField;
             IsHidden = field.IsHidden;
             AllowNull = field.AllowNull;
@@ -114,6 +113,21 @@ namespace onetouch.AppFields
                 DropdownOptions.Add(new AppTableFieldDropdownOption
                 {
                     SortOrder = option.SortOrder, Option = option.Option, Value = option.Value
+                });
+            SettingValues.Clear();
+            foreach (var value in field.SettingValues)
+                SettingValues.Add(new AppTableFieldSettingValue
+                {
+                    SettingFieldId = value.SettingFieldId,
+                    SettingFieldCode = value.SettingFieldCode,
+                    SettingFieldName = value.SettingFieldName,
+                    AppFieldsOptionId = value.AppFieldsOptionId,
+                    OptionCode = value.OptionCode,
+                    OptionName = value.OptionName,
+                    ValueText = value.ValueText,
+                    ValueNumber = value.ValueNumber,
+                    ValueBoolean = value.ValueBoolean,
+                    ValueDateTime = value.ValueDateTime
                 });
             FieldCreationTime = field.CreationTime;
             FieldCreatorUserId = field.CreatorUserId;
@@ -146,7 +160,6 @@ namespace onetouch.AppFields
                 TrackingNo = TrackingNo,
                 CurrentRevisionNo = AppliedRevisionNo,
                 IsStandard = IsStandard,
-                IsCustom = IsCustom,
                 IsExtraField = IsExtraField,
                 IsHidden = IsHidden,
                 AllowNull = AllowNull,
@@ -171,6 +184,21 @@ namespace onetouch.AppFields
                 AllowAddNew = AllowAddNew,
                 DropdownOptions = DropdownOptions.OrderBy(x => x.SortOrder).Select(x =>
                     new AppFieldDropdownOption { SortOrder = x.SortOrder, Option = x.Option, Value = x.Value }).ToList(),
+                SettingValues = SettingValues.Select(x => new AppFieldSettingValue
+                {
+                    TenantId = FieldTenantId,
+                    AppFieldId = SourceAppFieldId,
+                    SettingFieldId = x.SettingFieldId,
+                    SettingFieldCode = x.SettingFieldCode,
+                    SettingFieldName = x.SettingFieldName,
+                    AppFieldsOptionId = x.AppFieldsOptionId,
+                    OptionCode = x.OptionCode,
+                    OptionName = x.OptionName,
+                    ValueText = x.ValueText,
+                    ValueNumber = x.ValueNumber,
+                    ValueBoolean = x.ValueBoolean,
+                    ValueDateTime = x.ValueDateTime
+                }).ToList(),
                 CreationTime = FieldCreationTime,
                 CreatorUserId = FieldCreatorUserId,
                 LastModificationTime = FieldLastModificationTime,

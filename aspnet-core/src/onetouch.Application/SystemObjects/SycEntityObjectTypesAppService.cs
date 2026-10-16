@@ -144,6 +144,7 @@ namespace onetouch.SystemObjects
                     .ToDictionary(id => id, id => GetBaseEntityChain(id, baseIds));
                 var objectIds = chains.Values.SelectMany(x => x).Distinct().ToList();
                 var assignments = await _appTableFieldRepository.GetAll()
+                    .Include(x => x.SettingValues)
                     .Where(x => objectIds.Contains(x.SycObjectId) &&
                         (x.TenantId == null || x.TenantId == tenantId))
                     .AsNoTracking().ToListAsync();
@@ -204,19 +205,27 @@ namespace onetouch.SystemObjects
         private static ItemExtraAttribute ToExtraAttribute(AppTableField assignment)
         {
             var attribute = new ItemExtraAttribute();
+            var settings = assignment.SettingValues.GroupBy(x => x.SettingFieldName, StringComparer.OrdinalIgnoreCase)
+                .ToDictionary(x => x.Key, x => x.First(), StringComparer.OrdinalIgnoreCase);
             attribute.AttributeId = assignment.SourceAttributeId.GetValueOrDefault() > 0
                 ? assignment.SourceAttributeId.Value : assignment.SourceAppFieldId;
             attribute.Code = assignment.FieldCode;
             attribute.Name = assignment.FieldName;
             attribute.Description = assignment.Description;
             attribute.DataType = assignment.SourceDataType ?? FieldDataType(assignment.FieldCode);
-            attribute.Width = assignment.Length?.ToString(CultureInfo.InvariantCulture);
-            attribute.Decimals = assignment.Decimals ?? 0;
-            attribute.DefaultValue = assignment.DefaultValue;
+            attribute.Width = settings.TryGetValue("Length", out var length)
+                ? length.ValueNumber?.ToString(CultureInfo.InvariantCulture)
+                : assignment.Length?.ToString(CultureInfo.InvariantCulture);
+            attribute.Decimals = settings.TryGetValue("Decimals", out var decimals)
+                ? (int)(decimals.ValueNumber ?? 0) : assignment.Decimals ?? 0;
+            attribute.DefaultValue = settings.TryGetValue("DefaultValue", out var defaultValue)
+                ? defaultValue.ValueText ?? defaultValue.OptionCode : assignment.DefaultValue;
             attribute.Usage = assignment.Usage;
             attribute.IsLookup = assignment.IsLookup ?? false;
             attribute.EntityObjectTypeCode = assignment.EntityObjectTypeCode;
-            attribute.AcceptMultipleValues = (assignment.AcceptMultipleValues ?? false) || assignment.AllowMultiSelect;
+            attribute.AcceptMultipleValues = (assignment.AcceptMultipleValues ?? false) ||
+                (settings.TryGetValue("AllowMultiSelect", out var multiSelect)
+                    ? multiSelect.ValueBoolean == true : assignment.AllowMultiSelect);
             attribute.IsVariation = assignment.IsVariation ?? false;
             attribute.IsAdvancedSearch = assignment.IsAdvancedSearch ?? false;
             attribute.AllowAddNew = assignment.AllowAddNew ?? false;

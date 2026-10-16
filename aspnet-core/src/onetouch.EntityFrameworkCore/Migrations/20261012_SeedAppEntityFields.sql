@@ -18,6 +18,7 @@ IF COL_LENGTH(N'dbo.AppFieldsHistory', N'SnapshotJson') IS NOT NULL
     THROW 51121, 'Apply the current typed Field Manager migrations first.', 1;
 
 DECLARE @baseEntityObjectId bigint;
+DECLARE @baseEntityTypeId bigint;
 DECLARE @appEntityObjectId bigint;
 DECLARE @fieldObjectId bigint;
 DECLARE @fieldRootId bigint;
@@ -46,6 +47,11 @@ IF (SELECT COUNT(*) FROM dbo.SydObjects WHERE Code = N'BASEENTITY' AND IsDeleted
 SELECT @baseEntityObjectId = Id FROM dbo.SydObjects
 WHERE Code = N'BASEENTITY' AND Name = N'BaseEntity' AND ObjectTypeCode = N'ENTITY'
   AND ObjectTypeId = @entityTypeId AND IsDeleted = 0;
+SELECT @baseEntityTypeId = Id FROM dbo.SycEntityObjectTypes
+WHERE ObjectId = @baseEntityObjectId AND Code = N'BASEENTITY'
+  AND ParentId IS NULL AND IsDeleted = 0;
+IF @baseEntityTypeId IS NULL
+    THROW 51125, 'Apply the entity object type migration before seeding AppEntity fields.', 1;
 
 IF EXISTS (SELECT 1 FROM dbo.SydObjects
     WHERE (Code = N'APPENTITY-DATA' OR Name = N'AppEntity')
@@ -165,10 +171,12 @@ IF EXISTS (SELECT 1 FROM #SeedAppEntityFields s
 IF EXISTS (SELECT 1 FROM #SeedAppEntityFields s
     JOIN dbo.SycEntityObjectTypes t ON t.ObjectId = @fieldObjectId
         AND t.ParentId = @fieldRootId AND t.Code = s.TypeCode AND t.IsDeleted = 0
-    JOIN dbo.AppFields f ON f.SycObjectId = @appEntityObjectId
-        AND f.TenantId IS NULL AND f.FieldName = s.FieldName AND f.IsDeleted = 0
-    WHERE f.EntitySycObjectId <> @baseEntityObjectId OR f.FieldTypeId <> t.Id
-       OR f.IsStandard <> 1 OR f.IsCustom <> 0)
+    JOIN dbo.AppFields f ON f.TenantId IS NULL AND f.FieldName = s.FieldName AND f.IsDeleted = 0
+        AND (f.Description = N'AppEntities.' + s.FieldName OR EXISTS
+            (SELECT 1 FROM dbo.AppTableFields a WHERE a.SourceAppFieldId = f.Id
+             AND a.SycObjectId = @appEntityObjectId AND a.SycEntityObjectTypeId IS NULL))
+    WHERE f.SycObjectId IS NOT NULL OR f.EntitySycObjectId IS NOT NULL OR f.FieldTypeId <> t.Id
+       OR f.IsStandard <> 1)
     THROW 51117, 'An existing AppEntity field definition conflicts with the seed.', 1;
 
 ;WITH Missing AS
@@ -180,8 +188,10 @@ IF EXISTS (SELECT 1 FROM #SeedAppEntityFields s
     JOIN dbo.SycEntityObjectTypes t ON t.ObjectId = @fieldObjectId
         AND t.ParentId = @fieldRootId AND t.Code = s.TypeCode AND t.IsDeleted = 0
     WHERE NOT EXISTS (SELECT 1 FROM dbo.AppFields f
-        WHERE f.SycObjectId = @appEntityObjectId AND f.TenantId IS NULL
-          AND f.FieldName = s.FieldName AND f.IsDeleted = 0)
+        WHERE f.TenantId IS NULL AND f.FieldName = s.FieldName AND f.IsDeleted = 0
+          AND (f.Description = N'AppEntities.' + s.FieldName OR EXISTS
+              (SELECT 1 FROM dbo.AppTableFields a WHERE a.SourceAppFieldId = f.Id
+               AND a.SycObjectId = @appEntityObjectId AND a.SycEntityObjectTypeId IS NULL)))
 )
 SELECT m.*,
        COALESCE((SELECT MAX(TRY_CONVERT(int, RIGHT(f.FieldCode, 4)))
@@ -198,16 +208,16 @@ INSERT dbo.AppFields
     (TenantId, SourceFieldId, SycObjectId, EntitySycObjectId, FieldCode, FieldName,
      Description, FieldTypeId, WidgetTypeId, FieldLevelId, FieldStatusId,
      FieldLevelCode, FieldStatusCode, TrackingNo, CurrentRevisionNo,
-     IsStandard, IsCustom, IsExtraField, IsHidden, AllowNull, [Length], Decimals,
+     IsStandard, IsExtraField, IsHidden, AllowNull, [Length], Decimals,
      DefaultValue, DateFormat, TimeFormat, AllowMultiSelect, Required, Visible,
      Editable, CreationTime, CreatorUserId, LastModificationTime,
      LastModifierUserId, IsDeleted, DeleterUserId, DeletionTime)
-SELECT NULL, NULL, @appEntityObjectId, @baseEntityObjectId,
+SELECT NULL, NULL, NULL, NULL,
        LEFT(m.TypeCode, 2) + N'S' + LEFT(UPPER(m.FieldName) + N'____', 4)
            + RIGHT(N'0000' + CONVERT(nvarchar(10), m.NextSequence), 4),
        m.FieldName, N'AppEntities.' + m.FieldName, m.FieldTypeId,
        NULL, NULL, NULL, N'System', N'Proposed', NULL, N'00',
-       1, 0, 0, 0, c.is_nullable,
+       1, 0, 0, c.is_nullable,
        CASE WHEN ty.name IN (N'nvarchar', N'nchar') AND c.max_length > 0
             THEN c.max_length / 2
             WHEN ty.name IN (N'varchar', N'char') AND c.max_length > 0
@@ -222,8 +232,10 @@ JOIN sys.types ty ON ty.user_type_id = c.user_type_id;
 
 IF EXISTS (SELECT 1 FROM #SeedAppEntityFields s
     OUTER APPLY (SELECT COUNT(*) AS Cnt FROM dbo.AppFields f
-        WHERE f.SycObjectId = @appEntityObjectId AND f.TenantId IS NULL
-          AND f.FieldName = s.FieldName AND f.IsDeleted = 0) matches
+        WHERE f.TenantId IS NULL AND f.FieldName = s.FieldName AND f.IsDeleted = 0
+          AND (f.Description = N'AppEntities.' + s.FieldName OR EXISTS
+              (SELECT 1 FROM dbo.AppTableFields a WHERE a.SourceAppFieldId = f.Id
+               AND a.SycObjectId = @appEntityObjectId AND a.SycEntityObjectTypeId IS NULL))) matches
     WHERE matches.Cnt <> 1)
     THROW 51119, 'Expected one active AppEntity field definition per column.', 1;
 
@@ -232,7 +244,7 @@ INSERT dbo.AppTableFields
      SycEntityObjectTypeId, SourceAppFieldId, FieldTenantId, SourceFieldId,
      DefinitionSycObjectId, EntitySycObjectId, FieldName, Description,
      FieldTypeId, WidgetTypeId, FieldLevelId, FieldStatusId, FieldLevelCode,
-     FieldStatusCode, TrackingNo, IsStandard, IsCustom, IsExtraField, IsHidden,
+     FieldStatusCode, TrackingNo, IsStandard, IsExtraField, IsHidden,
      AllowNull, [Length], Decimals, DefaultValue, DateFormat, TimeFormat,
      AllowMultiSelect, Required, Visible, Editable, SourceAttributeId,
      SourceDataType, SourceEntityObjectTypeId, EntityObjectTypeCode, Usage,
@@ -245,7 +257,7 @@ SELECT f.TenantId, f.FieldDefinitionKey, f.FieldCode, f.CurrentRevisionNo,
        f.SycObjectId, f.EntitySycObjectId, f.FieldName, f.Description,
        f.FieldTypeId, f.WidgetTypeId, f.FieldLevelId, f.FieldStatusId,
        f.FieldLevelCode, f.FieldStatusCode, f.TrackingNo, f.IsStandard,
-       f.IsCustom, f.IsExtraField, f.IsHidden, f.AllowNull, f.[Length],
+       f.IsExtraField, f.IsHidden, f.AllowNull, f.[Length],
        f.Decimals, f.DefaultValue, f.DateFormat, f.TimeFormat,
        f.AllowMultiSelect, f.Required, f.Visible, f.Editable,
        f.SourceAttributeId, f.SourceDataType, f.SourceEntityObjectTypeId,
@@ -255,8 +267,10 @@ SELECT f.TenantId, f.FieldDefinitionKey, f.FieldCode, f.CurrentRevisionNo,
        f.LastModifierUserId, f.IsDeleted, f.DeleterUserId, f.DeletionTime,
        SYSUTCDATETIME(), NULL
 FROM #SeedAppEntityFields s
-JOIN dbo.AppFields f ON f.SycObjectId = @appEntityObjectId AND f.TenantId IS NULL
-    AND f.FieldName = s.FieldName AND f.IsDeleted = 0
+JOIN dbo.AppFields f ON f.TenantId IS NULL AND f.FieldName = s.FieldName AND f.IsDeleted = 0
+    AND (f.Description = N'AppEntities.' + s.FieldName OR EXISTS
+        (SELECT 1 FROM dbo.AppTableFields existing WHERE existing.SourceAppFieldId = f.Id
+         AND existing.SycObjectId = @appEntityObjectId AND existing.SycEntityObjectTypeId IS NULL))
 WHERE NOT EXISTS (SELECT 1 FROM dbo.AppTableFields a
     WHERE a.TenantId IS NULL AND a.FieldDefinitionKey = f.FieldDefinitionKey
       AND a.SycObjectId = @appEntityObjectId AND a.SycEntityObjectTypeId IS NULL);
@@ -277,7 +291,10 @@ SET @historySql = N'INSERT dbo.AppFieldsHistory
 SELECT f.Id, f.CurrentRevisionNo, N''Create'', SYSUTCDATETIME(), ' + @historyValues + N'
 FROM dbo.AppFields f
 JOIN #SeedAppEntityFields s ON s.FieldName = f.FieldName
-WHERE f.SycObjectId = @objectId AND f.TenantId IS NULL AND f.IsDeleted = 0
+WHERE f.TenantId IS NULL AND f.IsDeleted = 0
+  AND (f.Description = N''AppEntities.'' + s.FieldName OR EXISTS
+      (SELECT 1 FROM dbo.AppTableFields a WHERE a.SourceAppFieldId = f.Id
+       AND a.SycObjectId = @objectId AND a.SycEntityObjectTypeId IS NULL))
   AND NOT EXISTS (SELECT 1 FROM dbo.AppFieldsHistory h
       WHERE h.AppFieldId = f.Id AND h.RevisionNo = f.CurrentRevisionNo);';
 EXEC sys.sp_executesql @historySql, N'@objectId bigint', @objectId = @appEntityObjectId;
@@ -288,8 +305,8 @@ BEGIN CATCH
     THROW;
 END CATCH;
 
-SELECT (SELECT COUNT(*) FROM dbo.AppFields f JOIN dbo.SydObjects o ON o.Id=f.SycObjectId
-        WHERE o.Code=N'APPENTITY-DATA' AND f.TenantId IS NULL AND f.IsDeleted=0) AS FieldDefinitions,
+SELECT (SELECT COUNT(*) FROM dbo.AppFields f
+        WHERE f.Description LIKE N'AppEntities.%' AND f.TenantId IS NULL AND f.IsDeleted=0) AS FieldDefinitions,
        (SELECT COUNT(*) FROM dbo.AppTableFields a JOIN dbo.SydObjects o ON o.Id=a.SycObjectId
         WHERE o.Code=N'APPENTITY-DATA' AND a.TenantId IS NULL AND a.SycEntityObjectTypeId IS NULL) AS TableAssignments;
 DROP TABLE #MissingAppEntityFields;
