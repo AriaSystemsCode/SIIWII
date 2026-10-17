@@ -1,5 +1,19 @@
 {
   "profiles": {
+    "Local onetouchDevDb3 - check": {
+      "commandName": "Project",
+      "commandLineArgs": "--config ..\\onetouch.Web.Host\\appsettings.json --default-only --expected-database onetouchDevDb3 --check",
+      "environmentVariables": {
+        "ConnectionStrings__Default": "Server=localhost;Database=onetouchDevDb3;Integrated Security=True;TrustServerCertificate=True"
+      }
+    },
+    "Local onetouchDevDb3 - apply": {
+      "commandName": "Project",
+      "commandLineArgs": "--config ..\\onetouch.Web.Host\\appsettings.json --content-root ..\\onetouch.Web.Host --default-only --expected-database onetouchDevDb3 --apply --maintenance-confirmed",
+      "environmentVariables": {
+        "ConnectionStrings__Default": "Server=localhost;Database=onetouchDevDb3;Integrated Security=True;TrustServerCertificate=True"
+      }
+    },
     "onetouchDevDb3 - check": {
       "commandName": "Project",
       "commandLineArgs": "--config ..\\onetouch.Web.Host\\appsettings.json --default-only --expected-database onetouchDevDb3 --check"

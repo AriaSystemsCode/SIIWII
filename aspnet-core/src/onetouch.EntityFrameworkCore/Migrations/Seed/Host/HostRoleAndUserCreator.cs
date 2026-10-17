@@ -8,6 +8,7 @@ using Abp.MultiTenancy;
 using Abp.Localization;
 using Abp.Notifications;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore.Storage;
 using onetouch.Authorization;
 using onetouch.Authorization.Roles;
 using onetouch.Authorization.Users;
@@ -91,7 +92,15 @@ namespace onetouch.Migrations.Seed.Host
                                 throw new InvalidOperationException("Missing Field Manager seed resource: " + resourceName);
 
                             using (var reader = new StreamReader(stream))
-                                _context.Database.ExecuteSqlRaw(reader.ReadToEnd());
+                            using (var command = _context.Database.GetDbConnection().CreateCommand())
+                            {
+                                // ExecuteSqlRaw treats JSON braces in seed scripts as
+                                // string-format placeholders and throws FormatException.
+                                command.CommandText = reader.ReadToEnd();
+                                command.CommandTimeout = _context.Database.GetCommandTimeout() ?? 30;
+                                command.Transaction = _context.Database.CurrentTransaction?.GetDbTransaction();
+                                command.ExecuteNonQuery();
+                            }
                         }
                     }
 

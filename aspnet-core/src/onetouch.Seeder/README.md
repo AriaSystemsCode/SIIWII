@@ -161,6 +161,11 @@ includes Visual Studio launch profiles named `onetouchDevDb3 - check` and
 `onetouchDevDb3 - apply`. Select the apply profile explicitly to seed from
 Visual Studio. Those profiles use paths relative to the Seeder project folder;
 confirm that the Web Host config points to the intended server before applying.
+For a local SQL Server on the developer's computer, use `Local onetouchDevDb3 -
+check` or `Local onetouchDevDb3 - apply` instead. These profiles override only
+`ConnectionStrings.Default` with integrated authentication to `localhost` and
+do not query the client registry. Relative paths are resolved from the current
+working directory first, then the Seeder project folder for Visual Studio runs.
 
 ## Concurrency, failures and retry
 

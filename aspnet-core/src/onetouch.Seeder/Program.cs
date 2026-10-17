@@ -231,8 +231,28 @@ public sealed record Options(string ConfigPath, string ContentRoot, bool Apply, 
         if (values.TryGetValue("--command-timeout", out var seconds) && !int.TryParse(seconds, out timeout))
             throw new SeederOptionsException("Command timeout must be an integer between 1 and 3600 seconds.");
         if (timeout < 1 || timeout > 3600) throw new SeederOptionsException("Timeout must be between 1 and 3600 seconds.");
-        return new Options(Path.GetFullPath(config), Path.GetFullPath(values.GetValueOrDefault("--content-root", ".")), apply,
+        var configPath = ResolvePath(config, File.Exists);
+        if (!File.Exists(configPath))
+            throw new SeederOptionsException("Config file was not found relative to the working directory or Seeder project.");
+        var contentRoot = ResolvePath(values.GetValueOrDefault("--content-root", "."), Directory.Exists);
+        if (apply && !Directory.Exists(contentRoot))
+            throw new SeederOptionsException("Content root directory was not found relative to the working directory or Seeder project.");
+        return new Options(configPath, contentRoot, apply,
             values.GetValueOrDefault("--client-url"), timeout, defaultOnly, values.GetValueOrDefault("--expected-database"));
+    }
+
+    private static string ResolvePath(string path, Func<string, bool> exists)
+    {
+        var fromWorkingDirectory = Path.GetFullPath(path);
+        if (Path.IsPathFullyQualified(path) || exists(fromWorkingDirectory))
+            return fromWorkingDirectory;
+
+        // Visual Studio may launch a project with the solution folder as its
+        // working directory. During source runs, bin/<Configuration>/<TFM>
+        // is three levels below the Seeder project folder.
+        var projectDirectory = Path.GetFullPath(Path.Combine(AppContext.BaseDirectory, "..", "..", ".."));
+        var fromProjectDirectory = Path.GetFullPath(Path.Combine(projectDirectory, path));
+        return exists(fromProjectDirectory) ? fromProjectDirectory : fromWorkingDirectory;
     }
 }
 
