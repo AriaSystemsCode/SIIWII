@@ -1,0 +1,12 @@
+{
+  "profiles": {
+    "onetouchDevDb3 - check": {
+      "commandName": "Project",
+      "commandLineArgs": "--config ..\\onetouch.Web.Host\\appsettings.json --default-only --expected-database onetouchDevDb3 --check"
+    },
+    "onetouchDevDb3 - apply": {
+      "commandName": "Project",
+      "commandLineArgs": "--config ..\\onetouch.Web.Host\\appsettings.json --content-root ..\\onetouch.Web.Host --default-only --expected-database onetouchDevDb3 --apply --maintenance-confirmed"
+    }
+  }
+}

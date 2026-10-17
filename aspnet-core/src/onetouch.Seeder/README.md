@@ -107,7 +107,7 @@ Exit codes: **0** all selected databases match this release, **1** failure,
 A newer database is not accepted by check and is refused by apply (no downgrade).
 The SQL principal needs permission to see/read the history table for check mode.
 
-All rows of `dbo.Clients` are included; the current implementation assumes no
+Unless `--default-only` is selected, all rows of `dbo.Clients` are included; the current implementation assumes no
 active-client column. Blank/invalid connections fail the job rather than silently
 skipping a client. Default and client databases are deduplicated by server/catalog;
 server case is normalized but catalog case is preserved for case-sensitive SQL instances.
@@ -154,6 +154,14 @@ dotnet <published-seeder.dll> --config <effective-settings.json> --client-url <e
 If other clients share that database, take all of them offline as well. The explicit
 maintenance confirmation is an operator assertion, not automatic access control.
 
+To run only `ConnectionStrings.Default`, use `--default-only --expected-database
+onetouchDevDb3`. The runner compares the actual default catalog to that exact
+name and does not query or seed any registered client. The Seeder project also
+includes Visual Studio launch profiles named `onetouchDevDb3 - check` and
+`onetouchDevDb3 - apply`. Select the apply profile explicitly to seed from
+Visual Studio. Those profiles use paths relative to the Seeder project folder;
+confirm that the Web Host config points to the intended server before applying.
+
 ## Concurrency, failures and retry
 
 Databases are processed sequentially. A session-owned SQL application lock prevents
@@ -170,7 +178,8 @@ after failure. Pooling is disabled on the lock-owning connection, so closing it
 releases the lock. The principal needs table creation, seed write and application
 lock permissions. A long transaction can require substantial transaction-log space.
 
-Status/timing and exception type/SQL error number go to stdout/stderr for pipeline
+Status/timing, exception type/SQL error number, and the first application stack
+location go to stdout/stderr for pipeline
 capture. Raw exception messages are suppressed because they may expose credentials
 or customer data. Inspect SQL diagnostics securely when deeper investigation is
 required. Do not blindly retry a deterministic data/schema failure.
