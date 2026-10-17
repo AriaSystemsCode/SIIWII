@@ -7,7 +7,7 @@ It reuses the existing seed helper; translation generation is not changed.
 ## Release contract
 
 `SeedRelease.RequiredVersion` in `Program.cs` is the version-controlled required
-seed snapshot (version 10 adds DateFormat choices). Increment it whenever
+seed snapshot (version 11 enables multiple DropdownOptions selections). Increment it whenever
 the cumulative seed routines or their assets change. It is not an arbitrary
 command-line value.
 Each database records successful snapshots in `dbo.__OneTouchSeedHistory`.
@@ -64,6 +64,11 @@ after all type-owned setting definitions are present.
 
 Version 10 adds three common DateFormat choices and maps matching current
 Date picker setting values to those options. The option seed is idempotent.
+
+Version 11 follows `20261016170000_UseFieldSettingOptionsOnly`. It enables
+multiple selections for the List--Dropdown `DropdownOptions` setting. The
+matching option choices and selections live in `AppFieldsOptions` and the
+setting-value tables; the separate dropdown-option tables have been removed.
 
 Existing `Clients.IsSeeded` values are ignored and left untouched. Do not mark old
 databases version 1 merely because that flag is True: run the new seed baseline.

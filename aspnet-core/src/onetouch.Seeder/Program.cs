@@ -159,10 +159,10 @@ public static class Program
 
 public static class SeedRelease
 {
-    // Increment only when the cumulative seed snapshot changes. Version 10
-    // adds Date picker format choices to the Field Manager settings.
+    // Increment only when the cumulative seed snapshot changes. Version 11
+    // enables multiple DropdownOptions selections for List--Dropdown fields.
     // This is not an EF schema version.
-    public const int RequiredVersion = 10;
+    public const int RequiredVersion = 11;
 }
 
 public sealed record Target(string Label, string ConnectionString, string Identity)
