@@ -56,7 +56,6 @@ namespace onetouch.AppFields
         public bool? IsAdvancedSearch { get; set; }
         public bool? AcceptMultipleValues { get; set; }
         public bool? AllowAddNew { get; set; }
-        public ICollection<AppTableFieldDropdownOption> DropdownOptions { get; set; } = new List<AppTableFieldDropdownOption>();
         public ICollection<AppTableFieldSettingValue> SettingValues { get; set; } = new List<AppTableFieldSettingValue>();
         public DateTime FieldCreationTime { get; set; }
         public long? FieldCreatorUserId { get; set; }
@@ -108,12 +107,6 @@ namespace onetouch.AppFields
             IsAdvancedSearch = field.IsAdvancedSearch;
             AcceptMultipleValues = field.AcceptMultipleValues;
             AllowAddNew = field.AllowAddNew;
-            DropdownOptions.Clear();
-            foreach (var option in field.DropdownOptions.OrderBy(x => x.SortOrder))
-                DropdownOptions.Add(new AppTableFieldDropdownOption
-                {
-                    SortOrder = option.SortOrder, Option = option.Option, Value = option.Value
-                });
             SettingValues.Clear();
             foreach (var value in field.SettingValues)
                 SettingValues.Add(new AppTableFieldSettingValue
@@ -182,8 +175,6 @@ namespace onetouch.AppFields
                 IsAdvancedSearch = IsAdvancedSearch,
                 AcceptMultipleValues = AcceptMultipleValues,
                 AllowAddNew = AllowAddNew,
-                DropdownOptions = DropdownOptions.OrderBy(x => x.SortOrder).Select(x =>
-                    new AppFieldDropdownOption { SortOrder = x.SortOrder, Option = x.Option, Value = x.Value }).ToList(),
                 SettingValues = SettingValues.Select(x => new AppFieldSettingValue
                 {
                     TenantId = FieldTenantId,

@@ -163,7 +163,8 @@ BEGIN TRY
            m.FieldName, N'Field Manager ' + o.TypeName + N' ' + m.[Section] + N' setting',
            m.FieldTypeId, NULL, NULL, NULL, N'System', N'Active', NULL, N'00',
            1, 0, 0, m.AllowNull, NULL, NULL, m.DefaultValue,
-           NULL, NULL, 0, m.Required, 1, 1, N'FieldManager.' + m.[Section],
+           NULL, NULL, CASE WHEN m.FieldName = N'DropdownOptions' THEN 1 ELSE 0 END,
+           m.Required, 1, 1, N'FieldManager.' + m.[Section],
            SYSUTCDATETIME(), NULL, NULL, NULL, 0, NULL, NULL
     FROM #MissingSettings AS m JOIN #OwnerTypes AS o ON o.TypeId = m.OwnerTypeId;
 

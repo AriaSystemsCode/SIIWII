@@ -64,9 +64,6 @@ namespace onetouch.EntityFrameworkCore
         public virtual DbSet<AppField> AppFields { get; set; }
         public virtual DbSet<AppFieldHistory> AppFieldsHistory { get; set; }
         public virtual DbSet<AppTableField> AppTableFields { get; set; }
-        public virtual DbSet<AppFieldDropdownOption> AppFieldDropdownOptions { get; set; }
-        public virtual DbSet<AppFieldHistoryDropdownOption> AppFieldHistoryDropdownOptions { get; set; }
-        public virtual DbSet<AppTableFieldDropdownOption> AppTableFieldDropdownOptions { get; set; }
         //I40[Start]
         public virtual DbSet<AppContactRelationshipInfo> AppContactRelationshipInfo { get; set; }
         //I40[End]
@@ -262,8 +259,6 @@ namespace onetouch.EntityFrameworkCore
 
             modelBuilder.Entity<AppField>(field =>
             {
-                field.HasMany(x => x.DropdownOptions).WithOne().HasForeignKey(x => x.AppFieldId)
-                    .OnDelete(DeleteBehavior.Cascade);
                 field.HasMany(x => x.SettingValues).WithOne().HasForeignKey(x => x.AppFieldId)
                     .OnDelete(DeleteBehavior.Cascade);
                 field.Property(x => x.FieldDefinitionKey).HasDefaultValueSql("newid()");
@@ -289,8 +284,6 @@ namespace onetouch.EntityFrameworkCore
             });
             modelBuilder.Entity<AppFieldHistory>(history =>
             {
-                history.HasMany(x => x.DropdownOptions).WithOne().HasForeignKey(x => x.AppFieldHistoryId)
-                    .OnDelete(DeleteBehavior.Cascade);
                 history.HasMany(x => x.SettingValues).WithOne().HasForeignKey(x => x.AppFieldHistoryId)
                     .OnDelete(DeleteBehavior.Cascade);
                 history.HasOne<AppField>().WithMany().HasForeignKey(x => x.AppFieldId)
@@ -300,8 +293,6 @@ namespace onetouch.EntityFrameworkCore
             });
             modelBuilder.Entity<AppTableField>(assignment =>
             {
-                assignment.HasMany(x => x.DropdownOptions).WithOne().HasForeignKey(x => x.AppTableFieldId)
-                    .OnDelete(DeleteBehavior.Cascade);
                 assignment.HasMany(x => x.SettingValues).WithOne().HasForeignKey(x => x.AppTableFieldId)
                     .OnDelete(DeleteBehavior.Cascade);
                 assignment.HasOne<SydObject>().WithMany().HasForeignKey(x => x.SycObjectId)
@@ -313,9 +304,6 @@ namespace onetouch.EntityFrameworkCore
                 assignment.HasIndex(x => new { x.TenantId, x.FieldDefinitionKey, x.SycObjectId, x.SycEntityObjectTypeId })
                     .IsUnique().HasFilter(null);
             });
-            modelBuilder.Entity<AppFieldDropdownOption>().HasIndex(x => new { x.AppFieldId, x.SortOrder }).IsUnique();
-            modelBuilder.Entity<AppFieldHistoryDropdownOption>().HasIndex(x => new { x.AppFieldHistoryId, x.SortOrder }).IsUnique();
-            modelBuilder.Entity<AppTableFieldDropdownOption>().HasIndex(x => new { x.AppTableFieldId, x.SortOrder }).IsUnique();
             modelBuilder.Entity<AppFieldsOption>(option =>
             {
                 option.Property(x => x.IsActive).HasDefaultValue(true);

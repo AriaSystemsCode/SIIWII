@@ -75,7 +75,6 @@ namespace onetouch.AppFields
         public bool? IsAdvancedSearch { get; set; }
         public bool? AcceptMultipleValues { get; set; }
         public bool? AllowAddNew { get; set; }
-        public ICollection<AppFieldDropdownOption> DropdownOptions { get; set; } = new List<AppFieldDropdownOption>();
         public ICollection<AppFieldSettingValue> SettingValues { get; set; } = new List<AppFieldSettingValue>();
     }
 }

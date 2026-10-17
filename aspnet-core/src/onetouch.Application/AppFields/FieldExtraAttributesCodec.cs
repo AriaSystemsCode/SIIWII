@@ -64,6 +64,8 @@ namespace onetouch.AppFields
                         x.Value == null || x.Option.Length > 500 || x.Value.Length > 500) == true)
                     throw new UserFriendlyException("Extra attributes exceed the allowed field lengths.");
                 data.DropdownOptions ??= new List<DropdownOptionData>();
+                if (data.DropdownOptions.Count > 0)
+                    throw new UserFriendlyException("Save selectable options through field settings and AppFieldsOptionId.");
                 return data;
             }
             catch (JsonException)
@@ -84,12 +86,6 @@ namespace onetouch.AppFields
             field.IsAdvancedSearch = data.IsAdvancedSearch;
             field.AcceptMultipleValues = data.AcceptMultipleValues;
             field.AllowAddNew = data.AllowAddNew;
-            field.DropdownOptions.Clear();
-            for (var i = 0; i < data.DropdownOptions.Count; i++)
-                field.DropdownOptions.Add(new AppFieldDropdownOption
-                {
-                    SortOrder = i, Option = data.DropdownOptions[i].Option, Value = data.DropdownOptions[i].Value
-                });
         }
 
         public static string Serialize(AppField field) => JsonSerializer.Serialize(new Data
@@ -104,8 +100,7 @@ namespace onetouch.AppFields
             IsAdvancedSearch = field.IsAdvancedSearch,
             AcceptMultipleValues = field.AcceptMultipleValues,
             AllowAddNew = field.AllowAddNew,
-            DropdownOptions = field.DropdownOptions.OrderBy(x => x.SortOrder)
-                .Select(x => new DropdownOptionData { Option = x.Option, Value = x.Value }).ToList()
+            DropdownOptions = new List<DropdownOptionData>()
         }, JsonOptions);
 
         public static string Serialize(AppFieldHistory field) => JsonSerializer.Serialize(new Data
@@ -120,8 +115,7 @@ namespace onetouch.AppFields
             IsAdvancedSearch = field.IsAdvancedSearch,
             AcceptMultipleValues = field.AcceptMultipleValues,
             AllowAddNew = field.AllowAddNew,
-            DropdownOptions = field.DropdownOptions.OrderBy(x => x.SortOrder)
-                .Select(x => new DropdownOptionData { Option = x.Option, Value = x.Value }).ToList()
+            DropdownOptions = new List<DropdownOptionData>()
         }, JsonOptions);
     }
 }

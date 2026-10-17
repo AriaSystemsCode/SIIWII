@@ -3064,45 +3064,6 @@ namespace onetouch.Migrations
                         });
                 });
 
-            modelBuilder.Entity("onetouch.AppFields.AppFieldDropdownOption", b =>
-                {
-                    b.Property<long>("Id").ValueGeneratedOnAdd().HasColumnType("bigint");
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<long>("Id"));
-                    b.Property<long>("AppFieldId").HasColumnType("bigint");
-                    b.Property<string>("Option").IsRequired().HasMaxLength(500).HasColumnType("nvarchar(500)");
-                    b.Property<int>("SortOrder").HasColumnType("int");
-                    b.Property<string>("Value").IsRequired().HasMaxLength(500).HasColumnType("nvarchar(500)");
-                    b.HasKey("Id");
-                    b.HasIndex("AppFieldId", "SortOrder").IsUnique();
-                    b.ToTable("AppFieldDropdownOptions");
-                });
-
-            modelBuilder.Entity("onetouch.AppFields.AppFieldHistoryDropdownOption", b =>
-                {
-                    b.Property<long>("Id").ValueGeneratedOnAdd().HasColumnType("bigint");
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<long>("Id"));
-                    b.Property<long>("AppFieldHistoryId").HasColumnType("bigint");
-                    b.Property<string>("Option").IsRequired().HasMaxLength(500).HasColumnType("nvarchar(500)");
-                    b.Property<int>("SortOrder").HasColumnType("int");
-                    b.Property<string>("Value").IsRequired().HasMaxLength(500).HasColumnType("nvarchar(500)");
-                    b.HasKey("Id");
-                    b.HasIndex("AppFieldHistoryId", "SortOrder").IsUnique();
-                    b.ToTable("AppFieldHistoryDropdownOptions");
-                });
-
-            modelBuilder.Entity("onetouch.AppFields.AppTableFieldDropdownOption", b =>
-                {
-                    b.Property<long>("Id").ValueGeneratedOnAdd().HasColumnType("bigint");
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<long>("Id"));
-                    b.Property<long>("AppTableFieldId").HasColumnType("bigint");
-                    b.Property<string>("Option").IsRequired().HasMaxLength(500).HasColumnType("nvarchar(500)");
-                    b.Property<int>("SortOrder").HasColumnType("int");
-                    b.Property<string>("Value").IsRequired().HasMaxLength(500).HasColumnType("nvarchar(500)");
-                    b.HasKey("Id");
-                    b.HasIndex("AppTableFieldId", "SortOrder").IsUnique();
-                    b.ToTable("AppTableFieldDropdownOptions");
-                });
-
             modelBuilder.Entity("onetouch.AppFields.AppFieldsOption", b =>
                 {
                     b.Property<long>("Id").ValueGeneratedOnAdd().HasColumnType("bigint");
@@ -9419,12 +9380,6 @@ namespace onetouch.Migrations
                         .OnDelete(DeleteBehavior.Restrict);
                 });
 
-            modelBuilder.Entity("onetouch.AppFields.AppFieldDropdownOption", b =>
-                {
-                    b.HasOne("onetouch.AppFields.AppField", null).WithMany("DropdownOptions")
-                        .HasForeignKey("AppFieldId").OnDelete(DeleteBehavior.Cascade).IsRequired();
-                });
-
             modelBuilder.Entity("onetouch.AppFields.AppFieldsOption", b =>
                 {
                     b.HasOne("onetouch.AppFields.AppField", null).WithMany()
@@ -9453,12 +9408,6 @@ namespace onetouch.Migrations
                         .IsRequired();
                 });
 
-            modelBuilder.Entity("onetouch.AppFields.AppFieldHistoryDropdownOption", b =>
-                {
-                    b.HasOne("onetouch.AppFields.AppFieldHistory", null).WithMany("DropdownOptions")
-                        .HasForeignKey("AppFieldHistoryId").OnDelete(DeleteBehavior.Cascade).IsRequired();
-                });
-
             modelBuilder.Entity("onetouch.AppFields.AppFieldHistorySettingValue", b =>
                 {
                     b.HasOne("onetouch.AppFields.AppFieldHistory", null).WithMany("SettingValues")
@@ -9473,26 +9422,17 @@ namespace onetouch.Migrations
 
             modelBuilder.Entity("onetouch.AppFields.AppField", b =>
                 {
-                    b.Navigation("DropdownOptions");
                     b.Navigation("SettingValues");
                 });
 
             modelBuilder.Entity("onetouch.AppFields.AppFieldHistory", b =>
                 {
-                    b.Navigation("DropdownOptions");
                     b.Navigation("SettingValues");
                 });
 
             modelBuilder.Entity("onetouch.AppFields.AppTableField", b =>
                 {
-                    b.Navigation("DropdownOptions");
                     b.Navigation("SettingValues");
-                });
-
-            modelBuilder.Entity("onetouch.AppFields.AppTableFieldDropdownOption", b =>
-                {
-                    b.HasOne("onetouch.AppFields.AppTableField", null).WithMany("DropdownOptions")
-                        .HasForeignKey("AppTableFieldId").OnDelete(DeleteBehavior.Cascade).IsRequired();
                 });
 
             modelBuilder.Entity("onetouch.AppItems.AppItem", b =>

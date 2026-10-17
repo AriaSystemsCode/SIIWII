@@ -81,7 +81,6 @@ namespace onetouch.AppFields
         public bool? IsAdvancedSearch { get; set; }
         public bool? AcceptMultipleValues { get; set; }
         public bool? AllowAddNew { get; set; }
-        public ICollection<AppFieldHistoryDropdownOption> DropdownOptions { get; set; } = new List<AppFieldHistoryDropdownOption>();
         public ICollection<AppFieldHistorySettingValue> SettingValues { get; set; } = new List<AppFieldHistorySettingValue>();
 
         public DateTime CreationTime { get; set; }
