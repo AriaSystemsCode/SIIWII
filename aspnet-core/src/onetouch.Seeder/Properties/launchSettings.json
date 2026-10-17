@@ -1,0 +1,8 @@
+{
+  "profiles": {
+    "onetouch.Seeder": {
+      "commandName": "Project",
+      "commandLineArgs": "--config \"C:\\Hassan\\SIIWII\\aspnet-core\\src\\onetouch.Web.Host\\appsettings.json\" --content-root \"C:\\Hassan\\SIIWII\\aspnet-core\\src\\onetouch.Web.Host\" --default-only --expected-database onetouchDevDb3 --apply --maintenance-confirmed"
+    }
+  }
+}
