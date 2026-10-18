@@ -234,17 +234,58 @@
         </span>
     </ng-template>
 
-    <app-filter-builder
-        *ngIf="showFilterDialog"
-        [fields]="filterBuilderFields"
-        [conditions]="selectedConditions"
-        [matchMode]="selectedMatchMode"
-        (matchModeChange)="onFilterMatchModeChanged($event)"
-        (apply)="onFiltersApplied($event)"
-        (cancel)="closeFilterDialog()">
-    </app-filter-builder>
+<app-filter-builder
+    *ngIf="showFilterDialog"
+    [fields]="filterBuilderFields"
+    [conditions]="selectedConditions"
+    [matchMode]="selectedMatchMode"
+    [filterTree]="selectedFilterTree"
+    (filterTreeChange)="onFilterTreeChanged($event)"
+    (apply)="onFiltersApplied($event)"
+    (cancel)="closeFilterDialog()">
+</app-filter-builder>
 
 </p-dialog>
+
+<!-- INSERT DESTINATION -->
+<div *ngIf="!isEditMode" class="insert-destination mt-4 mb-3">
+
+    <label class="insert-destination-option">
+
+        <input
+            type="checkbox"
+            [(ngModel)]="insertAsNewSheet"
+            [disabled]="isAdding" />
+
+        <span class="insert-destination-content">
+            <strong>
+                {{ 'InsertAsNewSheet' | localize }}
+            </strong>
+
+            <small class="d-block text-muted">
+                {{
+                    insertAsNewSheet
+                        ? 'Create a new worksheet for this data'
+                        : 'Data will be inserted into the current worksheet'
+                }}
+            </small>
+        </span>
+
+    </label>
+
+    <div *ngIf="!insertAsNewSheet" class="destination-info mt-2">
+        <i class="fa fa-table mr-2"></i>
+
+        {{ 'Destination' | localize }}:
+        <strong>{{ targetSheetName }}</strong>
+
+        <div *ngIf="targetSheetHasData" class="text-warning small mt-2">
+            <i class="fa fa-exclamation-triangle mr-1"></i>
+            Existing worksheet data will be replaced.
+        </div>
+    </div>
+
+</div>
             <button type="button" class="btn btn-primary btn-block" [disabled]="isAdding || !selectedColumns.length"
                 (click)="addSheet()">
 
@@ -254,13 +295,17 @@
                 <i *ngIf="!isAdding" class="fa mr-2" [ngClass]="isEditMode ? 'fa-check' : 'fa-plus'">
                 </i>
 
-                {{
-                (
-                isAdding
-                ? (isEditMode ? 'Applying' : 'Adding')
-                : (isEditMode ? 'ApplyChanges' : 'AddAsNewSheet')
-                ) | localize
-                }}
+               {{
+    (
+        isAdding
+            ? (isEditMode ? 'Applying' : 'Adding')
+            : (
+                isEditMode
+                    ? 'ApplyChanges'
+                    : (insertAsNewSheet ? 'AddAsNewSheet' : 'InsertIntoCurrentSheet')
+            )
+    ) | localize
+}}
             </button>
         </ng-container>
     </div>

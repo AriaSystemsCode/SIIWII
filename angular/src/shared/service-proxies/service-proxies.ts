@@ -78717,6 +78717,8 @@ export class DynamicCondition implements IDynamicCondition {
     operator!: string | undefined;
     value!: string | undefined;
     value2!: string | undefined;
+    andWithList!: DynamicCondition[] | undefined;
+    orWithList!: DynamicCondition[] | undefined;
 
     [key: string]: any;
 
@@ -78739,6 +78741,16 @@ export class DynamicCondition implements IDynamicCondition {
             this.operator = _data["operator"];
             this.value = _data["value"];
             this.value2 = _data["value2"];
+            if (Array.isArray(_data["andWithList"])) {
+                this.andWithList = [] as any;
+                for (let item of _data["andWithList"])
+                    this.andWithList!.push(DynamicCondition.fromJS(item));
+            }
+            if (Array.isArray(_data["orWithList"])) {
+                this.orWithList = [] as any;
+                for (let item of _data["orWithList"])
+                    this.orWithList!.push(DynamicCondition.fromJS(item));
+            }
         }
     }
 
@@ -78759,6 +78771,16 @@ export class DynamicCondition implements IDynamicCondition {
         data["operator"] = this.operator;
         data["value"] = this.value;
         data["value2"] = this.value2;
+        if (Array.isArray(this.andWithList)) {
+            data["andWithList"] = [];
+            for (let item of this.andWithList)
+                data["andWithList"].push(item.toJSON());
+        }
+        if (Array.isArray(this.orWithList)) {
+            data["orWithList"] = [];
+            for (let item of this.orWithList)
+                data["orWithList"].push(item.toJSON());
+        }
         return data;
     }
 }
@@ -78768,6 +78790,8 @@ export interface IDynamicCondition {
     operator: string | undefined;
     value: string | undefined;
     value2: string | undefined;
+    andWithList: DynamicCondition[] | undefined;
+    orWithList: DynamicCondition[] | undefined;
 
     [key: string]: any;
 }

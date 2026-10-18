@@ -188,3 +188,25 @@ export interface FilterBuilderRule extends FilterBuilderCondition {
 
 export type ChartAggregation =
     'None' | 'Sum' | 'Count' | 'Average' | 'Min' | 'Max';
+
+
+
+
+    export interface FilterConditionGroup {
+    type: 'group';
+    matchMode: 'all' | 'any';
+    children: FilterConditionNode[];
+}
+
+export interface FilterConditionRule {
+    type: 'rule';
+    field: string;
+    operator: string;
+    value: any;
+    datePeriod?: string;
+    dateRange?: Date[];
+}
+
+export type FilterConditionNode =
+    | FilterConditionGroup
+    | FilterConditionRule;

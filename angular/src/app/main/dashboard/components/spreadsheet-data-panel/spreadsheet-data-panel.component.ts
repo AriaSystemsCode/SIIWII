@@ -18,6 +18,7 @@ import {
 import {
     FilterBuilderCondition,
     FilterBuilderField,
+    FilterConditionGroup,
     SpreadsheetDataBatch,
     SpreadsheetSheetDataSource
 } from '../../models/dashboard.model';
@@ -48,7 +49,10 @@ export class SpreadsheetDataPanelComponent
     @Input() filterFieldKey: 'code' | 'name' = 'code';
     @Input() conditionFactory: ((filter: any) => DynamicCondition) | null = null;
 
+@Input() targetSheetName = '';
+@Input() targetSheetHasData = false;
 
+insertAsNewSheet = true;
     isEditMode = false;
 
     onFilterValuesChanged(values: any[]): void {
@@ -107,6 +111,7 @@ export class SpreadsheetDataPanelComponent
         const source = this.editSource.source;
 
         this.isEditMode = true;
+        this.insertAsNewSheet = false;
         this.showFilterDialog = false;
         this.selectedTable = source.sourceKey || source.type;
 
@@ -428,6 +433,33 @@ getConditionValueLabel(condition: FilterBuilderCondition): string {
 
 
     async addSheet(): Promise<void> {
+        const destinationSheetName = this.isEditMode
+    ? this.editSource?.sheetName
+    : this.targetSheetName;
+
+const shouldReplaceExistingSheet =
+    this.isEditMode || !this.insertAsNewSheet;
+
+if (shouldReplaceExistingSheet && !destinationSheetName) {
+    this.notify.warn('Please select a destination worksheet.');
+    return;
+}
+
+if (
+    !this.isEditMode &&
+    !this.insertAsNewSheet &&
+    this.targetSheetHasData
+) {
+    const confirmed = window.confirm(
+        `The worksheet "${destinationSheetName}" already contains data.\n\n` +
+        'Inserting this list will replace its existing contents and linked data source, if any.\n\n' +
+        'Do you want to continue?'
+    );
+
+    if (!confirmed) {
+        return;
+    }
+}
 
         if (
             !this.selectedTable ||
@@ -502,12 +534,18 @@ getConditionValueLabel(condition: FilterBuilderCondition): string {
                     records.length < this.batchSize ||
                     (total > 0 && loaded >= total);
 
-               this.batchLoaded.emit({
+      this.batchLoaded.emit({
     table: this.selectedTable,
     fields: [...selectedFields],
     selectedColumns: [...this.selectedColumns],
     conditions: [...conditions],
     matchMode: this.selectedMatchMode,
+
+    insertAsNewSheet:
+        !this.isEditMode && this.insertAsNewSheet,
+
+    targetSheetName: destinationSheetName,
+
     rows,
     loaded,
     total,
@@ -515,6 +553,8 @@ getConditionValueLabel(condition: FilterBuilderCondition): string {
     isLastBatch
 } as SpreadsheetDataBatch & {
     matchMode: 'all' | 'any';
+    insertAsNewSheet: boolean;
+    targetSheetName?: string;
 });
 
                 await this.waitForPaint();
@@ -738,6 +778,7 @@ getConditionValueLabel(condition: FilterBuilderCondition): string {
         this.selectedMatchMode = 'all';
         this.showFilterDialog = false;
         this.isEditMode = false;
+        this.insertAsNewSheet = true;
     }
 
 
@@ -752,6 +793,12 @@ goToColumnsStep(): void {
 
     // Existing function loads columns and moves to step 2
     this.selectTable(this.selectedTableForNext);
+}
+
+selectedFilterTree: FilterConditionGroup | null = null;
+
+onFilterTreeChanged(tree: FilterConditionGroup): void {
+    this.selectedFilterTree = tree;
 }
 
 }

@@ -558,3 +558,61 @@ $danger-bg: #fff0f0;
         width: 100%;
     }
 }
+
+
+.insert-destination {
+    padding: 14px;
+    background: #f8f9fc;
+    border: 1px solid #e5e7eb;
+    border-radius: 10px;
+
+    .insert-destination-option {
+        display: flex;
+        align-items: flex-start;
+        gap: 10px;
+        margin: 0;
+        cursor: pointer;
+
+        input[type='checkbox'] {
+            width: 17px;
+            height: 17px;
+            margin-top: 3px;
+            flex-shrink: 0;
+            accent-color: #6941c6;
+            cursor: pointer;
+        }
+
+        .insert-destination-content {
+            flex: 1;
+            min-width: 0;
+
+            strong {
+                display: block;
+                font-size: 13px;
+                font-weight: 600;
+                color: #344054;
+            }
+
+            small {
+                font-size: 12px;
+                line-height: 1.5;
+                margin-top: 4px;
+            }
+        }
+    }
+
+    .destination-info {
+        padding: 10px 12px;
+        background: #fff;
+        border: 1px solid #e5e7eb;
+        border-radius: 7px;
+        font-size: 12px;
+        overflow-wrap: anywhere;
+    }
+}
+
+@media (max-width: 767px) {
+    .insert-destination {
+        padding: 12px;
+    }
+}
