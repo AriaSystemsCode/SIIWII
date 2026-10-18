@@ -116,106 +116,124 @@ namespace onetouch.AppDashboards
                 }
 
             }
-                // 4. Build parameterized conditions
-                var index = 0;
+            // 4. Build parameterized conditions
+            //    var index = 0;
 
-            foreach (var condition in
-                     input.Conditions ?? new List<onetouch.AppDashboards.Dtos.DynamicCondition>())
+            //foreach (var condition in
+            //         input.Conditions ?? new List<onetouch.AppDashboards.Dtos.DynamicCondition>())
+            //{
+            //    if (condition == null ||
+            //        string.IsNullOrWhiteSpace(condition.Field)) //||
+            //        //!allowedColumns.Contains(condition.Field))
+            //    {
+            //        throw new UserFriendlyException(
+            //            "Invalid filter field.");
+            //    }
+
+            //    var field = $"[{condition.Field}]";
+            //    var op = condition.Operator?.ToLowerInvariant();
+
+            //    if (op == "isnull")
+            //    {
+            //        where.Add($"{field} IS NULL");
+            //        continue;
+            //    }
+
+            //    if (op == "isnotnull")
+            //    {
+            //        where.Add($"{field} IS NOT NULL");
+            //        continue;
+            //    }
+
+            //    if (condition.Value == null)
+            //    {
+            //        throw new UserFriendlyException(
+            //            "Filter value is required.");
+            //    }
+            //    object valueJson = condition.Value;
+            //    var value = valueJson is JValue jValue
+            //        ? jValue.ToObject<object>()
+            //        : valueJson;
+
+            //    object valueJson2 = condition.Value2;
+            //    var value2 = valueJson2 is JValue jValue2
+            //        ? jValue2.ToObject<object>()
+            //        : valueJson2;
+
+
+            //    var parameterName = $"@p{index++}";
+            //    string expression;
+
+            //    switch (op)
+            //    {             
+            //        case "eq":
+            //            expression = $"{field} = {parameterName}";
+            //            break;
+            //        case "neq":
+            //            expression = $"{field} <> {parameterName}";
+            //            break;
+            //        case "gt":
+            //            expression = $"{field} > {parameterName}";
+            //            break;
+            //        case "gte":
+            //            expression = $"{field} >= {parameterName}";
+            //            break;
+            //        case "lt":
+            //            expression = $"{field} < {parameterName}";
+            //            break;
+            //        case "lte":
+            //            expression = $"{field} <= {parameterName}";
+            //            break;
+            //        case "startwith":
+            //            expression = $"{field} LIKE {parameterName}";
+            //            value = "" + value + "%";
+            //            break;
+            //        case "contains":
+            //            expression = $"{field} LIKE {parameterName}";
+            //            value = "%" + value + "%";
+            //            break;
+            //        case "doesnotcontain":
+            //            expression = $"{field} Not LIKE {parameterName}";
+            //            value = "%" + value + "%";
+            //            break;
+            //        case "between":
+
+            //            var parameterName2 = $"@p{index++}";
+            //            expression = $"{field} Between {parameterName} AND {parameterName2}";
+            //            value = "" + value +"";
+            //            value2 = "" + value2 + "";
+            //            parameters.Add(CreateParameter(parameterName2, value2));
+            //            break;
+            //        default:
+            //            throw new UserFriendlyException(
+            //                "Unsupported filter operator.");
+            //    }
+
+            //    where.Add(expression);
+            //    parameters.Add(CreateParameter(parameterName, value));
+
+
+            //}
+            long oind = 0;
+            var returnCond = GenerateConditionList(input.Conditions,"AND", ref oind);
+            foreach (var conditionRet in returnCond) 
             {
-                if (condition == null ||
-                    string.IsNullOrWhiteSpace(condition.Field)) //||
-                    //!allowedColumns.Contains(condition.Field))
+                var whereExp = ""; 
+                if (conditionRet.ExpressionList.Count > 1)
                 {
-                    throw new UserFriendlyException(
-                        "Invalid filter field.");
+                     whereExp = " ( " + string.Join
+                     ((conditionRet.ApplyAnyOfThisCondition ? " OR " : " AND "),
+                     conditionRet.ExpressionList) + " ) ";
                 }
-
-                var field = $"[{condition.Field}]";
-                var op = condition.Operator?.ToLowerInvariant();
-
-                if (op == "isnull")
+                else
                 {
-                    where.Add($"{field} IS NULL");
-                    continue;
+                    whereExp = (conditionRet.ApplyAnyOfThisCondition ?
+                        " false " : " true ") + (conditionRet.ApplyAnyOfThisCondition ?
+                        " OR " : " AND ")+ conditionRet.ExpressionList[0];
                 }
-
-                if (op == "isnotnull")
-                {
-                    where.Add($"{field} IS NOT NULL");
-                    continue;
-                }
-
-                if (condition.Value == null)
-                {
-                    throw new UserFriendlyException(
-                        "Filter value is required.");
-                }
-                object valueJson = condition.Value;
-                var value = valueJson is JValue jValue
-                    ? jValue.ToObject<object>()
-                    : valueJson;
-
-                object valueJson2 = condition.Value2;
-                var value2 = valueJson2 is JValue jValue2
-                    ? jValue2.ToObject<object>()
-                    : valueJson2;
-
-
-                var parameterName = $"@p{index++}";
-                string expression;
-
-                switch (op)
-                {             
-                    case "eq":
-                        expression = $"{field} = {parameterName}";
-                        break;
-                    case "neq":
-                        expression = $"{field} <> {parameterName}";
-                        break;
-                    case "gt":
-                        expression = $"{field} > {parameterName}";
-                        break;
-                    case "gte":
-                        expression = $"{field} >= {parameterName}";
-                        break;
-                    case "lt":
-                        expression = $"{field} < {parameterName}";
-                        break;
-                    case "lte":
-                        expression = $"{field} <= {parameterName}";
-                        break;
-                    case "startwith":
-                        expression = $"{field} LIKE {parameterName}";
-                        value = "" + value + "%";
-                        break;
-                    case "contains":
-                        expression = $"{field} LIKE {parameterName}";
-                        value = "%" + value + "%";
-                        break;
-                    case "doesnotcontain":
-                        expression = $"{field} Not LIKE {parameterName}";
-                        value = "%" + value + "%";
-                        break;
-                    case "between":
-
-                        var parameterName2 = $"@p{index++}";
-                        expression = $"{field} Between {parameterName} AND {parameterName2}";
-                        value = "" + value +"";
-                        value2 = "" + value2 + "";
-                        parameters.Add(CreateParameter(parameterName2, value2));
-                        break;
-                    default:
-                        throw new UserFriendlyException(
-                            "Unsupported filter operator.");
-                }
-
-                where.Add(expression);
-                parameters.Add(CreateParameter(parameterName, value));
-
-                
+                where.Add(whereExp);
+                parameters.AddRange(conditionRet.ParameterList);
             }
-
-
             // Always AND user filters with the tenant condition.
             var whereSql = ""; 
             if (input.ApplyAnyOfConditions == true)
@@ -240,7 +258,7 @@ namespace onetouch.AppDashboards
             if (!tableName.ToUpper().Contains("Inner Join".ToUpper()))
                 tableName += " a";
             
-            var countSql =
+             var countSql =
                 $"SELECT COUNT_BIG(*) FROM {tableName} {whereSql}";
 
             var totalCount = await ExecuteCountAsync(
@@ -315,7 +333,191 @@ namespace onetouch.AppDashboards
                 Items = items
             };
         }
+        //string.Join(" OR "
+        private List<ConditionExp> GenerateConditionList(
+            List<onetouch.AppDashboards.Dtos.DynamicCondition> input, 
+            string andOrOr,ref long index)
 
+        {
+            bool whereAdded = false;
+            List<ConditionExp> returnExp = new List<ConditionExp>();
+            
+            var parameters = new List<DbParameter>();
+            var where = new List<string>();
+            //var index = 0;
+            foreach (var condition in
+                     input ?? new List<onetouch.AppDashboards.Dtos.DynamicCondition>())
+            {
+                if (condition == null ||
+                    string.IsNullOrWhiteSpace(condition.Field)) //||
+                                                                //!allowedColumns.Contains(condition.Field))
+                {
+                    throw new UserFriendlyException(
+                        "Invalid filter field.");
+                }
+
+                var field = $"[{condition.Field}]";
+                var op = condition.Operator?.ToLowerInvariant();
+
+                if (op == "isnull")
+                {
+                    where.Add($"{field} IS NULL");
+                    continue;
+                }
+
+                if (op == "isnotnull")
+                {
+                    where.Add($"{field} IS NOT NULL");
+                    continue;
+                }
+
+                if (condition.Value == null)
+                {
+                    throw new UserFriendlyException(
+                        "Filter value is required.");
+                }
+                object valueJson = condition.Value;
+                var value = valueJson is JValue jValue
+                    ? jValue.ToObject<object>()
+                    : valueJson;
+
+                object valueJson2 = condition.Value2;
+                var value2 = valueJson2 is JValue jValue2
+                    ? jValue2.ToObject<object>()
+                    : valueJson2;
+
+
+                var parameterName = $"@p{index++}";
+                string expression="";
+
+                switch (op)
+                {
+                    case "eq":
+                        expression = $"{field} = {parameterName}";
+                        break;
+                    case "neq":
+                        expression = $"{field} <> {parameterName}";
+                        break;
+                    case "gt":
+                        expression = $"{field} > {parameterName}";
+                        break;
+                    case "gte":
+                        expression = $"{field} >= {parameterName}";
+                        break;
+                    case "lt":
+                        expression = $"{field} < {parameterName}";
+                        break;
+                    case "lte":
+                        expression = $"{field} <= {parameterName}";
+                        break;
+                    case "startwith":
+                        expression = $"{field} LIKE {parameterName}";
+                        value = "" + value + "%";
+                        break;
+                    case "contains":
+                        expression = $"{field} LIKE {parameterName}";
+                        value = "%" + value + "%";
+                        break;
+                    case "doesnotcontain":
+                        expression = $"{field} Not LIKE {parameterName}";
+                        value = "%" + value + "%";
+                        break;
+                    case "between":
+
+                        var parameterName2 = $"@p{index++}";
+                        expression = $"{field} Between {parameterName} AND {parameterName2}";
+                        value = "" + value + "";
+                        value2 = "" + value2 + "";
+                        parameters.Add(CreateParameter(parameterName2, value2));
+                        break;
+                    default:
+                        throw new UserFriendlyException(
+                            "Unsupported filter operator.");
+                }
+                whereAdded = false;
+                
+                parameters.Add(CreateParameter(parameterName, value));
+                if (condition.AndWithList != null && condition.AndWithList.Count() > 0)
+                {
+                    //if (!whereAdded)
+                    //{
+                    //    ConditionExp condExpr = new ConditionExp();
+                    //    condExpr.ParameterList = parameters;
+                    //    condExpr.ExpressionList = where;
+                    //    condExpr.ApplyAnyOfThisCondition = (andOrOr == "OR");
+                    //    returnExp.Add(condExpr);
+                    //    whereAdded = true;
+                    //}
+                    var returnSubExp = GenerateConditionList(condition.AndWithList,"AND", ref index);
+                    if (returnSubExp != null)
+                    {
+                        expression += " AND (";
+                        foreach (var ex in returnSubExp)
+                        {
+                            bool llfirst = true;
+                            
+                            foreach (var expst in ex.ExpressionList)
+                            {
+                                expression += (llfirst == true ? "" : " AND ") + expst;
+                                llfirst = false;
+                            }
+                            
+                            parameters.AddRange(ex.ParameterList);
+                        }
+                        expression += " )";
+
+
+                        //returnExp.AddRange
+                        //    (returnSubExp);
+                    }
+                }
+                if (condition.OrWithList != null && condition.OrWithList.Count() > 0)
+                {
+                    //if (!whereAdded)
+                    //{
+                    //    ConditionExp condExpr = new ConditionExp();
+                    //    condExpr.ParameterList = parameters;
+                    //    condExpr.ExpressionList = where;
+                    //    condExpr.ApplyAnyOfThisCondition = (andOrOr == "OR");
+                    //    whereAdded = true;
+                    //    returnExp.Add(condExpr);
+                    //}
+                    var returnSubExp = GenerateConditionList(condition.OrWithList, "OR", ref index);
+                    if (returnSubExp != null)
+                    {
+                        expression += " OR (";
+                        //returnExp.AddRange(returnSubExp);
+                        foreach (var ex in returnSubExp)
+                        {
+                            bool llfirst = true;
+                            
+                            foreach (var expst in ex.ExpressionList)
+                            {
+                                expression += (llfirst == true ? "" : " OR ") + expst;
+                                llfirst = false;
+                            }
+                            
+                            parameters.AddRange(ex.ParameterList);
+                            
+                        }
+                        expression += " )";
+                    }
+                }
+                //expression += ")";
+                where.Add("( "+expression+" )");
+            }
+            
+            //if (!whereAdded)
+            {
+                ConditionExp condExp = new ConditionExp();
+                condExp.ParameterList = parameters;
+                condExp.ExpressionList = where;
+                condExp.ApplyAnyOfThisCondition = (andOrOr == "OR");
+                whereAdded = true;
+                returnExp.Add(condExp);
+            }
+            return returnExp;
+        }
         private DbParameter CreateParameter(
             string name, object value)
         {

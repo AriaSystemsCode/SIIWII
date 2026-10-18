@@ -737,8 +737,35 @@ namespace onetouch.AppDashboards
             //if (input.TableName.ToUpper() == "APPTRANSACTIONHEADERS")
             //{
             //    input.Conditions = new List<DynamicCondition>();
-            //    input.Conditions.Add(new DynamicCondition { Field = "PriceLevel", Operator = "eq", Value = "A" });
-            //    input.Conditions.Add(new DynamicCondition { Field = "reference", Operator = "neq", Value = "" });
+            //    input.Conditions.Add(new DynamicCondition
+            //    {
+            //        Field = "PriceLevel",
+            //        Operator = "eq",
+            //        Value = "MSRP",
+            //        OrWithList = new List<DynamicCondition>()
+            //    {new DynamicCondition { Field = "reference", Operator = "neq", Value = "",
+            //        AndWithList  = new List<DynamicCondition>() {new  DynamicCondition
+            //        {Field = "BuyerCompanyName", Value = "FRAME 2",
+            //        Operator = "eq" } } } }
+            //    });
+            //    DynamicCondition con = new DynamicCondition();
+            //    con.Operator = "eq";
+            //    con.Field = "SellerCompanySSIN";
+            //    con.Value = "Business-000000000023";
+            //    con.AndWithList = new List<DynamicCondition>();
+            //    //con.AndWithList.Add(new DynamicCondition 
+            //    // m{Field="SellerCompanyName",Value="",Operator="neq" });
+            //    con.AndWithList.Add(new DynamicCondition
+            //    {
+            //        Field = "SellerCompanyName",
+            //        Value = "ABN Inc",
+            //        Operator = "eq",
+            //        OrWithList =
+            //        new List<DynamicCondition>() { new DynamicCondition
+            //        { Operator="eq" , Field="SellerCompanyName", Value="FRAME 2" } }
+            //    });
+                 
+            //    input.Conditions.Add(con);
             //}
 
             DynamicQueryAppService dynamicQueryAppService = new DynamicQueryAppService(UnitOfWorkManager.Current.GetDbContext<onetouchDbContext>());

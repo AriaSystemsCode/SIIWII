@@ -3,6 +3,7 @@ using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
 using System;
 using System.Collections.Generic;
+using System.Data.Common;
 using System.Linq;
 using System.Security.Policy;
 using System.Text;
@@ -77,13 +78,20 @@ namespace onetouch.AppDashboards.Dtos
         public DateTime? LastUpdateDate { get; set; }
         public bool ApplyAnyOfConditions { get; set; } = false;
     }
-
+    public class ConditionExp
+    {
+        public List<string> ExpressionList { get; set; }
+        public List<DbParameter> ParameterList { get; set; }
+        public bool ApplyAnyOfThisCondition { set; get; }
+    }
     public class DynamicCondition
     {
         public string Field { get; set; }
         public string Operator { get; set; }
         public string Value { get; set; }
         public string Value2 { get; set; }
+        public List<DynamicCondition> AndWithList { get; set; }
+        public List<DynamicCondition> OrWithList { get; set; }
     }
 
     public class DynamicQueryResult
