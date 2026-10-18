@@ -46,6 +46,9 @@ export class FilterBuilderComponent implements OnChanges {
     @Output() filterTreeChange =
         new EventEmitter<FilterConditionGroup>();
 
+
+        @Output() applyTree = new EventEmitter<FilterConditionGroup>();
+
     rootGroup: FilterConditionGroup = {
         type: 'group',
         matchMode: 'all',
@@ -196,30 +199,21 @@ export class FilterBuilderComponent implements OnChanges {
         );
     }
 
-    addNestedGroup(group: FilterConditionGroup): void {
-
-        group.children.push({
-            type: 'group',
-            matchMode: 'any',
-            children: [
-                this.createConditionRule(),
-                this.createConditionRule()
-            ]
-        });
+    // Only one nested group is allowed, directly under the root group.
+    get hasNestedGroup(): boolean {
+        return this.rootGroup.children.some(node => node.type === 'group');
     }
 
-    addGroupAfter(
-        group: FilterConditionGroup,
-        index: number
-    ): void {
+    // The branching icon adds a group containing exactly one rule.
+    addGroupAfter(group: FilterConditionGroup, index: number): void {
+        if (group !== this.rootGroup || this.hasNestedGroup) {
+            return;
+        }
 
         group.children.splice(index + 1, 0, {
             type: 'group',
-            matchMode: 'any',
-            children: [
-                this.createConditionRule(),
-                this.createConditionRule()
-            ]
+            matchMode: 'all',
+            children: [this.createConditionRule()]
         });
     }
 
@@ -733,39 +727,44 @@ export class FilterBuilderComponent implements OnChanges {
     // APPLY / CLEAR / CANCEL
     // =====================================================
 
-    applyFilters(): void {
-
-        if (!this.canApply) {
-            return;
-        }
-
-        const tree = this.buildFilterTree(
-            this.rootGroup
-        );
-
-        // Full nested filter structure
-        this.filterTreeChange.emit(tree);
-
-        // Global ALL / ANY
-        this.matchMode = tree.matchMode;
-
-        this.matchModeChange.emit(
-            tree.matchMode
-        );
-
-        // Legacy API supports only flat conditions
-        if (!this.hasNestedGroups(tree)) {
-
-            const conditions =
-                this.buildFlatConditions(tree);
-
-            this.conditionsChange.emit(
-                conditions
-            );
-
-            this.apply.emit(conditions);
-        }
+applyFilters(): void {
+    if (!this.canApply) {
+        return;
     }
+
+    const tree = this.buildFilterTree(this.rootGroup);
+
+    this.filterTreeChange.emit(tree);
+
+    this.matchMode = tree.matchMode;
+    this.matchModeChange.emit(tree.matchMode);
+
+    if (this.hasNestedGroups(tree)) {
+        // Nested filters go to the parent as a tree, never flattened
+        this.applyTree.emit(tree);
+        return;
+    }
+
+    const conditions = this.buildFlatConditions(tree);
+    this.conditionsChange.emit(conditions);
+    this.apply.emit(conditions);
+}
+
+private nextRuleId = 0;
+
+getRuleId(rule: FilterBuilderRule): string {
+    const item = rule as FilterBuilderRule & {
+        _uiId?: string;
+    };
+
+    if (!item._uiId) {
+        item._uiId = `filter-rule-${++this.nextRuleId}`;
+    }
+
+    return item._uiId;
+}
+
+
 
     clearFilters(): void {
         this.rootGroup.children = [];

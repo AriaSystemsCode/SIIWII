@@ -60,7 +60,7 @@ $danger-bg: #fff0f0;
 
     width: 100%;
 
-    max-height: 70vh;
+    max-height: 80vh;
 
     background: $white;
 
@@ -266,11 +266,11 @@ $danger-bg: #fff0f0;
 
 .filter-rule-row {
 
+        margin: 0px 2px;
     min-height: 64px;
+    padding: 6px;
 
-    padding: 12px;
-
-    margin-bottom: 10px;
+    margin-bottom: 5px;
 
     background: $panel-bg;
 
@@ -1135,6 +1135,7 @@ $danger-bg: #fff0f0;
     position: relative;
     width: 100%;
     min-width: 0;
+        max-height: 450px;
 }
 
 .filter-group-root {
@@ -1149,8 +1150,8 @@ $danger-bg: #fff0f0;
     position: relative;
     width: 100%;
     min-width: 0;
-    margin: 12px 0 12px 18px;
-    padding: 12px 16px 12px 18px;
+      margin: 10px 0px 9px 12px;
+    padding: 8px 6px 6px 8px;
     border-left: 3px solid #87519b;
     border-radius: 0 8px 8px 0;
     background: #f9f7fc;

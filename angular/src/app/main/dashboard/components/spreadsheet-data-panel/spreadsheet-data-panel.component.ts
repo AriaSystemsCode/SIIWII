@@ -19,6 +19,7 @@ import {
     FilterBuilderCondition,
     FilterBuilderField,
     FilterConditionGroup,
+    FilterConditionNode,
     SpreadsheetDataBatch,
     SpreadsheetSheetDataSource
 } from '../../models/dashboard.model';
@@ -407,17 +408,103 @@ getConditionValueLabel(condition: FilterBuilderCondition): string {
 }
 
 
-    private gatherConditions(): DynamicCondition[] {
-        return this.selectedConditions.map(condition => {
-            const dto = new DynamicCondition();
+    // private gatherConditions(): DynamicCondition[] {
+    //     return this.selectedConditions.map(condition => {
+    //         const dto = new DynamicCondition();
 
-            dto.field = condition.field;
-            dto.operator = condition.operator;
-            dto.value = this.formatConditionValue(condition.value);
+    //         dto.field = condition.field;
+    //         dto.operator = condition.operator;
+    //         dto.value = this.formatConditionValue(condition.value);
 
-            return dto;
-        });
+    //         return dto;
+    //     });
+    // }
+
+   private gatherConditions(): DynamicCondition[] {
+    if (this.selectedFilterTree) {
+        return this.nodesToDtos(
+            this.selectedFilterTree.children,
+            this.selectedFilterTree.matchMode
+        );
     }
+    return this.selectedConditions.map(c => this.ruleToDto(c));
+}
+
+private nodesToDtos(
+    nodes: FilterConditionNode[],
+    parentMode: 'all' | 'any'
+): DynamicCondition[] {
+    const result: DynamicCondition[] = [];
+
+    for (const node of nodes) {
+        if (node.type === 'rule') {
+            result.push(this.ruleToDto(node));
+            continue;
+        }
+
+        const groupDto = this.groupToDto(node);
+        if (!groupDto) {
+            continue;
+        }
+
+        const parent = result[result.length - 1];
+
+        if (parent) {
+            // nested group becomes a child of the previous condition
+            this.attachChild(
+                parent,
+                parentMode === 'any' ? 'orWithList' : 'andWithList',
+                groupDto
+            );
+        } else {
+            // nothing before it, so it stays top level
+            result.push(groupDto);
+        }
+    }
+
+    return result;
+}
+
+private groupToDto(group: FilterConditionGroup): DynamicCondition | null {
+    const dtos = this.nodesToDtos(group.children, group.matchMode);
+    if (!dtos.length) {
+        return null;
+    }
+
+    const [head, ...rest] = dtos;
+    const listName: 'orWithList' | 'andWithList' =
+        group.matchMode === 'any' ? 'orWithList' : 'andWithList';
+
+    rest.forEach(child => this.attachChild(head, listName, child));
+    return head;
+}
+
+private ruleToDto(rule: { field: string; operator: string; value: any }): DynamicCondition {
+    const dto = new DynamicCondition();
+    dto.field = rule.field;
+    dto.operator = rule.operator;
+    dto.value = this.formatConditionValue(rule.value);
+    return dto;
+}
+
+private attachChild(
+    parent: DynamicCondition,
+    listName: 'orWithList' | 'andWithList',
+    child: DynamicCondition
+): void {
+    // next free index in this list
+    const pattern = new RegExp(`^${listName}\\[(\\d+)\\]\\.field$`);
+    const index = Object.keys(parent).filter(k => pattern.test(k)).length;
+
+    // The generated proxy does "" + item[attr], so arrays would be sent as
+    // "[object Object]". Use flat keys that ASP.NET model binding understands.
+    Object.keys(child).forEach(key => {
+        const value = (child as any)[key];
+        if (value !== undefined && value !== null) {
+            parent[`${listName}[${index}].${key}`] = value;
+        }
+    });
+}
 
     /** Dates -> "yyyy-MM-dd", everything else -> string (matches the API format). */
     private formatConditionValue(value: any): string {
@@ -432,158 +519,168 @@ getConditionValueLabel(condition: FilterBuilderCondition): string {
     }
 
 
-    async addSheet(): Promise<void> {
-        const destinationSheetName = this.isEditMode
-    ? this.editSource?.sheetName
-    : this.targetSheetName;
+async addSheet(): Promise<void> {
+    console.log('tree', JSON.stringify(this.selectedFilterTree));
+console.log('conditions', JSON.stringify(this.gatherConditions()));
+    const destinationSheetName = this.isEditMode
+        ? this.editSource?.sheetName
+        : this.targetSheetName;
 
-const shouldReplaceExistingSheet =
-    this.isEditMode || !this.insertAsNewSheet;
+    const shouldReplaceExistingSheet =
+        this.isEditMode || !this.insertAsNewSheet;
 
-if (shouldReplaceExistingSheet && !destinationSheetName) {
-    this.notify.warn('Please select a destination worksheet.');
-    return;
-}
-
-if (
-    !this.isEditMode &&
-    !this.insertAsNewSheet &&
-    this.targetSheetHasData
-) {
-    const confirmed = window.confirm(
-        `The worksheet "${destinationSheetName}" already contains data.\n\n` +
-        'Inserting this list will replace its existing contents and linked data source, if any.\n\n' +
-        'Do you want to continue?'
-    );
-
-    if (!confirmed) {
+    if (shouldReplaceExistingSheet && !destinationSheetName) {
+        this.notify.warn('Please select a destination worksheet.');
         return;
     }
-}
 
-        if (
-            !this.selectedTable ||
-            !this.selectedColumns.length ||
-            this.isAdding
-        ) {
+    if (
+        !this.isEditMode &&
+        !this.insertAsNewSheet &&
+        this.targetSheetHasData
+    ) {
+        const confirmed = window.confirm(
+            `The worksheet "${destinationSheetName}" already contains data.\n\n` +
+            'Inserting this list will replace its existing contents and linked data source, if any.\n\n' +
+            'Do you want to continue?'
+        );
+
+        if (!confirmed) {
             return;
         }
+    }
 
-        const tenantId = this.appSession?.tenantId;
+    if (
+        !this.selectedTable ||
+        !this.selectedColumns.length ||
+        this.isAdding
+    ) {
+        return;
+    }
 
-        const selectedFields: string[] = this.selectedColumns
-            .map(column => column.name)
-            .filter((field): field is string => !!field);
+    const tenantId = this.appSession?.tenantId;
 
-        const requestFields: string[] = [...selectedFields];
+    const selectedFields: string[] = this.selectedColumns
+        .map(column => column.name)
+        .filter((field): field is string => !!field);
 
-        if (!requestFields.some(field => field.toLowerCase() === 'id')) {
-            requestFields.push('Id');
-        }
+    const requestFields: string[] = [...selectedFields];
 
-        const conditions = this.gatherConditions();
+    if (!requestFields.some(field => field.toLowerCase() === 'id')) {
+        requestFields.push('Id');
+    }
 
-        let skip = 0;
-        let loaded = 0;
-        let firstBatch = true;
+    // Uses the nested tree when present, otherwise the flat conditions
+    const conditions = this.gatherConditions();
 
-        this.isAdding = true;
+    // Root match mode comes from the tree when there is one
+    const matchMode: 'all' | 'any' = this.selectedFilterTree
+        ? this.selectedFilterTree.matchMode
+        : this.selectedMatchMode;
 
-        try {
+    const isOr = matchMode === 'any';
 
-            while (true) {
+    let skip = 0;
+    let loaded = 0;
+    let firstBatch = true;
 
-                const result: any = await firstValueFrom(
-                    this.appDashboardService.getAllTableData(
-                        tenantId,
-                        this.selectedTable,
-                        requestFields,
-                        conditions,
-                        undefined,
-                      this.selectedMatchMode == 'all'?  false : true,
-                        undefined,
-                        skip,
-                        this.batchSize
-                    )
-                );
+    this.isAdding = true;
 
-                const records: any[] = result?.items ?? [];
-                const total = Number(result?.totalCount ?? 0);
-
-                if (!records.length) {
-                    break;
-                }
-
-                const rows = this.buildRows(records);
-
-                if (firstBatch) {
-                    console.log(
-                        '[Spreadsheet] Backend columns:',
-                        Object.keys(records[0] ?? {})
-                    );
-
-                    console.log(
-                        '[Spreadsheet] Emitted columns:',
-                        Object.keys(rows[0] ?? {})
-                    );
-                }
-
-                loaded += records.length;
-
-                const isLastBatch =
-                    records.length < this.batchSize ||
-                    (total > 0 && loaded >= total);
-
-      this.batchLoaded.emit({
-    table: this.selectedTable,
-    fields: [...selectedFields],
-    selectedColumns: [...this.selectedColumns],
-    conditions: [...conditions],
-    matchMode: this.selectedMatchMode,
-
-    insertAsNewSheet:
-        !this.isEditMode && this.insertAsNewSheet,
-
-    targetSheetName: destinationSheetName,
-
-    rows,
-    loaded,
-    total,
-    isFirstBatch: firstBatch,
-    isLastBatch
-} as SpreadsheetDataBatch & {
-    matchMode: 'all' | 'any';
-    insertAsNewSheet: boolean;
-    targetSheetName?: string;
-});
-
-                await this.waitForPaint();
-
-                firstBatch = false;
-                skip += records.length;
-
-                if (isLastBatch) {
-                    break;
-                }
-            }
-
-            if (loaded === 0) {
-                this.notify.info('No records found.');
-            }
-
-        } catch (error) {
-            console.error(
-                '[Spreadsheet Data Panel] load failed:',
-                error
+    try {
+        while (true) {
+            const result: any = await firstValueFrom(
+                this.appDashboardService.getAllTableData(
+                    tenantId,
+                    this.selectedTable,
+                    requestFields,
+                    conditions,
+                    undefined,
+                    isOr,
+                    undefined,
+                    skip,
+                    this.batchSize
+                )
             );
 
-            this.loadingFailed.emit(error);
+            const records: any[] = result?.items ?? [];
+            const total = Number(result?.totalCount ?? 0);
 
-        } finally {
-            this.isAdding = false;
-            this.cdr.detectChanges();
+            if (!records.length) {
+                break;
+            }
+
+            const rows = this.buildRows(records);
+
+            if (firstBatch) {
+                console.log(
+                    '[Spreadsheet] Backend columns:',
+                    Object.keys(records[0] ?? {})
+                );
+
+                console.log(
+                    '[Spreadsheet] Emitted columns:',
+                    Object.keys(rows[0] ?? {})
+                );
+            }
+
+            loaded += records.length;
+
+            const isLastBatch =
+                records.length < this.batchSize ||
+                (total > 0 && loaded >= total);
+
+            this.batchLoaded.emit({
+                table: this.selectedTable,
+                fields: [...selectedFields],
+                selectedColumns: [...this.selectedColumns],
+                conditions: [...conditions],
+                matchMode,
+                filterTree: this.selectedFilterTree,
+
+                insertAsNewSheet:
+                    !this.isEditMode && this.insertAsNewSheet,
+
+                targetSheetName: destinationSheetName,
+
+                rows,
+                loaded,
+                total,
+                isFirstBatch: firstBatch,
+                isLastBatch
+            } as SpreadsheetDataBatch & {
+                matchMode: 'all' | 'any';
+                filterTree: FilterConditionGroup | null;
+                insertAsNewSheet: boolean;
+                targetSheetName?: string;
+            });
+
+            await this.waitForPaint();
+
+            firstBatch = false;
+            skip += records.length;
+
+            if (isLastBatch) {
+                break;
+            }
         }
+
+        if (loaded === 0) {
+            this.notify.info('No records found.');
+        }
+
+    } catch (error) {
+        console.error(
+            '[Spreadsheet Data Panel] load failed:',
+            error
+        );
+
+        this.loadingFailed.emit(error);
+
+    } finally {
+        this.isAdding = false;
+        this.cdr.detectChanges();
     }
+}
 
 
     private buildRows(records: { [key: string]: any }[]): any[] {
@@ -782,6 +879,32 @@ if (
     }
 
 
+    onApplyTree(tree: FilterConditionGroup): void {
+    this.selectedFilterTree = tree;
+    this.selectedMatchMode = tree.matchMode;
+
+    // Keep the flat list only for the summary chips shown in the panel
+    this.selectedConditions = this.collectRules(tree);
+
+    this.showFilterDialog = false;
+}
+
+private collectRules(group: FilterConditionGroup): FilterBuilderCondition[] {
+    const result: FilterBuilderCondition[] = [];
+    for (const node of group.children) {
+        if (node.type === 'group') {
+            result.push(...this.collectRules(node));
+        } else {
+            result.push({
+                field: node.field,
+                operator: node.operator,
+                value: node.value
+            });
+        }
+    }
+    return result;
+}
+
 selectedTableForNext: string | null = null;
 
 chooseTable(table: string): void {
@@ -799,6 +922,55 @@ selectedFilterTree: FilterConditionGroup | null = null;
 
 onFilterTreeChanged(tree: FilterConditionGroup): void {
     this.selectedFilterTree = tree;
+}
+
+
+
+private previewCache: {
+    tree: FilterConditionGroup | null;
+    conditions: FilterBuilderCondition[];
+    mode: 'all' | 'any';
+    result: FilterConditionGroup | null;
+} | null = null;
+
+// Uses the tree when present, otherwise wraps the flat conditions (edit mode, old data).
+// Cached by reference so the template does not re-render on every change detection.
+get previewRoot(): FilterConditionGroup | null {
+    const c = this.previewCache;
+    if (
+        c &&
+        c.tree === this.selectedFilterTree &&
+        c.conditions === this.selectedConditions &&
+        c.mode === this.selectedMatchMode
+    ) {
+        return c.result;
+    }
+
+    let result: FilterConditionGroup | null = null;
+
+    if (this.selectedFilterTree?.children?.length) {
+        result = this.selectedFilterTree;
+    } else if (this.selectedConditions.length) {
+        result = {
+            type: 'group',
+            matchMode: this.selectedMatchMode,
+            children: this.selectedConditions.map(condition => ({
+                type: 'rule' as const,
+                field: condition.field,
+                operator: condition.operator,
+                value: condition.value
+            }))
+        };
+    }
+
+    this.previewCache = {
+        tree: this.selectedFilterTree,
+        conditions: this.selectedConditions,
+        mode: this.selectedMatchMode,
+        result
+    };
+
+    return result;
 }
 
 }

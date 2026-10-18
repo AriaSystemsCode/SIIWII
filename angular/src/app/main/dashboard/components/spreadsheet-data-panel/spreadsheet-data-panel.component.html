@@ -166,39 +166,100 @@
                 </div>
 
                 <!-- READ-ONLY FILTER SUMMARY -->
-                <div *ngIf="selectedConditions.length" class="filter-preview">
+       <div *ngIf="previewRoot" class="filter-preview">
 
-                    <div class="filter-preview-title">
-                        {{ 'Match' | localize }}
+    <div class="filter-preview-title">
+        {{ 'Match' | localize }}
+        <span class="filter-match-value">{{ previewRoot.matchMode }}</span>
+        {{ 'of the following conditions' | localize }}:
+    </div>
 
-                        <span class="filter-match-value">
-                            {{ selectedMatchMode }}
-                        </span>
+    <ng-container
+        *ngTemplateOutlet="previewGroup; context: { $implicit: previewRoot }">
+    </ng-container>
 
-                        {{ 'of the following conditions' | localize }}:
-                    </div>
+</div>
 
-                    <div class="filter-preview-rules">
+<ng-template #previewGroup let-group>
 
-                        <div *ngFor="let condition of selectedConditions" class="filter-preview-rule">
+    <div class="filter-preview-rules">
 
-                            <strong>
-                                {{ getConditionFieldLabel(condition.field) }}
-                            </strong>
+        <ng-container *ngFor="let node of group.children">
 
-                            <em>
-                                {{ getConditionOperatorLabel(condition.operator) }}
-                            </em>
+            <!-- RULE: no AND / OR badge -->
+            <div *ngIf="node.type === 'rule'" class="filter-preview-rule">
+                <strong>{{ getConditionFieldLabel(node.field) }}</strong>
+                <em>{{ getConditionOperatorLabel(node.operator) }}</em>
+                <span class="filter-preview-value">{{ getConditionValueLabel(node) }}</span>
+            </div>
 
-                            <span class="filter-preview-value">
-                                {{ getConditionValueLabel(condition) }}
-                            </span>
+            <!-- NESTED GROUP: only place where AND / OR is shown -->
+            <div *ngIf="node.type === 'group'" class="filter-preview-nested">
 
-                        </div>
-
-                    </div>
-
+                <div class="filter-preview-nested-title">
+                    <span class="join-badge" [class.join-or]="group.matchMode === 'any'">
+                        {{ (group.matchMode === 'any' ? 'OR' : 'AND') | localize }}
+                    </span>
+                    <span>
+                        {{ (node.matchMode === 'any' ? 'any of' : 'all of') | localize }}
+                        {{ 'these' | localize }}:
+                    </span>
                 </div>
+
+                <ng-container
+                    *ngTemplateOutlet="previewGroup; context: { $implicit: node }">
+                </ng-container>
+
+            </div>
+
+        </ng-container>
+
+    </div>
+
+</ng-template>
+<ng-template #previewGroup let-group>
+
+    <div class="filter-preview-rules">
+
+        <ng-container *ngFor="let node of group.children; let i = index">
+
+            <!-- RULE -->
+            <div *ngIf="node.type === 'rule'" class="filter-preview-rule">
+
+                <span *ngIf="i > 0" class="join-badge" [class.join-or]="group.matchMode === 'any'">
+                    {{ 'Match' | localize }}
+                </span>
+
+                <strong>{{ getConditionFieldLabel(node.field) }}</strong>
+                <em>{{ getConditionOperatorLabel(node.operator) }}</em>
+                <span class="filter-preview-value">{{ getConditionValueLabel(node) }}</span>
+
+            </div>
+
+            <!-- NESTED GROUP: attached to the condition above it -->
+            <div *ngIf="node.type === 'group'" class="filter-preview-nested">
+
+                <div class="filter-preview-nested-title">
+                    <span class="join-badge" [class.join-or]="group.matchMode === 'any'">
+                        {{ 'Match' | localize }}
+                    </span>
+                    <span>
+                        {{ (node.matchMode === 'any' ? 'any of' : 'all of') | localize }}
+                        {{ 'these' | localize }}:
+                    </span>
+                </div>
+
+                <ng-container
+                    *ngTemplateOutlet="previewGroup; context: { $implicit: node }">
+                </ng-container>
+
+            </div>
+
+        </ng-container>
+
+    </div>
+
+</ng-template>
                 <!-- EMPTY STATE -->
                 <div *ngIf="!selectedConditions.length" class="filter-empty-state">
 
@@ -241,6 +302,8 @@
     [matchMode]="selectedMatchMode"
     [filterTree]="selectedFilterTree"
     (filterTreeChange)="onFilterTreeChanged($event)"
+    (matchModeChange)="onFilterMatchModeChanged($event)"
+    (applyTree)="onApplyTree($event)"
     (apply)="onFiltersApplied($event)"
     (cancel)="closeFilterDialog()">
 </app-filter-builder>
@@ -276,7 +339,7 @@
     <div *ngIf="!insertAsNewSheet" class="destination-info mt-2">
         <i class="fa fa-table mr-2"></i>
 
-        {{ 'Destination' | localize }}:
+        {{ 'Sheet' | localize }}:
         <strong>{{ targetSheetName }}</strong>
 
         <div *ngIf="targetSheetHasData" class="text-warning small mt-2">
