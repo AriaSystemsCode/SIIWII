@@ -92,7 +92,7 @@
             </div>
 
             <div class="last-updated">
-              {{ 'LastEdit' | localize }} {{ lastUpdatedDate }}
+              {{ 'LastEdit' | localize }} {{ lastUpdatedDate  | momentFormat:'L h:mm a'  }}
             </div>
           </div>
         </div>
@@ -207,11 +207,11 @@
               <!-- EDIT FORM -->
               <div *ngIf="!viewMode" class="col-12 list-toolbar border-dashed-bottom pb-4">
                 <div class="h3 text-center text-success">
-                  {{
-                    !loading && list?.appItemsList?.statusCode
-                      ? l(list?.appItemsList?.statusCode | titlecase)
-                      : ''
-                  }}
+              {{
+    !loading && list?.appItemsList?.statusCode
+        ? (list.appItemsList.statusCode | titlecase | localize)
+        : ''
+}}
                 </div>
 
                 <div class="list-form-row">
