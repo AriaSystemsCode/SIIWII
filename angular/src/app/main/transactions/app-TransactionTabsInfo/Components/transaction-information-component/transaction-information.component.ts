@@ -3,7 +3,7 @@ import {
   , ViewChildren, QueryList, ViewContainerRef, ComponentFactoryResolver,
 } from '@angular/core';
 import { AppComponentBase } from '@shared/common/app-component-base';
-import { AppEntitiesServiceProxy, AppMarketplaceItemsServiceProxy, AppTransactionServiceProxy, CurrencyInfoDto, GetAccountInformationOutputDto, GetAllEntityObjectTypeOutput, GetAppMarketItemForViewDto, GetAppMarketplaceItemDetailForViewDto, GetAppTransactionsForViewDto, GetOrderDetailsForViewDto, LookupLabelDto, PagedResultDtoOfGetAccountInformationOutputDto, SycEntityObjectTypesServiceProxy, TenantTransactionInfo, TransactionPosition, TransactionType, ValidateTransaction } from '@shared/service-proxies/service-proxies';
+import { AppEntitiesServiceProxy, AppMarketplaceItemsServiceProxy, AppTransactionServiceProxy, CurrencyInfoDto, ExtraAttributesSource, GetAccountInformationOutputDto, GetAllEntityObjectTypeOutput, GetAppMarketItemForViewDto, GetAppMarketplaceItemDetailForViewDto, GetAppTransactionsForViewDto, GetOrderDetailsForViewDto, LookupLabelDto, PagedResultDtoOfGetAccountInformationOutputDto, SycEntityObjectTypesServiceProxy, TenantTransactionInfo, TransactionPosition, TransactionType, ValidateTransaction } from '@shared/service-proxies/service-proxies';
 import { ModalDirective } from 'ngx-bootstrap/modal';
 import { SelectItem } from 'primeng/api';
 import Swal from 'sweetalert2';
@@ -1803,7 +1803,8 @@ async printTransaction(): Promise<void> {
 
 
   getAppItemTypeExtraAttributesById() {
-    this._sycEntityObjectTypesServiceProxy.getAllWithExtraAttributes(this.appTransactionsForViewDto?.entityObjectTypeId)
+                let source: ExtraAttributesSource=0;
+    this._sycEntityObjectTypesServiceProxy.getAllWithExtraAttributes(this.appTransactionsForViewDto?.entityObjectTypeId, source)
       .subscribe((res) => {
         if (res?.length > 0) {
           this.selectedTransTypeData = res[0];

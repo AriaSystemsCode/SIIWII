@@ -61,7 +61,7 @@ namespace onetouch.EntityFrameworkCore
 {
     public class onetouchDbContext : AbpZeroDbContext<Tenant, Role, User, onetouchDbContext>, IAbpPersistedGrantDbContext
     {
-        public virtual DbSet<AppField> APPFields { get; set; }
+        public virtual DbSet<AppField> AppFields { get; set; }
         public virtual DbSet<AppFieldHistory> AppFieldsHistory { get; set; }
         public virtual DbSet<AppTableField> AppTableFields { get; set; }
         //I40[Start]
@@ -259,9 +259,12 @@ namespace onetouch.EntityFrameworkCore
 
             modelBuilder.Entity<AppField>(field =>
             {
+                field.HasMany(x => x.SettingValues).WithOne().HasForeignKey(x => x.AppFieldId)
+                    .OnDelete(DeleteBehavior.Cascade);
+                field.Property(x => x.FieldDefinitionKey).HasDefaultValueSql("newid()");
                 field.HasOne<SydObject>().WithMany().HasForeignKey(x => x.SycObjectId)
                     .OnDelete(DeleteBehavior.Restrict);
-                field.HasOne<SydObject>().WithMany().HasForeignKey(x => x.EntitySycObjectId)
+                field.HasOne<SycEntityObjectType>().WithMany().HasForeignKey(x => x.EntitySycObjectId)
                     .OnDelete(DeleteBehavior.Restrict);
                 field.HasOne<SycEntityObjectType>().WithMany().HasForeignKey(x => x.FieldTypeId)
                     .OnDelete(DeleteBehavior.Restrict);
@@ -274,12 +277,15 @@ namespace onetouch.EntityFrameworkCore
                 field.Property(x => x.CurrentRevisionNo).HasDefaultValue("00");
                 field.HasIndex(x => new { x.TenantId, x.FieldCode }).IsUnique()
                     .HasFilter("[IsDeleted] = 0");
+                field.HasIndex(x => x.FieldDefinitionKey).IsUnique();
                 field.HasIndex(x => new { x.TenantId, x.SycObjectId });
                 field.HasIndex(x => new { x.TenantId, x.SourceFieldId });
                 field.HasIndex(x => x.FieldTypeId);
             });
             modelBuilder.Entity<AppFieldHistory>(history =>
             {
+                history.HasMany(x => x.SettingValues).WithOne().HasForeignKey(x => x.AppFieldHistoryId)
+                    .OnDelete(DeleteBehavior.Cascade);
                 history.HasOne<AppField>().WithMany().HasForeignKey(x => x.AppFieldId)
                     .OnDelete(DeleteBehavior.Restrict);
                 history.HasIndex(x => new { x.AppFieldId, x.RevisionNo }).IsUnique();
@@ -287,16 +293,52 @@ namespace onetouch.EntityFrameworkCore
             });
             modelBuilder.Entity<AppTableField>(assignment =>
             {
-                assignment.HasOne<AppField>().WithMany().HasForeignKey(x => x.AppFieldId)
-                    .OnDelete(DeleteBehavior.Restrict);
+                assignment.HasMany(x => x.SettingValues).WithOne().HasForeignKey(x => x.AppTableFieldId)
+                    .OnDelete(DeleteBehavior.Cascade);
                 assignment.HasOne<SydObject>().WithMany().HasForeignKey(x => x.SycObjectId)
                     .OnDelete(DeleteBehavior.Restrict);
                 assignment.HasOne<SycEntityObjectType>().WithMany().HasForeignKey(x => x.SycEntityObjectTypeId)
                     .OnDelete(DeleteBehavior.Restrict);
                 assignment.HasIndex(x => new { x.TenantId, x.SycObjectId, x.SycEntityObjectTypeId });
-                assignment.HasIndex(x => x.AppFieldId);
-                assignment.HasIndex(x => new { x.TenantId, x.AppFieldId, x.SycObjectId, x.SycEntityObjectTypeId })
+                assignment.HasIndex(x => x.FieldDefinitionKey);
+                assignment.HasIndex(x => new { x.TenantId, x.FieldDefinitionKey, x.SycObjectId, x.SycEntityObjectTypeId })
                     .IsUnique().HasFilter(null);
+            });
+            modelBuilder.Entity<AppFieldsOption>(option =>
+            {
+                option.Property(x => x.IsActive).HasDefaultValue(true);
+                option.HasOne<AppField>().WithMany().HasForeignKey(x => x.SettingFieldId)
+                    .OnDelete(DeleteBehavior.Restrict);
+                option.HasIndex(x => new { x.SettingFieldId, x.Code }).IsUnique();
+            });
+            modelBuilder.Entity<AppFieldSettingValue>(value =>
+            {
+                value.ToTable(table => table.HasCheckConstraint("CK_AppFieldSettingValues_OneValue",
+                    "(CASE WHEN [AppFieldsOptionId] IS NULL THEN 0 ELSE 1 END) + " +
+                    "(CASE WHEN [ValueText] IS NULL THEN 0 ELSE 1 END) + " +
+                    "(CASE WHEN [ValueNumber] IS NULL THEN 0 ELSE 1 END) + " +
+                    "(CASE WHEN [ValueBoolean] IS NULL THEN 0 ELSE 1 END) + " +
+                    "(CASE WHEN [ValueDateTime] IS NULL THEN 0 ELSE 1 END) = 1"));
+                value.HasOne<AppField>().WithMany().HasForeignKey(x => x.SettingFieldId)
+                    .OnDelete(DeleteBehavior.Restrict);
+                value.HasOne<AppFieldsOption>().WithMany()
+                    .HasForeignKey(x => new { x.SettingFieldId, x.AppFieldsOptionId })
+                    .HasPrincipalKey(x => new { x.SettingFieldId, x.Id })
+                    .HasConstraintName("FK_AppFieldSettingValues_SettingOption")
+                    .OnDelete(DeleteBehavior.Restrict);
+                value.HasIndex(x => new { x.AppFieldId, x.SettingFieldId })
+                    .IsUnique().HasFilter("[AppFieldsOptionId] IS NULL");
+                value.HasIndex(x => new { x.AppFieldId, x.SettingFieldId, x.AppFieldsOptionId })
+                    .IsUnique().HasFilter("[AppFieldsOptionId] IS NOT NULL");
+            });
+            modelBuilder.Entity<AppFieldHistorySettingValue>().HasIndex(x => x.AppFieldHistoryId);
+            modelBuilder.Entity<AppTableFieldSettingValue>().HasIndex(x => x.AppTableFieldId);
+            modelBuilder.Entity<SydObject>(entity =>
+            {
+                entity.HasOne(x => x.BaseEntityFk).WithMany()
+                    .HasForeignKey(x => x.BaseEntityId)
+                    .OnDelete(DeleteBehavior.Restrict);
+                entity.HasIndex(x => x.BaseEntityId);
             });
 
             modelBuilder.Entity<AppItemSelector>(a =>

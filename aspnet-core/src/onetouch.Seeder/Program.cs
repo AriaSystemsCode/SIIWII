@@ -14,7 +14,7 @@ public static class Program
     {
         if (args.Length == 0 || args.Contains("--help"))
         {
-            Console.WriteLine("onetouch.Seeder --config <release-settings.json> --content-root <backend-release-folder> [--check | --apply --maintenance-confirmed] [--client-url <exact registered URL>] [--command-timeout <seconds>]");
+            Console.WriteLine("onetouch.Seeder --config <release-settings.json> --content-root <backend-release-folder> [--check | --apply --maintenance-confirmed] [--client-url <exact registered URL> | --default-only --expected-database <database name>] [--command-timeout <seconds>]");
             Console.WriteLine("Default: read-only check. Exit 0=ready, 1=failure, 2=seed required. No migrations or database creation. Secrets may instead use ConnectionStrings__Default and ConnectionStrings__AriaMaster environment variables.");
             return 0;
         }
@@ -47,10 +47,19 @@ public static class Program
                     failed = true;
                     // SQL/EF exception messages can contain credentials or customer data.
                     var sql = ex as SqlException ?? ex.InnerException as SqlException;
-                    Console.Error.WriteLine($"{DateTime.UtcNow:O} {target.Label}: FAILED type={ex.GetType().Name} sqlNumber={sql?.Number} elapsed={timer.Elapsed}. Traffic must remain offline; investigate then rerun.");
+                    var frame = new StackTrace(ex, true).GetFrames()?.FirstOrDefault(f =>
+                        f.GetMethod()?.DeclaringType?.Namespace?.StartsWith("onetouch", StringComparison.Ordinal) == true);
+                    var origin = frame == null ? "unknown" :
+                        $"{frame.GetMethod()?.DeclaringType?.FullName}.{frame.GetMethod()?.Name}:{frame.GetFileLineNumber()}";
+                    Console.Error.WriteLine($"{DateTime.UtcNow:O} {target.Label}: FAILED type={ex.GetType().Name} sqlNumber={sql?.Number} origin={origin} elapsed={timer.Elapsed}. Traffic must remain offline; investigate then rerun.");
                 }
             }
             return failed ? 1 : pending ? 2 : 0;
+        }
+        catch (SeederOptionsException ex)
+        {
+            Console.Error.WriteLine($"Seeder arguments are invalid: {ex.Message}");
+            return 1;
         }
         catch (Exception ex)
         {
@@ -73,6 +82,15 @@ public static class Program
             if (string.IsNullOrWhiteSpace(value))
                 throw new InvalidOperationException("Missing connection configuration.");
             return value;
+        }
+
+        if (options.DefaultOnly)
+        {
+            var defaultTarget = Target.Create("default", Connection("Default"));
+            var selectedCatalog = new SqlConnectionStringBuilder(defaultTarget.ConnectionString).InitialCatalog;
+            if (!string.Equals(selectedCatalog, options.ExpectedDatabase, StringComparison.Ordinal))
+                throw new InvalidOperationException("Default connection does not target the expected database.");
+            return new List<Target> { defaultTarget };
         }
 
         var targets = new List<Target>();
@@ -159,9 +177,10 @@ public static class Program
 
 public static class SeedRelease
 {
-    // Increment only when the cumulative seed snapshot changes. Never change through CLI.
-    // This is seed data versioning, not EF schema migration versioning.
-    public const int RequiredVersion = 1;
+    // Increment only when the cumulative seed snapshot changes. Version 11
+    // enables multiple DropdownOptions selections for List--Dropdown fields.
+    // This is not an EF schema version.
+    public const int RequiredVersion = 11;
 }
 
 public sealed record Target(string Label, string ConnectionString, string Identity)
@@ -177,7 +196,8 @@ public sealed record Target(string Label, string ConnectionString, string Identi
     }
 }
 
-public sealed record Options(string ConfigPath, string ContentRoot, bool Apply, string? ClientUrl, int CommandTimeout)
+public sealed record Options(string ConfigPath, string ContentRoot, bool Apply, string? ClientUrl, int CommandTimeout,
+    bool DefaultOnly, string? ExpectedDatabase)
 {
     public static Options Parse(string[] args)
     {
@@ -186,25 +206,57 @@ public sealed record Options(string ConfigPath, string ContentRoot, bool Apply, 
         for (var i = 0; i < args.Length; i++)
         {
             var key = args[i];
-            if (key is "--check" or "--apply" or "--maintenance-confirmed")
+            if (key is "--check" or "--apply" or "--maintenance-confirmed" or "--default-only")
             {
-                if (!switches.Add(key)) throw new ArgumentException("Duplicate switch.");
+                if (!switches.Add(key)) throw new SeederOptionsException("Duplicate switch.");
             }
-            else if (key is "--config" or "--content-root" or "--client-url" or "--command-timeout")
+            else if (key is "--config" or "--content-root" or "--client-url" or "--command-timeout" or "--expected-database")
             {
                 if (++i >= args.Length || string.IsNullOrWhiteSpace(args[i]) || args[i].StartsWith("--") || !values.TryAdd(key, args[i]))
-                    throw new ArgumentException("Missing or duplicate argument.");
+                    throw new SeederOptionsException("Missing or duplicate argument.");
             }
-            else throw new ArgumentException("Unknown argument.");
+            else throw new SeederOptionsException("Unknown argument.");
         }
         var apply = switches.Contains("--apply");
         if (apply && (!switches.Contains("--maintenance-confirmed") || switches.Contains("--check")))
-            throw new ArgumentException("Apply requires maintenance confirmation and cannot be combined with check.");
-        if (!values.TryGetValue("--config", out var config)) throw new ArgumentException("Config is required.");
-        if (apply && !values.ContainsKey("--content-root")) throw new ArgumentException("Content root is required for apply.");
-        var timeout = values.TryGetValue("--command-timeout", out var seconds) ? int.Parse(seconds) : 120;
-        if (timeout < 1 || timeout > 3600) throw new ArgumentException("Timeout must be between 1 and 3600 seconds.");
-        return new Options(Path.GetFullPath(config), Path.GetFullPath(values.GetValueOrDefault("--content-root", ".")), apply,
-            values.GetValueOrDefault("--client-url"), timeout);
+            throw new SeederOptionsException("Apply requires maintenance confirmation and cannot be combined with check.");
+        var defaultOnly = switches.Contains("--default-only");
+        if (defaultOnly && (values.ContainsKey("--client-url") || !values.ContainsKey("--expected-database")))
+            throw new SeederOptionsException("Default-only requires expected database and cannot select a client URL.");
+        if (!defaultOnly && values.ContainsKey("--expected-database"))
+            throw new SeederOptionsException("Expected database requires default-only.");
+        if (!values.TryGetValue("--config", out var config)) throw new SeederOptionsException("Config is required.");
+        if (apply && !values.ContainsKey("--content-root")) throw new SeederOptionsException("Content root is required for apply.");
+        var timeout = 120;
+        if (values.TryGetValue("--command-timeout", out var seconds) && !int.TryParse(seconds, out timeout))
+            throw new SeederOptionsException("Command timeout must be an integer between 1 and 3600 seconds.");
+        if (timeout < 1 || timeout > 3600) throw new SeederOptionsException("Timeout must be between 1 and 3600 seconds.");
+        var configPath = ResolvePath(config, File.Exists);
+        if (!File.Exists(configPath))
+            throw new SeederOptionsException("Config file was not found relative to the working directory or Seeder project.");
+        var contentRoot = ResolvePath(values.GetValueOrDefault("--content-root", "."), Directory.Exists);
+        if (apply && !Directory.Exists(contentRoot))
+            throw new SeederOptionsException("Content root directory was not found relative to the working directory or Seeder project.");
+        return new Options(configPath, contentRoot, apply,
+            values.GetValueOrDefault("--client-url"), timeout, defaultOnly, values.GetValueOrDefault("--expected-database"));
     }
+
+    private static string ResolvePath(string path, Func<string, bool> exists)
+    {
+        var fromWorkingDirectory = Path.GetFullPath(path);
+        if (Path.IsPathFullyQualified(path) || exists(fromWorkingDirectory))
+            return fromWorkingDirectory;
+
+        // Visual Studio may launch a project with the solution folder as its
+        // working directory. During source runs, bin/<Configuration>/<TFM>
+        // is three levels below the Seeder project folder.
+        var projectDirectory = Path.GetFullPath(Path.Combine(AppContext.BaseDirectory, "..", "..", ".."));
+        var fromProjectDirectory = Path.GetFullPath(Path.Combine(projectDirectory, path));
+        return exists(fromProjectDirectory) ? fromProjectDirectory : fromWorkingDirectory;
+    }
+}
+
+public sealed class SeederOptionsException : ArgumentException
+{
+    public SeederOptionsException(string message) : base(message) { }
 }

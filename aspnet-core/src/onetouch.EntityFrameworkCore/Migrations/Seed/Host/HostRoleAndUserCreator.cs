@@ -8,6 +8,7 @@ using Abp.MultiTenancy;
 using Abp.Localization;
 using Abp.Notifications;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore.Storage;
 using onetouch.Authorization;
 using onetouch.Authorization.Roles;
 using onetouch.Authorization.Users;
@@ -54,7 +55,62 @@ namespace onetouch.Migrations.Seed.Host
             //MMT-Iteration37[End]
             SeedExtraAttributes();
             AsyncHelper.RunSync(() => CreateHostSystemData());
+            CreateHostFieldManagerData();
 
+        }
+
+        private void CreateHostFieldManagerData()
+        {
+            var scriptNames = new[]
+            {
+                "20261012_SeedAppEntityFields.sql",
+                "20261002_SeedTransactionHeaderFields.sql",
+                "20261013_SeedTransactionDetailFields.sql",
+                "20261014_SeedStringTextboxSettings.sql",
+                "20261016_SeedDatePickerSettings.sql",
+                "20261016_SetDatePickerExtraAttributes.sql",
+                "20261016_SeedRemainingFieldTypeSettings.sql",
+                "20261016_DynamicFieldSettings.sql",
+                "20261016_SeedDateFormatOptions.sql"
+            };
+
+            var previousTimeout = _context.Database.GetCommandTimeout();
+            try
+            {
+                if (!previousTimeout.HasValue)
+                    _context.Database.SetCommandTimeout(180);
+
+                var ownsTransaction = _context.Database.CurrentTransaction == null;
+                using (var transaction = ownsTransaction ? _context.Database.BeginTransaction() : null)
+                {
+                    foreach (var scriptName in scriptNames)
+                    {
+                        var resourceName = "onetouch.Migrations.Seed." + scriptName;
+                        using (var stream = typeof(HostRoleAndUserCreator).Assembly.GetManifestResourceStream(resourceName))
+                        {
+                            if (stream == null)
+                                throw new InvalidOperationException("Missing Field Manager seed resource: " + resourceName);
+
+                            using (var reader = new StreamReader(stream))
+                            using (var command = _context.Database.GetDbConnection().CreateCommand())
+                            {
+                                // ExecuteSqlRaw treats JSON braces in seed scripts as
+                                // string-format placeholders and throws FormatException.
+                                command.CommandText = reader.ReadToEnd();
+                                command.CommandTimeout = _context.Database.GetCommandTimeout() ?? 30;
+                                command.Transaction = _context.Database.CurrentTransaction?.GetDbTransaction();
+                                command.ExecuteNonQuery();
+                            }
+                        }
+                    }
+
+                    transaction?.Commit();
+                }
+            }
+            finally
+            {
+                _context.Database.SetCommandTimeout(previousTimeout);
+            }
         }
 
         private async Task AddMissingTextsAsync<T>(

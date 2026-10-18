@@ -1,5 +1,5 @@
 import { ModalDirective } from 'ngx-bootstrap/modal';
-import { AccountsServiceProxy, AppEntitiesServiceProxy, SycAttachmentCategoriesServiceProxy, AppEntityAttachmentDto, TreeNodeOfBranchForViewDto, LookupLabelDto, BranchForViewDto, SycIdentifierDefinitionsServiceProxy, SycAttachmentCategoryDto, SycEntityObjectTypesServiceProxy, GetAllEntityObjectTypeOutput, AppEntityExtraDataDto, CreateOrEditAccountInfoDto, GetAccountForViewDto } from '@shared/service-proxies/service-proxies';
+import { AccountsServiceProxy, AppEntitiesServiceProxy, SycAttachmentCategoriesServiceProxy, AppEntityAttachmentDto, TreeNodeOfBranchForViewDto, LookupLabelDto, BranchForViewDto, SycIdentifierDefinitionsServiceProxy, SycAttachmentCategoryDto, SycEntityObjectTypesServiceProxy, GetAllEntityObjectTypeOutput, AppEntityExtraDataDto, CreateOrEditAccountInfoDto, GetAccountForViewDto, ExtraAttributesSource } from '@shared/service-proxies/service-proxies';
 import { AppComponentBase } from '@shared/common/app-component-base';
 import { ViewChild, Component, EventEmitter, Injector, Output, Input, ChangeDetectorRef } from '@angular/core';
 import { SelectBranchModalComponent } from '../../../../select-branch/select-branch-modal/select-branch-modal.component';
@@ -555,8 +555,9 @@ export class CreateOrEditMemberComponent extends AppComponentBase {
   getAppItemTypeExtraAttributesById() {
     const typeId = this.accData?.accountTypeId || this.memberDto?.accountTypeId;
     if (!typeId) return;
+              let source: ExtraAttributesSource=0;
   
-    this._sycEntityObjectTypesServiceProxy.getAllWithExtraAttributes(typeId)
+    this._sycEntityObjectTypesServiceProxy.getAllWithExtraAttributes(typeId,source)
       .subscribe((res) => {
         if (res?.length > 0) {
           this.allAttributes = res[0]?.extraAttributes.extraAttributes;

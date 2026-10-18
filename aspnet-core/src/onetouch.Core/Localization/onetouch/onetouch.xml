@@ -3105,6 +3105,6 @@ Please select one of the available linesheet templates
 		<text name="Dashboards">Dashboards</text>
 		<text name="EditOrCreateNewDashboard">Edit Dashboard or Create New Dashboard</text>
 		<text name="DeleteDashboard">Delete Dashboard</text>
-		<text name="ShareDashboard">Share Dashboard</text>
-	</texts>  
+		<text name="AddfromExistingField(s)"> Add from Existing Field(s) </text>
+  </texts>  
 </localizationDictionary>

@@ -37,6 +37,7 @@ import {
     VariationListToDeleteDto,
     AppItemLookupDto,
     SydObjectsServiceProxy,
+    ExtraAttributesSource,
 
 } from "@shared/service-proxies/service-proxies";
 import { BsModalRef, BsModalService, ModalOptions } from "ngx-bootstrap/modal";
@@ -431,9 +432,10 @@ export class CreateOrEditAppItemComponent
     }
 
     getAppItemTypeExtraAttributesById(id: number) {
+                    let source: ExtraAttributesSource=0;
         if (!id) return;
         return this._sycEntityObjectTypesServiceProxy.getAllWithExtraAttributes(
-            id
+            id,source
         );
     }
 

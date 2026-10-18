@@ -13811,6 +13811,70 @@ export class AppFieldManagerServiceProxy {
     }
 
     /**
+     * @param fieldDefinitionKey (optional) 
+     * @param sycObjectId (optional) 
+     * @param sycEntityObjectTypeId (optional) 
+     * @return Success
+     */
+    getAppliedField(fieldDefinitionKey: string | undefined, sycObjectId: number | undefined, sycEntityObjectTypeId: number | null | undefined): Observable<AppFieldDto> {
+        let url_ = this.baseUrl + "/api/services/app/AppFieldManager/GetAppliedField?";
+        if (fieldDefinitionKey === null)
+            throw new Error("The parameter 'fieldDefinitionKey' cannot be null.");
+        else if (fieldDefinitionKey !== undefined)
+            url_ += "FieldDefinitionKey=" + encodeURIComponent("" + fieldDefinitionKey) + "&";
+        if (sycObjectId === null)
+            throw new Error("The parameter 'sycObjectId' cannot be null.");
+        else if (sycObjectId !== undefined)
+            url_ += "SycObjectId=" + encodeURIComponent("" + sycObjectId) + "&";
+        if (sycEntityObjectTypeId !== undefined && sycEntityObjectTypeId !== null)
+            url_ += "SycEntityObjectTypeId=" + encodeURIComponent("" + sycEntityObjectTypeId) + "&";
+        url_ = url_.replace(/[?&]$/, "");
+
+        let options_ : any = {
+            observe: "response",
+            responseType: "blob",
+            headers: new HttpHeaders({
+                "Accept": "text/plain"
+            })
+        };
+
+        return this.http.request("get", url_, options_).pipe(_observableMergeMap((response_ : any) => {
+            return this.processGetAppliedField(response_);
+        })).pipe(_observableCatch((response_: any) => {
+            if (response_ instanceof HttpResponseBase) {
+                try {
+                    return this.processGetAppliedField(response_ as any);
+                } catch (e) {
+                    return _observableThrow(e) as any as Observable<AppFieldDto>;
+                }
+            } else
+                return _observableThrow(response_) as any as Observable<AppFieldDto>;
+        }));
+    }
+
+    protected processGetAppliedField(response: HttpResponseBase): Observable<AppFieldDto> {
+        const status = response.status;
+        const responseBlob =
+            response instanceof HttpResponse ? response.body :
+            (response as any).error instanceof Blob ? (response as any).error : undefined;
+
+        let _headers: any = {}; if (response.headers) { for (let key of response.headers.keys()) { _headers[key] = response.headers.get(key); }}
+        if (status === 200) {
+            return blobToText(responseBlob).pipe(_observableMergeMap((_responseText: string) => {
+            let result200: any = null;
+            let resultData200 = _responseText === "" ? null : JSON.parse(_responseText, this.jsonParseReviver);
+            result200 = AppFieldDto.fromJS(resultData200);
+            return _observableOf(result200);
+            }));
+        } else if (status !== 200 && status !== 204) {
+            return blobToText(responseBlob).pipe(_observableMergeMap((_responseText: string) => {
+            return throwException("An unexpected server error occurred.", status, _responseText, _headers);
+            }));
+        }
+        return _observableOf(null as any);
+    }
+
+    /**
      * @param body (optional) 
      * @return Success
      */
@@ -13867,6 +13931,137 @@ export class AppFieldManagerServiceProxy {
     }
 
     /**
+     * @param tableId (optional) 
+     * @param sycEntityObjectTypeId (optional) 
+     * @param searchText (optional) 
+     * @param sorting (optional) 
+     * @param skipCount (optional) 
+     * @param maxResultCount (optional) 
+     * @return Success
+     */
+    getUnlinkedFields(tableId: number | undefined, sycEntityObjectTypeId: number | null | undefined, searchText: string | null | undefined, sorting: string | null | undefined, skipCount: number | undefined, maxResultCount: number | undefined): Observable<PagedResultDtoOfAppFieldDto> {
+        let url_ = this.baseUrl + "/api/services/app/AppFieldManager/GetUnlinkedFields?";
+        if (tableId === null)
+            throw new Error("The parameter 'tableId' cannot be null.");
+        else if (tableId !== undefined)
+            url_ += "TableId=" + encodeURIComponent("" + tableId) + "&";
+        if (sycEntityObjectTypeId !== undefined && sycEntityObjectTypeId !== null)
+            url_ += "SycEntityObjectTypeId=" + encodeURIComponent("" + sycEntityObjectTypeId) + "&";
+        if (searchText !== undefined && searchText !== null)
+            url_ += "SearchText=" + encodeURIComponent("" + searchText) + "&";
+        if (sorting !== undefined && sorting !== null)
+            url_ += "Sorting=" + encodeURIComponent("" + sorting) + "&";
+        if (skipCount === null)
+            throw new Error("The parameter 'skipCount' cannot be null.");
+        else if (skipCount !== undefined)
+            url_ += "SkipCount=" + encodeURIComponent("" + skipCount) + "&";
+        if (maxResultCount === null)
+            throw new Error("The parameter 'maxResultCount' cannot be null.");
+        else if (maxResultCount !== undefined)
+            url_ += "MaxResultCount=" + encodeURIComponent("" + maxResultCount) + "&";
+        url_ = url_.replace(/[?&]$/, "");
+
+        let options_ : any = {
+            observe: "response",
+            responseType: "blob",
+            headers: new HttpHeaders({
+                "Accept": "text/plain"
+            })
+        };
+
+        return this.http.request("get", url_, options_).pipe(_observableMergeMap((response_ : any) => {
+            return this.processGetUnlinkedFields(response_);
+        })).pipe(_observableCatch((response_: any) => {
+            if (response_ instanceof HttpResponseBase) {
+                try {
+                    return this.processGetUnlinkedFields(response_ as any);
+                } catch (e) {
+                    return _observableThrow(e) as any as Observable<PagedResultDtoOfAppFieldDto>;
+                }
+            } else
+                return _observableThrow(response_) as any as Observable<PagedResultDtoOfAppFieldDto>;
+        }));
+    }
+
+    protected processGetUnlinkedFields(response: HttpResponseBase): Observable<PagedResultDtoOfAppFieldDto> {
+        const status = response.status;
+        const responseBlob =
+            response instanceof HttpResponse ? response.body :
+            (response as any).error instanceof Blob ? (response as any).error : undefined;
+
+        let _headers: any = {}; if (response.headers) { for (let key of response.headers.keys()) { _headers[key] = response.headers.get(key); }}
+        if (status === 200) {
+            return blobToText(responseBlob).pipe(_observableMergeMap((_responseText: string) => {
+            let result200: any = null;
+            let resultData200 = _responseText === "" ? null : JSON.parse(_responseText, this.jsonParseReviver);
+            result200 = PagedResultDtoOfAppFieldDto.fromJS(resultData200);
+            return _observableOf(result200);
+            }));
+        } else if (status !== 200 && status !== 204) {
+            return blobToText(responseBlob).pipe(_observableMergeMap((_responseText: string) => {
+            return throwException("An unexpected server error occurred.", status, _responseText, _headers);
+            }));
+        }
+        return _observableOf(null as any);
+    }
+
+    /**
+     * @param body (optional) 
+     * @return Success
+     */
+    linkExistingFields(body: LinkExistingFieldsInput | undefined): Observable<LinkExistingFieldsResultDto> {
+        let url_ = this.baseUrl + "/api/services/app/AppFieldManager/LinkExistingFields";
+        url_ = url_.replace(/[?&]$/, "");
+
+        const content_ = JSON.stringify(body);
+
+        let options_ : any = {
+            body: content_,
+            observe: "response",
+            responseType: "blob",
+            headers: new HttpHeaders({
+                "Content-Type": "application/json-patch+json",
+                "Accept": "text/plain"
+            })
+        };
+
+        return this.http.request("post", url_, options_).pipe(_observableMergeMap((response_ : any) => {
+            return this.processLinkExistingFields(response_);
+        })).pipe(_observableCatch((response_: any) => {
+            if (response_ instanceof HttpResponseBase) {
+                try {
+                    return this.processLinkExistingFields(response_ as any);
+                } catch (e) {
+                    return _observableThrow(e) as any as Observable<LinkExistingFieldsResultDto>;
+                }
+            } else
+                return _observableThrow(response_) as any as Observable<LinkExistingFieldsResultDto>;
+        }));
+    }
+
+    protected processLinkExistingFields(response: HttpResponseBase): Observable<LinkExistingFieldsResultDto> {
+        const status = response.status;
+        const responseBlob =
+            response instanceof HttpResponse ? response.body :
+            (response as any).error instanceof Blob ? (response as any).error : undefined;
+
+        let _headers: any = {}; if (response.headers) { for (let key of response.headers.keys()) { _headers[key] = response.headers.get(key); }}
+        if (status === 200) {
+            return blobToText(responseBlob).pipe(_observableMergeMap((_responseText: string) => {
+            let result200: any = null;
+            let resultData200 = _responseText === "" ? null : JSON.parse(_responseText, this.jsonParseReviver);
+            result200 = LinkExistingFieldsResultDto.fromJS(resultData200);
+            return _observableOf(result200);
+            }));
+        } else if (status !== 200 && status !== 204) {
+            return blobToText(responseBlob).pipe(_observableMergeMap((_responseText: string) => {
+            return throwException("An unexpected server error occurred.", status, _responseText, _headers);
+            }));
+        }
+        return _observableOf(null as any);
+    }
+
+    /**
      * @param id (optional) 
      * @return Success
      */
@@ -13912,6 +14107,69 @@ export class AppFieldManagerServiceProxy {
             let result200: any = null;
             let resultData200 = _responseText === "" ? null : JSON.parse(_responseText, this.jsonParseReviver);
             result200 = GetFieldForEditOutput.fromJS(resultData200);
+            return _observableOf(result200);
+            }));
+        } else if (status !== 200 && status !== 204) {
+            return blobToText(responseBlob).pipe(_observableMergeMap((_responseText: string) => {
+            return throwException("An unexpected server error occurred.", status, _responseText, _headers);
+            }));
+        }
+        return _observableOf(null as any);
+    }
+
+    /**
+     * @param appFieldId (optional) 
+     * @return Success
+     */
+    getFieldHistory(appFieldId: number | undefined): Observable<AppFieldHistoryDto[]> {
+        let url_ = this.baseUrl + "/api/services/app/AppFieldManager/GetFieldHistory?";
+        if (appFieldId === null)
+            throw new Error("The parameter 'appFieldId' cannot be null.");
+        else if (appFieldId !== undefined)
+            url_ += "appFieldId=" + encodeURIComponent("" + appFieldId) + "&";
+        url_ = url_.replace(/[?&]$/, "");
+
+        let options_ : any = {
+            observe: "response",
+            responseType: "blob",
+            headers: new HttpHeaders({
+                "Accept": "text/plain"
+            })
+        };
+
+        return this.http.request("get", url_, options_).pipe(_observableMergeMap((response_ : any) => {
+            return this.processGetFieldHistory(response_);
+        })).pipe(_observableCatch((response_: any) => {
+            if (response_ instanceof HttpResponseBase) {
+                try {
+                    return this.processGetFieldHistory(response_ as any);
+                } catch (e) {
+                    return _observableThrow(e) as any as Observable<AppFieldHistoryDto[]>;
+                }
+            } else
+                return _observableThrow(response_) as any as Observable<AppFieldHistoryDto[]>;
+        }));
+    }
+
+    protected processGetFieldHistory(response: HttpResponseBase): Observable<AppFieldHistoryDto[]> {
+        const status = response.status;
+        const responseBlob =
+            response instanceof HttpResponse ? response.body :
+            (response as any).error instanceof Blob ? (response as any).error : undefined;
+
+        let _headers: any = {}; if (response.headers) { for (let key of response.headers.keys()) { _headers[key] = response.headers.get(key); }}
+        if (status === 200) {
+            return blobToText(responseBlob).pipe(_observableMergeMap((_responseText: string) => {
+            let result200: any = null;
+            let resultData200 = _responseText === "" ? null : JSON.parse(_responseText, this.jsonParseReviver);
+            if (Array.isArray(resultData200)) {
+                result200 = [] as any;
+                for (let item of resultData200)
+                    result200!.push(AppFieldHistoryDto.fromJS(item));
+            }
+            else {
+                result200 = <any>null;
+            }
             return _observableOf(result200);
             }));
         } else if (status !== 200 && status !== 204) {
@@ -14133,6 +14391,62 @@ export class AppFieldManagerServiceProxy {
         if (status === 200) {
             return blobToText(responseBlob).pipe(_observableMergeMap((_responseText: string) => {
             return _observableOf(null as any);
+            }));
+        } else if (status !== 200 && status !== 204) {
+            return blobToText(responseBlob).pipe(_observableMergeMap((_responseText: string) => {
+            return throwException("An unexpected server error occurred.", status, _responseText, _headers);
+            }));
+        }
+        return _observableOf(null as any);
+    }
+
+    /**
+     * @param body (optional) 
+     * @return Success
+     */
+    syncFieldSnapshots(body: SyncFieldSnapshotsInput | undefined): Observable<FieldActionResultDto> {
+        let url_ = this.baseUrl + "/api/services/app/AppFieldManager/SyncFieldSnapshots";
+        url_ = url_.replace(/[?&]$/, "");
+
+        const content_ = JSON.stringify(body);
+
+        let options_ : any = {
+            body: content_,
+            observe: "response",
+            responseType: "blob",
+            headers: new HttpHeaders({
+                "Content-Type": "application/json-patch+json",
+                "Accept": "text/plain"
+            })
+        };
+
+        return this.http.request("post", url_, options_).pipe(_observableMergeMap((response_ : any) => {
+            return this.processSyncFieldSnapshots(response_);
+        })).pipe(_observableCatch((response_: any) => {
+            if (response_ instanceof HttpResponseBase) {
+                try {
+                    return this.processSyncFieldSnapshots(response_ as any);
+                } catch (e) {
+                    return _observableThrow(e) as any as Observable<FieldActionResultDto>;
+                }
+            } else
+                return _observableThrow(response_) as any as Observable<FieldActionResultDto>;
+        }));
+    }
+
+    protected processSyncFieldSnapshots(response: HttpResponseBase): Observable<FieldActionResultDto> {
+        const status = response.status;
+        const responseBlob =
+            response instanceof HttpResponse ? response.body :
+            (response as any).error instanceof Blob ? (response as any).error : undefined;
+
+        let _headers: any = {}; if (response.headers) { for (let key of response.headers.keys()) { _headers[key] = response.headers.get(key); }}
+        if (status === 200) {
+            return blobToText(responseBlob).pipe(_observableMergeMap((_responseText: string) => {
+            let result200: any = null;
+            let resultData200 = _responseText === "" ? null : JSON.parse(_responseText, this.jsonParseReviver);
+            result200 = FieldActionResultDto.fromJS(resultData200);
+            return _observableOf(result200);
             }));
         } else if (status !== 200 && status !== 204) {
             return blobToText(responseBlob).pipe(_observableMergeMap((_responseText: string) => {
@@ -49897,12 +50211,16 @@ export class SycEntityObjectTypesServiceProxy {
      * @param id (optional) 
      * @return Success
      */
-    getAllWithExtraAttributes(id: number | undefined): Observable<GetAllEntityObjectTypeOutput[]> {
+    getAllWithExtraAttributes(id: number | undefined, source: ExtraAttributesSource): Observable<GetAllEntityObjectTypeOutput[]> {
         let url_ = this.baseUrl + "/api/services/app/SycEntityObjectTypes/GetAllWithExtraAttributes?";
         if (id === null)
             throw new Error("The parameter 'id' cannot be null.");
         else if (id !== undefined)
             url_ += "id=" + encodeURIComponent("" + id) + "&";
+        if (source === undefined || source === null)
+            throw new Error("The parameter 'source' must be defined and cannot be null.");
+        else
+            url_ += "source=" + encodeURIComponent("" + source) + "&";
         url_ = url_.replace(/[?&]$/, "");
 
         let options_ : any = {
@@ -70965,6 +71283,8 @@ export class SydObject implements ISydObject {
     parentId!: number | undefined;
     parentFk!: SydObject;
     parentCode!: string | undefined;
+    baseEntityId!: number | undefined;
+    baseEntityFk!: SydObject;
     sydObjects!: SydObject[] | undefined;
     ssinIdentifierId!: number | undefined;
     ssinIdentifierCode!: string | undefined;
@@ -71006,6 +71326,8 @@ export class SydObject implements ISydObject {
             this.parentId = _data["parentId"];
             this.parentFk = _data["parentFk"] ? SydObject.fromJS(_data["parentFk"]) : <any>undefined;
             this.parentCode = _data["parentCode"];
+            this.baseEntityId = _data["baseEntityId"];
+            this.baseEntityFk = _data["baseEntityFk"] ? SydObject.fromJS(_data["baseEntityFk"]) : <any>undefined;
             if (Array.isArray(_data["sydObjects"])) {
                 this.sydObjects = [] as any;
                 for (let item of _data["sydObjects"])
@@ -71049,6 +71371,8 @@ export class SydObject implements ISydObject {
         data["parentId"] = this.parentId;
         data["parentFk"] = this.parentFk ? this.parentFk.toJSON() : <any>undefined;
         data["parentCode"] = this.parentCode;
+        data["baseEntityId"] = this.baseEntityId;
+        data["baseEntityFk"] = this.baseEntityFk ? this.baseEntityFk.toJSON() : <any>undefined;
         if (Array.isArray(this.sydObjects)) {
             data["sydObjects"] = [];
             for (let item of this.sydObjects)
@@ -71081,6 +71405,8 @@ export interface ISydObject {
     parentId: number | undefined;
     parentFk: SydObject;
     parentCode: string | undefined;
+    baseEntityId: number | undefined;
+    baseEntityFk: SydObject;
     sydObjects: SydObject[] | undefined;
     ssinIdentifierId: number | undefined;
     ssinIdentifierCode: string | undefined;
@@ -83027,7 +83353,7 @@ export interface IPreviewFieldCodeInput {
 }
 
 export class FieldCodePreviewDto implements IFieldCodePreviewDto {
-    fieldCode!: string | undefined;
+    sequence!: string | undefined;
 
     [key: string]: any;
 
@@ -83046,7 +83372,7 @@ export class FieldCodePreviewDto implements IFieldCodePreviewDto {
                 if (_data.hasOwnProperty(property))
                     this[property] = _data[property];
             }
-            this.fieldCode = _data["fieldCode"];
+            this.sequence = _data["sequence"];
         }
     }
 
@@ -83063,19 +83389,20 @@ export class FieldCodePreviewDto implements IFieldCodePreviewDto {
             if (this.hasOwnProperty(property))
                 data[property] = this[property];
         }
-        data["fieldCode"] = this.fieldCode;
+        data["sequence"] = this.sequence;
         return data;
     }
 }
 
 export interface IFieldCodePreviewDto {
-    fieldCode: string | undefined;
+    sequence: string | undefined;
 
     [key: string]: any;
 }
 
 export class AppFieldListDto implements IAppFieldListDto {
     id!: number;
+    fieldDefinitionKey!: string;
     fieldCode!: string | undefined;
     fieldName!: string | undefined;
     description!: string | undefined;
@@ -83096,6 +83423,7 @@ export class AppFieldListDto implements IAppFieldListDto {
     sycObjectId!: number;
     entitySycObjectId!: number | undefined;
     creatorUserId!: number | undefined;
+    creatorUserName!: string | undefined;
     creationTime!: moment.Moment;
     tables!: string[] | undefined;
 
@@ -83117,6 +83445,7 @@ export class AppFieldListDto implements IAppFieldListDto {
                     this[property] = _data[property];
             }
             this.id = _data["id"];
+            this.fieldDefinitionKey = _data["fieldDefinitionKey"];
             this.fieldCode = _data["fieldCode"];
             this.fieldName = _data["fieldName"];
             this.description = _data["description"];
@@ -83137,6 +83466,7 @@ export class AppFieldListDto implements IAppFieldListDto {
             this.sycObjectId = _data["sycObjectId"];
             this.entitySycObjectId = _data["entitySycObjectId"];
             this.creatorUserId = _data["creatorUserId"];
+            this.creatorUserName = _data["creatorUserName"];
             this.creationTime = _data["creationTime"] ? moment(_data["creationTime"].toString()) : <any>undefined;
             if (Array.isArray(_data["tables"])) {
                 this.tables = [] as any;
@@ -83160,6 +83490,7 @@ export class AppFieldListDto implements IAppFieldListDto {
                 data[property] = this[property];
         }
         data["id"] = this.id;
+        data["fieldDefinitionKey"] = this.fieldDefinitionKey;
         data["fieldCode"] = this.fieldCode;
         data["fieldName"] = this.fieldName;
         data["description"] = this.description;
@@ -83180,6 +83511,7 @@ export class AppFieldListDto implements IAppFieldListDto {
         data["sycObjectId"] = this.sycObjectId;
         data["entitySycObjectId"] = this.entitySycObjectId;
         data["creatorUserId"] = this.creatorUserId;
+        data["creatorUserName"] = this.creatorUserName;
         data["creationTime"] = this.creationTime ? this.creationTime.toISOString() : <any>undefined;
         if (Array.isArray(this.tables)) {
             data["tables"] = [];
@@ -83192,6 +83524,7 @@ export class AppFieldListDto implements IAppFieldListDto {
 
 export interface IAppFieldListDto {
     id: number;
+    fieldDefinitionKey: string;
     fieldCode: string | undefined;
     fieldName: string | undefined;
     description: string | undefined;
@@ -83212,6 +83545,7 @@ export interface IAppFieldListDto {
     sycObjectId: number;
     entitySycObjectId: number | undefined;
     creatorUserId: number | undefined;
+    creatorUserName: string | undefined;
     creationTime: moment.Moment;
     tables: string[] | undefined;
 
@@ -83274,6 +83608,218 @@ export class PagedResultDtoOfAppFieldListDto implements IPagedResultDtoOfAppFiel
 export interface IPagedResultDtoOfAppFieldListDto {
     totalCount: number;
     items: AppFieldListDto[] | undefined;
+
+    [key: string]: any;
+}
+
+export class AppFieldDto implements IAppFieldDto {
+    fieldDefinitionKey!: string;
+    tenantId!: number | undefined;
+    sourceFieldId!: number | undefined;
+    currentRevisionNo!: string | undefined;
+    nextRevisionNo!: string | undefined;
+    isStandard!: boolean;
+    isCustom!: boolean;
+    isHidden!: boolean;
+    creationTime!: moment.Moment;
+    creatorUserId!: number | undefined;
+    creatorUserName!: string | undefined;
+    lastModificationTime!: moment.Moment | undefined;
+    lastModifierUserId!: number | undefined;
+    isDeleted!: boolean;
+    deleterUserId!: number | undefined;
+    deletionTime!: moment.Moment | undefined;
+    id!: number | undefined;
+    sycObjectId!: number;
+    entitySycObjectId!: number | undefined;
+    selectedObjectTypeId!: number | undefined;
+    fieldTypeId!: number;
+    widgetTypeId!: number | undefined;
+    fieldLevelId!: number | undefined;
+    fieldStatusId!: number | undefined;
+    fieldCode!: string | undefined;
+    fieldName!: string;
+    description!: string | undefined;
+    fieldLevelCode!: string | undefined;
+    fieldStatusCode!: string | undefined;
+    trackingNo!: string | undefined;
+    isExtraField!: boolean;
+    allowNull!: boolean;
+    length!: number | undefined;
+    decimals!: number | undefined;
+    defaultValue!: string | undefined;
+    dateFormat!: string | undefined;
+    timeFormat!: string | undefined;
+    allowMultiSelect!: boolean;
+    required!: boolean;
+    visible!: boolean;
+    editable!: boolean;
+    extraAttributes!: string | undefined;
+
+    [key: string]: any;
+
+    constructor(data?: IAppFieldDto) {
+        if (data) {
+            for (var property in data) {
+                if (data.hasOwnProperty(property))
+                    (<any>this)[property] = (<any>data)[property];
+            }
+        }
+    }
+
+    init(_data?: any) {
+        if (_data) {
+            for (var property in _data) {
+                if (_data.hasOwnProperty(property))
+                    this[property] = _data[property];
+            }
+            this.fieldDefinitionKey = _data["fieldDefinitionKey"];
+            this.tenantId = _data["tenantId"];
+            this.sourceFieldId = _data["sourceFieldId"];
+            this.currentRevisionNo = _data["currentRevisionNo"];
+            this.nextRevisionNo = _data["nextRevisionNo"];
+            this.isStandard = _data["isStandard"];
+            this.isCustom = _data["isCustom"];
+            this.isHidden = _data["isHidden"];
+            this.creationTime = _data["creationTime"] ? moment(_data["creationTime"].toString()) : <any>undefined;
+            this.creatorUserId = _data["creatorUserId"];
+            this.creatorUserName = _data["creatorUserName"];
+            this.lastModificationTime = _data["lastModificationTime"] ? moment(_data["lastModificationTime"].toString()) : <any>undefined;
+            this.lastModifierUserId = _data["lastModifierUserId"];
+            this.isDeleted = _data["isDeleted"];
+            this.deleterUserId = _data["deleterUserId"];
+            this.deletionTime = _data["deletionTime"] ? moment(_data["deletionTime"].toString()) : <any>undefined;
+            this.id = _data["id"];
+            this.sycObjectId = _data["sycObjectId"];
+            this.entitySycObjectId = _data["entitySycObjectId"];
+            this.selectedObjectTypeId = _data["selectedObjectTypeId"];
+            this.fieldTypeId = _data["fieldTypeId"];
+            this.widgetTypeId = _data["widgetTypeId"];
+            this.fieldLevelId = _data["fieldLevelId"];
+            this.fieldStatusId = _data["fieldStatusId"];
+            this.fieldCode = _data["fieldCode"];
+            this.fieldName = _data["fieldName"];
+            this.description = _data["description"];
+            this.fieldLevelCode = _data["fieldLevelCode"];
+            this.fieldStatusCode = _data["fieldStatusCode"];
+            this.trackingNo = _data["trackingNo"];
+            this.isExtraField = _data["isExtraField"];
+            this.allowNull = _data["allowNull"];
+            this.length = _data["length"];
+            this.decimals = _data["decimals"];
+            this.defaultValue = _data["defaultValue"];
+            this.dateFormat = _data["dateFormat"];
+            this.timeFormat = _data["timeFormat"];
+            this.allowMultiSelect = _data["allowMultiSelect"];
+            this.required = _data["required"];
+            this.visible = _data["visible"];
+            this.editable = _data["editable"];
+            this.extraAttributes = _data["extraAttributes"];
+        }
+    }
+
+    static fromJS(data: any): AppFieldDto {
+        data = typeof data === 'object' ? data : {};
+        let result = new AppFieldDto();
+        result.init(data);
+        return result;
+    }
+
+    toJSON(data?: any) {
+        data = typeof data === 'object' ? data : {};
+        for (var property in this) {
+            if (this.hasOwnProperty(property))
+                data[property] = this[property];
+        }
+        data["fieldDefinitionKey"] = this.fieldDefinitionKey;
+        data["tenantId"] = this.tenantId;
+        data["sourceFieldId"] = this.sourceFieldId;
+        data["currentRevisionNo"] = this.currentRevisionNo;
+        data["nextRevisionNo"] = this.nextRevisionNo;
+        data["isStandard"] = this.isStandard;
+        data["isCustom"] = this.isCustom;
+        data["isHidden"] = this.isHidden;
+        data["creationTime"] = this.creationTime ? this.creationTime.toISOString() : <any>undefined;
+        data["creatorUserId"] = this.creatorUserId;
+        data["creatorUserName"] = this.creatorUserName;
+        data["lastModificationTime"] = this.lastModificationTime ? this.lastModificationTime.toISOString() : <any>undefined;
+        data["lastModifierUserId"] = this.lastModifierUserId;
+        data["isDeleted"] = this.isDeleted;
+        data["deleterUserId"] = this.deleterUserId;
+        data["deletionTime"] = this.deletionTime ? this.deletionTime.toISOString() : <any>undefined;
+        data["id"] = this.id;
+        data["sycObjectId"] = this.sycObjectId;
+        data["entitySycObjectId"] = this.entitySycObjectId;
+        data["selectedObjectTypeId"] = this.selectedObjectTypeId;
+        data["fieldTypeId"] = this.fieldTypeId;
+        data["widgetTypeId"] = this.widgetTypeId;
+        data["fieldLevelId"] = this.fieldLevelId;
+        data["fieldStatusId"] = this.fieldStatusId;
+        data["fieldCode"] = this.fieldCode;
+        data["fieldName"] = this.fieldName;
+        data["description"] = this.description;
+        data["fieldLevelCode"] = this.fieldLevelCode;
+        data["fieldStatusCode"] = this.fieldStatusCode;
+        data["trackingNo"] = this.trackingNo;
+        data["isExtraField"] = this.isExtraField;
+        data["allowNull"] = this.allowNull;
+        data["length"] = this.length;
+        data["decimals"] = this.decimals;
+        data["defaultValue"] = this.defaultValue;
+        data["dateFormat"] = this.dateFormat;
+        data["timeFormat"] = this.timeFormat;
+        data["allowMultiSelect"] = this.allowMultiSelect;
+        data["required"] = this.required;
+        data["visible"] = this.visible;
+        data["editable"] = this.editable;
+        data["extraAttributes"] = this.extraAttributes;
+        return data;
+    }
+}
+
+export interface IAppFieldDto {
+    fieldDefinitionKey: string;
+    tenantId: number | undefined;
+    sourceFieldId: number | undefined;
+    currentRevisionNo: string | undefined;
+    nextRevisionNo: string | undefined;
+    isStandard: boolean;
+    isCustom: boolean;
+    isHidden: boolean;
+    creationTime: moment.Moment;
+    creatorUserId: number | undefined;
+    creatorUserName: string | undefined;
+    lastModificationTime: moment.Moment | undefined;
+    lastModifierUserId: number | undefined;
+    isDeleted: boolean;
+    deleterUserId: number | undefined;
+    deletionTime: moment.Moment | undefined;
+    id: number | undefined;
+    sycObjectId: number;
+    entitySycObjectId: number | undefined;
+    selectedObjectTypeId: number | undefined;
+    fieldTypeId: number;
+    widgetTypeId: number | undefined;
+    fieldLevelId: number | undefined;
+    fieldStatusId: number | undefined;
+    fieldCode: string | undefined;
+    fieldName: string;
+    description: string | undefined;
+    fieldLevelCode: string | undefined;
+    fieldStatusCode: string | undefined;
+    trackingNo: string | undefined;
+    isExtraField: boolean;
+    allowNull: boolean;
+    length: number | undefined;
+    decimals: number | undefined;
+    defaultValue: string | undefined;
+    dateFormat: string | undefined;
+    timeFormat: string | undefined;
+    allowMultiSelect: boolean;
+    required: boolean;
+    visible: boolean;
+    editable: boolean;
+    extraAttributes: string | undefined;
 
     [key: string]: any;
 }
@@ -83386,50 +83932,13 @@ export interface IFieldActionResultDto {
     [key: string]: any;
 }
 
-export class AppFieldDto implements IAppFieldDto {
-    tenantId!: number | undefined;
-    sourceFieldId!: number | undefined;
-    currentRevisionNo!: string | undefined;
-    isStandard!: boolean;
-    isCustom!: boolean;
-    isHidden!: boolean;
-    creationTime!: moment.Moment;
-    creatorUserId!: number | undefined;
-    lastModificationTime!: moment.Moment | undefined;
-    lastModifierUserId!: number | undefined;
-    isDeleted!: boolean;
-    deleterUserId!: number | undefined;
-    deletionTime!: moment.Moment | undefined;
-    id!: number | undefined;
-    sycObjectId!: number;
-    entitySycObjectId!: number | undefined;
-    selectedObjectTypeId!: number | undefined;
-    fieldTypeId!: number;
-    widgetTypeId!: number | undefined;
-    fieldLevelId!: number | undefined;
-    fieldStatusId!: number | undefined;
-    fieldCode!: string | undefined;
-    fieldName!: string;
-    description!: string | undefined;
-    fieldLevelCode!: string | undefined;
-    fieldStatusCode!: string | undefined;
-    trackingNo!: string | undefined;
-    isExtraField!: boolean;
-    allowNull!: boolean;
-    length!: number | undefined;
-    decimals!: number | undefined;
-    defaultValue!: string | undefined;
-    dateFormat!: string | undefined;
-    timeFormat!: string | undefined;
-    allowMultiSelect!: boolean;
-    required!: boolean;
-    visible!: boolean;
-    editable!: boolean;
-    extraAttributes!: string | undefined;
+export class PagedResultDtoOfAppFieldDto implements IPagedResultDtoOfAppFieldDto {
+    totalCount!: number;
+    items!: AppFieldDto[] | undefined;
 
     [key: string]: any;
 
-    constructor(data?: IAppFieldDto) {
+    constructor(data?: IPagedResultDtoOfAppFieldDto) {
         if (data) {
             for (var property in data) {
                 if (data.hasOwnProperty(property))
@@ -83444,51 +83953,18 @@ export class AppFieldDto implements IAppFieldDto {
                 if (_data.hasOwnProperty(property))
                     this[property] = _data[property];
             }
-            this.tenantId = _data["tenantId"];
-            this.sourceFieldId = _data["sourceFieldId"];
-            this.currentRevisionNo = _data["currentRevisionNo"];
-            this.isStandard = _data["isStandard"];
-            this.isCustom = _data["isCustom"];
-            this.isHidden = _data["isHidden"];
-            this.creationTime = _data["creationTime"] ? moment(_data["creationTime"].toString()) : <any>undefined;
-            this.creatorUserId = _data["creatorUserId"];
-            this.lastModificationTime = _data["lastModificationTime"] ? moment(_data["lastModificationTime"].toString()) : <any>undefined;
-            this.lastModifierUserId = _data["lastModifierUserId"];
-            this.isDeleted = _data["isDeleted"];
-            this.deleterUserId = _data["deleterUserId"];
-            this.deletionTime = _data["deletionTime"] ? moment(_data["deletionTime"].toString()) : <any>undefined;
-            this.id = _data["id"];
-            this.sycObjectId = _data["sycObjectId"];
-            this.entitySycObjectId = _data["entitySycObjectId"];
-            this.selectedObjectTypeId = _data["selectedObjectTypeId"];
-            this.fieldTypeId = _data["fieldTypeId"];
-            this.widgetTypeId = _data["widgetTypeId"];
-            this.fieldLevelId = _data["fieldLevelId"];
-            this.fieldStatusId = _data["fieldStatusId"];
-            this.fieldCode = _data["fieldCode"];
-            this.fieldName = _data["fieldName"];
-            this.description = _data["description"];
-            this.fieldLevelCode = _data["fieldLevelCode"];
-            this.fieldStatusCode = _data["fieldStatusCode"];
-            this.trackingNo = _data["trackingNo"];
-            this.isExtraField = _data["isExtraField"];
-            this.allowNull = _data["allowNull"];
-            this.length = _data["length"];
-            this.decimals = _data["decimals"];
-            this.defaultValue = _data["defaultValue"];
-            this.dateFormat = _data["dateFormat"];
-            this.timeFormat = _data["timeFormat"];
-            this.allowMultiSelect = _data["allowMultiSelect"];
-            this.required = _data["required"];
-            this.visible = _data["visible"];
-            this.editable = _data["editable"];
-            this.extraAttributes = _data["extraAttributes"];
+            this.totalCount = _data["totalCount"];
+            if (Array.isArray(_data["items"])) {
+                this.items = [] as any;
+                for (let item of _data["items"])
+                    this.items!.push(AppFieldDto.fromJS(item));
+            }
         }
     }
 
-    static fromJS(data: any): AppFieldDto {
+    static fromJS(data: any): PagedResultDtoOfAppFieldDto {
         data = typeof data === 'object' ? data : {};
-        let result = new AppFieldDto();
+        let result = new PagedResultDtoOfAppFieldDto();
         result.init(data);
         return result;
     }
@@ -83499,89 +83975,138 @@ export class AppFieldDto implements IAppFieldDto {
             if (this.hasOwnProperty(property))
                 data[property] = this[property];
         }
-        data["tenantId"] = this.tenantId;
-        data["sourceFieldId"] = this.sourceFieldId;
-        data["currentRevisionNo"] = this.currentRevisionNo;
-        data["isStandard"] = this.isStandard;
-        data["isCustom"] = this.isCustom;
-        data["isHidden"] = this.isHidden;
-        data["creationTime"] = this.creationTime ? this.creationTime.toISOString() : <any>undefined;
-        data["creatorUserId"] = this.creatorUserId;
-        data["lastModificationTime"] = this.lastModificationTime ? this.lastModificationTime.toISOString() : <any>undefined;
-        data["lastModifierUserId"] = this.lastModifierUserId;
-        data["isDeleted"] = this.isDeleted;
-        data["deleterUserId"] = this.deleterUserId;
-        data["deletionTime"] = this.deletionTime ? this.deletionTime.toISOString() : <any>undefined;
-        data["id"] = this.id;
-        data["sycObjectId"] = this.sycObjectId;
-        data["entitySycObjectId"] = this.entitySycObjectId;
-        data["selectedObjectTypeId"] = this.selectedObjectTypeId;
-        data["fieldTypeId"] = this.fieldTypeId;
-        data["widgetTypeId"] = this.widgetTypeId;
-        data["fieldLevelId"] = this.fieldLevelId;
-        data["fieldStatusId"] = this.fieldStatusId;
-        data["fieldCode"] = this.fieldCode;
-        data["fieldName"] = this.fieldName;
-        data["description"] = this.description;
-        data["fieldLevelCode"] = this.fieldLevelCode;
-        data["fieldStatusCode"] = this.fieldStatusCode;
-        data["trackingNo"] = this.trackingNo;
-        data["isExtraField"] = this.isExtraField;
-        data["allowNull"] = this.allowNull;
-        data["length"] = this.length;
-        data["decimals"] = this.decimals;
-        data["defaultValue"] = this.defaultValue;
-        data["dateFormat"] = this.dateFormat;
-        data["timeFormat"] = this.timeFormat;
-        data["allowMultiSelect"] = this.allowMultiSelect;
-        data["required"] = this.required;
-        data["visible"] = this.visible;
-        data["editable"] = this.editable;
-        data["extraAttributes"] = this.extraAttributes;
+        data["totalCount"] = this.totalCount;
+        if (Array.isArray(this.items)) {
+            data["items"] = [];
+            for (let item of this.items)
+                data["items"].push(item.toJSON());
+        }
         return data;
     }
 }
 
-export interface IAppFieldDto {
-    tenantId: number | undefined;
-    sourceFieldId: number | undefined;
-    currentRevisionNo: string | undefined;
-    isStandard: boolean;
-    isCustom: boolean;
-    isHidden: boolean;
-    creationTime: moment.Moment;
-    creatorUserId: number | undefined;
-    lastModificationTime: moment.Moment | undefined;
-    lastModifierUserId: number | undefined;
-    isDeleted: boolean;
-    deleterUserId: number | undefined;
-    deletionTime: moment.Moment | undefined;
-    id: number | undefined;
-    sycObjectId: number;
-    entitySycObjectId: number | undefined;
-    selectedObjectTypeId: number | undefined;
-    fieldTypeId: number;
-    widgetTypeId: number | undefined;
-    fieldLevelId: number | undefined;
-    fieldStatusId: number | undefined;
-    fieldCode: string | undefined;
-    fieldName: string;
-    description: string | undefined;
-    fieldLevelCode: string | undefined;
-    fieldStatusCode: string | undefined;
-    trackingNo: string | undefined;
-    isExtraField: boolean;
-    allowNull: boolean;
-    length: number | undefined;
-    decimals: number | undefined;
-    defaultValue: string | undefined;
-    dateFormat: string | undefined;
-    timeFormat: string | undefined;
-    allowMultiSelect: boolean;
-    required: boolean;
-    visible: boolean;
-    editable: boolean;
-    extraAttributes: string | undefined;
+export interface IPagedResultDtoOfAppFieldDto {
+    totalCount: number;
+    items: AppFieldDto[] | undefined;
+
+    [key: string]: any;
+}
+
+export class LinkExistingFieldsInput implements ILinkExistingFieldsInput {
+    tableId!: number;
+    sycEntityObjectTypeId!: number | undefined;
+    appFieldIds!: number[];
+
+    [key: string]: any;
+
+    constructor(data?: ILinkExistingFieldsInput) {
+        if (data) {
+            for (var property in data) {
+                if (data.hasOwnProperty(property))
+                    (<any>this)[property] = (<any>data)[property];
+            }
+        }
+        if (!data) {
+            this.appFieldIds = [];
+        }
+    }
+
+    init(_data?: any) {
+        if (_data) {
+            for (var property in _data) {
+                if (_data.hasOwnProperty(property))
+                    this[property] = _data[property];
+            }
+            this.tableId = _data["tableId"];
+            this.sycEntityObjectTypeId = _data["sycEntityObjectTypeId"];
+            if (Array.isArray(_data["appFieldIds"])) {
+                this.appFieldIds = [] as any;
+                for (let item of _data["appFieldIds"])
+                    this.appFieldIds!.push(item);
+            }
+        }
+    }
+
+    static fromJS(data: any): LinkExistingFieldsInput {
+        data = typeof data === 'object' ? data : {};
+        let result = new LinkExistingFieldsInput();
+        result.init(data);
+        return result;
+    }
+
+    toJSON(data?: any) {
+        data = typeof data === 'object' ? data : {};
+        for (var property in this) {
+            if (this.hasOwnProperty(property))
+                data[property] = this[property];
+        }
+        data["tableId"] = this.tableId;
+        data["sycEntityObjectTypeId"] = this.sycEntityObjectTypeId;
+        if (Array.isArray(this.appFieldIds)) {
+            data["appFieldIds"] = [];
+            for (let item of this.appFieldIds)
+                data["appFieldIds"].push(item);
+        }
+        return data;
+    }
+}
+
+export interface ILinkExistingFieldsInput {
+    tableId: number;
+    sycEntityObjectTypeId: number | undefined;
+    appFieldIds: number[];
+
+    [key: string]: any;
+}
+
+export class LinkExistingFieldsResultDto implements ILinkExistingFieldsResultDto {
+    linkedCount!: number;
+    alreadyLinkedCount!: number;
+
+    [key: string]: any;
+
+    constructor(data?: ILinkExistingFieldsResultDto) {
+        if (data) {
+            for (var property in data) {
+                if (data.hasOwnProperty(property))
+                    (<any>this)[property] = (<any>data)[property];
+            }
+        }
+    }
+
+    init(_data?: any) {
+        if (_data) {
+            for (var property in _data) {
+                if (_data.hasOwnProperty(property))
+                    this[property] = _data[property];
+            }
+            this.linkedCount = _data["linkedCount"];
+            this.alreadyLinkedCount = _data["alreadyLinkedCount"];
+        }
+    }
+
+    static fromJS(data: any): LinkExistingFieldsResultDto {
+        data = typeof data === 'object' ? data : {};
+        let result = new LinkExistingFieldsResultDto();
+        result.init(data);
+        return result;
+    }
+
+    toJSON(data?: any) {
+        data = typeof data === 'object' ? data : {};
+        for (var property in this) {
+            if (this.hasOwnProperty(property))
+                data[property] = this[property];
+        }
+        data["linkedCount"] = this.linkedCount;
+        data["alreadyLinkedCount"] = this.alreadyLinkedCount;
+        return data;
+    }
+}
+
+export interface ILinkExistingFieldsResultDto {
+    linkedCount: number;
+    alreadyLinkedCount: number;
 
     [key: string]: any;
 }
@@ -83698,6 +84223,90 @@ export class GetFieldForEditOutput implements IGetFieldForEditOutput {
 export interface IGetFieldForEditOutput {
     field: AppFieldDto;
     permissions: FieldEditPermissionDto;
+
+    [key: string]: any;
+}
+
+export class AppFieldHistoryDto implements IAppFieldHistoryDto {
+    id!: number;
+    appFieldId!: number;
+    fieldDefinitionKey!: string;
+    revisionNo!: string | undefined;
+    changeType!: string | undefined;
+    field!: AppFieldDto;
+    changedAt!: moment.Moment;
+    changedBy!: number | undefined;
+    changedByName!: string | undefined;
+    restoredFromRevisionNo!: string | undefined;
+
+    [key: string]: any;
+
+    constructor(data?: IAppFieldHistoryDto) {
+        if (data) {
+            for (var property in data) {
+                if (data.hasOwnProperty(property))
+                    (<any>this)[property] = (<any>data)[property];
+            }
+        }
+    }
+
+    init(_data?: any) {
+        if (_data) {
+            for (var property in _data) {
+                if (_data.hasOwnProperty(property))
+                    this[property] = _data[property];
+            }
+            this.id = _data["id"];
+            this.appFieldId = _data["appFieldId"];
+            this.fieldDefinitionKey = _data["fieldDefinitionKey"];
+            this.revisionNo = _data["revisionNo"];
+            this.changeType = _data["changeType"];
+            this.field = _data["field"] ? AppFieldDto.fromJS(_data["field"]) : <any>undefined;
+            this.changedAt = _data["changedAt"] ? moment(_data["changedAt"].toString()) : <any>undefined;
+            this.changedBy = _data["changedBy"];
+            this.changedByName = _data["changedByName"];
+            this.restoredFromRevisionNo = _data["restoredFromRevisionNo"];
+        }
+    }
+
+    static fromJS(data: any): AppFieldHistoryDto {
+        data = typeof data === 'object' ? data : {};
+        let result = new AppFieldHistoryDto();
+        result.init(data);
+        return result;
+    }
+
+    toJSON(data?: any) {
+        data = typeof data === 'object' ? data : {};
+        for (var property in this) {
+            if (this.hasOwnProperty(property))
+                data[property] = this[property];
+        }
+        data["id"] = this.id;
+        data["appFieldId"] = this.appFieldId;
+        data["fieldDefinitionKey"] = this.fieldDefinitionKey;
+        data["revisionNo"] = this.revisionNo;
+        data["changeType"] = this.changeType;
+        data["field"] = this.field ? this.field.toJSON() : <any>undefined;
+        data["changedAt"] = this.changedAt ? this.changedAt.toISOString() : <any>undefined;
+        data["changedBy"] = this.changedBy;
+        data["changedByName"] = this.changedByName;
+        data["restoredFromRevisionNo"] = this.restoredFromRevisionNo;
+        return data;
+    }
+}
+
+export interface IAppFieldHistoryDto {
+    id: number;
+    appFieldId: number;
+    fieldDefinitionKey: string;
+    revisionNo: string | undefined;
+    changeType: string | undefined;
+    field: AppFieldDto;
+    changedAt: moment.Moment;
+    changedBy: number | undefined;
+    changedByName: string | undefined;
+    restoredFromRevisionNo: string | undefined;
 
     [key: string]: any;
 }
@@ -83894,6 +84503,62 @@ export class EntityDtoOfInt64 implements IEntityDtoOfInt64 {
 
 export interface IEntityDtoOfInt64 {
     id: number;
+
+    [key: string]: any;
+}
+
+export class SyncFieldSnapshotsInput implements ISyncFieldSnapshotsInput {
+    appFieldId!: number;
+    sycObjectId!: number | undefined;
+    sycEntityObjectTypeId!: number | undefined;
+
+    [key: string]: any;
+
+    constructor(data?: ISyncFieldSnapshotsInput) {
+        if (data) {
+            for (var property in data) {
+                if (data.hasOwnProperty(property))
+                    (<any>this)[property] = (<any>data)[property];
+            }
+        }
+    }
+
+    init(_data?: any) {
+        if (_data) {
+            for (var property in _data) {
+                if (_data.hasOwnProperty(property))
+                    this[property] = _data[property];
+            }
+            this.appFieldId = _data["appFieldId"];
+            this.sycObjectId = _data["sycObjectId"];
+            this.sycEntityObjectTypeId = _data["sycEntityObjectTypeId"];
+        }
+    }
+
+    static fromJS(data: any): SyncFieldSnapshotsInput {
+        data = typeof data === 'object' ? data : {};
+        let result = new SyncFieldSnapshotsInput();
+        result.init(data);
+        return result;
+    }
+
+    toJSON(data?: any) {
+        data = typeof data === 'object' ? data : {};
+        for (var property in this) {
+            if (this.hasOwnProperty(property))
+                data[property] = this[property];
+        }
+        data["appFieldId"] = this.appFieldId;
+        data["sycObjectId"] = this.sycObjectId;
+        data["sycEntityObjectTypeId"] = this.sycEntityObjectTypeId;
+        return data;
+    }
+}
+
+export interface ISyncFieldSnapshotsInput {
+    appFieldId: number;
+    sycObjectId: number | undefined;
+    sycEntityObjectTypeId: number | undefined;
 
     [key: string]: any;
 }
@@ -116150,6 +116815,11 @@ export interface ISycEntityObjectStatusSydObjectLookupTableDto {
     displayName: string | undefined;
 
     [key: string]: any;
+}
+
+export enum ExtraAttributesSource {
+    Xml = 0,
+    AppFields = 1,
 }
 
 export class ItemExtraAttributes implements IItemExtraAttributes {

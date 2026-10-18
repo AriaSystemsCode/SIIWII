@@ -1,3 +1,5 @@
+using System;
+using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
 using Abp.Domain.Entities;
@@ -5,13 +7,14 @@ using Abp.Domain.Entities.Auditing;
 
 namespace onetouch.AppFields
 {
-    [Table("APPFields")]
+    [Table("AppFields")]
     public class AppField : FullAuditedEntity<long>, IMayHaveTenant
     {
         public int? TenantId { get; set; }
+        public Guid FieldDefinitionKey { get; set; } = Guid.NewGuid();
         public long? SourceFieldId { get; set; }
-        public long SycObjectId { get; set; }
-        public long? EntitySycObjectId { get; set; }
+        public long? SycObjectId { get; set; } // SydObjects.Id only for field-type setting definitions.
+        public long? EntitySycObjectId { get; set; } // SycEntityObjectTypes.Id: the owning entity type.
 
         [Required, StringLength(11, MinimumLength = 11)]
         public string FieldCode { get; set; }
@@ -37,11 +40,10 @@ namespace onetouch.AppFields
         [StringLength(100)]
         public string TrackingNo { get; set; }
 
-        [Required, StringLength(10)]
+        [Required, StringLength(10), ConcurrencyCheck]
         public string CurrentRevisionNo { get; set; }
 
         public bool IsStandard { get; set; }
-        public bool IsCustom { get; set; }
         public bool IsExtraField { get; set; }
         public bool IsHidden { get; set; }
 
@@ -63,7 +65,16 @@ namespace onetouch.AppFields
         public bool Visible { get; set; }
         public bool Editable { get; set; }
 
-        // Type-specific attributes (for example dropdown options) are JSON.
-       // public string ExtraAttributes { get; set; }
+        public long? SourceAttributeId { get; set; }
+        [StringLength(100)] public string SourceDataType { get; set; }
+        public long? SourceEntityObjectTypeId { get; set; } // XML attribute's source type, when imported.
+        [StringLength(100)] public string EntityObjectTypeCode { get; set; }
+        [StringLength(500)] public string Usage { get; set; }
+        public bool? IsLookup { get; set; }
+        public bool? IsVariation { get; set; }
+        public bool? IsAdvancedSearch { get; set; }
+        public bool? AcceptMultipleValues { get; set; }
+        public bool? AllowAddNew { get; set; }
+        public ICollection<AppFieldSettingValue> SettingValues { get; set; } = new List<AppFieldSettingValue>();
     }
 }
