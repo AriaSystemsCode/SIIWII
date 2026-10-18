@@ -218,6 +218,9 @@ namespace onetouch.AppDashboards
             var returnCond = GenerateConditionList(input.Conditions,"AND", ref oind);
             foreach (var conditionRet in returnCond) 
             {
+                if (conditionRet == null || conditionRet.ExpressionList==null || conditionRet.ExpressionList.Count==0)
+                    continue;
+                
                 var whereExp = ""; 
                 if (conditionRet.ExpressionList.Count > 1)
                 {
