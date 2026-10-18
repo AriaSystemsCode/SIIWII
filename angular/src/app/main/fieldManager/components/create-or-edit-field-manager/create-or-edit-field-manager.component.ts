@@ -3,13 +3,16 @@ import { ActivatedRoute, Router } from '@angular/router';
 import { ModalDirective } from 'ngx-bootstrap/modal';
 import { AppComponentBase } from '@shared/common/app-component-base';
 import { FieldManagerService } from '../../field-manager.service';
+import { ExtraAttributeDataService } from '@app/main/app-items/app-item-shared/services/extra-attribute-data.service';
 import Swal from 'sweetalert2';
-import { AppFieldDto, CreateOrEditFieldInput, FieldCreateOrEditMetadataDto, FieldLookupDto } from '@shared/service-proxies/service-proxies';
+import * as moment from 'moment';
+import { AppFieldDto, CreateOrEditFieldInput, ExtraAttribute, ExtraAttributesSource, FieldCreateOrEditMetadataDto, FieldLookupDto, FieldSettingValueDto, SycEntityObjectTypesServiceProxy } from '@shared/service-proxies/service-proxies';
 
 @Component({
     selector: 'app-create-or-edit-field-manager',
     templateUrl: './create-or-edit-field-manager.component.html',
-    styleUrls: ['./create-or-edit-field-manager.component.scss']
+    styleUrls: ['./create-or-edit-field-manager.component.scss'],
+    providers: [ExtraAttributeDataService]
 })
 export class CreateOrEditFieldManagerComponent extends AppComponentBase implements OnInit {
     @ViewChild('fieldManagerModal', { static: true }) modal!: ModalDirective;
@@ -25,6 +28,9 @@ export class CreateOrEditFieldManagerComponent extends AppComponentBase implemen
     widgetTypes: FieldLookupDto[] = [];
     fieldLevels: FieldLookupDto[] = [];
     fieldStatuses: FieldLookupDto[] = [];
+    fieldTypeSettings: ExtraAttribute[] = [];
+    dynamicInputsForViewDto: any;
+    dynamicSettingsObject: any = { value: { extraAttributes: [], filteredExtraAttributes: [], header: 'AdvancedInformation' } };
     selectedObjectTypeId: number | null = null;
     entityParentId: number | null = null;
     private codePreviewRequest = 0;
@@ -33,12 +39,15 @@ export class CreateOrEditFieldManagerComponent extends AppComponentBase implemen
     private extraAttributes: { [key: string]: any } = {};
     private expectedCurrentRevisionNo?: string;
     private isRevisionEdit = false;
+    private fieldSettingsRequest = 0;
 
     constructor(
         injector: Injector,
         private activatedRoute: ActivatedRoute,
         private router: Router,
-        private fieldManagerService: FieldManagerService
+        private fieldManagerService: FieldManagerService,
+        private sycEntityObjectTypesService: SycEntityObjectTypesServiceProxy,
+        private extraAttributeDataService: ExtraAttributeDataService
     ) {
         super(injector);
     }
@@ -108,6 +117,7 @@ export class CreateOrEditFieldManagerComponent extends AppComponentBase implemen
             ? fieldOptions as { option: string; value: string }[]
             : [];
         this.fieldManagerService.syncFieldLookupIds(this.item, this.fieldLevels, this.fieldStatuses);
+        if (this.item.fieldTypeId) this.loadFieldTypeSettings(this.item.fieldTypeId);
         this.active = true;
         this.initialFormState = this.getFormState();
         this.modal.show();
@@ -119,6 +129,7 @@ export class CreateOrEditFieldManagerComponent extends AppComponentBase implemen
     }
 
     save(): void {
+         //i51_BE-FE- Extra Data  saving ???
         //i51-BE-Define the expected behavior when two users attempt to create a new revision at the same time. If one user saves a revision number that has already been used by another user, the system should notify the second user and ask whether they want to continue with a different revision number or cancel the operation.
         this.dropdownOptions = this.dropdownOptions
             .filter(option => option.option.trim().length > 0 || option.value.trim().length > 0)
@@ -282,11 +293,71 @@ export class CreateOrEditFieldManagerComponent extends AppComponentBase implemen
     }
 
     onFieldTypeChanged(typeId: number | undefined): void {
+        const typeChanged = this.item.fieldTypeId !== typeId;
         this.item.fieldTypeId = typeId || 0;
+        if (typeChanged) this.item.settingValues = [];
         if (!this.availableWidgets.some(widget => widget.id === this.item.widgetTypeId)) {
             this.item.widgetTypeId = undefined;
         }
+        if (this.item.fieldTypeId) this.loadFieldTypeSettings(this.item.fieldTypeId);
+        else {
+            ++this.fieldSettingsRequest;
+            this.fieldTypeSettings = [];
+            this.setDynamicFieldSettings([]);
+        }
         this.generateCode();
+    }
+
+    onDynamicSettingsChanged(values: any[]): void {
+        //i51- extra attributes !!
+        const incomingValues = values || [];
+        const incomingAttributeIds = new Set(incomingValues.map(value => value.attributeId));
+        const existingValues = (this.item.settingValues || []).filter(value =>
+            !incomingAttributeIds.has(value.settingFieldId)
+        );
+
+        const updatedValues = incomingValues.flatMap(value => {
+            const definition = this.fieldTypeSettings.find(setting => setting.attributeId === value.attributeId);
+            const selectedValues = value.acceptMultipleValues
+                ? (Array.isArray(value.value) ? value.value : [])
+                : [value.value];
+
+            return selectedValues
+                .filter(selectedValue => selectedValue !== undefined && selectedValue !== null && selectedValue !== '')
+                .map(selectedValue => {
+                const settingValue = new FieldSettingValueDto();
+                settingValue.settingFieldId = value.attributeId;
+                settingValue.settingFieldCode = definition?.code;
+                settingValue.settingFieldName = definition?.name;
+                const selectedOption = value.isLookup
+                    ? this.dynamicSettingsObject.value.filteredExtraAttributes
+                        .find((attribute: any) => attribute.attributeId === value.attributeId)
+                        ?.paginationSetting?.list?.find((option: any) =>
+                            String(option.value) === String(selectedValue) || option.code === selectedValue
+                        )
+                    : undefined;
+
+                if (selectedOption) {
+                    settingValue.appFieldsOptionId = selectedOption.value;
+                    settingValue.optionCode = selectedOption.code;
+                    settingValue.optionName = selectedOption.label;
+                } else {
+                    const typeCode = (definition?.dataType || '').toLowerCase();
+                    if (typeCode.includes('bool') || typeCode === 'bit') {
+                        settingValue.valueBoolean = selectedValue === true || selectedValue === 'true';
+                    } else if (typeCode.includes('date') || typeCode.includes('time')) {
+                        settingValue.valueDateTime = selectedValue ? moment(selectedValue) : undefined;
+                    } else if (typeCode.includes('number') || typeCode.includes('numeric') || typeCode.includes('int') || typeCode.includes('decimal')) {
+                        settingValue.valueNumber = selectedValue === '' ? undefined : Number(selectedValue);
+                    } else {
+                        settingValue.valueText = selectedValue == null ? undefined : String(selectedValue);
+                    }
+                }
+                return settingValue;
+            });
+        });
+
+        this.item.settingValues = [...existingValues, ...updatedValues];
     }
 
     get availableFieldLevels(): FieldLookupDto[] {
@@ -306,6 +377,8 @@ export class CreateOrEditFieldManagerComponent extends AppComponentBase implemen
             this.setCreateDefaults();
             this.initialFormState = this.getFormState();
             this.generateCode();
+        } else if (this.item.fieldTypeId) {
+            this.loadFieldTypeSettings(this.item.fieldTypeId);
         }
     }
 
@@ -314,9 +387,84 @@ export class CreateOrEditFieldManagerComponent extends AppComponentBase implemen
         const firstFieldLevel = this.availableFieldLevels[0];
         const firstFieldStatus = this.fieldStatuses[0];
 
-        if (firstFieldType) this.item.fieldTypeId = firstFieldType.id || 0;
+        if (firstFieldType && this.item.fieldTypeId !== firstFieldType.id) {
+            this.item.settingValues = [];
+            this.item.fieldTypeId = firstFieldType.id || 0;
+        }
         if (firstFieldLevel) this.fieldManagerService.setFieldLevel(this.item, firstFieldLevel.code || '', this.fieldLevels);
         if (firstFieldStatus) this.fieldManagerService.setFieldStatus(this.item, firstFieldStatus.code || '', this.fieldStatuses);
+        if (this.item.fieldTypeId) this.loadFieldTypeSettings(this.item.fieldTypeId);
+    }
+
+    private loadFieldTypeSettings(fieldTypeId: number): void {
+        const request = ++this.fieldSettingsRequest;
+        this.sycEntityObjectTypesService.getAllWithExtraAttributes(fieldTypeId, ExtraAttributesSource.AppFields).subscribe({
+            next: objectTypes => {
+                if (request !== this.fieldSettingsRequest) return;
+                this.fieldTypeSettings = objectTypes?.[0]?.extraAttributes?.extraAttributes || [];
+                this.setDynamicFieldSettings(this.fieldTypeSettings);
+                this.loadFieldTypeSettingLookups(this.fieldTypeSettings, request);
+            },
+            error: () => {
+                if (request === this.fieldSettingsRequest) {
+                    this.fieldTypeSettings = [];
+                    this.setDynamicFieldSettings([]);
+                }
+            }
+        });
+    }
+
+    private setDynamicFieldSettings(settings: ExtraAttribute[]): void {
+        const savedValues = this.item.settingValues || [];
+        const attributes = settings.map(setting => {
+            const saved = savedValues.filter(value => value.settingFieldId === setting.attributeId);
+            const savedSelections = saved.map(value => value.appFieldsOptionId ?? value.valueText ?? value.valueNumber ??
+                value.valueBoolean?.toString() ?? (value.valueDateTime ? value.valueDateTime.toDate() : undefined))
+                .filter(value => value !== undefined && value !== null);
+            const selectedValues = setting.acceptMultipleValues
+                ? (savedSelections.length ? savedSelections : [])
+                : (savedSelections[0] ?? setting.defaultValue);
+
+            return {
+                ...setting,
+                id: setting.attributeId,
+                selectedValues: selectedValues ?? (setting.acceptMultipleValues ? [] : ''),
+                paginationSetting: {
+                    skipCount: 0,
+                    maxResultCount: 10,
+                    totalCount: 0,
+                    list: []
+                }
+            };
+        });
+
+        this.dynamicSettingsObject = {
+            value: {
+                extraAttributes: attributes,
+                filteredExtraAttributes: attributes,
+                header: 'AdvancedInformation'
+            }
+        };
+    }
+
+    private loadFieldTypeSettingLookups(settings: ExtraAttribute[], request: number): void {
+        settings.filter(setting => setting.isLookup && setting.entityObjectTypeCode).forEach(setting => {
+            const attribute = this.dynamicSettingsObject.value.filteredExtraAttributes
+                .find((item: any) => item.attributeId === setting.attributeId);
+            this.extraAttributeDataService.getExtraAttributeLookupDataWithPaging(
+                setting.entityObjectTypeCode,
+                0,
+                10
+            ).subscribe(result => {
+                if (request !== this.fieldSettingsRequest || !attribute) return;
+                attribute.paginationSetting.totalCount = result.totalCount;
+                attribute.paginationSetting.list = result.items || [];
+                if (attribute.paginationSetting.list.length < result.totalCount) {
+                    attribute.paginationSetting.list.push({ value: -1, label: this.l('showMore') });
+                }
+                attribute.paginationSetting.skipCount = 10;
+            });
+        });
     }
 
     private loadField(id: number): void {
@@ -334,6 +482,7 @@ export class CreateOrEditFieldManagerComponent extends AppComponentBase implemen
                 this.dropdownOptions = Array.isArray(fieldOptions)
                     ? fieldOptions as { option: string; value: string }[]
                     : [];
+                if (this.item.fieldTypeId) this.loadFieldTypeSettings(this.item.fieldTypeId);
                 if (!this.fieldTypes.length) this.fieldManagerService.getFieldMetadata().subscribe({
                     next: metadata => {
                         this.setFieldMetadata(metadata);
