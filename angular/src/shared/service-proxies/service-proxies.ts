@@ -13389,6 +13389,62 @@ export class AppFieldManagerServiceProxy {
      * @param body (optional) 
      * @return Success
      */
+    restoreFieldRevision(body: RestoreFieldRevisionInput | undefined): Observable<AppFieldDto> {
+        let url_ = this.baseUrl + "/api/services/app/AppFieldManager/RestoreFieldRevision";
+        url_ = url_.replace(/[?&]$/, "");
+
+        const content_ = JSON.stringify(body);
+
+        let options_ : any = {
+            body: content_,
+            observe: "response",
+            responseType: "blob",
+            headers: new HttpHeaders({
+                "Content-Type": "application/json-patch+json",
+                "Accept": "text/plain"
+            })
+        };
+
+        return this.http.request("post", url_, options_).pipe(_observableMergeMap((response_ : any) => {
+            return this.processRestoreFieldRevision(response_);
+        })).pipe(_observableCatch((response_: any) => {
+            if (response_ instanceof HttpResponseBase) {
+                try {
+                    return this.processRestoreFieldRevision(response_ as any);
+                } catch (e) {
+                    return _observableThrow(e) as any as Observable<AppFieldDto>;
+                }
+            } else
+                return _observableThrow(response_) as any as Observable<AppFieldDto>;
+        }));
+    }
+
+    protected processRestoreFieldRevision(response: HttpResponseBase): Observable<AppFieldDto> {
+        const status = response.status;
+        const responseBlob =
+            response instanceof HttpResponse ? response.body :
+            (response as any).error instanceof Blob ? (response as any).error : undefined;
+
+        let _headers: any = {}; if (response.headers) { for (let key of response.headers.keys()) { _headers[key] = response.headers.get(key); }}
+        if (status === 200) {
+            return blobToText(responseBlob).pipe(_observableMergeMap((_responseText: string) => {
+            let result200: any = null;
+            let resultData200 = _responseText === "" ? null : JSON.parse(_responseText, this.jsonParseReviver);
+            result200 = AppFieldDto.fromJS(resultData200);
+            return _observableOf(result200);
+            }));
+        } else if (status !== 200 && status !== 204) {
+            return blobToText(responseBlob).pipe(_observableMergeMap((_responseText: string) => {
+            return throwException("An unexpected server error occurred.", status, _responseText, _headers);
+            }));
+        }
+        return _observableOf(null as any);
+    }
+
+    /**
+     * @param body (optional) 
+     * @return Success
+     */
     createOrEditField(body: CreateOrEditFieldInput | undefined): Observable<AppFieldDto> {
         let url_ = this.baseUrl + "/api/services/app/AppFieldManager/CreateOrEditField";
         url_ = url_.replace(/[?&]$/, "");
@@ -13651,6 +13707,132 @@ export class AppFieldManagerServiceProxy {
             let result200: any = null;
             let resultData200 = _responseText === "" ? null : JSON.parse(_responseText, this.jsonParseReviver);
             result200 = FieldActionResultDto.fromJS(resultData200);
+            return _observableOf(result200);
+            }));
+        } else if (status !== 200 && status !== 204) {
+            return blobToText(responseBlob).pipe(_observableMergeMap((_responseText: string) => {
+            return throwException("An unexpected server error occurred.", status, _responseText, _headers);
+            }));
+        }
+        return _observableOf(null as any);
+    }
+
+    /**
+     * @param fieldTypeId (optional) 
+     * @return Success
+     */
+    getFieldTypeSettings(fieldTypeId: number | undefined): Observable<FieldSettingDefinitionDto[]> {
+        let url_ = this.baseUrl + "/api/services/app/AppFieldManager/GetFieldTypeSettings?";
+        if (fieldTypeId === null)
+            throw new Error("The parameter 'fieldTypeId' cannot be null.");
+        else if (fieldTypeId !== undefined)
+            url_ += "fieldTypeId=" + encodeURIComponent("" + fieldTypeId) + "&";
+        url_ = url_.replace(/[?&]$/, "");
+
+        let options_ : any = {
+            observe: "response",
+            responseType: "blob",
+            headers: new HttpHeaders({
+                "Accept": "text/plain"
+            })
+        };
+
+        return this.http.request("get", url_, options_).pipe(_observableMergeMap((response_ : any) => {
+            return this.processGetFieldTypeSettings(response_);
+        })).pipe(_observableCatch((response_: any) => {
+            if (response_ instanceof HttpResponseBase) {
+                try {
+                    return this.processGetFieldTypeSettings(response_ as any);
+                } catch (e) {
+                    return _observableThrow(e) as any as Observable<FieldSettingDefinitionDto[]>;
+                }
+            } else
+                return _observableThrow(response_) as any as Observable<FieldSettingDefinitionDto[]>;
+        }));
+    }
+
+    protected processGetFieldTypeSettings(response: HttpResponseBase): Observable<FieldSettingDefinitionDto[]> {
+        const status = response.status;
+        const responseBlob =
+            response instanceof HttpResponse ? response.body :
+            (response as any).error instanceof Blob ? (response as any).error : undefined;
+
+        let _headers: any = {}; if (response.headers) { for (let key of response.headers.keys()) { _headers[key] = response.headers.get(key); }}
+        if (status === 200) {
+            return blobToText(responseBlob).pipe(_observableMergeMap((_responseText: string) => {
+            let result200: any = null;
+            let resultData200 = _responseText === "" ? null : JSON.parse(_responseText, this.jsonParseReviver);
+            if (Array.isArray(resultData200)) {
+                result200 = [] as any;
+                for (let item of resultData200)
+                    result200!.push(FieldSettingDefinitionDto.fromJS(item));
+            }
+            else {
+                result200 = <any>null;
+            }
+            return _observableOf(result200);
+            }));
+        } else if (status !== 200 && status !== 204) {
+            return blobToText(responseBlob).pipe(_observableMergeMap((_responseText: string) => {
+            return throwException("An unexpected server error occurred.", status, _responseText, _headers);
+            }));
+        }
+        return _observableOf(null as any);
+    }
+
+    /**
+     * @param body (optional) 
+     * @return Success
+     */
+    saveFieldSettingOptions(body: SaveFieldSettingOptionsInput | undefined): Observable<FieldSettingOptionDto[]> {
+        let url_ = this.baseUrl + "/api/services/app/AppFieldManager/SaveFieldSettingOptions";
+        url_ = url_.replace(/[?&]$/, "");
+
+        const content_ = JSON.stringify(body);
+
+        let options_ : any = {
+            body: content_,
+            observe: "response",
+            responseType: "blob",
+            headers: new HttpHeaders({
+                "Content-Type": "application/json-patch+json",
+                "Accept": "text/plain"
+            })
+        };
+
+        return this.http.request("post", url_, options_).pipe(_observableMergeMap((response_ : any) => {
+            return this.processSaveFieldSettingOptions(response_);
+        })).pipe(_observableCatch((response_: any) => {
+            if (response_ instanceof HttpResponseBase) {
+                try {
+                    return this.processSaveFieldSettingOptions(response_ as any);
+                } catch (e) {
+                    return _observableThrow(e) as any as Observable<FieldSettingOptionDto[]>;
+                }
+            } else
+                return _observableThrow(response_) as any as Observable<FieldSettingOptionDto[]>;
+        }));
+    }
+
+    protected processSaveFieldSettingOptions(response: HttpResponseBase): Observable<FieldSettingOptionDto[]> {
+        const status = response.status;
+        const responseBlob =
+            response instanceof HttpResponse ? response.body :
+            (response as any).error instanceof Blob ? (response as any).error : undefined;
+
+        let _headers: any = {}; if (response.headers) { for (let key of response.headers.keys()) { _headers[key] = response.headers.get(key); }}
+        if (status === 200) {
+            return blobToText(responseBlob).pipe(_observableMergeMap((_responseText: string) => {
+            let result200: any = null;
+            let resultData200 = _responseText === "" ? null : JSON.parse(_responseText, this.jsonParseReviver);
+            if (Array.isArray(resultData200)) {
+                result200 = [] as any;
+                for (let item of resultData200)
+                    result200!.push(FieldSettingOptionDto.fromJS(item));
+            }
+            else {
+                result200 = <any>null;
+            }
             return _observableOf(result200);
             }));
         } else if (status !== 200 && status !== 204) {
@@ -81354,8 +81536,6 @@ export interface IFieldCreateOrEditMetadataDto {
 
 export class PreviewFieldCodeInput implements IPreviewFieldCodeInput {
     fieldTypeId!: number;
-    fieldName!: string;
-    fieldLevelCode!: string | undefined;
 
     [key: string]: any;
 
@@ -81375,8 +81555,6 @@ export class PreviewFieldCodeInput implements IPreviewFieldCodeInput {
                     this[property] = _data[property];
             }
             this.fieldTypeId = _data["fieldTypeId"];
-            this.fieldName = _data["fieldName"];
-            this.fieldLevelCode = _data["fieldLevelCode"];
         }
     }
 
@@ -81394,16 +81572,12 @@ export class PreviewFieldCodeInput implements IPreviewFieldCodeInput {
                 data[property] = this[property];
         }
         data["fieldTypeId"] = this.fieldTypeId;
-        data["fieldName"] = this.fieldName;
-        data["fieldLevelCode"] = this.fieldLevelCode;
         return data;
     }
 }
 
 export interface IPreviewFieldCodeInput {
     fieldTypeId: number;
-    fieldName: string;
-    fieldLevelCode: string | undefined;
 
     [key: string]: any;
 }
@@ -81476,7 +81650,7 @@ export class AppFieldListDto implements IAppFieldListDto {
     canEdit!: boolean;
     canDelete!: boolean;
     canHide!: boolean;
-    sycObjectId!: number;
+    sycObjectId!: number | undefined;
     entitySycObjectId!: number | undefined;
     creatorUserId!: number | undefined;
     creatorUserName!: string | undefined;
@@ -81598,7 +81772,7 @@ export interface IAppFieldListDto {
     canEdit: boolean;
     canDelete: boolean;
     canHide: boolean;
-    sycObjectId: number;
+    sycObjectId: number | undefined;
     entitySycObjectId: number | undefined;
     creatorUserId: number | undefined;
     creatorUserName: string | undefined;
@@ -81668,6 +81842,90 @@ export interface IPagedResultDtoOfAppFieldListDto {
     [key: string]: any;
 }
 
+export class FieldSettingValueDto implements IFieldSettingValueDto {
+    settingFieldId!: number;
+    appFieldsOptionId!: number | undefined;
+    valueText!: string | undefined;
+    valueNumber!: number | undefined;
+    valueBoolean!: boolean | undefined;
+    valueDateTime!: moment.Moment | undefined;
+    settingFieldCode!: string | undefined;
+    settingFieldName!: string | undefined;
+    optionCode!: string | undefined;
+    optionName!: string | undefined;
+
+    [key: string]: any;
+
+    constructor(data?: IFieldSettingValueDto) {
+        if (data) {
+            for (var property in data) {
+                if (data.hasOwnProperty(property))
+                    (<any>this)[property] = (<any>data)[property];
+            }
+        }
+    }
+
+    init(_data?: any) {
+        if (_data) {
+            for (var property in _data) {
+                if (_data.hasOwnProperty(property))
+                    this[property] = _data[property];
+            }
+            this.settingFieldId = _data["settingFieldId"];
+            this.appFieldsOptionId = _data["appFieldsOptionId"];
+            this.valueText = _data["valueText"];
+            this.valueNumber = _data["valueNumber"];
+            this.valueBoolean = _data["valueBoolean"];
+            this.valueDateTime = _data["valueDateTime"] ? moment(_data["valueDateTime"].toString()) : <any>undefined;
+            this.settingFieldCode = _data["settingFieldCode"];
+            this.settingFieldName = _data["settingFieldName"];
+            this.optionCode = _data["optionCode"];
+            this.optionName = _data["optionName"];
+        }
+    }
+
+    static fromJS(data: any): FieldSettingValueDto {
+        data = typeof data === 'object' ? data : {};
+        let result = new FieldSettingValueDto();
+        result.init(data);
+        return result;
+    }
+
+    toJSON(data?: any) {
+        data = typeof data === 'object' ? data : {};
+        for (var property in this) {
+            if (this.hasOwnProperty(property))
+                data[property] = this[property];
+        }
+        data["settingFieldId"] = this.settingFieldId;
+        data["appFieldsOptionId"] = this.appFieldsOptionId;
+        data["valueText"] = this.valueText;
+        data["valueNumber"] = this.valueNumber;
+        data["valueBoolean"] = this.valueBoolean;
+        data["valueDateTime"] = this.valueDateTime ? this.valueDateTime.toISOString() : <any>undefined;
+        data["settingFieldCode"] = this.settingFieldCode;
+        data["settingFieldName"] = this.settingFieldName;
+        data["optionCode"] = this.optionCode;
+        data["optionName"] = this.optionName;
+        return data;
+    }
+}
+
+export interface IFieldSettingValueDto {
+    settingFieldId: number;
+    appFieldsOptionId: number | undefined;
+    valueText: string | undefined;
+    valueNumber: number | undefined;
+    valueBoolean: boolean | undefined;
+    valueDateTime: moment.Moment | undefined;
+    settingFieldCode: string | undefined;
+    settingFieldName: string | undefined;
+    optionCode: string | undefined;
+    optionName: string | undefined;
+
+    [key: string]: any;
+}
+
 export class AppFieldDto implements IAppFieldDto {
     fieldDefinitionKey!: string;
     tenantId!: number | undefined;
@@ -81686,7 +81944,8 @@ export class AppFieldDto implements IAppFieldDto {
     deleterUserId!: number | undefined;
     deletionTime!: moment.Moment | undefined;
     id!: number | undefined;
-    sycObjectId!: number;
+    expectedCurrentRevisionNo!: string | undefined;
+    sycObjectId!: number | undefined;
     entitySycObjectId!: number | undefined;
     selectedObjectTypeId!: number | undefined;
     fieldTypeId!: number;
@@ -81711,6 +81970,7 @@ export class AppFieldDto implements IAppFieldDto {
     visible!: boolean;
     editable!: boolean;
     extraAttributes!: string | undefined;
+    settingValues!: FieldSettingValueDto[] | undefined;
 
     [key: string]: any;
 
@@ -81746,6 +82006,7 @@ export class AppFieldDto implements IAppFieldDto {
             this.deleterUserId = _data["deleterUserId"];
             this.deletionTime = _data["deletionTime"] ? moment(_data["deletionTime"].toString()) : <any>undefined;
             this.id = _data["id"];
+            this.expectedCurrentRevisionNo = _data["expectedCurrentRevisionNo"];
             this.sycObjectId = _data["sycObjectId"];
             this.entitySycObjectId = _data["entitySycObjectId"];
             this.selectedObjectTypeId = _data["selectedObjectTypeId"];
@@ -81771,6 +82032,11 @@ export class AppFieldDto implements IAppFieldDto {
             this.visible = _data["visible"];
             this.editable = _data["editable"];
             this.extraAttributes = _data["extraAttributes"];
+            if (Array.isArray(_data["settingValues"])) {
+                this.settingValues = [] as any;
+                for (let item of _data["settingValues"])
+                    this.settingValues!.push(FieldSettingValueDto.fromJS(item));
+            }
         }
     }
 
@@ -81804,6 +82070,7 @@ export class AppFieldDto implements IAppFieldDto {
         data["deleterUserId"] = this.deleterUserId;
         data["deletionTime"] = this.deletionTime ? this.deletionTime.toISOString() : <any>undefined;
         data["id"] = this.id;
+        data["expectedCurrentRevisionNo"] = this.expectedCurrentRevisionNo;
         data["sycObjectId"] = this.sycObjectId;
         data["entitySycObjectId"] = this.entitySycObjectId;
         data["selectedObjectTypeId"] = this.selectedObjectTypeId;
@@ -81829,6 +82096,11 @@ export class AppFieldDto implements IAppFieldDto {
         data["visible"] = this.visible;
         data["editable"] = this.editable;
         data["extraAttributes"] = this.extraAttributes;
+        if (Array.isArray(this.settingValues)) {
+            data["settingValues"] = [];
+            for (let item of this.settingValues)
+                data["settingValues"].push(item.toJSON());
+        }
         return data;
     }
 }
@@ -81851,7 +82123,8 @@ export interface IAppFieldDto {
     deleterUserId: number | undefined;
     deletionTime: moment.Moment | undefined;
     id: number | undefined;
-    sycObjectId: number;
+    expectedCurrentRevisionNo: string | undefined;
+    sycObjectId: number | undefined;
     entitySycObjectId: number | undefined;
     selectedObjectTypeId: number | undefined;
     fieldTypeId: number;
@@ -81876,6 +82149,7 @@ export interface IAppFieldDto {
     visible: boolean;
     editable: boolean;
     extraAttributes: string | undefined;
+    settingValues: FieldSettingValueDto[] | undefined;
 
     [key: string]: any;
 }
@@ -82367,9 +82641,66 @@ export interface IAppFieldHistoryDto {
     [key: string]: any;
 }
 
+export class RestoreFieldRevisionInput implements IRestoreFieldRevisionInput {
+    appFieldId!: number;
+    historyId!: number;
+    expectedCurrentRevisionNo!: string;
+
+    [key: string]: any;
+
+    constructor(data?: IRestoreFieldRevisionInput) {
+        if (data) {
+            for (var property in data) {
+                if (data.hasOwnProperty(property))
+                    (<any>this)[property] = (<any>data)[property];
+            }
+        }
+    }
+
+    init(_data?: any) {
+        if (_data) {
+            for (var property in _data) {
+                if (_data.hasOwnProperty(property))
+                    this[property] = _data[property];
+            }
+            this.appFieldId = _data["appFieldId"];
+            this.historyId = _data["historyId"];
+            this.expectedCurrentRevisionNo = _data["expectedCurrentRevisionNo"];
+        }
+    }
+
+    static fromJS(data: any): RestoreFieldRevisionInput {
+        data = typeof data === 'object' ? data : {};
+        let result = new RestoreFieldRevisionInput();
+        result.init(data);
+        return result;
+    }
+
+    toJSON(data?: any) {
+        data = typeof data === 'object' ? data : {};
+        for (var property in this) {
+            if (this.hasOwnProperty(property))
+                data[property] = this[property];
+        }
+        data["appFieldId"] = this.appFieldId;
+        data["historyId"] = this.historyId;
+        data["expectedCurrentRevisionNo"] = this.expectedCurrentRevisionNo;
+        return data;
+    }
+}
+
+export interface IRestoreFieldRevisionInput {
+    appFieldId: number;
+    historyId: number;
+    expectedCurrentRevisionNo: string;
+
+    [key: string]: any;
+}
+
 export class CreateOrEditFieldInput implements ICreateOrEditFieldInput {
     id!: number | undefined;
-    sycObjectId!: number;
+    expectedCurrentRevisionNo!: string | undefined;
+    sycObjectId!: number | undefined;
     entitySycObjectId!: number | undefined;
     selectedObjectTypeId!: number | undefined;
     fieldTypeId!: number;
@@ -82394,6 +82725,7 @@ export class CreateOrEditFieldInput implements ICreateOrEditFieldInput {
     visible!: boolean;
     editable!: boolean;
     extraAttributes!: string | undefined;
+    settingValues!: FieldSettingValueDto[] | undefined;
 
     [key: string]: any;
 
@@ -82413,6 +82745,7 @@ export class CreateOrEditFieldInput implements ICreateOrEditFieldInput {
                     this[property] = _data[property];
             }
             this.id = _data["id"];
+            this.expectedCurrentRevisionNo = _data["expectedCurrentRevisionNo"];
             this.sycObjectId = _data["sycObjectId"];
             this.entitySycObjectId = _data["entitySycObjectId"];
             this.selectedObjectTypeId = _data["selectedObjectTypeId"];
@@ -82438,6 +82771,11 @@ export class CreateOrEditFieldInput implements ICreateOrEditFieldInput {
             this.visible = _data["visible"];
             this.editable = _data["editable"];
             this.extraAttributes = _data["extraAttributes"];
+            if (Array.isArray(_data["settingValues"])) {
+                this.settingValues = [] as any;
+                for (let item of _data["settingValues"])
+                    this.settingValues!.push(FieldSettingValueDto.fromJS(item));
+            }
         }
     }
 
@@ -82455,6 +82793,7 @@ export class CreateOrEditFieldInput implements ICreateOrEditFieldInput {
                 data[property] = this[property];
         }
         data["id"] = this.id;
+        data["expectedCurrentRevisionNo"] = this.expectedCurrentRevisionNo;
         data["sycObjectId"] = this.sycObjectId;
         data["entitySycObjectId"] = this.entitySycObjectId;
         data["selectedObjectTypeId"] = this.selectedObjectTypeId;
@@ -82480,13 +82819,19 @@ export class CreateOrEditFieldInput implements ICreateOrEditFieldInput {
         data["visible"] = this.visible;
         data["editable"] = this.editable;
         data["extraAttributes"] = this.extraAttributes;
+        if (Array.isArray(this.settingValues)) {
+            data["settingValues"] = [];
+            for (let item of this.settingValues)
+                data["settingValues"].push(item.toJSON());
+        }
         return data;
     }
 }
 
 export interface ICreateOrEditFieldInput {
     id: number | undefined;
-    sycObjectId: number;
+    expectedCurrentRevisionNo: string | undefined;
+    sycObjectId: number | undefined;
     entitySycObjectId: number | undefined;
     selectedObjectTypeId: number | undefined;
     fieldTypeId: number;
@@ -82511,6 +82856,7 @@ export interface ICreateOrEditFieldInput {
     visible: boolean;
     editable: boolean;
     extraAttributes: string | undefined;
+    settingValues: FieldSettingValueDto[] | undefined;
 
     [key: string]: any;
 }
@@ -82615,6 +82961,214 @@ export interface ISyncFieldSnapshotsInput {
     appFieldId: number;
     sycObjectId: number | undefined;
     sycEntityObjectTypeId: number | undefined;
+
+    [key: string]: any;
+}
+
+export class FieldSettingOptionDto implements IFieldSettingOptionDto {
+    id!: number;
+    code!: string | undefined;
+    name!: string | undefined;
+    sortOrder!: number;
+
+    [key: string]: any;
+
+    constructor(data?: IFieldSettingOptionDto) {
+        if (data) {
+            for (var property in data) {
+                if (data.hasOwnProperty(property))
+                    (<any>this)[property] = (<any>data)[property];
+            }
+        }
+    }
+
+    init(_data?: any) {
+        if (_data) {
+            for (var property in _data) {
+                if (_data.hasOwnProperty(property))
+                    this[property] = _data[property];
+            }
+            this.id = _data["id"];
+            this.code = _data["code"];
+            this.name = _data["name"];
+            this.sortOrder = _data["sortOrder"];
+        }
+    }
+
+    static fromJS(data: any): FieldSettingOptionDto {
+        data = typeof data === 'object' ? data : {};
+        let result = new FieldSettingOptionDto();
+        result.init(data);
+        return result;
+    }
+
+    toJSON(data?: any) {
+        data = typeof data === 'object' ? data : {};
+        for (var property in this) {
+            if (this.hasOwnProperty(property))
+                data[property] = this[property];
+        }
+        data["id"] = this.id;
+        data["code"] = this.code;
+        data["name"] = this.name;
+        data["sortOrder"] = this.sortOrder;
+        return data;
+    }
+}
+
+export interface IFieldSettingOptionDto {
+    id: number;
+    code: string | undefined;
+    name: string | undefined;
+    sortOrder: number;
+
+    [key: string]: any;
+}
+
+export class FieldSettingDefinitionDto implements IFieldSettingDefinitionDto {
+    settingFieldId!: number;
+    fieldCode!: string | undefined;
+    fieldName!: string | undefined;
+    valueTypeId!: number;
+    valueTypeCode!: string | undefined;
+    defaultValue!: string | undefined;
+    required!: boolean;
+    allowMultiSelect!: boolean;
+    options!: FieldSettingOptionDto[] | undefined;
+
+    [key: string]: any;
+
+    constructor(data?: IFieldSettingDefinitionDto) {
+        if (data) {
+            for (var property in data) {
+                if (data.hasOwnProperty(property))
+                    (<any>this)[property] = (<any>data)[property];
+            }
+        }
+    }
+
+    init(_data?: any) {
+        if (_data) {
+            for (var property in _data) {
+                if (_data.hasOwnProperty(property))
+                    this[property] = _data[property];
+            }
+            this.settingFieldId = _data["settingFieldId"];
+            this.fieldCode = _data["fieldCode"];
+            this.fieldName = _data["fieldName"];
+            this.valueTypeId = _data["valueTypeId"];
+            this.valueTypeCode = _data["valueTypeCode"];
+            this.defaultValue = _data["defaultValue"];
+            this.required = _data["required"];
+            this.allowMultiSelect = _data["allowMultiSelect"];
+            if (Array.isArray(_data["options"])) {
+                this.options = [] as any;
+                for (let item of _data["options"])
+                    this.options!.push(FieldSettingOptionDto.fromJS(item));
+            }
+        }
+    }
+
+    static fromJS(data: any): FieldSettingDefinitionDto {
+        data = typeof data === 'object' ? data : {};
+        let result = new FieldSettingDefinitionDto();
+        result.init(data);
+        return result;
+    }
+
+    toJSON(data?: any) {
+        data = typeof data === 'object' ? data : {};
+        for (var property in this) {
+            if (this.hasOwnProperty(property))
+                data[property] = this[property];
+        }
+        data["settingFieldId"] = this.settingFieldId;
+        data["fieldCode"] = this.fieldCode;
+        data["fieldName"] = this.fieldName;
+        data["valueTypeId"] = this.valueTypeId;
+        data["valueTypeCode"] = this.valueTypeCode;
+        data["defaultValue"] = this.defaultValue;
+        data["required"] = this.required;
+        data["allowMultiSelect"] = this.allowMultiSelect;
+        if (Array.isArray(this.options)) {
+            data["options"] = [];
+            for (let item of this.options)
+                data["options"].push(item.toJSON());
+        }
+        return data;
+    }
+}
+
+export interface IFieldSettingDefinitionDto {
+    settingFieldId: number;
+    fieldCode: string | undefined;
+    fieldName: string | undefined;
+    valueTypeId: number;
+    valueTypeCode: string | undefined;
+    defaultValue: string | undefined;
+    required: boolean;
+    allowMultiSelect: boolean;
+    options: FieldSettingOptionDto[] | undefined;
+
+    [key: string]: any;
+}
+
+export class SaveFieldSettingOptionsInput implements ISaveFieldSettingOptionsInput {
+    settingFieldId!: number;
+    options!: FieldSettingOptionDto[] | undefined;
+
+    [key: string]: any;
+
+    constructor(data?: ISaveFieldSettingOptionsInput) {
+        if (data) {
+            for (var property in data) {
+                if (data.hasOwnProperty(property))
+                    (<any>this)[property] = (<any>data)[property];
+            }
+        }
+    }
+
+    init(_data?: any) {
+        if (_data) {
+            for (var property in _data) {
+                if (_data.hasOwnProperty(property))
+                    this[property] = _data[property];
+            }
+            this.settingFieldId = _data["settingFieldId"];
+            if (Array.isArray(_data["options"])) {
+                this.options = [] as any;
+                for (let item of _data["options"])
+                    this.options!.push(FieldSettingOptionDto.fromJS(item));
+            }
+        }
+    }
+
+    static fromJS(data: any): SaveFieldSettingOptionsInput {
+        data = typeof data === 'object' ? data : {};
+        let result = new SaveFieldSettingOptionsInput();
+        result.init(data);
+        return result;
+    }
+
+    toJSON(data?: any) {
+        data = typeof data === 'object' ? data : {};
+        for (var property in this) {
+            if (this.hasOwnProperty(property))
+                data[property] = this[property];
+        }
+        data["settingFieldId"] = this.settingFieldId;
+        if (Array.isArray(this.options)) {
+            data["options"] = [];
+            for (let item of this.options)
+                data["options"].push(item.toJSON());
+        }
+        return data;
+    }
+}
+
+export interface ISaveFieldSettingOptionsInput {
+    settingFieldId: number;
+    options: FieldSettingOptionDto[] | undefined;
 
     [key: string]: any;
 }

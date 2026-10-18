@@ -387,10 +387,14 @@ export class BrowseFieldManagerComponent extends AppComponentBase implements OnI
 
     onCreateOrEditDone(): void {
         this.loadItems();
+        const fieldId = this.viewFieldManagerModal.item?.id;
+        if (this.viewFieldManagerModal.active && fieldId) {
+            this.viewFieldManagerModal.show({ id: fieldId });
+        }
     }
 
-    onCreateOrEditClosed(): void {
-        // The view modal manages its own revision workflow.
+    onRevisionSaved(): void {
+        this.loadItems();
     }
 
     @HostListener('document:click')
