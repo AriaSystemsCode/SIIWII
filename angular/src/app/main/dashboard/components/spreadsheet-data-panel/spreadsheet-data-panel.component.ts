@@ -20,6 +20,7 @@ import {
     FilterBuilderField,
     FilterConditionGroup,
     FilterConditionNode,
+    FilterConditionRule,
     SpreadsheetDataBatch,
     SpreadsheetSheetDataSource
 } from '../../models/dashboard.model';
@@ -420,20 +421,14 @@ getConditionValueLabel(condition: FilterBuilderCondition): string {
     //     });
     // }
 
-   private gatherConditions(): DynamicCondition[] {
+private gatherConditions(): DynamicCondition[] {
     if (this.selectedFilterTree) {
-        return this.nodesToDtos(
-            this.selectedFilterTree.children,
-            this.selectedFilterTree.matchMode
-        );
+        return this.nodesToDtos(this.selectedFilterTree.children);
     }
     return this.selectedConditions.map(c => this.ruleToDto(c));
 }
 
-private nodesToDtos(
-    nodes: FilterConditionNode[],
-    parentMode: 'all' | 'any'
-): DynamicCondition[] {
+private nodesToDtos(nodes: FilterConditionNode[]): DynamicCondition[] {
     const result: DynamicCondition[] = [];
 
     for (const node of nodes) {
@@ -442,42 +437,56 @@ private nodesToDtos(
             continue;
         }
 
-        const groupDto = this.groupToDto(node);
-        if (!groupDto) {
+        const rules = this.flattenRules(node);
+        if (!rules.length) {
             continue;
         }
 
-        const parent = result[result.length - 1];
+        const listName: 'orWithList' | 'andWithList' =
+            node.matchMode === 'any' ? 'orWithList' : 'andWithList';
 
-        if (parent) {
-            // nested group becomes a child of the previous condition
-            this.attachChild(
-                parent,
-                parentMode === 'any' ? 'orWithList' : 'andWithList',
-                groupDto
-            );
-        } else {
-            // nothing before it, so it stays top level
-            result.push(groupDto);
+        let parent = result[result.length - 1];
+
+        // no condition before the group: its first rule becomes the parent
+        if (!parent) {
+            parent = this.ruleToDto(rules.shift()!);
+            result.push(parent);
         }
+
+        // every nested rule becomes a direct child of the parent (one level)
+        rules.forEach(rule =>
+            this.attachChild(parent, listName, this.ruleToDto(rule))
+        );
     }
 
     return result;
 }
 
-private groupToDto(group: FilterConditionGroup): DynamicCondition | null {
-    const dtos = this.nodesToDtos(group.children, group.matchMode);
-    if (!dtos.length) {
-        return null;
+private flattenRules(group: FilterConditionGroup): FilterConditionRule[] {
+    const rules: FilterConditionRule[] = [];
+    for (const node of group.children) {
+        if (node.type === 'rule') {
+            rules.push(node);
+        } else {
+            rules.push(...this.flattenRules(node));
+        }
     }
-
-    const [head, ...rest] = dtos;
-    const listName: 'orWithList' | 'andWithList' =
-        group.matchMode === 'any' ? 'orWithList' : 'andWithList';
-
-    rest.forEach(child => this.attachChild(head, listName, child));
-    return head;
+    return rules;
 }
+
+// private groupToDto(group: FilterConditionGroup): DynamicCondition | null {
+//     const dtos = this.nodesToDtos(group.children, group.matchMode);
+//     if (!dtos.length) {
+//         return null;
+//     }
+
+//     const [head, ...rest] = dtos;
+//     const listName: 'orWithList' | 'andWithList' =
+//         group.matchMode === 'any' ? 'orWithList' : 'andWithList';
+
+//     rest.forEach(child => this.attachChild(head, listName, child));
+//     return head;
+// }
 
 private ruleToDto(rule: { field: string; operator: string; value: any }): DynamicCondition {
     const dto = new DynamicCondition();

@@ -3,8 +3,8 @@
    COLORS
    ========================================================= */
 
-$primary: #5b176d;
-$primary-dark: #481056;
+$primary: #4A0D4A;
+$primary-dark: #4A0D4A;
 $primary-light: #f5eef8;
 $primary-border: #ddcce4;
 
@@ -476,13 +476,13 @@ $danger-bg: #fff0f0;
     }
 
     &.entity-card-selected {
-        border: 2px solid #651477;
+        border: 2px solid #4A0D4A;
         background: #faf5ff;
     }
 }
 
 .selected-check {
-    color: #651477;
+    color: #4A0D4A;
     font-size: 17px;
 }
 
@@ -490,13 +490,13 @@ $danger-bg: #fff0f0;
     min-width: 110px;
     padding: 9px 22px;
     border-radius: 8px;
-    background: #651477 !important;
-    border-color: #651477 !important;
+    background: #4A0D4A !important;
+    border-color: #4A0D4A !important;
     font-weight: 600;
 
     &:hover:not(:disabled) {
-        background: #50105f;
-        border-color: #50105f;
+        background: #4A0D4A;
+        border-color: #4A0D4A;
     }
 
     &:disabled {

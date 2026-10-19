@@ -197,12 +197,20 @@
             <div *ngIf="node.type === 'group'" class="filter-preview-nested">
 
                 <div class="filter-preview-nested-title">
-                    <span class="join-badge" [class.join-or]="group.matchMode === 'any'">
+                    <!-- <span class="join-badge" [class.join-or]="group.matchMode === 'any'">
                         {{ (group.matchMode === 'any' ? 'OR' : 'AND') | localize }}
+                    </span> -->
+                        <span>
+                        {{ 'Match' | localize }}
                     </span>
-                    <span>
-                        {{ (node.matchMode === 'any' ? 'any of' : 'all of') | localize }}
-                        {{ 'these' | localize }}:
+                    <span class="" style="color: #4A0D4A;font-weight: 700;">
+                        {{ (node.matchMode === 'any' ? 'any' : 'all') | localize }}
+                     
+                    </span>
+
+                        <span>
+                    
+                        {{ 'of these' | localize }}:
                     </span>
                 </div>
 
