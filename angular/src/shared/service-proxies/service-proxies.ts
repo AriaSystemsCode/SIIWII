@@ -13784,8 +13784,8 @@ export class AppFieldManagerServiceProxy {
      * @param body (optional) 
      * @return Success
      */
-    saveFieldSettingOptions(body: SaveFieldSettingOptionsInput | undefined): Observable<FieldSettingOptionDto[]> {
-        let url_ = this.baseUrl + "/api/services/app/AppFieldManager/SaveFieldSettingOptions";
+    saveFieldValidEntries(body: SaveFieldValidEntriesInput | undefined): Observable<string> {
+        let url_ = this.baseUrl + "/api/services/app/AppFieldManager/SaveFieldValidEntries";
         url_ = url_.replace(/[?&]$/, "");
 
         const content_ = JSON.stringify(body);
@@ -13801,20 +13801,20 @@ export class AppFieldManagerServiceProxy {
         };
 
         return this.http.request("post", url_, options_).pipe(_observableMergeMap((response_ : any) => {
-            return this.processSaveFieldSettingOptions(response_);
+            return this.processSaveFieldValidEntries(response_);
         })).pipe(_observableCatch((response_: any) => {
             if (response_ instanceof HttpResponseBase) {
                 try {
-                    return this.processSaveFieldSettingOptions(response_ as any);
+                    return this.processSaveFieldValidEntries(response_ as any);
                 } catch (e) {
-                    return _observableThrow(e) as any as Observable<FieldSettingOptionDto[]>;
+                    return _observableThrow(e) as any as Observable<string>;
                 }
             } else
-                return _observableThrow(response_) as any as Observable<FieldSettingOptionDto[]>;
+                return _observableThrow(response_) as any as Observable<string>;
         }));
     }
 
-    protected processSaveFieldSettingOptions(response: HttpResponseBase): Observable<FieldSettingOptionDto[]> {
+    protected processSaveFieldValidEntries(response: HttpResponseBase): Observable<string> {
         const status = response.status;
         const responseBlob =
             response instanceof HttpResponse ? response.body :
@@ -13825,14 +13825,8 @@ export class AppFieldManagerServiceProxy {
             return blobToText(responseBlob).pipe(_observableMergeMap((_responseText: string) => {
             let result200: any = null;
             let resultData200 = _responseText === "" ? null : JSON.parse(_responseText, this.jsonParseReviver);
-            if (Array.isArray(resultData200)) {
-                result200 = [] as any;
-                for (let item of resultData200)
-                    result200!.push(FieldSettingOptionDto.fromJS(item));
-            }
-            else {
-                result200 = <any>null;
-            }
+                result200 = resultData200 !== undefined ? resultData200 : <any>null;
+    
             return _observableOf(result200);
             }));
         } else if (status !== 200 && status !== 204) {
@@ -81844,15 +81838,9 @@ export interface IPagedResultDtoOfAppFieldListDto {
 
 export class FieldSettingValueDto implements IFieldSettingValueDto {
     settingFieldId!: number;
-    appFieldsOptionId!: number | undefined;
-    valueText!: string | undefined;
-    valueNumber!: number | undefined;
-    valueBoolean!: boolean | undefined;
-    valueDateTime!: moment.Moment | undefined;
+    value!: string | undefined;
     settingFieldCode!: string | undefined;
     settingFieldName!: string | undefined;
-    optionCode!: string | undefined;
-    optionName!: string | undefined;
 
     [key: string]: any;
 
@@ -81872,15 +81860,9 @@ export class FieldSettingValueDto implements IFieldSettingValueDto {
                     this[property] = _data[property];
             }
             this.settingFieldId = _data["settingFieldId"];
-            this.appFieldsOptionId = _data["appFieldsOptionId"];
-            this.valueText = _data["valueText"];
-            this.valueNumber = _data["valueNumber"];
-            this.valueBoolean = _data["valueBoolean"];
-            this.valueDateTime = _data["valueDateTime"] ? moment(_data["valueDateTime"].toString()) : <any>undefined;
+            this.value = _data["value"];
             this.settingFieldCode = _data["settingFieldCode"];
             this.settingFieldName = _data["settingFieldName"];
-            this.optionCode = _data["optionCode"];
-            this.optionName = _data["optionName"];
         }
     }
 
@@ -81898,30 +81880,18 @@ export class FieldSettingValueDto implements IFieldSettingValueDto {
                 data[property] = this[property];
         }
         data["settingFieldId"] = this.settingFieldId;
-        data["appFieldsOptionId"] = this.appFieldsOptionId;
-        data["valueText"] = this.valueText;
-        data["valueNumber"] = this.valueNumber;
-        data["valueBoolean"] = this.valueBoolean;
-        data["valueDateTime"] = this.valueDateTime ? this.valueDateTime.toISOString() : <any>undefined;
+        data["value"] = this.value;
         data["settingFieldCode"] = this.settingFieldCode;
         data["settingFieldName"] = this.settingFieldName;
-        data["optionCode"] = this.optionCode;
-        data["optionName"] = this.optionName;
         return data;
     }
 }
 
 export interface IFieldSettingValueDto {
     settingFieldId: number;
-    appFieldsOptionId: number | undefined;
-    valueText: string | undefined;
-    valueNumber: number | undefined;
-    valueBoolean: boolean | undefined;
-    valueDateTime: moment.Moment | undefined;
+    value: string | undefined;
     settingFieldCode: string | undefined;
     settingFieldName: string | undefined;
-    optionCode: string | undefined;
-    optionName: string | undefined;
 
     [key: string]: any;
 }
@@ -81966,6 +81936,7 @@ export class AppFieldDto implements IAppFieldDto {
     dateFormat!: string | undefined;
     timeFormat!: string | undefined;
     allowMultiSelect!: boolean;
+    validEntries!: string | undefined;
     required!: boolean;
     visible!: boolean;
     editable!: boolean;
@@ -82028,6 +81999,7 @@ export class AppFieldDto implements IAppFieldDto {
             this.dateFormat = _data["dateFormat"];
             this.timeFormat = _data["timeFormat"];
             this.allowMultiSelect = _data["allowMultiSelect"];
+            this.validEntries = _data["validEntries"];
             this.required = _data["required"];
             this.visible = _data["visible"];
             this.editable = _data["editable"];
@@ -82092,6 +82064,7 @@ export class AppFieldDto implements IAppFieldDto {
         data["dateFormat"] = this.dateFormat;
         data["timeFormat"] = this.timeFormat;
         data["allowMultiSelect"] = this.allowMultiSelect;
+        data["validEntries"] = this.validEntries;
         data["required"] = this.required;
         data["visible"] = this.visible;
         data["editable"] = this.editable;
@@ -82145,6 +82118,7 @@ export interface IAppFieldDto {
     dateFormat: string | undefined;
     timeFormat: string | undefined;
     allowMultiSelect: boolean;
+    validEntries: string | undefined;
     required: boolean;
     visible: boolean;
     editable: boolean;
@@ -82721,6 +82695,7 @@ export class CreateOrEditFieldInput implements ICreateOrEditFieldInput {
     dateFormat!: string | undefined;
     timeFormat!: string | undefined;
     allowMultiSelect!: boolean;
+    validEntries!: string | undefined;
     required!: boolean;
     visible!: boolean;
     editable!: boolean;
@@ -82767,6 +82742,7 @@ export class CreateOrEditFieldInput implements ICreateOrEditFieldInput {
             this.dateFormat = _data["dateFormat"];
             this.timeFormat = _data["timeFormat"];
             this.allowMultiSelect = _data["allowMultiSelect"];
+            this.validEntries = _data["validEntries"];
             this.required = _data["required"];
             this.visible = _data["visible"];
             this.editable = _data["editable"];
@@ -82815,6 +82791,7 @@ export class CreateOrEditFieldInput implements ICreateOrEditFieldInput {
         data["dateFormat"] = this.dateFormat;
         data["timeFormat"] = this.timeFormat;
         data["allowMultiSelect"] = this.allowMultiSelect;
+        data["validEntries"] = this.validEntries;
         data["required"] = this.required;
         data["visible"] = this.visible;
         data["editable"] = this.editable;
@@ -82852,6 +82829,7 @@ export interface ICreateOrEditFieldInput {
     dateFormat: string | undefined;
     timeFormat: string | undefined;
     allowMultiSelect: boolean;
+    validEntries: string | undefined;
     required: boolean;
     visible: boolean;
     editable: boolean;
@@ -82965,66 +82943,6 @@ export interface ISyncFieldSnapshotsInput {
     [key: string]: any;
 }
 
-export class FieldSettingOptionDto implements IFieldSettingOptionDto {
-    id!: number;
-    code!: string | undefined;
-    name!: string | undefined;
-    sortOrder!: number;
-
-    [key: string]: any;
-
-    constructor(data?: IFieldSettingOptionDto) {
-        if (data) {
-            for (var property in data) {
-                if (data.hasOwnProperty(property))
-                    (<any>this)[property] = (<any>data)[property];
-            }
-        }
-    }
-
-    init(_data?: any) {
-        if (_data) {
-            for (var property in _data) {
-                if (_data.hasOwnProperty(property))
-                    this[property] = _data[property];
-            }
-            this.id = _data["id"];
-            this.code = _data["code"];
-            this.name = _data["name"];
-            this.sortOrder = _data["sortOrder"];
-        }
-    }
-
-    static fromJS(data: any): FieldSettingOptionDto {
-        data = typeof data === 'object' ? data : {};
-        let result = new FieldSettingOptionDto();
-        result.init(data);
-        return result;
-    }
-
-    toJSON(data?: any) {
-        data = typeof data === 'object' ? data : {};
-        for (var property in this) {
-            if (this.hasOwnProperty(property))
-                data[property] = this[property];
-        }
-        data["id"] = this.id;
-        data["code"] = this.code;
-        data["name"] = this.name;
-        data["sortOrder"] = this.sortOrder;
-        return data;
-    }
-}
-
-export interface IFieldSettingOptionDto {
-    id: number;
-    code: string | undefined;
-    name: string | undefined;
-    sortOrder: number;
-
-    [key: string]: any;
-}
-
 export class FieldSettingDefinitionDto implements IFieldSettingDefinitionDto {
     settingFieldId!: number;
     fieldCode!: string | undefined;
@@ -83034,7 +82952,8 @@ export class FieldSettingDefinitionDto implements IFieldSettingDefinitionDto {
     defaultValue!: string | undefined;
     required!: boolean;
     allowMultiSelect!: boolean;
-    options!: FieldSettingOptionDto[] | undefined;
+    validEntries!: string | undefined;
+    options!: string[] | undefined;
 
     [key: string]: any;
 
@@ -83061,10 +82980,11 @@ export class FieldSettingDefinitionDto implements IFieldSettingDefinitionDto {
             this.defaultValue = _data["defaultValue"];
             this.required = _data["required"];
             this.allowMultiSelect = _data["allowMultiSelect"];
+            this.validEntries = _data["validEntries"];
             if (Array.isArray(_data["options"])) {
                 this.options = [] as any;
                 for (let item of _data["options"])
-                    this.options!.push(FieldSettingOptionDto.fromJS(item));
+                    this.options!.push(item);
             }
         }
     }
@@ -83090,10 +83010,11 @@ export class FieldSettingDefinitionDto implements IFieldSettingDefinitionDto {
         data["defaultValue"] = this.defaultValue;
         data["required"] = this.required;
         data["allowMultiSelect"] = this.allowMultiSelect;
+        data["validEntries"] = this.validEntries;
         if (Array.isArray(this.options)) {
             data["options"] = [];
             for (let item of this.options)
-                data["options"].push(item.toJSON());
+                data["options"].push(item);
         }
         return data;
     }
@@ -83108,18 +83029,19 @@ export interface IFieldSettingDefinitionDto {
     defaultValue: string | undefined;
     required: boolean;
     allowMultiSelect: boolean;
-    options: FieldSettingOptionDto[] | undefined;
+    validEntries: string | undefined;
+    options: string[] | undefined;
 
     [key: string]: any;
 }
 
-export class SaveFieldSettingOptionsInput implements ISaveFieldSettingOptionsInput {
+export class SaveFieldValidEntriesInput implements ISaveFieldValidEntriesInput {
     settingFieldId!: number;
-    options!: FieldSettingOptionDto[] | undefined;
+    validEntries!: string | undefined;
 
     [key: string]: any;
 
-    constructor(data?: ISaveFieldSettingOptionsInput) {
+    constructor(data?: ISaveFieldValidEntriesInput) {
         if (data) {
             for (var property in data) {
                 if (data.hasOwnProperty(property))
@@ -83135,17 +83057,13 @@ export class SaveFieldSettingOptionsInput implements ISaveFieldSettingOptionsInp
                     this[property] = _data[property];
             }
             this.settingFieldId = _data["settingFieldId"];
-            if (Array.isArray(_data["options"])) {
-                this.options = [] as any;
-                for (let item of _data["options"])
-                    this.options!.push(FieldSettingOptionDto.fromJS(item));
-            }
+            this.validEntries = _data["validEntries"];
         }
     }
 
-    static fromJS(data: any): SaveFieldSettingOptionsInput {
+    static fromJS(data: any): SaveFieldValidEntriesInput {
         data = typeof data === 'object' ? data : {};
-        let result = new SaveFieldSettingOptionsInput();
+        let result = new SaveFieldValidEntriesInput();
         result.init(data);
         return result;
     }
@@ -83157,18 +83075,14 @@ export class SaveFieldSettingOptionsInput implements ISaveFieldSettingOptionsInp
                 data[property] = this[property];
         }
         data["settingFieldId"] = this.settingFieldId;
-        if (Array.isArray(this.options)) {
-            data["options"] = [];
-            for (let item of this.options)
-                data["options"].push(item.toJSON());
-        }
+        data["validEntries"] = this.validEntries;
         return data;
     }
 }
 
-export interface ISaveFieldSettingOptionsInput {
+export interface ISaveFieldValidEntriesInput {
     settingFieldId: number;
-    options: FieldSettingOptionDto[] | undefined;
+    validEntries: string | undefined;
 
     [key: string]: any;
 }
