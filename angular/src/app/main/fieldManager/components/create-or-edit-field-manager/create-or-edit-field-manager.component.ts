@@ -252,7 +252,6 @@ export class CreateOrEditFieldManagerComponent extends AppComponentBase implemen
     }
 
     generateCode(): void {
-        debugger;
         if (this.isEdit)
             return;
 
@@ -316,13 +315,15 @@ export class CreateOrEditFieldManagerComponent extends AppComponentBase implemen
             !incomingAttributeIds.has(value.settingFieldId)
         );
 
-        const updatedValues = incomingValues.flatMap(value => {
+        const updatedValues = incomingValues.reduce((result: FieldSettingValueDto[], value: any) => {
             const definition = this.fieldTypeSettings.find(setting => setting.attributeId === value.attributeId);
-            const selectedValues = value.acceptMultipleValues
+            const selectedValues: any[] = value.acceptMultipleValues
                 ? (Array.isArray(value.value) ? value.value : [])
                 : [value.value];
+            const attribute = this.dynamicSettingsObject.value.filteredExtraAttributes
+                .find((item: any) => item.attributeId === value.attributeId);
 
-            return selectedValues
+            const settingValues = selectedValues
                 .filter(selectedValue => selectedValue !== undefined && selectedValue !== null && selectedValue !== '')
                 .map(selectedValue => {
                 const settingValue = new FieldSettingValueDto();
@@ -330,32 +331,28 @@ export class CreateOrEditFieldManagerComponent extends AppComponentBase implemen
                 settingValue.settingFieldCode = definition?.code;
                 settingValue.settingFieldName = definition?.name;
                 const selectedOption = value.isLookup
-                    ? this.dynamicSettingsObject.value.filteredExtraAttributes
-                        .find((attribute: any) => attribute.attributeId === value.attributeId)
-                        ?.paginationSetting?.list?.find((option: any) =>
-                            String(option.value) === String(selectedValue) || option.code === selectedValue
-                        )
+                    ? attribute?.paginationSetting?.list?.find((option: any) =>
+                        String(option.value) === String(typeof selectedValue === 'object' ? selectedValue.value : selectedValue) ||
+                        option.code === (typeof selectedValue === 'object' ? selectedValue.code : selectedValue)
+                    )
                     : undefined;
+                const normalizedValue = selectedOption?.value ??
+                    (typeof selectedValue === 'object' ? selectedValue.value : selectedValue);
 
                 if (selectedOption) {
                     settingValue.appFieldsOptionId = selectedOption.value;
                     settingValue.optionCode = selectedOption.code;
                     settingValue.optionName = selectedOption.label;
-                } else {
-                    const typeCode = (definition?.dataType || '').toLowerCase();
-                    if (typeCode.includes('bool') || typeCode === 'bit') {
-                        settingValue.valueBoolean = selectedValue === true || selectedValue === 'true';
-                    } else if (typeCode.includes('date') || typeCode.includes('time')) {
-                        settingValue.valueDateTime = selectedValue ? moment(selectedValue) : undefined;
-                    } else if (typeCode.includes('number') || typeCode.includes('numeric') || typeCode.includes('int') || typeCode.includes('decimal')) {
-                        settingValue.valueNumber = selectedValue === '' ? undefined : Number(selectedValue);
-                    } else {
-                        settingValue.valueText = selectedValue == null ? undefined : String(selectedValue);
-                    }
                 }
+                const typeCode = (definition?.dataType || '').toLowerCase();
+                settingValue.value = normalizedValue == null ? undefined :
+                    typeCode.includes('date') || typeCode.includes('time')
+                        ? (moment as any)(normalizedValue).toISOString()
+                        : String(normalizedValue);
                 return settingValue;
             });
-        });
+            return result.concat(settingValues);
+        }, []);
 
         this.item.settingValues = [...existingValues, ...updatedValues];
     }
@@ -418,8 +415,16 @@ export class CreateOrEditFieldManagerComponent extends AppComponentBase implemen
         const savedValues = this.item.settingValues || [];
         const attributes = settings.map(setting => {
             const saved = savedValues.filter(value => value.settingFieldId === setting.attributeId);
-            const savedSelections = saved.map(value => value.appFieldsOptionId ?? value.valueText ?? value.valueNumber ??
+            const dataType = (setting.dataType || '').toLowerCase();
+            const savedSelections = saved.map(value => value.appFieldsOptionId ?? value.value ?? value.valueText ?? value.valueNumber ??
                 value.valueBoolean?.toString() ?? (value.valueDateTime ? value.valueDateTime.toDate() : undefined))
+                .map(value => {
+                    if (value == null) return value;
+                    if ((dataType.includes('date') || dataType.includes('time')) && (moment as any)(value).isValid()) {
+                        return (moment as any)(value).toDate();
+                    }
+                    return value;
+                })
                 .filter(value => value !== undefined && value !== null);
             const selectedValues = setting.acceptMultipleValues
                 ? (savedSelections.length ? savedSelections : [])
@@ -449,10 +454,12 @@ export class CreateOrEditFieldManagerComponent extends AppComponentBase implemen
 
     private loadFieldTypeSettingLookups(settings: ExtraAttribute[], request: number): void {
         settings.filter(setting => setting.isLookup && setting.entityObjectTypeCode).forEach(setting => {
+            const entityObjectTypeCode = setting.entityObjectTypeCode;
+            if (!entityObjectTypeCode) return;
             const attribute = this.dynamicSettingsObject.value.filteredExtraAttributes
                 .find((item: any) => item.attributeId === setting.attributeId);
             this.extraAttributeDataService.getExtraAttributeLookupDataWithPaging(
-                setting.entityObjectTypeCode,
+                entityObjectTypeCode,
                 0,
                 10
             ).subscribe(result => {
