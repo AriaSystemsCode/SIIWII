@@ -230,9 +230,11 @@ namespace onetouch.AppDashboards
                 }
                 else
                 {
-                    whereExp = (conditionRet.ApplyAnyOfThisCondition ?
-                        " false " : " true ") + (conditionRet.ApplyAnyOfThisCondition ?
-                        " OR " : " AND ")+ conditionRet.ExpressionList[0];
+                    // (conditionRet.ApplyAnyOfThisCondition ?
+                    //" false " : " true ") +
+                   // (conditionRet.ApplyAnyOfThisCondition ?
+                     //   " OR " : " AND ") +
+                   whereExp =  conditionRet.ExpressionList[0];
                 }
                 where.Add(whereExp);
                 parameters.AddRange(conditionRet.ParameterList);
