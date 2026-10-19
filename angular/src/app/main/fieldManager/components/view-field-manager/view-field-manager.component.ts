@@ -30,6 +30,7 @@ export class ViewFieldManagerComponent extends AppComponentBase implements OnIni
     private detailsRequest = 0;
     private historyRequest = 0;
     private isRevisionSaved = false;
+    private savedRevisionFieldId: number | null = null;
 
     constructor(
         injector: Injector,
@@ -131,18 +132,20 @@ export class ViewFieldManagerComponent extends AppComponentBase implements OnIni
     private requestRevision(field: AppFieldDto): void {
         if (!this.currentItem) return;
         this.isRevisionSaved = false;
+        this.savedRevisionFieldId = null;
         this.modal.hide();
         this.revisionEditor.showRevision(this.copyItem(field), this.currentItem.currentRevisionNo);
     }
 
-    onRevisionEditorSaved(): void {
+    onRevisionEditorSaved(field: AppFieldDto): void {
         this.isRevisionSaved = true;
+        this.savedRevisionFieldId = field.id ?? null;
     }
 
     onRevisionEditorClosed(): void {
-        if (this.isRevisionSaved && this.item?.id) {
+        if (this.isRevisionSaved && this.savedRevisionFieldId) {
             this.revisionSaved.emit();
-            this.loadDetails(this.item.id);
+            this.loadDetails(this.savedRevisionFieldId);
             return;
         }
 

@@ -16,7 +16,7 @@ import { AppFieldDto, CreateOrEditFieldInput, ExtraAttribute, ExtraAttributesSou
 })
 export class CreateOrEditFieldManagerComponent extends AppComponentBase implements OnInit {
     @ViewChild('fieldManagerModal', { static: true }) modal!: ModalDirective;
-    @Output() saved = new EventEmitter<void>();
+    @Output() saved = new EventEmitter<AppFieldDto>();
     @Output() closed = new EventEmitter<void>();
     item: AppFieldDto = this.createEmptyItem();
     isEdit = false;
@@ -142,10 +142,6 @@ export class CreateOrEditFieldManagerComponent extends AppComponentBase implemen
             this.notify.error('Select a field type and enter a field name.');
             return;
         }
-        if (!this.item.sycObjectId) {
-            this.notify.error('Select an entity or data object for the field.');
-            return;
-        }
         const fieldName = this.item.fieldName.trim();
         const input = new CreateOrEditFieldInput();
         Object.assign(input, {
@@ -189,7 +185,8 @@ export class CreateOrEditFieldManagerComponent extends AppComponentBase implemen
                 this.notify.success(revision
                     ? `Revision #${revision} saved successfully.`
                     : (this.l('SavedSuccessfully') ?? 'Saved successfully'));
-                this.saved.emit();
+                this.item = savedField;
+                this.saved.emit(savedField);
                 this.initialFormState = this.getFormState();
                 this.close();
             },
