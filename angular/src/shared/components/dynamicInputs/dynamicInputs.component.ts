@@ -11,7 +11,7 @@ import { IAjaxResponse, TokenService } from '@node_modules/abp-ng2-module';
 import { DynamicApiDispatcherService } from '@shared/dynamicApiDispatcherService ';
 import Swal from 'sweetalert2';
 import { finalize, map  } from 'rxjs/operators';
-import { forkJoin ,of} from 'rxjs';
+import { forkJoin, Observable, of } from 'rxjs';
 
 
 
@@ -23,9 +23,9 @@ import { forkJoin ,of} from 'rxjs';
   animations: [appModuleAnimation()]
 })
 export class dynamicInputs extends AppComponentBase implements OnInit, OnChanges {
-  @Input("extraAttributeObject") extraAttributeObject;
-  @Input("entityType") entityType;
-  @Input("entityObjectTypeId") entityObjectTypeId;
+  @Input("extraAttributeObject") extraAttributeObject: any;
+  @Input("entityType") entityType: any;
+  @Input("entityObjectTypeId") entityObjectTypeId: any;
   @Output() extraDataChanged = new EventEmitter<any[]>();
   @Output() extraDataCleared = new EventEmitter<number>(); // send attributeId
   selectedExtraData: any[] = [];
@@ -35,7 +35,7 @@ export class dynamicInputs extends AppComponentBase implements OnInit, OnChanges
   originalValuesMap = new Map<number, any>();
 
 
-  sycAttachmentCategoryImage: SycAttachmentCategoryDto;
+  sycAttachmentCategoryImage!: SycAttachmentCategoryDto;
   @Input() defaultBooleanValue: boolean | string = 'true'; // parent can override
   warningMsg: string = "";
   isInitializing = true;
@@ -61,7 +61,6 @@ export class dynamicInputs extends AppComponentBase implements OnInit, OnChanges
  onAnyInputChange() {
   //if (this.isInitializing) return;
   //this.formTouched = true;
-
   const updatedDataMap = new Map<number, any>();
 
   // Preserve existing values
@@ -79,12 +78,14 @@ export class dynamicInputs extends AppComponentBase implements OnInit, OnChanges
         continue;
       }
 
-    let formattedValue =
-  attr.selectedValues == null ||
-  attr.selectedValues === '' ||
-  (Array.isArray(attr.selectedValues) && attr.selectedValues.length === 0)
-    ? attr.defaultValue
-    : attr.selectedValues;
+    const isChips = attr.dataType?.toLowerCase() === 'chips';
+    let formattedValue = isChips
+      ? this.normalizeChipValues(attr.selectedValues)
+      : attr.selectedValues == null ||
+        attr.selectedValues === '' ||
+        (Array.isArray(attr.selectedValues) && attr.selectedValues.length === 0)
+          ? attr.defaultValue
+          : attr.selectedValues;
 
 attr.selectedValues = formattedValue;
 
@@ -112,7 +113,7 @@ attr.selectedValues = formattedValue;
       }
 
     //  Handle Numeric / Boolean / Color
-      if (['Numeric', 'boolean', 'Boolean', 'bit', 'color'].includes(attr.dataType)) {
+      if (['Numeric', 'boolean', 'Boolean', 'bit', 'color'].indexOf(attr.dataType) !== -1) {
         if (formattedValue === null || formattedValue === undefined || formattedValue === '') {
           formattedValue = '';
         }
@@ -123,7 +124,7 @@ attr.selectedValues = formattedValue;
 
       let finalValue;
 
-      if (attr.acceptMultipleValues && Array.isArray(formattedValue)) {
+      if ((attr.acceptMultipleValues || isChips) && Array.isArray(formattedValue)) {
         finalValue = formattedValue.length ? formattedValue : [];
       } else if (!attr.acceptMultipleValues && (formattedValue === undefined || formattedValue === null || formattedValue === '')) {
         finalValue = '';
@@ -137,7 +138,7 @@ attr.selectedValues = formattedValue;
         attributeId: attr.attributeId,
         value: finalValue,
         isLookup: attr.isLookup === true,
-        acceptMultipleValues: attr.acceptMultipleValues === true
+        acceptMultipleValues: attr.acceptMultipleValues === true || isChips
       };
 
       updatedDataMap.set(attr.attributeId, updatedValue);
@@ -148,6 +149,18 @@ attr.selectedValues = formattedValue;
   
     }
   }
+}
+
+onChipsChange(values: any, extraAttr: any): void {
+  extraAttr.selectedValues = this.normalizeChipValues(values);
+  this.onAnyInputChange();
+}
+
+private normalizeChipValues(values: any): string[] {
+  const entries = Array.isArray(values) ? values : values == null || values === '' ? [] : [values];
+  return entries
+    .map(value => String(value).trim())
+    .filter(value => value.length > 0);
 }
 
 onDropdownChange(extraAttr: any) {
@@ -166,10 +179,11 @@ handleRelatedWhen(attr: any, finalValue: any, updatedDataMap: Map<number, any>) 
 
   if (!attr.relatedWhen?.relation?.length) return;
 
-  const calls = attr.relatedWhen.relation.map(relation => {
+  const calls: Observable<any>[] = attr.relatedWhen.relation
+    .map((relation: any): Observable<any> | null => {
 
     const targetAttr = this.extraAttributeObject.value.extraAttributes
-      .find(x => x.name === relation.targetName || x.code === relation.targetName);
+      .find((x: any) => x.name === relation.targetName || x.code === relation.targetName);
 
     if (!targetAttr) return null;
 
@@ -185,14 +199,15 @@ handleRelatedWhen(attr: any, finalValue: any, updatedDataMap: Map<number, any>) 
       .pipe(
         map((result: any) => {
           const newValue = result.extraDataAttributes
-            .find(x => x.extraAttrName === relation.targetName)
+            .find((x: any) => x.extraAttrName === relation.targetName)
             ?.selectedValues?.[0]?.value || 0;
 
           return { targetAttr, relation, newValue };
         })
       );
 
-  }).filter(x => x !== null);
+  })
+    .filter((call: Observable<any> | null): call is Observable<any> => call !== null);
 
   if (calls.length) {
     forkJoin(calls).subscribe((results: any[]) => {
@@ -257,7 +272,7 @@ reset(extraAttr: any): void {
 }
 
 
-  themes = [];
+  themes: any[] = [];
   selectedTheme: any;
 
   // set thems  ?
@@ -282,7 +297,6 @@ reset(extraAttr: any): void {
   if (!this.extraAttributeObject?.value?.extraAttributes || !this.dynamicInputsForViewDto?.extraDataAttributes) {
     return;
   }
-
   const dtoData = this.dynamicInputsForViewDto.extraDataAttributes;
 
   const allAttributes = [
@@ -292,7 +306,7 @@ reset(extraAttr: any): void {
 
   for (const attr of allAttributes) {
     const matchedDto = dtoData.find(
-      d => d.extraAttributeId === attr.attributeId
+      (d: any) => d.extraAttributeId === attr.attributeId
     );
 
     if (matchedDto && matchedDto.selectedValues?.length) {
@@ -302,7 +316,7 @@ reset(extraAttr: any): void {
       }
       if (attr.isLookup) {
         const matchedOption =  attr.paginationSetting?.list?.find(
-            opt => opt.label === dtoValue || opt.value === dtoValue
+            (opt: any) => opt.label === dtoValue || opt.value === dtoValue
           );
 
         if (matchedOption) {
@@ -370,7 +384,7 @@ reset(extraAttr: any): void {
 
     //  Also clear original source value 
     const matchedAttr = this.extraAttributeObject?.value?.extraAttributes?.find(
-      a => a.attributeId === attr.attributeId
+      (a: any) => a.attributeId === attr.attributeId
     );
     if (matchedAttr) {
       matchedAttr.selectedValues = attr.selectedValues;
@@ -424,7 +438,7 @@ reset(extraAttr: any): void {
         extraAttr.selectedValues.push(value);
       }
     } else {
-      extraAttr.selectedValues = extraAttr.selectedValues.filter(val => val !== value);
+      extraAttr.selectedValues = extraAttr.selectedValues.filter((val: any) => val !== value);
     }
     this.onAnyInputChange(); // emit changes
   }
@@ -437,7 +451,7 @@ reset(extraAttr: any): void {
         return;
       } */
       const allowedTypes = ['image/jpeg', 'image/png', 'image/gif'];
-      if (!allowedTypes.includes(file.type)) {
+      if (allowedTypes.indexOf(file.type) === -1) {
         //alert('Only JPG, PNG, or GIF files are allowed.');
         Swal.fire(
           " ",
@@ -459,8 +473,8 @@ reset(extraAttr: any): void {
     }
   }
 
-  attachmentsUploader: FileUploader;
-  onUploadFile(file) {
+  attachmentsUploader!: FileUploader;
+  onUploadFile(file: File) {
     this.attachmentsUploader = this.createUploader(
       '/Attachment/UploadFiles',
       result => {
@@ -499,7 +513,7 @@ reset(extraAttr: any): void {
           success(ajaxResponse.result);
         }
       } else {
-        this.message.error(ajaxResponse.error.message);
+        this.message.error(ajaxResponse.error?.message || this.l('UploadFailed'));
       }
     };
 
@@ -514,7 +528,7 @@ reset(extraAttr: any): void {
 
   getDropdownOptions(extraAttr: any) {
     if (extraAttr?.validEntries && !extraAttr?.dataSource) {
-    return extraAttr.validEntries.split('|').map(v => ({
+    return extraAttr.validEntries.split('|').map((v: string) => ({
       label: v.trim(),
       value: v.trim()
     }));
@@ -558,7 +572,7 @@ reset(extraAttr: any): void {
 
  callDynamicAPI(extraAttr: any, skipCount: number = 0, maxResultCount: number = 10) {
   if (extraAttr?.validEntries && extraAttr.validEntries.includes('|')) {
-    const items = extraAttr.validEntries.split('|').map(val => ({
+    const items = extraAttr.validEntries.split('|').map((val: string) => ({
       label: val.trim(),
       value: val.trim()
     }));
@@ -579,8 +593,8 @@ reset(extraAttr: any): void {
     this.dynamicApi.dispatch(serviceName, apiMethod, {
       skipCount: skipCount,
       maxResultCount: maxResultCount
-    }).subscribe(result => {
-      const dropdownItems = result.items.map(item => ({
+    }).subscribe((result: any) => {
+      const dropdownItems = result.items.map((item: any) => ({
         label: this.getByPath(item, resultField.trim()),
         value: item.account.id
       }));
@@ -604,7 +618,7 @@ reset(extraAttr: any): void {
 
   getExtraAttr(attributeId: number, nameIncludes: string) {
     return this.extraAttributeObject.value.extraAttributes
-      .find(x => x?.attributeId === attributeId || x?.name?.includes(nameIncludes));
+      .find((x: any) => x?.attributeId === attributeId || x?.name?.includes(nameIncludes));
   }
 
 
@@ -635,7 +649,7 @@ reset(extraAttr: any): void {
   if (!extraAttr.visibleWhen) return true;
 
   const parentAttr = this.extraAttributeObject.value.extraAttributes
-    .find(x => x.attributeId == extraAttr.visibleWhen.extraAttributeId);
+    .find((x: any) => x.attributeId == extraAttr.visibleWhen.extraAttributeId);
 
   if (!parentAttr) return false;
 

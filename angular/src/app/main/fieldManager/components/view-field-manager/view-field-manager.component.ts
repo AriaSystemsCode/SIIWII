@@ -184,7 +184,7 @@ export class ViewFieldManagerComponent extends AppComponentBase implements OnIni
     }
 
     private copyItem(item: AppFieldDto): AppFieldDto {
-        return AppFieldDto.fromJS(item.toJSON());
+        return this.fieldManagerService.mapDto(item, AppFieldDto);
     }
 
     private normalizeRevisionNo(revisionNo?: string): string | null {

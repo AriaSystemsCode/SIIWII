@@ -96,7 +96,6 @@
 
                     <section class="field-form-section" *ngIf="fieldTypeSettings.length">
                         <h4 class="field-section-title">{{ 'AdvancedInformation' | localize }}</h4>
-                       <!--   //i51_BE-FE-Handle Extra Data in the View and Create/Edit/view modals -->
                         <app-dynamicInputs
                             [extraAttributeObject]="dynamicSettingsObject"
                             [entityObjectTypeId]="item.fieldTypeId"
@@ -105,10 +104,8 @@
                             (extraDataChanged)="onDynamicSettingsChanged($event)">
                         </app-dynamicInputs>
                     </section>
-
-
-                    <!-- //i51_BE-FE-ExtraAttributes from BE -->
-                    <section class="field-form-section extra-attributes-form">
+                  
+                  <!--   <section class="field-form-section extra-attributes-form">
                         <h4 class="field-section-title">{{ 'ExtraAttributes' | localize }}</h4>
                         <div class="field-form-grid">
                             <div class="form-group">
@@ -126,7 +123,7 @@
                                 </select>
                             </div>
                         </div>
-                    </section>
+                    </section> -->
                     <div class="d-flex justify-content-end pt-4 mb-4">
                         <button type="button" class="btn btn-secondary mr-2" (click)="close()">
                             {{ 'Cancel' | localize }}
