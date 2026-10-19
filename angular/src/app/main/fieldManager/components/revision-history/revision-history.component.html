@@ -1,0 +1,29 @@
+<div class="revision-table-card">
+    <div class="revision-table-scroll">
+        <table class="revision-table">
+            <thead>
+                <tr>
+                    <th>Revision</th>
+                    <th>Created By</th>
+                    <th>Created On</th>
+                    <th class="actions-column">Actions</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr *ngFor="let revision of revisions">
+                    <td class="revision-number">Revision #{{ revision.revisionNo || revision.field?.currentRevisionNo || '00' }}</td>
+                    <td>{{ revision.changedByName || '-' }}</td>
+                    <td>{{ revision.changedAt | date:'MM/dd/yyyy h:mm a' }}</td>
+                    <td class="actions-column">
+                        <button type="button" class="details-button" (click)="selectRevision(revision)">
+                            Details <i class="fa fa-arrow-right"></i>
+                        </button>
+                    </td>
+                </tr>
+                <tr *ngIf="!revisions.length">
+                    <td colspan="4" class="empty-history">No revisions available.</td>
+                </tr>
+            </tbody>
+        </table>
+    </div>
+</div>

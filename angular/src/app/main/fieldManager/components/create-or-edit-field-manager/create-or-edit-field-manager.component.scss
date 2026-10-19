@@ -1,3 +1,7 @@
+.cursor-not-allowed {
+    cursor: not-allowed !important;
+}
+
 :host {
     display: block;
 }
@@ -106,23 +110,35 @@
 
 .form-control.field-value-control:disabled,
 .form-control.field-value-control[readonly] {
-    color: #343a40 !important;
+    color: #212529 !important;
     background-color: #e9ecef;
     opacity: 1;
-    -webkit-text-fill-color: #343a40 !important;
+    -webkit-text-fill-color: #212529 !important;
 }
 
 :host ::ng-deep .field-manager-edit-mode input.field-value-control,
 :host ::ng-deep .field-manager-edit-mode textarea.field-value-control,
-:host ::ng-deep .field-manager-edit-mode select.field-value-control,
+:host ::ng-deep .field-manager-edit-mode select.field-value-control {
+    color: #000 !important;
+    -webkit-text-fill-color: #000 !important;
+    opacity: 1 !important;
+}
+
 :host ::ng-deep .field-manager-edit-mode input.field-value-control:disabled,
 :host ::ng-deep .field-manager-edit-mode textarea.field-value-control:disabled,
 :host ::ng-deep .field-manager-edit-mode select.field-value-control:disabled,
 :host ::ng-deep .field-manager-edit-mode input.field-value-control[readonly],
 :host ::ng-deep .field-manager-edit-mode textarea.field-value-control[readonly],
 :host ::ng-deep .field-manager-edit-mode select.field-value-control[readonly] {
-    color: #000 !important;
-    -webkit-text-fill-color: #000 !important;
+    color: #212529 !important;
+    -webkit-text-fill-color: #212529 !important;
+    opacity: 1 !important;
+}
+
+:host ::ng-deep .field-manager-edit-mode input.field-value-control::placeholder,
+:host ::ng-deep .field-manager-edit-mode textarea.field-value-control::placeholder {
+    color: #6c757d !important;
+    -webkit-text-fill-color: #6c757d !important;
     opacity: 1 !important;
 }
 

@@ -182,8 +182,8 @@
     </div>
 
     <app-create-or-edit-field-manager #createOrEditFieldManagerModal
-        (saved)="onCreateOrEditDone()" (closed)="onCreateOrEditClosed()"></app-create-or-edit-field-manager>
-    <app-view-field-manager #viewFieldManagerModal></app-view-field-manager>
+        (saved)="onCreateOrEditDone()"></app-create-or-edit-field-manager>
+    <app-view-field-manager #viewFieldManagerModal (revisionSaved)="onRevisionSaved()"></app-view-field-manager>
  <app-existing-fields-modal #existingFieldsModal [items]="items" [entityId]="selectedEntityId"
              [objectTypeId]="selectedNode?.nodeType === 'ObjectType' ? selectedNode?.id : null"
      [tableName]="selectedEntityPath.length ? selectedEntityPath[selectedEntityPath.length - 1].name : ''"

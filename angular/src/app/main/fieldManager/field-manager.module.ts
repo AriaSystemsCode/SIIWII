@@ -12,13 +12,16 @@ import { BrowseFieldManagerComponent } from './components/browse-field-manager/b
 import { CreateOrEditFieldManagerComponent } from './components/create-or-edit-field-manager/create-or-edit-field-manager.component';
 import { ViewFieldManagerComponent } from './components/view-field-manager/view-field-manager.component';
 import { ExistingFieldsModalComponent } from './components/existing-fields-modal/existing-fields-modal.component';
+import { RevisionHistoryComponent } from './components/revision-history/revision-history.component';
+import { SharedDynamicInputsModule } from '@shared/shared-module';
 
 @NgModule({
     declarations: [
         BrowseFieldManagerComponent,
         CreateOrEditFieldManagerComponent,
         ViewFieldManagerComponent,
-        ExistingFieldsModalComponent
+        ExistingFieldsModalComponent,
+        RevisionHistoryComponent
     ],
     imports: [
         CommonModule,
@@ -28,6 +31,7 @@ import { ExistingFieldsModalComponent } from './components/existing-fields-modal
         TableModule,
         AppCommonModule,
         UtilsModule,
+        SharedDynamicInputsModule,
         FieldManagerRoutingModule
     ],
     providers: [FieldManagerService]

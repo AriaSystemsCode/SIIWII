@@ -24,19 +24,16 @@
                         <div class="form-group">
                             <label for="fieldCode">{{ 'FieldCode' | localize }}<b>*</b></label>
                             <input *ngIf="!isEdit" id="generatedFieldCode" name="generatedCode" type="text"
-                                class="form-control field-value-control mt-2" [ngModel]="item.fieldCode" readonly
-                                style="cursor: not-allowed;" required />
-                            <input id="fieldCode" name="code" type="text" class="form-control field-value-control"
-                                *ngIf="isEdit" [(ngModel)]="item.fieldCode" [readonly]="true"
-                                [style.cursor]="'not-allowed'" required />
+                                class="form-control field-value-control mt-2 cursor-not-allowed" [ngModel]="item.fieldCode" readonly
+                                required />
+                            <input id="fieldCode" name="code" type="text" class="form-control field-value-control cursor-not-allowed"
+                                *ngIf="isEdit" [(ngModel)]="item.fieldCode" [readonly]="true" required />
                         </div>
-                        <!-- //i51_FE-color of data inputs in edit modal -->
-                           <!-- //i51_FE-review read only data inputs in edit modal -->
                         <div class="form-group">
                             <label for="fieldName">{{ 'FieldName' | localize }}<b>*</b></label>
                             <input id="fieldName" name="name" type="text" class="form-control field-value-control"
                                 [ngModel]="item.fieldName" (ngModelChange)="item.fieldName = $event; generateCode()" [readonly]="isEdit"
-                                [style.cursor]="isEdit ? 'not-allowed' : 'auto'" required />
+                                [ngClass]="{ 'cursor-not-allowed': isEdit }" required />
                         </div>
                     </div>
                     <div class="form-group">
@@ -55,22 +52,20 @@
                         <div class="form-group">
                             <label for="fieldLevel">{{ 'FieldLevel' | localize }}<b>*</b></label>
                             <select id="fieldLevel" name="fieldLevel" class="form-control field-value-control"
-                                [ngModel]="isHost ? item.fieldLevelCode : (isEdit && item.fieldLevelCode !== 'Tenant' ? item.fieldLevelCode : 'Tenant')"
-                                (ngModelChange)="item.fieldLevelCode = $event; generateCode()" [disabled]="isEdit"
-                                [style.cursor]="isEdit ? 'not-allowed' : 'auto'">
-                                <option *ngIf="isHost" value="System">{{ 'System' | localize }}</option>
-                                <option *ngIf="isHost" value="Application">{{ 'Application' | localize }}</option>
-                                <option *ngIf="!isHost && isEdit && item.fieldLevelCode !== 'Tenant'"
-                                    [value]="item.fieldLevelCode" hidden>{{ item.fieldLevelCode | localize }}</option>
-                                <option *ngIf="!isHost" value="Tenant">{{ 'Tenant' | localize }}</option>
+                                [(ngModel)]="item.fieldLevelCode" [disabled]="isEdit"
+                                [ngClass]="{ 'cursor-not-allowed': isEdit }">
+                                <option *ngFor="let level of availableFieldLevels" [value]="level.code">
+                                    {{ (level.name || level.code) | localize }}
+                                </option>
                             </select>
                         </div>
                          <div class="form-group">
                         <label for="fieldStatus">{{ 'Status' | localize }}<b>*</b></label>
-                        <select id="fieldStatus" name="fieldStatusCode" class="form-control field-value-control" [(ngModel)]="item.fieldStatusCode">
-                            <option value="Proposed">{{ 'Proposed' | localize }}</option>
-                            <option value="Active">{{ 'Active' | localize }}</option>
-                            <option value="Discontinued">{{ 'Discontinued' | localize }}</option>
+                        <select id="fieldStatus" name="fieldStatusCode" class="form-control field-value-control"
+                            [(ngModel)]="item.fieldStatusCode">
+                            <option *ngFor="let status of fieldStatuses" [value]="status.code">
+                                {{ (status.name || status.code) | localize }}
+                            </option>
                         </select>
                     </div>
                     </div>
@@ -79,8 +74,8 @@
                      <div class="form-group">
                             <label for="fieldType">{{ 'FieldType' | localize }}<b>*</b></label>
                             <select id="fieldType" name="fieldTypeId" class="form-control field-value-control" [ngModel]="item.fieldTypeId" (ngModelChange)="onFieldTypeChanged($event)" #fieldType="ngModel" [disabled]="isEdit"
-                                [style.cursor]="isEdit ? 'not-allowed' : 'auto'" required>
-                                <option *ngFor="let type of fieldTypes" [ngValue]="type.id || 0">{{ (type.name || '').replace('--', ' - ') }}</option>
+                                [ngClass]="{ 'cursor-not-allowed': isEdit }" required>
+                                <option *ngFor="let type of fieldTypes" [ngValue]="type.id || 0">{{ (type.name || type.code) | localize }}</option>
                             </select>
                         </div>
                    
@@ -99,95 +94,17 @@
                         <small>Leave unchecked to create a standard field.</small>
                     </div>
 
-                  <!-- //i51_BE-FE-Handle Extra Data in the View and Create/Edit/view modals  -->
-                    <ng-container *ngIf="selectedFieldTypeName">
-                        <section class="field-form-section">
-                            <h4 class="field-section-title">{{ 'AdvancedInformation' | localize }}</h4>
-                            <ng-container *ngIf="selectedFieldTypeName === 'String - Textbox' || selectedFieldTypeName === 'Integer - Numeric input' || selectedFieldTypeName === 'Integer - Currency' || selectedFieldTypeName === 'Date - Date picker' || selectedFieldTypeName === 'List - Dropdown'">
-                                <div class="field-form-grid">
-                            <div class="form-group">
-                                <label for="allowNull">{{ 'AllowNull' | localize }}</label>
-                                <select id="allowNull" name="allowNull" class="form-control field-value-control" [(ngModel)]="item.allowNull">
-                                    <option [ngValue]="true">{{ 'Yes' | localize }}</option>
-                                    <option [ngValue]="false">{{ 'No' | localize }}</option>
-                                </select>
-                            </div>
-                            <div class="form-group" *ngIf="selectedFieldTypeName === 'String - Textbox'">
-                                <label for="fieldLength">{{ 'Length' | localize }}</label>
-                                <input id="fieldLength" name="length" type="number" class="form-control field-value-control"
-                                    [(ngModel)]="item.length" min="0" />
-                            </div>
-                            <div class="form-group" *ngIf="selectedFieldTypeName === 'Integer - Numeric input' || selectedFieldTypeName === 'Integer - Currency'">
-                                <label for="decimals">{{ 'Decimals' | localize }}</label>
-                                <input id="decimals" name="decimals" type="number" class="form-control field-value-control"
-                                    [(ngModel)]="item.decimals" min="0" />
-                            </div>
-                            <div class="form-group" *ngIf="selectedFieldTypeName === 'Date - Date picker'">
-                                <label for="dateFormat">{{ 'DateFormat' | localize }}</label>
-                                <select id="dateFormat" name="dateFormat" class="form-control field-value-control" [(ngModel)]="item.dateFormat">
-                                    <option value="mm/dd/yyyy">mm/dd/yyyy</option>
-                                    <option value="dd/mm/yyyy">dd/mm/yyyy</option>
-                                    <option value="yyyy/mm/dd">yyyy/mm/dd</option>
-                                </select>
-                            </div>
-                            <div class="form-group" *ngIf="selectedFieldTypeName === 'Date - Date picker'">
-                                <label for="timeFormat">Time Format</label>
-                                <input id="timeFormat" name="timeFormat" type="text" class="form-control field-value-control" [(ngModel)]="item.timeFormat" />
-                            </div>
-                            <div class="form-group" *ngIf="selectedFieldTypeName === 'List - Dropdown'">
-                                <label for="allowMultiSelect">{{ 'AllowMultiSelect' | localize }}</label>
-                                <select id="allowMultiSelect" name="allowMultiSelect" class="form-control field-value-control" [(ngModel)]="item.allowMultiSelect">
-                                    <option [ngValue]="true">{{ 'Yes' | localize }}</option>
-                                    <option [ngValue]="false">{{ 'No' | localize }}</option>
-                                </select>
-                            </div>
-                                </div>
-                            </ng-container>
-                        <div class="form-group" *ngIf="selectedFieldTypeName !== 'Boolean - Checkbox'">
-                            <label for="defaultValue">{{ 'DefaultValue' | localize }}</label>
-                            <input id="defaultValue" name="defaultValue" type="text" class="form-control field-value-control"
-                                [(ngModel)]="item.defaultValue" />
-                        </div>
-                        <div class="form-group" *ngIf="selectedFieldTypeName === 'Boolean - Checkbox'">
-                            <label for="booleanDefaultValue">{{ 'DefaultValue' | localize }}</label>
-                            <select id="booleanDefaultValue" name="booleanDefaultValue" class="form-control field-value-control" [(ngModel)]="item.defaultValue">
-                                <option value="true">{{ 'True' | localize }}</option>
-                                <option value="false">{{ 'False' | localize }}</option>
-                            </select>
-                        </div>
-                        <div class="form-group" *ngIf="selectedFieldTypeName !== 'List - Dropdown'">
-                            <label for="fieldRequired">{{ 'Required' | localize }}</label>
-                            <select id="fieldRequired" name="required" class="form-control field-value-control" [(ngModel)]="item.required">
-                                <option [ngValue]="true">{{ 'Yes' | localize }}</option>
-                                <option [ngValue]="false">{{ 'No' | localize }}</option>
-                            </select>
-                        </div>
-                        <div class="form-group" *ngIf="selectedFieldTypeName === 'List - Dropdown'">
-                            <label for="listRequired">{{ 'Required' | localize }}</label>
-                            <select id="listRequired" name="listRequired" class="form-control field-value-control" [(ngModel)]="item.required">
-                                <option [ngValue]="true">{{ 'Yes' | localize }}</option>
-                                <option [ngValue]="false">{{ 'No' | localize }}</option>
-                            </select>
-                        </div>
-                        <div class="dropdown-options-header" *ngIf="selectedFieldTypeName === 'List - Dropdown'">
-                            <label>{{ 'DropdownOptions' | localize }}</label>
-                            <button type="button" class="btn btn-outline-primary btn-sm " (click)="addOption()">
-                                <i class="fa fa-plus"></i> {{ 'AddOption' | localize }}
-                            </button>
-                        </div>
-                        <ng-container *ngIf="selectedFieldTypeName === 'List - Dropdown'">
-                            <div class="dropdown-option-row" *ngFor="let option of dropdownOptions; let i = index">
-                                <input type="text" class="form-control field-value-control" [name]="'dropdownOptionName' + i"
-                                    [placeholder]="'Option' | localize" [(ngModel)]="option.option" />
-                                <input type="text" class="form-control field-value-control option-value" [name]="'dropdownOptionValue' + i"
-                                    [placeholder]="'Value' | localize" [(ngModel)]="option.value" />
-                                <button type="button" class="btn btn-link text-danger" (click)="removeOption(i)">
-                                    <i class="fa fa-times"></i>
-                                </button>
-                            </div>
-                        </ng-container>
-                        </section>
-                    </ng-container>
+                    <section class="field-form-section" *ngIf="fieldTypeSettings.length">
+                        <h4 class="field-section-title">{{ 'AdvancedInformation' | localize }}</h4>
+                       <!--   //i51_BE-FE-Handle Extra Data in the View and Create/Edit/view modals -->
+                        <app-dynamicInputs
+                            [extraAttributeObject]="dynamicSettingsObject"
+                            [entityObjectTypeId]="item.fieldTypeId"
+                            [entityType]="'Field'"
+                            [dynamicInputsForViewDto]="dynamicInputsForViewDto"
+                            (extraDataChanged)="onDynamicSettingsChanged($event)">
+                        </app-dynamicInputs>
+                    </section>
 
 
                     <!-- //i51_BE-FE-ExtraAttributes from BE -->

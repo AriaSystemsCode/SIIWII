@@ -7,6 +7,7 @@ import {
     AppFieldListDto,
     AppFieldManagerServiceProxy,
     FieldCreateOrEditMetadataDto,
+    FieldLookupDto,
     FieldManagerPermissionDto,
     CreateOrEditFieldInput,
     EntityDtoOfInt64,
@@ -74,12 +75,51 @@ export class FieldManagerService {
     }
 
     getFieldMetadata(): Observable<FieldCreateOrEditMetadataDto> {
-        //i51_BE-FE-Get the data of Field Type dropdown inside create or edit modal 
-        //i51_BE-FE-fieldtypes => []  => id ,code,name
-        //i51_BE-FE-field level 
-        //i51_BE-FE-field status  
-        //i51_BE-FE-translation
         return this.appFieldManagerProxy.getFieldCreateOrEditMetadata();
+    }
+
+    getAvailableFieldLevels(
+        fieldLevels: FieldLookupDto[],
+        isHost: boolean,
+        isEdit: boolean,
+        currentFieldLevelCode?: string
+    ): FieldLookupDto[] {
+        return fieldLevels.filter(level => isHost || level.code === 'Tenant' ||
+            (isEdit && level.code === currentFieldLevelCode));
+    }
+
+    setFieldLevel(item: AppFieldDto, code: string, fieldLevels: FieldLookupDto[]): void {
+        item.fieldLevelCode = code;
+        item.fieldLevelId = fieldLevels.find(level => level.code === code)?.id;
+    }
+
+    setFieldStatus(item: AppFieldDto, code: string, fieldStatuses: FieldLookupDto[]): void {
+        item.fieldStatusCode = code;
+        item.fieldStatusId = fieldStatuses.find(status => status.code === code)?.id;
+    }
+
+    syncFieldLookupIds(item: AppFieldDto, fieldLevels: FieldLookupDto[], fieldStatuses: FieldLookupDto[]): void {
+        const level = fieldLevels.find(option => option.id === item.fieldLevelId) ||
+            fieldLevels.find(option => option.code === item.fieldLevelCode);
+        const status = fieldStatuses.find(option => option.id === item.fieldStatusId) ||
+            fieldStatuses.find(option => option.code === item.fieldStatusCode);
+
+        if (level) {
+            item.fieldLevelId = level.id;
+            item.fieldLevelCode = level.code;
+        }
+        if (status) {
+            item.fieldStatusId = status.id;
+            item.fieldStatusCode = status.code;
+        }
+    }
+
+    getFieldLevelId(fieldLevels: FieldLookupDto[], code?: string, fallbackId?: number): number | undefined {
+        return fieldLevels.find(level => level.code === code)?.id ?? fallbackId;
+    }
+
+    getFieldStatusId(fieldStatuses: FieldLookupDto[], code?: string, fallbackId?: number): number | undefined {
+        return fieldStatuses.find(status => status.code === code)?.id ?? fallbackId;
     }
 
     getFieldForEdit(id: number): Observable<AppFieldDto> {
@@ -87,16 +127,16 @@ export class FieldManagerService {
             if (!response.field) throw new Error('Field details were not returned.');
             return response.field;
         }));
-    }
+    }    
 
     getFieldHistory(appFieldId: number): Observable<AppFieldHistoryDto[]> {
         return this.appFieldManagerProxy.getFieldHistory(appFieldId);
     }
 
-    previewFieldCode(fieldTypeId: number, fieldName: string, fieldLevelCode: string): Observable<string> {
+    previewFieldCode(fieldTypeId: number): Observable<string> {
         return this.appFieldManagerProxy.previewFieldCode(
-            new PreviewFieldCodeInput({ fieldTypeId, fieldName, fieldLevelCode })
-        ).pipe(map(response => response.fieldCode || ''));
+            new PreviewFieldCodeInput({ fieldTypeId })
+        ).pipe(map(response => response.sequence || ''));
     }
 
     createField(input: CreateOrEditFieldInput): Observable<AppFieldDto> {
