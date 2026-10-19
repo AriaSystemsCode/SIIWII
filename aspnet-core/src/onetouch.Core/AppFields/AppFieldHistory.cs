@@ -68,6 +68,7 @@ namespace onetouch.AppFields
         public string TimeFormat { get; set; }
 
         public bool AllowMultiSelect { get; set; }
+        public string ValidEntries { get; set; }
         public bool Required { get; set; }
         public bool Visible { get; set; }
         public bool Editable { get; set; }

@@ -55,5 +55,6 @@
     <EmbeddedResource Include="Migrations\20261016_RemapFieldEntityObjectTypes.sql" LogicalName="onetouch.Migrations.Seed.20261016_RemapFieldEntityObjectTypes.sql" />
     <EmbeddedResource Include="Migrations\20261016_DynamicFieldSettings.sql" LogicalName="onetouch.Migrations.Seed.20261016_DynamicFieldSettings.sql" />
     <EmbeddedResource Include="Migrations\20261016_SeedDateFormatOptions.sql" LogicalName="onetouch.Migrations.Seed.20261016_SeedDateFormatOptions.sql" />
+    <EmbeddedResource Include="Migrations\20261018_SeedSingleValueFieldSettings.sql" LogicalName="onetouch.Migrations.Seed.20261018_SeedSingleValueFieldSettings.sql" />
   </ItemGroup>
 </Project>

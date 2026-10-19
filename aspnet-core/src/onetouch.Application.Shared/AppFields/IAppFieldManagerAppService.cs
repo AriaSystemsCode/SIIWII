@@ -12,7 +12,7 @@ namespace onetouch.AppFields
         Task<List<ObjectTypeTreeNodeDto>> GetObjectTypeTree();
         Task<FieldCreateOrEditMetadataDto> GetFieldCreateOrEditMetadata();
         Task<List<FieldSettingDefinitionDto>> GetFieldTypeSettings(long fieldTypeId);
-        Task<List<FieldSettingOptionDto>> SaveFieldSettingOptions(SaveFieldSettingOptionsInput input);
+        Task<string> SaveFieldValidEntries(SaveFieldValidEntriesInput input);
         Task<FieldCodePreviewDto> PreviewFieldCode(PreviewFieldCodeInput input);
         Task<PagedResultDto<AppFieldListDto>> GetFields(GetFieldsInput input);
         Task<FieldActionResultDto> AssignExistingField(AssignExistingFieldInput input);

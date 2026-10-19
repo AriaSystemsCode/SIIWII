@@ -40,6 +40,7 @@ namespace onetouch.AppFields.Dto
         [StringLength(100)] public string DateFormat { get; set; }
         [StringLength(100)] public string TimeFormat { get; set; }
         public bool AllowMultiSelect { get; set; }
+        public string ValidEntries { get; set; }
         public bool Required { get; set; }
         public bool Visible { get; set; } = true;
         public bool Editable { get; set; } = true;
@@ -51,24 +52,10 @@ namespace onetouch.AppFields.Dto
     public class FieldSettingValueDto
     {
         public long SettingFieldId { get; set; }
-        public long? AppFieldsOptionId { get; set; }
-        [StringLength(2000)] public string ValueText { get; set; }
-        public decimal? ValueNumber { get; set; }
-        public bool? ValueBoolean { get; set; }
-        public DateTime? ValueDateTime { get; set; }
+        [StringLength(2000)] public string Value { get; set; }
         // Copied names are populated for applied fields and historical revisions.
         public string SettingFieldCode { get; set; }
         public string SettingFieldName { get; set; }
-        public string OptionCode { get; set; }
-        public string OptionName { get; set; }
-    }
-
-    public class FieldSettingOptionDto
-    {
-        public long Id { get; set; }
-        public string Code { get; set; }
-        public string Name { get; set; }
-        public int SortOrder { get; set; }
     }
 
     public class FieldSettingDefinitionDto
@@ -81,13 +68,15 @@ namespace onetouch.AppFields.Dto
         public string DefaultValue { get; set; }
         public bool Required { get; set; }
         public bool AllowMultiSelect { get; set; }
-        public List<FieldSettingOptionDto> Options { get; set; } = new List<FieldSettingOptionDto>();
+        public string ValidEntries { get; set; }
+        public List<string> Options { get; set; } = new List<string>();
     }
 
-    public class SaveFieldSettingOptionsInput
+    public class SaveFieldValidEntriesInput
     {
+        [Range(1, long.MaxValue)]
         public long SettingFieldId { get; set; }
-        public List<FieldSettingOptionDto> Options { get; set; } = new List<FieldSettingOptionDto>();
+        public string ValidEntries { get; set; }
     }
 
     public class GetFieldsInput : PagedAndSortedResultRequestDto

@@ -913,6 +913,7 @@ namespace onetouch.AppFields
             if (input.Length.HasValue && input.Length.Value <= 0) throw new UserFriendlyException("Length must be positive.");
             if (input.Decimals.HasValue && input.Decimals.Value < 0) throw new UserFriendlyException("Decimals cannot be negative.");
             FieldExtraAttributesCodec.Parse(input.ExtraAttributes);
+            NormalizeValidEntries(input.ValidEntries);
             ResolveFieldLevelCode(input.FieldLevelCode);
             if (!new[] { "Proposed", "Active", "Discontinued" }.Contains(input.FieldStatusCode ?? "Proposed"))
                 throw new UserFriendlyException("Select a valid field status.");
@@ -930,6 +931,8 @@ namespace onetouch.AppFields
             field.FieldStatusCode = input.FieldStatusCode ?? "Proposed";
             field.TrackingNo = input.TrackingNo?.Trim();
             field.IsExtraField = input.IsExtraField;
+            if (field.Id == 0 || input.ValidEntries != null)
+                field.ValidEntries = NormalizeValidEntries(input.ValidEntries);
             if (field.Id == 0 || input.SettingValues != null)
             {
                 field.AllowNull = input.AllowNull;
@@ -967,6 +970,7 @@ namespace onetouch.AppFields
             field.DateFormat = revision.DateFormat;
             field.TimeFormat = revision.TimeFormat;
             field.AllowMultiSelect = revision.AllowMultiSelect;
+            field.ValidEntries = revision.ValidEntries;
             field.Required = revision.Required;
             field.Visible = revision.Visible;
             field.Editable = revision.Editable;
@@ -1019,6 +1023,7 @@ namespace onetouch.AppFields
                 DateFormat = field.DateFormat,
                 TimeFormat = field.TimeFormat,
                 AllowMultiSelect = field.AllowMultiSelect,
+                ValidEntries = field.ValidEntries,
                 Required = field.Required,
                 Visible = field.Visible,
                 Editable = field.Editable,
@@ -1197,6 +1202,7 @@ namespace onetouch.AppFields
             TrackingNo = x.TrackingNo, IsExtraField = x.IsExtraField, AllowNull = x.AllowNull,
             Length = x.Length, Decimals = x.Decimals, DefaultValue = x.DefaultValue,
             DateFormat = x.DateFormat, TimeFormat = x.TimeFormat, AllowMultiSelect = x.AllowMultiSelect,
+            ValidEntries = x.ValidEntries,
             Required = x.Required, Visible = x.Visible, Editable = x.Editable,
             ExtraAttributes = FieldExtraAttributesCodec.Serialize(x),
             SettingValues = x.SettingValues.Select(ToSettingDto).ToList()
@@ -1214,6 +1220,7 @@ namespace onetouch.AppFields
             IsStandard = x.IsStandard, IsCustom = !x.IsStandard, IsExtraField = x.IsExtraField, IsHidden = x.IsHidden,
             AllowNull = x.AllowNull, Length = x.Length, Decimals = x.Decimals, DefaultValue = x.DefaultValue,
             DateFormat = x.DateFormat, TimeFormat = x.TimeFormat, AllowMultiSelect = x.AllowMultiSelect,
+            ValidEntries = x.ValidEntries,
             Required = x.Required, Visible = x.Visible, Editable = x.Editable,
             ExtraAttributes = FieldExtraAttributesCodec.Serialize(x),
             SettingValues = x.SettingValues.Select(ToSettingDto).ToList(),
@@ -1237,6 +1244,7 @@ namespace onetouch.AppFields
             AllowNull = x.AllowNull, Length = x.Length, Decimals = x.Decimals,
             DefaultValue = x.DefaultValue, DateFormat = x.DateFormat, TimeFormat = x.TimeFormat,
             AllowMultiSelect = x.AllowMultiSelect, Required = x.Required,
+            ValidEntries = x.ValidEntries,
             Visible = x.Visible, Editable = x.Editable,
             ExtraAttributes = FieldExtraAttributesCodec.Serialize(x),
             SettingValues = x.SettingValues.Select(ToSettingDto).ToList(),
