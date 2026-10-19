@@ -138,8 +138,10 @@ namespace onetouch.SystemObjects
             {
                 var tenantId = AbpSession.TenantId;
                 var objects = await _lookup_sydObjectRepository.GetAll().Where(x => !x.IsDeleted)
-                    .Select(x => new { x.Id, x.BaseEntityId }).AsNoTracking().ToListAsync();
+                    .Select(x => new { x.Id, x.Code, x.BaseEntityId }).AsNoTracking().ToListAsync();
                 var baseIds = objects.ToDictionary(x => x.Id, x => x.BaseEntityId);
+                var fieldObjectId = objects.Where(x => x.Code == "FIELD")
+                    .Select(x => (long?)x.Id).FirstOrDefault();
                 var chains = types.Select(x => x.ObjectId).Distinct()
                     .ToDictionary(id => id, id => GetBaseEntityChain(id, baseIds));
                 var objectIds = chains.Values.SelectMany(x => x).Distinct().ToList();
@@ -181,7 +183,9 @@ namespace onetouch.SystemObjects
                         .ToList();
                     foreach (var assignment in applied)
                     {
-                        if (!assignment.IsExtraField || assignment.IsHidden) continue;
+                        var isFieldManagerSetting = type.ObjectId == fieldObjectId &&
+                            assignment.Usage?.StartsWith("FieldManager.", StringComparison.OrdinalIgnoreCase) == true;
+                        if (assignment.IsHidden || (!assignment.IsExtraField && !isFieldManagerSetting)) continue;
                         result[i].ExtraAttributes.ExtraAttributes.Add(ToExtraAttribute(assignment));
                     }
                 }

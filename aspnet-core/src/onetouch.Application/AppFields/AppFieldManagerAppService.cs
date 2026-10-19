@@ -572,6 +572,9 @@ namespace onetouch.AppFields
             using (UnitOfWorkManager.Current.DisableFilter(AbpDataFilters.SoftDelete))
             {
                 var field = await VisibleFields().Include(x => x.SettingValues).FirstOrDefaultAsync(x => x.Id == id);
+                if (field == null && AbpSession.TenantId.HasValue)
+                    field = await _fields.GetAll().Include(x => x.SettingValues)
+                        .FirstOrDefaultAsync(x => x.TenantId == AbpSession.TenantId && x.SourceFieldId == id);
                 if (field == null || (field.IsDeleted && !await _tableFields.GetAll().AnyAsync(x =>
                     x.FieldDefinitionKey == field.FieldDefinitionKey &&
                     (x.TenantId == null || x.TenantId == AbpSession.TenantId))))
@@ -600,7 +603,7 @@ namespace onetouch.AppFields
             using (UnitOfWorkManager.Current.DisableFilter(AbpDataFilters.MayHaveTenant))
             {
                 var revisions = await _history.GetAll().Include(x => x.SettingValues)
-                    .Where(x => x.AppFieldId == appFieldId && x.TenantId == field.TenantId)
+                    .Where(x => x.AppFieldId == field.Id && x.TenantId == field.TenantId)
                     .OrderByDescending(x => x.ChangedAt)
                     .ThenByDescending(x => x.Id)
                     .AsNoTracking().ToListAsync();
@@ -897,9 +900,12 @@ namespace onetouch.AppFields
         {
             if (input.SycObjectId.HasValue && (input.SycObjectId.Value <= 0 ||
                 !await _objects.GetAll().AnyAsync(x => x.Id == input.SycObjectId.Value && !x.IsDeleted &&
-                    (input.Id.HasValue || x.ObjectTypeCode == "DATA"))))
-                throw new UserFriendlyException("Select a valid data object.");
-            if (input.EntitySycObjectId.HasValue && !await _objectTypes.GetAll().AnyAsync(x => x.Id == input.EntitySycObjectId.Value && !x.IsDeleted))
+                    (input.Id.HasValue || x.ObjectTypeCode == "DATA" || x.ObjectTypeCode == "ENTITY"))))
+                throw new UserFriendlyException("Select a valid field object.");
+            // The tree sends its root SydObjects.Id in EntitySycObjectId. A normal field
+            // is assigned through AppTableFields, so this value is not part of its definition.
+            if (!input.SycObjectId.HasValue && input.EntitySycObjectId.HasValue &&
+                !await _objectTypes.GetAll().AnyAsync(x => x.Id == input.EntitySycObjectId.Value && !x.IsDeleted))
                 throw new UserFriendlyException("Select a valid entity object type.");
             if (input.SelectedObjectTypeId.HasValue && (!input.SycObjectId.HasValue ||
                 !await _objectTypes.GetAll().AnyAsync(x =>
@@ -1048,6 +1054,9 @@ namespace onetouch.AppFields
                 ChangedAt = DateTime.UtcNow,
                 ChangedBy = AbpSession.UserId
             });
+            // Persist each revision before returning a successful save response. The
+            // surrounding unit of work still commits the field and history atomically.
+            await CurrentUnitOfWork.SaveChangesAsync();
         }
 
         private async Task ValidateFieldType(long fieldTypeId)
