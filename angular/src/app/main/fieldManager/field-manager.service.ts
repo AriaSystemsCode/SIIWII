@@ -7,9 +7,11 @@ import {
     AppFieldListDto,
     AppFieldManagerServiceProxy,
     FieldCreateOrEditMetadataDto,
+    ExtraAttribute,
     FieldLookupDto,
     FieldManagerPermissionDto,
     CreateOrEditFieldInput,
+    FieldSettingValueDto,
     EntityDtoOfInt64,
     LinkExistingFieldsInput,
     LinkExistingFieldsResultDto,
@@ -17,11 +19,81 @@ import {
     PreviewFieldCodeInput
 } from '@shared/service-proxies/service-proxies';
 
+type DtoConstructor<T extends object> = {
+    new (...args: any[]): T;
+    fromJS?: (data: any) => T;
+};
+
 @Injectable()
 export class FieldManagerService {
     private readonly pageSize = 1000;
 
     constructor(private appFieldManagerProxy: AppFieldManagerServiceProxy) { }
+
+    mapDto<TSource, TTarget extends object>(source: TSource, targetType: DtoConstructor<TTarget>): TTarget {
+        if (source === null || source === undefined) {
+            return new targetType();
+        }
+
+        const sourceData = source as any;
+        const data = typeof sourceData.toJSON === 'function'
+            ? sourceData.toJSON()
+            : sourceData;
+
+        return targetType.fromJS
+            ? targetType.fromJS(data)
+            : Object.assign(new targetType(), data);
+    }
+
+    mapExtraAttributeValuesToSettings(
+        values: any[],
+        definitions: ExtraAttribute[],
+        attributes: any[]
+    ): FieldSettingValueDto[] {
+        return (values || []).reduce((mapped: FieldSettingValueDto[], entry: any) => {
+            const definition = definitions.find(item => item.attributeId === entry.attributeId);
+            const attribute = (attributes || []).find(item => item.attributeId === entry.attributeId);
+            const dataType = (definition?.dataType || '').toLowerCase();
+            const isMultiple = entry.acceptMultipleValues === true || dataType === 'chips';
+            const selectedValues = isMultiple
+                ? (Array.isArray(entry.value) ? entry.value : [])
+                : [entry.value];
+
+            selectedValues.forEach((selectedValue: any) => {
+                if (selectedValue === undefined || selectedValue === null || selectedValue === '') return;
+
+                const isOptionObject = typeof selectedValue === 'object' && selectedValue !== null &&
+                    Object.prototype.hasOwnProperty.call(selectedValue, 'value');
+                const selectedId = isOptionObject ? selectedValue.value : selectedValue;
+                const selectedCode = isOptionObject ? selectedValue.code : undefined;
+                const option = entry.isLookup
+                    ? attribute?.paginationSetting?.list?.find((item: any) =>
+                        String(item.value) === String(selectedId) || item.code === selectedCode
+                    )
+                    : undefined;
+                const setting = new FieldSettingValueDto();
+                setting.settingFieldId = entry.attributeId;
+                setting.settingFieldCode = definition?.code;
+                setting.settingFieldName = definition?.name;
+                const mappedValue = option?.label != null
+                    ? String(option.label)
+                    : dataType.includes('date') || dataType.includes('time')
+                        ? (selectedId instanceof Date ? selectedId.toISOString() : String(selectedId))
+                        : String(selectedId);
+                setting.value = mappedValue;
+
+                if (option) {
+                    setting.appFieldsOptionId = option.value;
+                    setting.optionCode = option.code;
+                    setting.optionName = option.label;
+                }
+
+                mapped.push(setting);
+            });
+
+            return mapped;
+        }, []);
+    }
 
     getEntityTree(): Observable<ObjectTypeTreeNodeDto[]> {
         return this.appFieldManagerProxy.getObjectTypeTree();

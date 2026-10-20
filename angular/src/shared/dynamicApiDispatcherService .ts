@@ -1,27 +1,27 @@
-import { Injectable } from "@angular/core";
+import { Injectable, Injector } from "@angular/core";
 import { AccountsServiceProxy, AppItemsServiceProxy, MarketplaceAccountsServiceProxy } from "./service-proxies/service-proxies";
 
 @Injectable({ providedIn: 'root' })
 export class DynamicApiDispatcherService {
 
- constructor(
-    private accountsServiceProxy: AccountsServiceProxy,
-    private appItemsServiceProxy: AppItemsServiceProxy,
-    private marketplaceAccountsServiceProxy: MarketplaceAccountsServiceProxy,
-) {}
+ constructor(private injector: Injector) {}
 
  
 dispatch(serviceName: string, methodName: string, values: any = {}) {
 
-  let selectedService = (this as any)[serviceName];
+  const serviceProxies: { [name: string]: any } = {
+    AccountsServiceProxy,
+    AppItemsServiceProxy,
+    MarketplaceAccountsServiceProxy
+  };
+  const serviceType = serviceProxies[serviceName] ||
+    serviceProxies[serviceName.charAt(0).toUpperCase() + serviceName.slice(1)];
 
-  if (!selectedService) {
-    selectedService = (this as any)[serviceName.charAt(0).toLowerCase() + serviceName.slice(1)];
-  }
-
-  if (!selectedService) {
+  if (!serviceType) {
     throw new Error(`Service '${serviceName}' not found`);
   }
+
+  const selectedService = this.injector.get(serviceType);
 
   const selectedMethod = selectedService[methodName];
 

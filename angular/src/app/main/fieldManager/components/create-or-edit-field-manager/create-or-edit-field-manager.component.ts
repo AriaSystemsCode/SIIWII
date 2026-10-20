@@ -6,7 +6,7 @@ import { FieldManagerService } from '../../field-manager.service';
 import { ExtraAttributeDataService } from '@app/main/app-items/app-item-shared/services/extra-attribute-data.service';
 import Swal from 'sweetalert2';
 import * as moment from 'moment';
-import { AppFieldDto, CreateOrEditFieldInput, ExtraAttribute, ExtraAttributesSource, FieldCreateOrEditMetadataDto, FieldLookupDto, FieldSettingValueDto, SycEntityObjectTypesServiceProxy } from '@shared/service-proxies/service-proxies';
+import { AppFieldDto, CreateOrEditFieldInput, ExtraAttribute, ExtraAttributesSource, FieldCreateOrEditMetadataDto, FieldLookupDto, SycEntityObjectTypesServiceProxy } from '@shared/service-proxies/service-proxies';
 
 @Component({
     selector: 'app-create-or-edit-field-manager',
@@ -104,7 +104,7 @@ export class CreateOrEditFieldManagerComponent extends AppComponentBase implemen
         this.isEdit = true;
         this.isRevisionEdit = true;
         this.expectedCurrentRevisionNo = expectedCurrentRevisionNo;
-        this.item = AppFieldDto.fromJS(field.toJSON());
+        this.item = this.fieldManagerService.mapDto(field, AppFieldDto);
         this.selectedObjectTypeId = field.selectedObjectTypeId ?? null;
         this.entityParentId = field.entitySycObjectId ?? null;
         this.extraAttributes = {};
@@ -129,7 +129,9 @@ export class CreateOrEditFieldManagerComponent extends AppComponentBase implemen
     }
 
     save(): void {
+        debugger
          //i51_BE-FE- Extra Data  saving ???
+         //i51 Whem chips !!
         //i51-BE-Define the expected behavior when two users attempt to create a new revision at the same time. If one user saves a revision number that has already been used by another user, the system should notify the second user and ask whether they want to continue with a different revision number or cancel the operation.
         this.dropdownOptions = this.dropdownOptions
             .filter(option => option.option.trim().length > 0 || option.value.trim().length > 0)
@@ -249,7 +251,6 @@ export class CreateOrEditFieldManagerComponent extends AppComponentBase implemen
     }
 
     generateCode(): void {
-        debugger;
         if (this.isEdit)
             return;
 
@@ -306,53 +307,16 @@ export class CreateOrEditFieldManagerComponent extends AppComponentBase implemen
     }
 
     onDynamicSettingsChanged(values: any[]): void {
-        //i51- extra attributes !!
         const incomingValues = values || [];
         const incomingAttributeIds = new Set(incomingValues.map(value => value.attributeId));
         const existingValues = (this.item.settingValues || []).filter(value =>
             !incomingAttributeIds.has(value.settingFieldId)
         );
-
-        const updatedValues = incomingValues.flatMap(value => {
-            const definition = this.fieldTypeSettings.find(setting => setting.attributeId === value.attributeId);
-            const selectedValues = value.acceptMultipleValues
-                ? (Array.isArray(value.value) ? value.value : [])
-                : [value.value];
-
-            return selectedValues
-                .filter(selectedValue => selectedValue !== undefined && selectedValue !== null && selectedValue !== '')
-                .map(selectedValue => {
-                const settingValue = new FieldSettingValueDto();
-                settingValue.settingFieldId = value.attributeId;
-                settingValue.settingFieldCode = definition?.code;
-                settingValue.settingFieldName = definition?.name;
-                const selectedOption = value.isLookup
-                    ? this.dynamicSettingsObject.value.filteredExtraAttributes
-                        .find((attribute: any) => attribute.attributeId === value.attributeId)
-                        ?.paginationSetting?.list?.find((option: any) =>
-                            String(option.value) === String(selectedValue) || option.code === selectedValue
-                        )
-                    : undefined;
-
-                if (selectedOption) {
-                    settingValue.appFieldsOptionId = selectedOption.value;
-                    settingValue.optionCode = selectedOption.code;
-                    settingValue.optionName = selectedOption.label;
-                } else {
-                    const typeCode = (definition?.dataType || '').toLowerCase();
-                    if (typeCode.includes('bool') || typeCode === 'bit') {
-                        settingValue.valueBoolean = selectedValue === true || selectedValue === 'true';
-                    } else if (typeCode.includes('date') || typeCode.includes('time')) {
-                        settingValue.valueDateTime = selectedValue ? moment(selectedValue) : undefined;
-                    } else if (typeCode.includes('number') || typeCode.includes('numeric') || typeCode.includes('int') || typeCode.includes('decimal')) {
-                        settingValue.valueNumber = selectedValue === '' ? undefined : Number(selectedValue);
-                    } else {
-                        settingValue.valueText = selectedValue == null ? undefined : String(selectedValue);
-                    }
-                }
-                return settingValue;
-            });
-        });
+        const updatedValues = this.fieldManagerService.mapExtraAttributeValuesToSettings(
+            incomingValues,
+            this.fieldTypeSettings,
+            this.dynamicSettingsObject.value.filteredExtraAttributes
+        );
 
         this.item.settingValues = [...existingValues, ...updatedValues];
     }
@@ -415,17 +379,29 @@ export class CreateOrEditFieldManagerComponent extends AppComponentBase implemen
         const savedValues = this.item.settingValues || [];
         const attributes = settings.map(setting => {
             const saved = savedValues.filter(value => value.settingFieldId === setting.attributeId);
-            const savedSelections = saved.map(value => value.appFieldsOptionId ?? value.valueText ?? value.valueNumber ??
+            const dataType = (setting.dataType || '').toLowerCase();
+            const savedSelections = saved.map(value => value.appFieldsOptionId ?? value.value ?? value.valueText ?? value.valueNumber ??
                 value.valueBoolean?.toString() ?? (value.valueDateTime ? value.valueDateTime.toDate() : undefined))
+                .map(value => {
+                    if (value == null) return value;
+                    if ((dataType.includes('date') || dataType.includes('time')) && (moment as any)(value).isValid()) {
+                        return (moment as any)(value).toDate();
+                    }
+                    return value;
+                })
                 .filter(value => value !== undefined && value !== null);
-            const selectedValues = setting.acceptMultipleValues
+            const isChips = dataType === 'chips';
+            const defaultSelections = isChips && typeof setting.defaultValue === 'string'
+                ? setting.defaultValue.split('|').map(value => value.trim()).filter(Boolean)
+                : setting.defaultValue;
+            const selectedValues = setting.acceptMultipleValues || isChips
                 ? (savedSelections.length ? savedSelections : [])
-                : (savedSelections[0] ?? setting.defaultValue);
+                : (savedSelections[0] ?? defaultSelections);
 
             return {
                 ...setting,
                 id: setting.attributeId,
-                selectedValues: selectedValues ?? (setting.acceptMultipleValues ? [] : ''),
+                selectedValues: selectedValues ?? (setting.acceptMultipleValues || isChips ? [] : ''),
                 paginationSetting: {
                     skipCount: 0,
                     maxResultCount: 10,
@@ -446,10 +422,12 @@ export class CreateOrEditFieldManagerComponent extends AppComponentBase implemen
 
     private loadFieldTypeSettingLookups(settings: ExtraAttribute[], request: number): void {
         settings.filter(setting => setting.isLookup && setting.entityObjectTypeCode).forEach(setting => {
+            const entityObjectTypeCode = setting.entityObjectTypeCode;
+            if (!entityObjectTypeCode) return;
             const attribute = this.dynamicSettingsObject.value.filteredExtraAttributes
                 .find((item: any) => item.attributeId === setting.attributeId);
             this.extraAttributeDataService.getExtraAttributeLookupDataWithPaging(
-                setting.entityObjectTypeCode,
+                entityObjectTypeCode,
                 0,
                 10
             ).subscribe(result => {
