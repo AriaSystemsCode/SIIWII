@@ -36,6 +36,11 @@ BEGIN TRY
     DECLARE @fieldRootId bigint = (SELECT Id FROM dbo.SycEntityObjectTypes
         WHERE ObjectId = @fieldObjectId AND Code = N'FIELD'
           AND ParentId IS NULL AND IsDeleted = 0);
+    -- This older cumulative script also runs after the later String--Chips
+    -- correction. Accept that promoted value type on subsequent seed runs.
+    DECLARE @chipsTypeId bigint = (SELECT Id FROM dbo.SycEntityObjectTypes
+        WHERE ObjectId = @fieldObjectId AND ParentId = @fieldRootId
+          AND Code = N'SC' AND TenantId IS NULL AND IsDeleted = 0);
 
     CREATE TABLE #OwnerTypes
     (
@@ -96,6 +101,8 @@ BEGIN TRY
         (N'IC', 6, N'Editable', N'Editable', N'BOOLEAN', N'boolean', N'ExtraAttributes', N'true', 0, 1),
         (N'LD', 1, N'AllowNull', N'Allow Null', N'BOOLEAN', N'boolean', N'AdvancedInformation', N'false', 0, 1),
         (N'LD', 2, N'AllowMultiSelect', N'Multi-Select', N'BOOLEAN', N'boolean', N'AdvancedInformation', N'false', 0, 1),
+        -- The later cumulative seed promotes this setting to String--Chips,
+        -- which does not exist yet when this migration first runs.
         (N'LD', 3, N'DropdownOptions', N'Dropdown Options', N'LD', N'dropDownList', N'AdvancedInformation', NULL, 1, 0),
         (N'LD', 4, N'Required', N'Required', N'BOOLEAN', N'boolean', N'AdvancedInformation', N'false', 0, 1),
         (N'LD', 5, N'Visible', N'Visible', N'BOOLEAN', N'boolean', N'ExtraAttributes', N'true', 0, 1),
@@ -119,7 +126,10 @@ BEGIN TRY
     IF EXISTS (SELECT 1 FROM #Settings s JOIN dbo.AppFields f
         ON f.SycObjectId = @fieldObjectId AND f.EntitySycObjectId = s.OwnerTypeId
        AND f.TenantId IS NULL AND f.FieldName = s.FieldName AND f.IsDeleted = 0
-        WHERE f.FieldTypeId <> s.FieldTypeId OR f.FieldLevelCode <> N'System'
+        WHERE (f.FieldTypeId <> s.FieldTypeId
+           AND NOT (s.OwnerCode = N'LD' AND s.FieldName = N'DropdownOptions'
+                    AND f.FieldTypeId = @chipsTypeId))
+           OR f.FieldLevelCode <> N'System'
            OR f.IsStandard <> 1 OR f.IsExtraField <> 0)
         THROW 51405, 'An existing setting definition conflicts with the seed.', 1;
     IF EXISTS (SELECT 1 FROM #Settings s JOIN dbo.AppFields f
@@ -172,7 +182,10 @@ BEGIN TRY
         (SELECT COUNT(*) AS Cnt FROM dbo.AppFields f
          WHERE f.SycObjectId = @fieldObjectId AND f.EntitySycObjectId = s.OwnerTypeId
            AND f.TenantId IS NULL AND f.FieldName = s.FieldName
-           AND f.FieldTypeId = s.FieldTypeId AND f.IsDeleted = 0) matches
+            AND (f.FieldTypeId = s.FieldTypeId
+                 OR (s.OwnerCode = N'LD' AND s.FieldName = N'DropdownOptions'
+                     AND f.FieldTypeId = @chipsTypeId))
+            AND f.IsDeleted = 0) matches
         WHERE matches.Cnt <> 1)
         THROW 51408, 'Expected one active definition per field type setting.', 1;
 
@@ -230,7 +243,10 @@ BEGIN TRY
         AND s.FieldName = a.FieldName
     JOIN dbo.AppFields AS f ON f.SycObjectId = @fieldObjectId
         AND f.EntitySycObjectId = s.OwnerTypeId AND f.TenantId IS NULL
-        AND f.FieldName = s.FieldName AND f.FieldTypeId = s.FieldTypeId AND f.IsDeleted = 0
+        AND f.FieldName = s.FieldName AND f.IsDeleted = 0
+        AND (f.FieldTypeId = s.FieldTypeId
+             OR (s.OwnerCode = N'LD' AND s.FieldName = N'DropdownOptions'
+                 AND f.FieldTypeId = @chipsTypeId))
     WHERE a.SycObjectId = @fieldObjectId AND a.TenantId IS NULL
       AND a.FieldDefinitionKey <> f.FieldDefinitionKey;
 
@@ -263,7 +279,10 @@ BEGIN TRY
     FROM #Settings AS s
     JOIN dbo.AppFields AS f ON f.SycObjectId = @fieldObjectId
         AND f.EntitySycObjectId = s.OwnerTypeId AND f.TenantId IS NULL
-        AND f.FieldName = s.FieldName AND f.FieldTypeId = s.FieldTypeId AND f.IsDeleted = 0
+        AND f.FieldName = s.FieldName AND f.IsDeleted = 0
+        AND (f.FieldTypeId = s.FieldTypeId
+             OR (s.OwnerCode = N'LD' AND s.FieldName = N'DropdownOptions'
+                 AND f.FieldTypeId = @chipsTypeId))
     WHERE NOT EXISTS (SELECT 1 FROM dbo.AppTableFields a
         WHERE a.TenantId IS NULL AND a.SycObjectId = @fieldObjectId
           AND a.SycEntityObjectTypeId = s.OwnerTypeId AND a.FieldName = s.FieldName);
@@ -299,11 +318,15 @@ BEGIN TRY
         + @historyValues + N'
     FROM dbo.AppFields f JOIN #Settings s
       ON s.OwnerTypeId = f.EntitySycObjectId AND s.FieldName = f.FieldName
-     AND s.FieldTypeId = f.FieldTypeId
+     AND (s.FieldTypeId = f.FieldTypeId
+          OR (s.OwnerCode = N''LD'' AND s.FieldName = N''DropdownOptions''
+              AND f.FieldTypeId = @chipsTypeId))
     WHERE f.SycObjectId = @objectId AND f.TenantId IS NULL AND f.IsDeleted = 0
       AND NOT EXISTS (SELECT 1 FROM dbo.AppFieldsHistory h
           WHERE h.AppFieldId = f.Id AND h.RevisionNo = f.CurrentRevisionNo);';
-    EXEC sys.sp_executesql @historySql, N'@objectId bigint', @objectId = @fieldObjectId;
+    EXEC sys.sp_executesql @historySql,
+        N'@objectId bigint, @chipsTypeId bigint',
+        @objectId = @fieldObjectId, @chipsTypeId = @chipsTypeId;
 
     -- Preserve attribute IDs for matching codes, including the old typo
     -- NoOfDecmials -> Decimals on Numeric input. Allocate new IDs globally.
