@@ -858,7 +858,6 @@ export class MainImportComponent
 
                     var ret = this.serviceUtilitesProxy.setImagesGuids(this.uploadingResult, this.finalUploadedImages);
                     this.uploadingResult = ret;
-                    debugger
                     if (Array.isArray(this.uploadingResult.excelRecords)) {
                         this.uploadingResult.excelRecords = this.uploadingResult.excelRecords.map(item => {
                             if (item?.image) {

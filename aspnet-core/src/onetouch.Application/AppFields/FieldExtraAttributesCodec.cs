@@ -65,7 +65,7 @@ namespace onetouch.AppFields
                     throw new UserFriendlyException("Extra attributes exceed the allowed field lengths.");
                 data.DropdownOptions ??= new List<DropdownOptionData>();
                 if (data.DropdownOptions.Count > 0)
-                    throw new UserFriendlyException("Save selectable options through field settings and AppFieldsOptionId.");
+                    throw new UserFriendlyException("Save selectable choices in the field's ValidEntries.");
                 return data;
             }
             catch (JsonException)

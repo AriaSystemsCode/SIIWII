@@ -4,8 +4,9 @@ import { ModalDirective } from 'ngx-bootstrap/modal';
 import { forkJoin } from 'rxjs';
 import { finalize } from 'rxjs/operators';
 import { AppComponentBase } from '@shared/common/app-component-base';
-import { AppFieldDto, AppFieldHistoryDto, CreateOrEditFieldInput, FieldLookupDto } from '@shared/service-proxies/service-proxies';
+import { AppFieldDto, AppFieldHistoryDto, FieldLookupDto } from '@shared/service-proxies/service-proxies';
 import { FieldManagerService } from '../../field-manager.service';
+import { CreateOrEditFieldManagerComponent } from '../create-or-edit-field-manager/create-or-edit-field-manager.component';
 import Swal from 'sweetalert2';
 
 @Component({
@@ -15,19 +16,21 @@ import Swal from 'sweetalert2';
 })
 export class ViewFieldManagerComponent extends AppComponentBase implements OnInit {
     @ViewChild('fieldManagerViewModal', { static: true }) modal!: ModalDirective;
+    @ViewChild('revisionEditor', { static: true }) revisionEditor!: CreateOrEditFieldManagerComponent;
     @Output() revisionSaved = new EventEmitter<void>();
     item: AppFieldDto | null = null;
     revisions: AppFieldHistoryDto[] = [];
     selectedRevision: AppFieldDto | null = null;
     fieldTypes: FieldLookupDto[] = [];
-    widgetTypes: FieldLookupDto[] = [];
-    viewState: 'details' | 'history' | 'draft' = 'details';
+    viewState: 'details' | 'history' = 'details';
     active = false;
     isViewingHistoryRevision = false;
     canRestoreRevision = false;
     private currentItem: AppFieldDto | null = null;
     private detailsRequest = 0;
     private historyRequest = 0;
+    private isRevisionSaved = false;
+    private savedRevisionFieldId: number | null = null;
 
     constructor(
         injector: Injector,
@@ -51,7 +54,8 @@ export class ViewFieldManagerComponent extends AppComponentBase implements OnIni
     }
 
     fieldTypeName(id: number): string {
-        return this.fieldTypes.find(type => type.id === id)?.name || '';
+        const fieldType = this.fieldTypes.find(type => type.id === id);
+        return fieldType?.name || fieldType?.code || '';
     }
 
     goToHistory(): void {
@@ -101,9 +105,7 @@ export class ViewFieldManagerComponent extends AppComponentBase implements OnIni
 
     createNewRevision(): void {
         if (!this.item) return;
-        this.currentItem = this.copyItem(this.item);
-        this.item = this.copyItem(this.item);
-        this.viewState = 'draft';
+        this.requestRevision(this.item);
     }
 
   // ...existing code...
@@ -122,65 +124,32 @@ export class ViewFieldManagerComponent extends AppComponentBase implements OnIni
             allowEscapeKey: false
         }).then(result => {
             if (result.isConfirmed) {
-                this.item = this.copyItem(itemToRestore);
-                this.saveRevision();
+                this.requestRevision(itemToRestore);
             }
         });
     }
-// ...existing code...
 
-    saveRevision(): void {
-        if (!this.item || !this.item.fieldName.trim() || !this.item.id) return;
-
-        const input = new CreateOrEditFieldInput({
-            id: this.item.id,
-            sycObjectId: this.item.sycObjectId,
-            entitySycObjectId: this.item.entitySycObjectId,
-            selectedObjectTypeId: this.item.selectedObjectTypeId,
-            fieldTypeId: this.item.fieldTypeId,
-            widgetTypeId: this.item.widgetTypeId,
-            fieldLevelId: this.item.fieldLevelId,
-            fieldStatusId: this.item.fieldStatusId,
-            fieldCode: this.item.fieldCode,
-            fieldName: this.item.fieldName,
-            description: this.item.description,
-            fieldLevelCode: this.item.fieldLevelCode,
-            fieldStatusCode: this.item.fieldStatusCode,
-            trackingNo: this.item.trackingNo,
-            isExtraField: this.item.isExtraField,
-            allowNull: this.item.allowNull,
-            length: this.item.length,
-            decimals: this.item.decimals,
-            defaultValue: this.item.defaultValue,
-            dateFormat: this.item.dateFormat,
-            timeFormat: this.item.timeFormat,
-            allowMultiSelect: this.item.allowMultiSelect,
-            required: this.item.required,
-            visible: this.item.visible,
-            editable: this.item.editable,
-            extraAttributes: this.item.extraAttributes
-        });
-
-        this.showMainSpinner();
-        this.fieldManagerService.createField(input).pipe(finalize(() => this.hideMainSpinner())).subscribe({
-            next: savedField => {
-                this.item = savedField;
-                this.currentItem = this.copyItem(savedField);
-                this.selectedRevision = savedField;
-                this.revisions = [];
-                this.viewState = 'details';
-                this.isViewingHistoryRevision = false;
-                this.canRestoreRevision = false;
-                this.revisionSaved.emit();
-                this.notify.success('Revision saved successfully.');
-            },
-            error: () => this.notify.error('Could not save the field revision.')
-        });
+    private requestRevision(field: AppFieldDto): void {
+        if (!this.currentItem) return;
+        this.isRevisionSaved = false;
+        this.savedRevisionFieldId = null;
+        this.modal.hide();
+        this.revisionEditor.showRevision(this.copyItem(field), this.currentItem.currentRevisionNo);
     }
 
-    cancelDraft(): void {
-        if (this.currentItem) this.item = this.copyItem(this.currentItem);
-        this.viewState = 'details';
+    onRevisionEditorSaved(field: AppFieldDto): void {
+        this.isRevisionSaved = true;
+        this.savedRevisionFieldId = field.id ?? null;
+    }
+
+    onRevisionEditorClosed(): void {
+        if (this.isRevisionSaved && this.savedRevisionFieldId) {
+            this.revisionSaved.emit();
+            this.loadDetails(this.savedRevisionFieldId);
+            return;
+        }
+
+        this.modal.show();
     }
 
     private loadDetails(id: number): void {
@@ -199,7 +168,6 @@ export class ViewFieldManagerComponent extends AppComponentBase implements OnIni
                 this.revisions = [];
                 this.selectedRevision = result.field;
                 this.fieldTypes = result.metadata.fieldTypes || [];
-                this.widgetTypes = result.metadata.widgetTypes || [];
                 this.viewState = 'details';
                 this.isViewingHistoryRevision = false;
                 this.canRestoreRevision = false;
@@ -216,7 +184,7 @@ export class ViewFieldManagerComponent extends AppComponentBase implements OnIni
     }
 
     private copyItem(item: AppFieldDto): AppFieldDto {
-        return AppFieldDto.fromJS(item.toJSON());
+        return this.fieldManagerService.mapDto(item, AppFieldDto);
     }
 
     private normalizeRevisionNo(revisionNo?: string): string | null {
@@ -226,10 +194,6 @@ export class ViewFieldManagerComponent extends AppComponentBase implements OnIni
     }
 
     close(): void {
-        if (this.viewState === 'draft') {
-            this.cancelDraft();
-            return;
-        }
         if (this.viewState === 'history') {
             this.backToFieldDetails();
             return;

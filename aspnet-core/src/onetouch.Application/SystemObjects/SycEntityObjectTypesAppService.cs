@@ -138,8 +138,10 @@ namespace onetouch.SystemObjects
             {
                 var tenantId = AbpSession.TenantId;
                 var objects = await _lookup_sydObjectRepository.GetAll().Where(x => !x.IsDeleted)
-                    .Select(x => new { x.Id, x.BaseEntityId }).AsNoTracking().ToListAsync();
+                    .Select(x => new { x.Id, x.Code, x.BaseEntityId }).AsNoTracking().ToListAsync();
                 var baseIds = objects.ToDictionary(x => x.Id, x => x.BaseEntityId);
+                var fieldObjectId = objects.Where(x => x.Code == "FIELD")
+                    .Select(x => (long?)x.Id).FirstOrDefault();
                 var chains = types.Select(x => x.ObjectId).Distinct()
                     .ToDictionary(id => id, id => GetBaseEntityChain(id, baseIds));
                 var objectIds = chains.Values.SelectMany(x => x).Distinct().ToList();
@@ -181,7 +183,9 @@ namespace onetouch.SystemObjects
                         .ToList();
                     foreach (var assignment in applied)
                     {
-                        if (!assignment.IsExtraField || assignment.IsHidden) continue;
+                        var isFieldManagerSetting = type.ObjectId == fieldObjectId &&
+                            assignment.Usage?.StartsWith("FieldManager.", StringComparison.OrdinalIgnoreCase) == true;
+                        if (assignment.IsHidden || (!assignment.IsExtraField && !isFieldManagerSetting)) continue;
                         result[i].ExtraAttributes.ExtraAttributes.Add(ToExtraAttribute(assignment));
                     }
                 }
@@ -214,22 +218,35 @@ namespace onetouch.SystemObjects
             attribute.Description = assignment.Description;
             attribute.DataType = assignment.SourceDataType ?? FieldDataType(assignment.FieldCode);
             attribute.Width = settings.TryGetValue("Length", out var length)
-                ? length.ValueNumber?.ToString(CultureInfo.InvariantCulture)
+                ? (TryWholeSettingNumber(length.Value, out var width)
+                    ? width.ToString(CultureInfo.InvariantCulture) : length.Value)
                 : assignment.Length?.ToString(CultureInfo.InvariantCulture);
             attribute.Decimals = settings.TryGetValue("Decimals", out var decimals)
-                ? (int)(decimals.ValueNumber ?? 0) : assignment.Decimals ?? 0;
+                ? (TryWholeSettingNumber(decimals.Value, out var count)
+                    ? count : 0) : assignment.Decimals ?? 0;
             attribute.DefaultValue = settings.TryGetValue("DefaultValue", out var defaultValue)
-                ? defaultValue.ValueText ?? defaultValue.OptionCode : assignment.DefaultValue;
+                ? defaultValue.Value : assignment.DefaultValue;
+            attribute.ValidEntries = assignment.ValidEntries;
             attribute.Usage = assignment.Usage;
             attribute.IsLookup = assignment.IsLookup ?? false;
             attribute.EntityObjectTypeCode = assignment.EntityObjectTypeCode;
             attribute.AcceptMultipleValues = (assignment.AcceptMultipleValues ?? false) ||
                 (settings.TryGetValue("AllowMultiSelect", out var multiSelect)
-                    ? multiSelect.ValueBoolean == true : assignment.AllowMultiSelect);
+                    ? bool.TryParse(multiSelect.Value, out var multiple) && multiple : assignment.AllowMultiSelect);
             attribute.IsVariation = assignment.IsVariation ?? false;
             attribute.IsAdvancedSearch = assignment.IsAdvancedSearch ?? false;
             attribute.AllowAddNew = assignment.AllowAddNew ?? false;
             return attribute;
+        }
+
+        private static bool TryWholeSettingNumber(string text, out int value)
+        {
+            value = 0;
+            if (!decimal.TryParse(text, NumberStyles.Number, CultureInfo.InvariantCulture, out var number) ||
+                number != decimal.Truncate(number) || number < int.MinValue || number > int.MaxValue)
+                return false;
+            value = (int)number;
+            return true;
         }
 
         private static string FieldDataType(string fieldCode)

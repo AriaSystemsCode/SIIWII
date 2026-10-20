@@ -572,6 +572,9 @@ namespace onetouch.AppFields
             using (UnitOfWorkManager.Current.DisableFilter(AbpDataFilters.SoftDelete))
             {
                 var field = await VisibleFields().Include(x => x.SettingValues).FirstOrDefaultAsync(x => x.Id == id);
+                if (field == null && AbpSession.TenantId.HasValue)
+                    field = await _fields.GetAll().Include(x => x.SettingValues)
+                        .FirstOrDefaultAsync(x => x.TenantId == AbpSession.TenantId && x.SourceFieldId == id);
                 if (field == null || (field.IsDeleted && !await _tableFields.GetAll().AnyAsync(x =>
                     x.FieldDefinitionKey == field.FieldDefinitionKey &&
                     (x.TenantId == null || x.TenantId == AbpSession.TenantId))))
@@ -600,7 +603,7 @@ namespace onetouch.AppFields
             using (UnitOfWorkManager.Current.DisableFilter(AbpDataFilters.MayHaveTenant))
             {
                 var revisions = await _history.GetAll().Include(x => x.SettingValues)
-                    .Where(x => x.AppFieldId == appFieldId && x.TenantId == field.TenantId)
+                    .Where(x => x.AppFieldId == field.Id && x.TenantId == field.TenantId)
                     .OrderByDescending(x => x.ChangedAt)
                     .ThenByDescending(x => x.Id)
                     .AsNoTracking().ToListAsync();
@@ -897,9 +900,12 @@ namespace onetouch.AppFields
         {
             if (input.SycObjectId.HasValue && (input.SycObjectId.Value <= 0 ||
                 !await _objects.GetAll().AnyAsync(x => x.Id == input.SycObjectId.Value && !x.IsDeleted &&
-                    (input.Id.HasValue || x.ObjectTypeCode == "DATA"))))
-                throw new UserFriendlyException("Select a valid data object.");
-            if (input.EntitySycObjectId.HasValue && !await _objectTypes.GetAll().AnyAsync(x => x.Id == input.EntitySycObjectId.Value && !x.IsDeleted))
+                    (input.Id.HasValue || x.ObjectTypeCode == "DATA" || x.ObjectTypeCode == "ENTITY"))))
+                throw new UserFriendlyException("Select a valid field object.");
+            // The tree sends its root SydObjects.Id in EntitySycObjectId. A normal field
+            // is assigned through AppTableFields, so this value is not part of its definition.
+            if (!input.SycObjectId.HasValue && input.EntitySycObjectId.HasValue &&
+                !await _objectTypes.GetAll().AnyAsync(x => x.Id == input.EntitySycObjectId.Value && !x.IsDeleted))
                 throw new UserFriendlyException("Select a valid entity object type.");
             if (input.SelectedObjectTypeId.HasValue && (!input.SycObjectId.HasValue ||
                 !await _objectTypes.GetAll().AnyAsync(x =>
@@ -913,6 +919,7 @@ namespace onetouch.AppFields
             if (input.Length.HasValue && input.Length.Value <= 0) throw new UserFriendlyException("Length must be positive.");
             if (input.Decimals.HasValue && input.Decimals.Value < 0) throw new UserFriendlyException("Decimals cannot be negative.");
             FieldExtraAttributesCodec.Parse(input.ExtraAttributes);
+            NormalizeValidEntries(input.ValidEntries);
             ResolveFieldLevelCode(input.FieldLevelCode);
             if (!new[] { "Proposed", "Active", "Discontinued" }.Contains(input.FieldStatusCode ?? "Proposed"))
                 throw new UserFriendlyException("Select a valid field status.");
@@ -930,6 +937,8 @@ namespace onetouch.AppFields
             field.FieldStatusCode = input.FieldStatusCode ?? "Proposed";
             field.TrackingNo = input.TrackingNo?.Trim();
             field.IsExtraField = input.IsExtraField;
+            if (field.Id == 0 || input.ValidEntries != null)
+                field.ValidEntries = NormalizeValidEntries(input.ValidEntries);
             if (field.Id == 0 || input.SettingValues != null)
             {
                 field.AllowNull = input.AllowNull;
@@ -967,6 +976,7 @@ namespace onetouch.AppFields
             field.DateFormat = revision.DateFormat;
             field.TimeFormat = revision.TimeFormat;
             field.AllowMultiSelect = revision.AllowMultiSelect;
+            field.ValidEntries = revision.ValidEntries;
             field.Required = revision.Required;
             field.Visible = revision.Visible;
             field.Editable = revision.Editable;
@@ -1019,6 +1029,7 @@ namespace onetouch.AppFields
                 DateFormat = field.DateFormat,
                 TimeFormat = field.TimeFormat,
                 AllowMultiSelect = field.AllowMultiSelect,
+                ValidEntries = field.ValidEntries,
                 Required = field.Required,
                 Visible = field.Visible,
                 Editable = field.Editable,
@@ -1043,6 +1054,9 @@ namespace onetouch.AppFields
                 ChangedAt = DateTime.UtcNow,
                 ChangedBy = AbpSession.UserId
             });
+            // Persist each revision before returning a successful save response. The
+            // surrounding unit of work still commits the field and history atomically.
+            await CurrentUnitOfWork.SaveChangesAsync();
         }
 
         private async Task ValidateFieldType(long fieldTypeId)
@@ -1197,6 +1211,7 @@ namespace onetouch.AppFields
             TrackingNo = x.TrackingNo, IsExtraField = x.IsExtraField, AllowNull = x.AllowNull,
             Length = x.Length, Decimals = x.Decimals, DefaultValue = x.DefaultValue,
             DateFormat = x.DateFormat, TimeFormat = x.TimeFormat, AllowMultiSelect = x.AllowMultiSelect,
+            ValidEntries = x.ValidEntries,
             Required = x.Required, Visible = x.Visible, Editable = x.Editable,
             ExtraAttributes = FieldExtraAttributesCodec.Serialize(x),
             SettingValues = x.SettingValues.Select(ToSettingDto).ToList()
@@ -1214,6 +1229,7 @@ namespace onetouch.AppFields
             IsStandard = x.IsStandard, IsCustom = !x.IsStandard, IsExtraField = x.IsExtraField, IsHidden = x.IsHidden,
             AllowNull = x.AllowNull, Length = x.Length, Decimals = x.Decimals, DefaultValue = x.DefaultValue,
             DateFormat = x.DateFormat, TimeFormat = x.TimeFormat, AllowMultiSelect = x.AllowMultiSelect,
+            ValidEntries = x.ValidEntries,
             Required = x.Required, Visible = x.Visible, Editable = x.Editable,
             ExtraAttributes = FieldExtraAttributesCodec.Serialize(x),
             SettingValues = x.SettingValues.Select(ToSettingDto).ToList(),
@@ -1237,6 +1253,7 @@ namespace onetouch.AppFields
             AllowNull = x.AllowNull, Length = x.Length, Decimals = x.Decimals,
             DefaultValue = x.DefaultValue, DateFormat = x.DateFormat, TimeFormat = x.TimeFormat,
             AllowMultiSelect = x.AllowMultiSelect, Required = x.Required,
+            ValidEntries = x.ValidEntries,
             Visible = x.Visible, Editable = x.Editable,
             ExtraAttributes = FieldExtraAttributesCodec.Serialize(x),
             SettingValues = x.SettingValues.Select(ToSettingDto).ToList(),

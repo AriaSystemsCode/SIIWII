@@ -3,18 +3,20 @@ import { ActivatedRoute, Router } from '@angular/router';
 import { ModalDirective } from 'ngx-bootstrap/modal';
 import { AppComponentBase } from '@shared/common/app-component-base';
 import { FieldManagerService } from '../../field-manager.service';
+import { ExtraAttributeDataService } from '@app/main/app-items/app-item-shared/services/extra-attribute-data.service';
 import Swal from 'sweetalert2';
-import { of } from 'rxjs';
-import { AppFieldDto, CreateOrEditFieldInput, FieldLookupDto } from '@shared/service-proxies/service-proxies';
+import * as moment from 'moment';
+import { AppFieldDto, CreateOrEditFieldInput, ExtraAttribute, ExtraAttributesSource, FieldCreateOrEditMetadataDto, FieldLookupDto, SycEntityObjectTypesServiceProxy } from '@shared/service-proxies/service-proxies';
 
 @Component({
     selector: 'app-create-or-edit-field-manager',
     templateUrl: './create-or-edit-field-manager.component.html',
-    styleUrls: ['./create-or-edit-field-manager.component.scss']
+    styleUrls: ['./create-or-edit-field-manager.component.scss'],
+    providers: [ExtraAttributeDataService]
 })
 export class CreateOrEditFieldManagerComponent extends AppComponentBase implements OnInit {
     @ViewChild('fieldManagerModal', { static: true }) modal!: ModalDirective;
-    @Output() saved = new EventEmitter<void>();
+    @Output() saved = new EventEmitter<AppFieldDto>();
     @Output() closed = new EventEmitter<void>();
     item: AppFieldDto = this.createEmptyItem();
     isEdit = false;
@@ -24,32 +26,41 @@ export class CreateOrEditFieldManagerComponent extends AppComponentBase implemen
     isHost :boolean=false;
     fieldTypes: FieldLookupDto[] = [];
     widgetTypes: FieldLookupDto[] = [];
+    fieldLevels: FieldLookupDto[] = [];
+    fieldStatuses: FieldLookupDto[] = [];
+    fieldTypeSettings: ExtraAttribute[] = [];
+    dynamicInputsForViewDto: any;
+    dynamicSettingsObject: any = { value: { extraAttributes: [], filteredExtraAttributes: [], header: 'AdvancedInformation' } };
     selectedObjectTypeId: number | null = null;
     entityParentId: number | null = null;
     private codePreviewRequest = 0;
     private previewTimer: ReturnType<typeof setTimeout> | null = null;
     private initialFormState = '';
     private extraAttributes: { [key: string]: any } = {};
+    private expectedCurrentRevisionNo?: string;
+    private isRevisionEdit = false;
+    private fieldSettingsRequest = 0;
 
     constructor(
         injector: Injector,
         private activatedRoute: ActivatedRoute,
         private router: Router,
-        private fieldManagerService: FieldManagerService
+        private fieldManagerService: FieldManagerService,
+        private sycEntityObjectTypesService: SycEntityObjectTypesServiceProxy,
+        private extraAttributeDataService: ExtraAttributeDataService
     ) {
         super(injector);
     }
 
     ngOnInit(): void {
+        this.isHost = !this.appSession.tenantId;
         this.fieldManagerService.getFieldMetadata().subscribe({
             next: metadata => {
-                this.fieldTypes = metadata.fieldTypes || [];
-                this.widgetTypes = metadata.widgetTypes || [];
+                this.setFieldMetadata(metadata);
             },
-            error: () => this.notify.error('Could not load field types.')
+            error: () => this.notify.error('Could not load field metadata.')
         });
         const id = Number(this.activatedRoute.snapshot.paramMap.get('id'));
-        this.isHost = !this.appSession.tenantId;
         if (!id) {
             return;
         }
@@ -59,6 +70,8 @@ export class CreateOrEditFieldManagerComponent extends AppComponentBase implemen
     show(id?: number, fromExisting = false, _tableName?: string, entityId?: number | null,
         objectTypeId?: number | null, entityParentId?: number | null): void {
         this.activeTab = 'field-info';
+        this.expectedCurrentRevisionNo = undefined;
+        this.isRevisionEdit = false;
         this.isEdit = !!id;
         this.selectedObjectTypeId = objectTypeId || null;
         this.entityParentId = entityParentId || null;
@@ -78,8 +91,33 @@ export class CreateOrEditFieldManagerComponent extends AppComponentBase implemen
             if (fromExisting) {
                 this.item.fieldStatusCode = 'Proposed';
             }
+            this.setCreateDefaults();
             this.generateCode();
         }
+        this.active = true;
+        this.initialFormState = this.getFormState();
+        this.modal.show();
+    }
+
+    showRevision(field: AppFieldDto, expectedCurrentRevisionNo?: string): void {
+        this.activeTab = 'field-info';
+        this.isEdit = true;
+        this.isRevisionEdit = true;
+        this.expectedCurrentRevisionNo = expectedCurrentRevisionNo;
+        this.item = this.fieldManagerService.mapDto(field, AppFieldDto);
+        this.selectedObjectTypeId = field.selectedObjectTypeId ?? null;
+        this.entityParentId = field.entitySycObjectId ?? null;
+        this.extraAttributes = {};
+        try { this.extraAttributes = JSON.parse(field.extraAttributes || '{}'); } catch (_) { this.extraAttributes = {}; }
+        if (!this.extraAttributes || typeof this.extraAttributes !== 'object' || Array.isArray(this.extraAttributes)) {
+            this.extraAttributes = {};
+        }
+        const fieldOptions = this.extraAttributes.dropdownOptions;
+        this.dropdownOptions = Array.isArray(fieldOptions)
+            ? fieldOptions as { option: string; value: string }[]
+            : [];
+        this.fieldManagerService.syncFieldLookupIds(this.item, this.fieldLevels, this.fieldStatuses);
+        if (this.item.fieldTypeId) this.loadFieldTypeSettings(this.item.fieldTypeId);
         this.active = true;
         this.initialFormState = this.getFormState();
         this.modal.show();
@@ -91,6 +129,10 @@ export class CreateOrEditFieldManagerComponent extends AppComponentBase implemen
     }
 
     save(): void {
+        debugger
+         //i51_BE-FE- Extra Data  saving ???
+         //i51 Whem chips !!
+        //i51-BE-Define the expected behavior when two users attempt to create a new revision at the same time. If one user saves a revision number that has already been used by another user, the system should notify the second user and ask whether they want to continue with a different revision number or cancel the operation.
         this.dropdownOptions = this.dropdownOptions
             .filter(option => option.option.trim().length > 0 || option.value.trim().length > 0)
             .map(option => ({
@@ -102,21 +144,22 @@ export class CreateOrEditFieldManagerComponent extends AppComponentBase implemen
             this.notify.error('Select a field type and enter a field name.');
             return;
         }
-        if (!this.item.sycObjectId) {
-            this.notify.error('Select an entity or data object for the field.');
-            return;
-        }
         const fieldName = this.item.fieldName.trim();
         const input = new CreateOrEditFieldInput();
         Object.assign(input, {
             id: this.isEdit ? this.item.id : undefined,
+            expectedCurrentRevisionNo: this.isEdit
+                ? this.expectedCurrentRevisionNo ?? this.item.currentRevisionNo
+                : undefined,
             sycObjectId: this.item.sycObjectId,
             entitySycObjectId: this.entityParentId ?? undefined,
-            selectedObjectTypeId: this.isEdit ? undefined : this.selectedObjectTypeId ?? undefined,
+            selectedObjectTypeId: this.isRevisionEdit
+                ? this.item.selectedObjectTypeId
+                : this.isEdit ? undefined : this.selectedObjectTypeId ?? undefined,
             fieldTypeId: fieldType.id!,
             widgetTypeId: this.item.widgetTypeId ?? undefined,
-            fieldLevelId: this.item.fieldLevelId,
-            fieldStatusId: this.item.fieldStatusId,
+            fieldLevelId: this.fieldManagerService.getFieldLevelId(this.fieldLevels, this.item.fieldLevelCode, this.item.fieldLevelId),
+            fieldStatusId: this.fieldManagerService.getFieldStatusId(this.fieldStatuses, this.item.fieldStatusCode, this.item.fieldStatusId),
             fieldName,
             description: this.item.description,
             fieldLevelCode: this.item.fieldLevelCode,
@@ -133,37 +176,24 @@ export class CreateOrEditFieldManagerComponent extends AppComponentBase implemen
             required: this.item.required,
             visible: this.item.visible,
             editable: this.item.editable,
-            extraAttributes: JSON.stringify({ ...this.extraAttributes, dropdownOptions: this.dropdownOptions })
+            extraAttributes: JSON.stringify({ ...this.extraAttributes, dropdownOptions: this.dropdownOptions }),
+            settingValues: this.item.settingValues
         });
 
-        //i51_BE-FE-Generate field code !! 
-        //i51_BE-FE- fieldType.id! default first one 
-        const codeSource = this.isEdit
-            ? of(this.item.fieldCode || '')
-            : this.fieldManagerService.previewFieldCode(fieldType.id!, fieldName, input.fieldLevelCode || '');
-        codeSource
-            .subscribe({
-                next: code => {
-                    input.fieldCode = code;
-                    //i51-BE-Define the expected behavior when two users attempt to create a new revision at the same time. If one user saves a revision number that has already been used by another user, the system should notify the second user and ask whether they want to continue with a different revision number or cancel the operation.
-                   
-                   //i51-BE-Validate the allowed entries. Please refer to the thread shared by Sam for further clarification: [Link].
-                      //i51_BE- CreateOrEditField
-                   this.fieldManagerService.createField(input).subscribe({
-                    next: savedField => {
-                        const revision = this.isEdit ? savedField.currentRevisionNo : undefined;
-                        this.notify.success(revision
-                            ? `Revision #${revision} saved successfully.`
-                            : (this.l('SavedSuccessfully') ?? 'Saved successfully'));
-                        this.saved.emit();
-                        this.initialFormState = this.getFormState();
-                        this.close();
-                    },
-                    error: () => this.notify.error('Could not save the field.')
-                    });
-                },
-                error: () => this.notify.error('Could not generate the field code.')
-            });
+        input.fieldCode = this.item.fieldCode;
+        this.fieldManagerService.createField(input).subscribe({
+            next: savedField => {
+                const revision = this.isEdit ? savedField.currentRevisionNo : undefined;
+                this.notify.success(revision
+                    ? `Revision #${revision} saved successfully.`
+                    : (this.l('SavedSuccessfully') ?? 'Saved successfully'));
+                this.item = savedField;
+                this.saved.emit(savedField);
+                this.initialFormState = this.getFormState();
+                this.close();
+            },
+            error: () => this.notify.error('Could not save the field.')
+        });
     }
 
     backToList(): void {
@@ -221,27 +251,25 @@ export class CreateOrEditFieldManagerComponent extends AppComponentBase implemen
     }
 
     generateCode(): void {
-        debugger;
-           //i51_BE-FE-Generate field code !! 
         if (this.isEdit)
             return;
 
         const request = ++this.codePreviewRequest;
         if (this.previewTimer) clearTimeout(this.previewTimer);
-        const name = this.item?.fieldName?.trim();
+        const name = this.item?.fieldName?.trim() || '';
         const level = this.item?.fieldLevelCode || '';
         const fieldTypeId = this.selectedFieldType?.id;
-        if (!name || !level || fieldTypeId == null) {
+        if (!level || fieldTypeId == null) {
             return;
         }
 
         this.previewTimer = setTimeout(() => {
-        //i51_BE-FE-set only fieldCodeSeq
-            this.fieldManagerService.previewFieldCode(fieldTypeId, name, level)
-                .subscribe({ next: code => { if (request === this.codePreviewRequest)
-                // this.item.code ? 
-         this.item.fieldCode = `${this.selectedFieldType?.code?.substring(0, 2)}${level?.substring(0, 1)}${name?.substring(0, 4)}${code}`;
-         } });
+            this.fieldManagerService.previewFieldCode(fieldTypeId)
+                .subscribe({ next: sequence => {
+                    if (request !== this.codePreviewRequest) return;
+                    const typeCode = this.selectedFieldType?.code || '';
+                    this.item.fieldCode = `${typeCode.substring(0, 2)}${level.substring(0, 1)}${name.substring(0, 4)}${sequence}`;
+                } });
         }, 250);
     }
 
@@ -263,17 +291,162 @@ export class CreateOrEditFieldManagerComponent extends AppComponentBase implemen
     }
 
     onFieldTypeChanged(typeId: number | undefined): void {
+        const typeChanged = this.item.fieldTypeId !== typeId;
         this.item.fieldTypeId = typeId || 0;
+        if (typeChanged) this.item.settingValues = [];
         if (!this.availableWidgets.some(widget => widget.id === this.item.widgetTypeId)) {
             this.item.widgetTypeId = undefined;
         }
+        if (this.item.fieldTypeId) this.loadFieldTypeSettings(this.item.fieldTypeId);
+        else {
+            ++this.fieldSettingsRequest;
+            this.fieldTypeSettings = [];
+            this.setDynamicFieldSettings([]);
+        }
         this.generateCode();
+    }
+
+    onDynamicSettingsChanged(values: any[]): void {
+        const incomingValues = values || [];
+        const incomingAttributeIds = new Set(incomingValues.map(value => value.attributeId));
+        const existingValues = (this.item.settingValues || []).filter(value =>
+            !incomingAttributeIds.has(value.settingFieldId)
+        );
+        const updatedValues = this.fieldManagerService.mapExtraAttributeValuesToSettings(
+            incomingValues,
+            this.fieldTypeSettings,
+            this.dynamicSettingsObject.value.filteredExtraAttributes
+        );
+
+        this.item.settingValues = [...existingValues, ...updatedValues];
+    }
+
+    get availableFieldLevels(): FieldLookupDto[] {
+        return this.fieldManagerService.getAvailableFieldLevels(
+            this.fieldLevels, this.isHost, this.isEdit, this.item.fieldLevelCode
+        );
+    }
+
+    private setFieldMetadata(metadata: FieldCreateOrEditMetadataDto): void {
+        this.fieldTypes = metadata.fieldTypes || [];
+        this.widgetTypes = metadata.widgetTypes || [];
+        this.fieldLevels = metadata.fieldLevels || [];
+        this.fieldStatuses = metadata.fieldStatuses || [];
+
+        this.fieldManagerService.syncFieldLookupIds(this.item, this.fieldLevels, this.fieldStatuses);
+        if (this.active && !this.isEdit) {
+            this.setCreateDefaults();
+            this.initialFormState = this.getFormState();
+            this.generateCode();
+        } else if (this.item.fieldTypeId) {
+            this.loadFieldTypeSettings(this.item.fieldTypeId);
+        }
+    }
+
+    private setCreateDefaults(): void {
+        const firstFieldType = this.fieldTypes[0];
+        const firstFieldLevel = this.availableFieldLevels[0];
+        const firstFieldStatus = this.fieldStatuses[0];
+
+        if (firstFieldType && this.item.fieldTypeId !== firstFieldType.id) {
+            this.item.settingValues = [];
+            this.item.fieldTypeId = firstFieldType.id || 0;
+        }
+        if (firstFieldLevel) this.fieldManagerService.setFieldLevel(this.item, firstFieldLevel.code || '', this.fieldLevels);
+        if (firstFieldStatus) this.fieldManagerService.setFieldStatus(this.item, firstFieldStatus.code || '', this.fieldStatuses);
+        if (this.item.fieldTypeId) this.loadFieldTypeSettings(this.item.fieldTypeId);
+    }
+
+    private loadFieldTypeSettings(fieldTypeId: number): void {
+        const request = ++this.fieldSettingsRequest;
+        this.sycEntityObjectTypesService.getAllWithExtraAttributes(fieldTypeId, ExtraAttributesSource.AppFields).subscribe({
+            next: objectTypes => {
+                if (request !== this.fieldSettingsRequest) return;
+                this.fieldTypeSettings = objectTypes?.[0]?.extraAttributes?.extraAttributes || [];
+                this.setDynamicFieldSettings(this.fieldTypeSettings);
+                this.loadFieldTypeSettingLookups(this.fieldTypeSettings, request);
+            },
+            error: () => {
+                if (request === this.fieldSettingsRequest) {
+                    this.fieldTypeSettings = [];
+                    this.setDynamicFieldSettings([]);
+                }
+            }
+        });
+    }
+
+    private setDynamicFieldSettings(settings: ExtraAttribute[]): void {
+        const savedValues = this.item.settingValues || [];
+        const attributes = settings.map(setting => {
+            const saved = savedValues.filter(value => value.settingFieldId === setting.attributeId);
+            const dataType = (setting.dataType || '').toLowerCase();
+            const savedSelections = saved.map(value => value.appFieldsOptionId ?? value.value ?? value.valueText ?? value.valueNumber ??
+                value.valueBoolean?.toString() ?? (value.valueDateTime ? value.valueDateTime.toDate() : undefined))
+                .map(value => {
+                    if (value == null) return value;
+                    if ((dataType.includes('date') || dataType.includes('time')) && (moment as any)(value).isValid()) {
+                        return (moment as any)(value).toDate();
+                    }
+                    return value;
+                })
+                .filter(value => value !== undefined && value !== null);
+            const isChips = dataType === 'chips';
+            const defaultSelections = isChips && typeof setting.defaultValue === 'string'
+                ? setting.defaultValue.split('|').map(value => value.trim()).filter(Boolean)
+                : setting.defaultValue;
+            const selectedValues = setting.acceptMultipleValues || isChips
+                ? (savedSelections.length ? savedSelections : [])
+                : (savedSelections[0] ?? defaultSelections);
+
+            return {
+                ...setting,
+                id: setting.attributeId,
+                selectedValues: selectedValues ?? (setting.acceptMultipleValues || isChips ? [] : ''),
+                paginationSetting: {
+                    skipCount: 0,
+                    maxResultCount: 10,
+                    totalCount: 0,
+                    list: []
+                }
+            };
+        });
+
+        this.dynamicSettingsObject = {
+            value: {
+                extraAttributes: attributes,
+                filteredExtraAttributes: attributes,
+                header: 'AdvancedInformation'
+            }
+        };
+    }
+
+    private loadFieldTypeSettingLookups(settings: ExtraAttribute[], request: number): void {
+        settings.filter(setting => setting.isLookup && setting.entityObjectTypeCode).forEach(setting => {
+            const entityObjectTypeCode = setting.entityObjectTypeCode;
+            if (!entityObjectTypeCode) return;
+            const attribute = this.dynamicSettingsObject.value.filteredExtraAttributes
+                .find((item: any) => item.attributeId === setting.attributeId);
+            this.extraAttributeDataService.getExtraAttributeLookupDataWithPaging(
+                entityObjectTypeCode,
+                0,
+                10
+            ).subscribe(result => {
+                if (request !== this.fieldSettingsRequest || !attribute) return;
+                attribute.paginationSetting.totalCount = result.totalCount;
+                attribute.paginationSetting.list = result.items || [];
+                if (attribute.paginationSetting.list.length < result.totalCount) {
+                    attribute.paginationSetting.list.push({ value: -1, label: this.l('showMore') });
+                }
+                attribute.paginationSetting.skipCount = 10;
+            });
+        });
     }
 
     private loadField(id: number): void {
         this.fieldManagerService.getFieldForEdit(id).subscribe({
             next: field => {
                 this.item = field;
+                this.fieldManagerService.syncFieldLookupIds(this.item, this.fieldLevels, this.fieldStatuses);
                 this.extraAttributes = {};
                 try { this.extraAttributes = JSON.parse(field.extraAttributes || '{}'); } catch (_) { this.extraAttributes = {}; }
                 if (!this.extraAttributes || typeof this.extraAttributes !== 'object' || Array.isArray(this.extraAttributes)) {
@@ -284,10 +457,10 @@ export class CreateOrEditFieldManagerComponent extends AppComponentBase implemen
                 this.dropdownOptions = Array.isArray(fieldOptions)
                     ? fieldOptions as { option: string; value: string }[]
                     : [];
+                if (this.item.fieldTypeId) this.loadFieldTypeSettings(this.item.fieldTypeId);
                 if (!this.fieldTypes.length) this.fieldManagerService.getFieldMetadata().subscribe({
                     next: metadata => {
-                        this.fieldTypes = metadata.fieldTypes || [];
-                        this.widgetTypes = metadata.widgetTypes || [];
+                        this.setFieldMetadata(metadata);
                     }
                 });
                 this.isEdit = true;

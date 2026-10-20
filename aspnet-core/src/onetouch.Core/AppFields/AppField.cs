@@ -61,6 +61,8 @@ namespace onetouch.AppFields
         public string TimeFormat { get; set; }
 
         public bool AllowMultiSelect { get; set; }
+        // Pipe-separated choices for a selectable setting, for example Manual|Automatic|Inquire.
+        public string ValidEntries { get; set; }
         public bool Required { get; set; }
         public bool Visible { get; set; }
         public bool Editable { get; set; }

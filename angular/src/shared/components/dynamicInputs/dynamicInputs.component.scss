@@ -22,6 +22,68 @@
     font-weight: 700;
 }
 
+.dynamic-attribute-field {
+  display: grid;
+  grid-template-columns: minmax(110px, 34%) minmax(0, 1fr);
+  align-items: center;
+  column-gap: 12px;
+  min-height: 44px;
+}
+
+.dynamic-attribute-label {
+  min-width: 0;
+  overflow-wrap: anywhere;
+}
+
+.dynamic-attribute-control {
+  min-width: 0;
+  width: 100%;
+}
+
+.dynamic-attribute-control > * {
+  min-width: 0;
+  max-width: 100%;
+}
+
+.dynamic-option-row {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto;
+  align-items: center;
+  gap: 16px;
+  width: 100%;
+}
+
+.dynamic-option-label,
+.dynamic-option-selected {
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.dynamic-option-value {
+  color: #6b6670;
+  font-size: 0.875rem;
+  text-align: right;
+  overflow-wrap: anywhere;
+}
+
+.dynamic-chips-control {
+  min-width: 0;
+  width: 100%;
+}
+
+::ng-deep .dynamic-chips,
+::ng-deep .dynamic-chips .p-chips-multiple-container {
+  width: 100%;
+}
+
+::ng-deep .dynamic-chips .p-chips-multiple-container {
+  min-height: 44px;
+  align-items: center;
+  gap: 4px;
+}
+
 .clear-action-icon {
   right: 10px;
   top: 15px;
@@ -47,11 +109,6 @@
     }
 }
 ::ng-deep {
-    .calWidth {
-        .p-calendar {
-            // width: 305px !important;
-        }
-    }
     .p-inputswitch.p-inputswitch-checked .p-inputswitch-slider {
         background-color: #2DC74F !important;
     }
@@ -188,6 +245,19 @@
 }
 
 ::ng-deep {
+  .dynamic-options-dropdown,
+  .dynamic-options-dropdown .p-dropdown {
+    width: 100%;
+  }
+
+  .dynamic-options-panel .p-dropdown-items .p-dropdown-item {
+    padding: 0.65rem 0.875rem;
+  }
+
+  .dynamic-options-panel .p-dropdown-items .p-dropdown-item .dynamic-option-value {
+    margin-left: auto;
+  }
+
   body .wide-drop-down .p-dropdown .p-dropdown-trigger {
     padding-right: 0 !important;
 }
@@ -225,6 +295,11 @@
 }
 
 @media screen and (max-width: 767px) {
+  .dynamic-attribute-field {
+    grid-template-columns: minmax(88px, 36%) minmax(0, 1fr);
+    column-gap: 8px;
+  }
+
     .upload-box {
         max-width: 100%;
     }

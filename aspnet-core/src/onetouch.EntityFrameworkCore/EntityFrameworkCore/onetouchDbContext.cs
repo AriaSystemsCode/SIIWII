@@ -304,32 +304,13 @@ namespace onetouch.EntityFrameworkCore
                 assignment.HasIndex(x => new { x.TenantId, x.FieldDefinitionKey, x.SycObjectId, x.SycEntityObjectTypeId })
                     .IsUnique().HasFilter(null);
             });
-            modelBuilder.Entity<AppFieldsOption>(option =>
-            {
-                option.Property(x => x.IsActive).HasDefaultValue(true);
-                option.HasOne<AppField>().WithMany().HasForeignKey(x => x.SettingFieldId)
-                    .OnDelete(DeleteBehavior.Restrict);
-                option.HasIndex(x => new { x.SettingFieldId, x.Code }).IsUnique();
-            });
             modelBuilder.Entity<AppFieldSettingValue>(value =>
             {
                 value.ToTable(table => table.HasCheckConstraint("CK_AppFieldSettingValues_OneValue",
-                    "(CASE WHEN [AppFieldsOptionId] IS NULL THEN 0 ELSE 1 END) + " +
-                    "(CASE WHEN [ValueText] IS NULL THEN 0 ELSE 1 END) + " +
-                    "(CASE WHEN [ValueNumber] IS NULL THEN 0 ELSE 1 END) + " +
-                    "(CASE WHEN [ValueBoolean] IS NULL THEN 0 ELSE 1 END) + " +
-                    "(CASE WHEN [ValueDateTime] IS NULL THEN 0 ELSE 1 END) = 1"));
+                    "[Value] IS NOT NULL"));
                 value.HasOne<AppField>().WithMany().HasForeignKey(x => x.SettingFieldId)
                     .OnDelete(DeleteBehavior.Restrict);
-                value.HasOne<AppFieldsOption>().WithMany()
-                    .HasForeignKey(x => new { x.SettingFieldId, x.AppFieldsOptionId })
-                    .HasPrincipalKey(x => new { x.SettingFieldId, x.Id })
-                    .HasConstraintName("FK_AppFieldSettingValues_SettingOption")
-                    .OnDelete(DeleteBehavior.Restrict);
-                value.HasIndex(x => new { x.AppFieldId, x.SettingFieldId })
-                    .IsUnique().HasFilter("[AppFieldsOptionId] IS NULL");
-                value.HasIndex(x => new { x.AppFieldId, x.SettingFieldId, x.AppFieldsOptionId })
-                    .IsUnique().HasFilter("[AppFieldsOptionId] IS NOT NULL");
+                value.HasIndex(x => new { x.AppFieldId, x.SettingFieldId });
             });
             modelBuilder.Entity<AppFieldHistorySettingValue>().HasIndex(x => x.AppFieldHistoryId);
             modelBuilder.Entity<AppTableFieldSettingValue>().HasIndex(x => x.AppTableFieldId);

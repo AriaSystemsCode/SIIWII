@@ -195,7 +195,6 @@ export class uploadStatusComponent extends AppComponentBase implements OnInit, O
   }
 
   GoNextstep() {
-    debugger
     var _text = "";
     _text = "All " + ImportTypes[this.importType] + " Failed , can not import.";
 

@@ -3070,50 +3070,21 @@ namespace onetouch.Migrations
                         });
                 });
 
-            modelBuilder.Entity("onetouch.AppFields.AppFieldsOption", b =>
-                {
-                    b.Property<long>("Id").ValueGeneratedOnAdd().HasColumnType("bigint");
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<long>("Id"));
-                    b.Property<string>("Code").IsRequired().HasMaxLength(100).HasColumnType("nvarchar(100)");
-                    b.Property<bool>("IsActive").ValueGeneratedOnAdd().HasColumnType("bit").HasDefaultValue(true);
-                    b.Property<string>("Name").IsRequired().HasMaxLength(500).HasColumnType("nvarchar(500)");
-                    b.Property<long>("SettingFieldId").HasColumnType("bigint");
-                    b.Property<int>("SortOrder").HasColumnType("int");
-                    b.Property<int?>("TenantId").HasColumnType("int");
-                    b.HasKey("Id");
-                    b.HasAlternateKey("SettingFieldId", "Id");
-                    b.HasIndex("SettingFieldId", "Code").IsUnique();
-                    b.ToTable("AppFieldsOptions");
-                });
-
             modelBuilder.Entity("onetouch.AppFields.AppFieldSettingValue", b =>
                 {
                     b.Property<long>("Id").ValueGeneratedOnAdd().HasColumnType("bigint");
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<long>("Id"));
                     b.Property<long>("AppFieldId").HasColumnType("bigint");
-                    b.Property<long?>("AppFieldsOptionId").HasColumnType("bigint");
-                    b.Property<string>("OptionCode").HasMaxLength(100).HasColumnType("nvarchar(100)");
-                    b.Property<string>("OptionName").HasMaxLength(500).HasColumnType("nvarchar(500)");
                     b.Property<string>("SettingFieldCode").IsRequired().HasMaxLength(11).HasColumnType("nvarchar(11)");
                     b.Property<long>("SettingFieldId").HasColumnType("bigint");
                     b.Property<string>("SettingFieldName").IsRequired().HasMaxLength(250).HasColumnType("nvarchar(250)");
                     b.Property<int?>("TenantId").HasColumnType("int");
-                    b.Property<bool?>("ValueBoolean").HasColumnType("bit");
-                    b.Property<DateTime?>("ValueDateTime").HasColumnType("datetime2");
-                    b.Property<decimal?>("ValueNumber").HasColumnType("decimal(18,6)");
-                    b.Property<string>("ValueText").HasMaxLength(2000).HasColumnType("nvarchar(2000)");
+                    b.Property<string>("Value").HasMaxLength(2000).HasColumnType("nvarchar(2000)");
                     b.HasKey("Id");
-                    b.HasIndex("AppFieldId", "SettingFieldId").IsUnique().HasFilter("[AppFieldsOptionId] IS NULL");
-                    b.HasIndex("AppFieldId", "SettingFieldId", "AppFieldsOptionId").IsUnique()
-                        .HasFilter("[AppFieldsOptionId] IS NOT NULL");
-                    b.HasIndex("SettingFieldId", "AppFieldsOptionId");
+                    b.HasIndex("AppFieldId", "SettingFieldId");
                     b.HasIndex("SettingFieldId");
                     b.ToTable("AppFieldSettingValues", t => t.HasCheckConstraint("CK_AppFieldSettingValues_OneValue",
-                        "(CASE WHEN [AppFieldsOptionId] IS NULL THEN 0 ELSE 1 END) + " +
-                        "(CASE WHEN [ValueText] IS NULL THEN 0 ELSE 1 END) + " +
-                        "(CASE WHEN [ValueNumber] IS NULL THEN 0 ELSE 1 END) + " +
-                        "(CASE WHEN [ValueBoolean] IS NULL THEN 0 ELSE 1 END) + " +
-                        "(CASE WHEN [ValueDateTime] IS NULL THEN 0 ELSE 1 END) = 1"));
+                        "[Value] IS NOT NULL"));
                 });
 
             modelBuilder.Entity("onetouch.AppFields.AppFieldHistorySettingValue", b =>
@@ -3121,16 +3092,10 @@ namespace onetouch.Migrations
                     b.Property<long>("Id").ValueGeneratedOnAdd().HasColumnType("bigint");
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<long>("Id"));
                     b.Property<long>("AppFieldHistoryId").HasColumnType("bigint");
-                    b.Property<long?>("AppFieldsOptionId").HasColumnType("bigint");
-                    b.Property<string>("OptionCode").HasMaxLength(100).HasColumnType("nvarchar(100)");
-                    b.Property<string>("OptionName").HasMaxLength(500).HasColumnType("nvarchar(500)");
                     b.Property<string>("SettingFieldCode").IsRequired().HasMaxLength(11).HasColumnType("nvarchar(11)");
                     b.Property<long>("SettingFieldId").HasColumnType("bigint");
                     b.Property<string>("SettingFieldName").IsRequired().HasMaxLength(250).HasColumnType("nvarchar(250)");
-                    b.Property<bool?>("ValueBoolean").HasColumnType("bit");
-                    b.Property<DateTime?>("ValueDateTime").HasColumnType("datetime2");
-                    b.Property<decimal?>("ValueNumber").HasColumnType("decimal(18,6)");
-                    b.Property<string>("ValueText").HasMaxLength(2000).HasColumnType("nvarchar(2000)");
+                    b.Property<string>("Value").HasMaxLength(2000).HasColumnType("nvarchar(2000)");
                     b.HasKey("Id");
                     b.HasIndex("AppFieldHistoryId");
                     b.ToTable("AppFieldHistorySettingValues");
@@ -3141,16 +3106,10 @@ namespace onetouch.Migrations
                     b.Property<long>("Id").ValueGeneratedOnAdd().HasColumnType("bigint");
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<long>("Id"));
                     b.Property<long>("AppTableFieldId").HasColumnType("bigint");
-                    b.Property<long?>("AppFieldsOptionId").HasColumnType("bigint");
-                    b.Property<string>("OptionCode").HasMaxLength(100).HasColumnType("nvarchar(100)");
-                    b.Property<string>("OptionName").HasMaxLength(500).HasColumnType("nvarchar(500)");
                     b.Property<string>("SettingFieldCode").IsRequired().HasMaxLength(11).HasColumnType("nvarchar(11)");
                     b.Property<long>("SettingFieldId").HasColumnType("bigint");
                     b.Property<string>("SettingFieldName").IsRequired().HasMaxLength(250).HasColumnType("nvarchar(250)");
-                    b.Property<bool?>("ValueBoolean").HasColumnType("bit");
-                    b.Property<DateTime?>("ValueDateTime").HasColumnType("datetime2");
-                    b.Property<decimal?>("ValueNumber").HasColumnType("decimal(18,6)");
-                    b.Property<string>("ValueText").HasMaxLength(2000).HasColumnType("nvarchar(2000)");
+                    b.Property<string>("Value").HasMaxLength(2000).HasColumnType("nvarchar(2000)");
                     b.HasKey("Id");
                     b.HasIndex("AppTableFieldId");
                     b.ToTable("AppTableFieldSettingValues");
@@ -3166,6 +3125,8 @@ namespace onetouch.Migrations
 
                     b.Property<bool>("AllowMultiSelect")
                         .HasColumnType("bit");
+
+                    b.Property<string>("ValidEntries").HasColumnType("nvarchar(max)");
 
                     b.Property<bool>("AllowNull")
                         .HasColumnType("bit");
@@ -3344,6 +3305,7 @@ namespace onetouch.Migrations
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<long>("Id"));
 
                     b.Property<bool>("AllowMultiSelect").HasColumnType("bit");
+                    b.Property<string>("ValidEntries").HasColumnType("nvarchar(max)");
                     b.Property<bool>("AllowNull").HasColumnType("bit");
                     b.Property<long>("AppFieldId")
                         .HasColumnType("bigint");
@@ -3433,6 +3395,7 @@ namespace onetouch.Migrations
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<long>("Id"));
                     b.Property<string>("AppliedRevisionNo").IsRequired().HasMaxLength(10).HasColumnType("nvarchar(10)");
                     b.Property<bool>("AllowMultiSelect").HasColumnType("bit");
+                    b.Property<string>("ValidEntries").HasColumnType("nvarchar(max)");
                     b.Property<bool>("AllowNull").HasColumnType("bit");
                     b.Property<DateTime>("CreationTime").HasColumnType("datetime2");
                     b.Property<long?>("CreatorUserId").HasColumnType("bigint");
@@ -9386,23 +9349,12 @@ namespace onetouch.Migrations
                         .OnDelete(DeleteBehavior.Restrict);
                 });
 
-            modelBuilder.Entity("onetouch.AppFields.AppFieldsOption", b =>
-                {
-                    b.HasOne("onetouch.AppFields.AppField", null).WithMany()
-                        .HasForeignKey("SettingFieldId").OnDelete(DeleteBehavior.Restrict).IsRequired();
-                });
-
             modelBuilder.Entity("onetouch.AppFields.AppFieldSettingValue", b =>
                 {
                     b.HasOne("onetouch.AppFields.AppField", null).WithMany("SettingValues")
                         .HasForeignKey("AppFieldId").OnDelete(DeleteBehavior.Cascade).IsRequired();
                     b.HasOne("onetouch.AppFields.AppField", null).WithMany()
                         .HasForeignKey("SettingFieldId").OnDelete(DeleteBehavior.Restrict).IsRequired();
-                    b.HasOne("onetouch.AppFields.AppFieldsOption", null).WithMany()
-                        .HasForeignKey("SettingFieldId", "AppFieldsOptionId")
-                        .HasPrincipalKey("SettingFieldId", "Id")
-                        .HasConstraintName("FK_AppFieldSettingValues_SettingOption")
-                        .OnDelete(DeleteBehavior.Restrict);
                 });
 
             modelBuilder.Entity("onetouch.AppFields.AppFieldHistory", b =>

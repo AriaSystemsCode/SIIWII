@@ -43,6 +43,7 @@ namespace onetouch.AppFields
         [StringLength(100)] public string DateFormat { get; set; }
         [StringLength(100)] public string TimeFormat { get; set; }
         public bool AllowMultiSelect { get; set; }
+        public string ValidEntries { get; set; }
         public bool Required { get; set; }
         public bool Visible { get; set; }
         public bool Editable { get; set; }
@@ -94,6 +95,7 @@ namespace onetouch.AppFields
             DateFormat = field.DateFormat;
             TimeFormat = field.TimeFormat;
             AllowMultiSelect = field.AllowMultiSelect;
+            ValidEntries = field.ValidEntries;
             Required = field.Required;
             Visible = field.Visible;
             Editable = field.Editable;
@@ -114,13 +116,7 @@ namespace onetouch.AppFields
                     SettingFieldId = value.SettingFieldId,
                     SettingFieldCode = value.SettingFieldCode,
                     SettingFieldName = value.SettingFieldName,
-                    AppFieldsOptionId = value.AppFieldsOptionId,
-                    OptionCode = value.OptionCode,
-                    OptionName = value.OptionName,
-                    ValueText = value.ValueText,
-                    ValueNumber = value.ValueNumber,
-                    ValueBoolean = value.ValueBoolean,
-                    ValueDateTime = value.ValueDateTime
+                    Value = value.Value
                 });
             FieldCreationTime = field.CreationTime;
             FieldCreatorUserId = field.CreatorUserId;
@@ -162,6 +158,7 @@ namespace onetouch.AppFields
                 DateFormat = DateFormat,
                 TimeFormat = TimeFormat,
                 AllowMultiSelect = AllowMultiSelect,
+                ValidEntries = ValidEntries,
                 Required = Required,
                 Visible = Visible,
                 Editable = Editable,
@@ -182,13 +179,7 @@ namespace onetouch.AppFields
                     SettingFieldId = x.SettingFieldId,
                     SettingFieldCode = x.SettingFieldCode,
                     SettingFieldName = x.SettingFieldName,
-                    AppFieldsOptionId = x.AppFieldsOptionId,
-                    OptionCode = x.OptionCode,
-                    OptionName = x.OptionName,
-                    ValueText = x.ValueText,
-                    ValueNumber = x.ValueNumber,
-                    ValueBoolean = x.ValueBoolean,
-                    ValueDateTime = x.ValueDateTime
+                    Value = x.Value
                 }).ToList(),
                 CreationTime = FieldCreationTime,
                 CreatorUserId = FieldCreatorUserId,
