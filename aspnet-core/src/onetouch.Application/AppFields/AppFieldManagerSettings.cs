@@ -33,6 +33,8 @@ namespace onetouch.AppFields
                     FieldName = x.FieldName,
                     ValueTypeId = x.FieldTypeId,
                     ValueTypeCode = typeCodes.TryGetValue(x.FieldTypeId, out var code) ? code : null,
+                    DataType = x.SourceDataType ?? (typeCodes.TryGetValue(x.FieldTypeId, out var dataTypeCode)
+                        ? SettingDataType(dataTypeCode) : null),
                     DefaultValue = x.DefaultValue,
                     Required = x.Required,
                     AllowMultiSelect = x.AllowMultiSelect,
@@ -71,6 +73,15 @@ namespace onetouch.AppFields
 
         private static List<string> ParseValidEntries(string text) =>
             string.IsNullOrEmpty(text) ? new List<string>() : text.Split('|').ToList();
+
+        private static string SettingDataType(string typeCode) => typeCode switch
+        {
+            "BOOLEAN" => "boolean",
+            "DP" => "Datetime",
+            "IN" or "IC" => "Numeric",
+            "LD" or "SD" => "dropDownList",
+            _ => "string"
+        };
 
         private static string NormalizeValidEntries(string text)
         {

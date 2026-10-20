@@ -65,6 +65,7 @@ namespace onetouch.AppFields.Dto
         public string FieldName { get; set; }
         public long ValueTypeId { get; set; }
         public string ValueTypeCode { get; set; }
+        public string DataType { get; set; }
         public string DefaultValue { get; set; }
         public bool Required { get; set; }
         public bool AllowMultiSelect { get; set; }
@@ -141,6 +142,8 @@ namespace onetouch.AppFields.Dto
 
     public class AppFieldDto : CreateOrEditFieldInput
     {
+        // Populated only when CreateOrEditField rejects a revision without saving.
+        public FieldRevisionErrorDto Error { get; set; }
         public Guid FieldDefinitionKey { get; set; }
         public int? TenantId { get; set; }
         public long? SourceFieldId { get; set; }
@@ -157,6 +160,16 @@ namespace onetouch.AppFields.Dto
         public bool IsDeleted { get; set; }
         public long? DeleterUserId { get; set; }
         public DateTime? DeletionTime { get; set; }
+    }
+
+    public class FieldRevisionErrorDto
+    {
+        public int Code { get; set; }
+        public string Message { get; set; }
+        public string ConflictingRevisionNo { get; set; }
+        public string ExpectedNewRevisionNo { get; set; }
+        public long CurrentFieldId { get; set; }
+        public bool RevisionAlreadyExists { get; set; }
     }
 
     public class AppFieldListDto
@@ -186,6 +199,7 @@ namespace onetouch.AppFields.Dto
         public string CreatorUserName { get; set; }
         public DateTime CreationTime { get; set; }
         public List<string> Tables { get; set; } = new List<string>();
+        public List<FieldSettingValueDto> SettingValues { get; set; } = new List<FieldSettingValueDto>();
     }
 
     public class FieldEditPermissionDto

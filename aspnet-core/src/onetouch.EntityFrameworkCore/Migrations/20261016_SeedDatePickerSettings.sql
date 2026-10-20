@@ -83,7 +83,7 @@ BEGIN TRY
     INSERT #SeedDatePickerSettings (Ordinal, FieldName, TypeCode, [Section], AllowNull, Required, DefaultValue)
     VALUES
         (1, N'AllowNull',    N'BOOLEAN', N'AdvancedInformation', 0, 1, N'false'),
-        (2, N'DateFormat',   N'ST',      N'AdvancedInformation', 1, 0, NULL),
+        (2, N'DateFormat',   N'SD',      N'AdvancedInformation', 1, 0, NULL),
         (3, N'DefaultValue', N'DP',      N'AdvancedInformation', 1, 0, NULL),
         (4, N'Required',     N'BOOLEAN', N'AdvancedInformation', 0, 1, N'false'),
         (5, N'Visible',      N'BOOLEAN', N'ExtraAttributes',     0, 1, N'true');
@@ -137,7 +137,7 @@ BEGIN TRY
          FieldLevelCode, FieldStatusCode, TrackingNo, CurrentRevisionNo,
          IsStandard, IsExtraField, IsHidden, AllowNull, [Length], Decimals,
          DefaultValue, DateFormat, TimeFormat, AllowMultiSelect, Required, Visible,
-         Editable, Usage, CreationTime, CreatorUserId, LastModificationTime,
+         Editable, SourceDataType, Usage, CreationTime, CreatorUserId, LastModificationTime,
          LastModifierUserId, IsDeleted, DeleterUserId, DeletionTime)
     SELECT NULL, NULL, @fieldObjectId, @dateTypeId,
            LEFT(m.TypeCode, 2) + N'S' + LEFT(UPPER(m.FieldName) + N'____', 4)
@@ -145,7 +145,9 @@ BEGIN TRY
            m.FieldName, N'Field Manager Date--Date picker ' + m.[Section] + N' setting',
            m.FieldTypeId, NULL, NULL, NULL, N'System', N'Active', NULL, N'00',
            1, 0, 0, m.AllowNull, NULL, NULL, m.DefaultValue,
-           NULL, NULL, 0, m.Required, 1, 1, N'FieldManager.' + m.[Section],
+           NULL, NULL, 0, m.Required, 1, 1,
+           CASE WHEN m.FieldName = N'DateFormat' THEN N'dropDownList' ELSE NULL END,
+           N'FieldManager.' + m.[Section],
            SYSUTCDATETIME(), NULL, NULL, NULL, 0, NULL, NULL
     FROM #MissingDatePickerSettings m;
 
@@ -287,7 +289,7 @@ END CATCH;
 SELECT (SELECT COUNT(*) FROM dbo.AppFields f
         JOIN dbo.SydObjects o ON o.Id = f.SycObjectId
         JOIN dbo.SycEntityObjectTypes t ON t.Id = f.FieldTypeId
-        JOIN (VALUES (N'AllowNull',N'BOOLEAN'), (N'DateFormat',N'ST'),
+        JOIN (VALUES (N'AllowNull',N'BOOLEAN'), (N'DateFormat',N'SD'),
                      (N'DefaultValue',N'DP'), (N'Required',N'BOOLEAN'),
                      (N'Visible',N'BOOLEAN')) s(FieldName,TypeCode)
           ON s.FieldName = f.FieldName AND s.TypeCode = t.Code

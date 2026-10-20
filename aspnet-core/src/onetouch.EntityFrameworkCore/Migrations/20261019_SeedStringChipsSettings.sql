@@ -88,12 +88,14 @@ BEGIN TRY
          DefaultValue, AllowNull, Required)
     VALUES
         (1, N'hasOptions', N'BOOLEAN', @booleanTypeId, N'boolean', N'false', 0, 1),
-        (2, N'OptionsList', N'ST', @stringTypeId, N'string', NULL, 1, 0);
+        (2, N'OptionsList', N'SC', @chipsTypeId, N'string', NULL, 1, 0);
 
     IF EXISTS (SELECT 1 FROM #ChipsSettings s JOIN dbo.AppFields f
         ON f.SycObjectId = @fieldObjectId AND f.EntitySycObjectId = @chipsTypeId
        AND f.TenantId IS NULL AND f.FieldName = s.FieldName AND f.IsDeleted = 0
-        WHERE f.FieldTypeId <> s.FieldTypeId OR f.FieldLevelCode <> N'System'
+        WHERE (f.FieldTypeId <> s.FieldTypeId
+           AND NOT (s.FieldName = N'OptionsList' AND f.FieldTypeId = @stringTypeId))
+           OR f.FieldLevelCode <> N'System'
            OR f.IsStandard <> 1 OR f.IsExtraField <> 0)
         THROW 51506, 'An existing String--Chips setting definition conflicts with the seed.', 1;
     IF EXISTS (SELECT 1 FROM #ChipsSettings s JOIN dbo.AppFields f
@@ -101,6 +103,43 @@ BEGIN TRY
        AND f.TenantId IS NULL AND f.FieldName = s.FieldName AND f.IsDeleted = 0
         GROUP BY s.FieldName HAVING COUNT(*) > 1)
         THROW 51507, 'String--Chips has duplicate active setting definitions.', 1;
+
+    -- Existing databases seeded OptionsList as String--Textbox. Promote that
+    -- definition to String--Chips as a new revision without changing its code.
+    CREATE TABLE #ChangedChipsSettings
+    (
+        AppFieldId bigint NOT NULL PRIMARY KEY,
+        RevisionNo nvarchar(10) COLLATE DATABASE_DEFAULT NOT NULL
+    );
+    IF EXISTS (SELECT 1 FROM dbo.AppFields f
+        WHERE f.SycObjectId = @fieldObjectId AND f.EntitySycObjectId = @chipsTypeId
+          AND f.TenantId IS NULL AND f.FieldName = N'OptionsList'
+          AND f.FieldTypeId = @stringTypeId AND f.IsDeleted = 0
+          AND (TRY_CONVERT(int, f.CurrentRevisionNo) IS NULL
+               OR TRY_CONVERT(int, f.CurrentRevisionNo) >= 999999999))
+        THROW 51515, 'OptionsList has an invalid or exhausted revision number.', 1;
+    IF EXISTS (SELECT 1 FROM dbo.AppFields f
+        JOIN dbo.AppFieldsHistory h ON h.AppFieldId = f.Id
+        WHERE f.SycObjectId = @fieldObjectId AND f.EntitySycObjectId = @chipsTypeId
+          AND f.TenantId IS NULL AND f.FieldName = N'OptionsList'
+          AND f.FieldTypeId = @stringTypeId AND f.IsDeleted = 0
+          AND h.RevisionNo = CASE
+              WHEN TRY_CONVERT(int, f.CurrentRevisionNo) + 1 < 10 THEN N'0'
+              ELSE N'' END + CONVERT(nvarchar(10), TRY_CONVERT(int, f.CurrentRevisionNo) + 1))
+        THROW 51516, 'The next OptionsList revision already exists.', 1;
+
+    UPDATE f SET
+        FieldTypeId = @chipsTypeId,
+        CurrentRevisionNo = CASE
+            WHEN TRY_CONVERT(int, f.CurrentRevisionNo) + 1 < 10 THEN N'0'
+            ELSE N'' END + CONVERT(nvarchar(10), TRY_CONVERT(int, f.CurrentRevisionNo) + 1),
+        LastModificationTime = SYSUTCDATETIME()
+    OUTPUT inserted.Id, inserted.CurrentRevisionNo
+        INTO #ChangedChipsSettings(AppFieldId, RevisionNo)
+    FROM dbo.AppFields AS f
+    WHERE f.SycObjectId = @fieldObjectId AND f.EntitySycObjectId = @chipsTypeId
+      AND f.TenantId IS NULL AND f.FieldName = N'OptionsList'
+      AND f.FieldTypeId = @stringTypeId AND f.IsDeleted = 0;
 
     ;WITH Missing AS
     (
@@ -191,6 +230,19 @@ BEGIN TRY
         WHERE matches.Cnt <> 1)
         THROW 51511, 'Expected one String--Chips assignment per setting.', 1;
 
+    UPDATE a SET
+        FieldTypeId = f.FieldTypeId,
+        AppliedRevisionNo = f.CurrentRevisionNo
+    FROM dbo.AppTableFields a
+    JOIN dbo.AppFields f ON f.FieldDefinitionKey = a.FieldDefinitionKey
+    WHERE a.TenantId IS NULL AND a.SycObjectId = @fieldObjectId
+      AND a.SycEntityObjectTypeId = @chipsTypeId
+      AND f.TenantId IS NULL AND f.SycObjectId = @fieldObjectId
+      AND f.EntitySycObjectId = @chipsTypeId AND f.FieldName = N'OptionsList'
+      AND f.IsDeleted = 0
+      AND (a.FieldTypeId <> f.FieldTypeId
+           OR a.AppliedRevisionNo <> f.CurrentRevisionNo);
+
     DECLARE @historyColumns nvarchar(max), @historyValues nvarchar(max), @historySql nvarchar(max);
     SELECT @historyColumns = STRING_AGG(CAST(QUOTENAME(c.name) AS nvarchar(max)), N',')
                WITHIN GROUP (ORDER BY c.column_id),
@@ -201,8 +253,12 @@ BEGIN TRY
     WHERE c.object_id = OBJECT_ID(N'dbo.AppFields') AND c.name <> N'Id';
     SET @historySql = N'INSERT dbo.AppFieldsHistory
         (AppFieldId, RevisionNo, ChangeType, ChangedAt, ' + @historyColumns + N')
-    SELECT f.Id, f.CurrentRevisionNo, N''Create'', SYSUTCDATETIME(), ' + @historyValues + N'
-    FROM dbo.AppFields f WHERE f.SycObjectId = @objectId
+    SELECT f.Id, f.CurrentRevisionNo,
+           CASE WHEN changed.AppFieldId IS NULL THEN N''Create'' ELSE N''Edit'' END,
+           SYSUTCDATETIME(), ' + @historyValues + N'
+    FROM dbo.AppFields f
+    LEFT JOIN #ChangedChipsSettings changed ON changed.AppFieldId = f.Id
+    WHERE f.SycObjectId = @objectId
       AND f.EntitySycObjectId = @typeId AND f.TenantId IS NULL AND f.IsDeleted = 0
       AND f.FieldName IN (N''hasOptions'', N''OptionsList'')
       AND NOT EXISTS (SELECT 1 FROM dbo.AppFieldsHistory h
@@ -268,6 +324,7 @@ BEGIN TRY
     END;
 
     DROP TABLE #MissingChipsSettings;
+    DROP TABLE #ChangedChipsSettings;
     DROP TABLE #ChipsSettings;
     COMMIT TRANSACTION;
 END TRY

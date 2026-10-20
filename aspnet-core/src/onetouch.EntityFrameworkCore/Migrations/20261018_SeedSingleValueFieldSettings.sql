@@ -82,3 +82,19 @@ JOIN dbo.SydObjects AS fieldObject ON fieldObject.Id = setting.SycObjectId
 WHERE fieldType.Code = N'DP' AND fieldObject.Code = N'FIELD'
   AND setting.FieldName = N'DateFormat' AND setting.TenantId IS NULL
   AND setting.IsDeleted = 0 AND setting.ValidEntries IS NULL;
+
+-- Keep the applied Field Manager definition self-contained for extra-attribute APIs.
+UPDATE assignment
+SET assignment.ValidEntries = setting.ValidEntries,
+    assignment.SourceDataType = N'dropDownList'
+FROM dbo.AppTableFields AS assignment
+JOIN dbo.AppFields AS setting
+  ON setting.FieldDefinitionKey = assignment.FieldDefinitionKey
+JOIN dbo.SycEntityObjectTypes AS ownerType
+  ON ownerType.Id = setting.EntitySycObjectId
+JOIN dbo.SydObjects AS fieldObject ON fieldObject.Id = setting.SycObjectId
+WHERE ownerType.Code = N'DP' AND fieldObject.Code = N'FIELD'
+  AND setting.FieldName = N'DateFormat' AND setting.TenantId IS NULL
+  AND setting.IsDeleted = 0 AND assignment.TenantId IS NULL
+  AND (ISNULL(assignment.ValidEntries, N'') <> ISNULL(setting.ValidEntries, N'')
+       OR ISNULL(assignment.SourceDataType, N'') <> N'dropDownList');

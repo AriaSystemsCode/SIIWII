@@ -67,6 +67,7 @@ namespace onetouch.Migrations.Seed.Host
                 "20261002_SeedTransactionHeaderFields.sql",
                 "20261013_SeedTransactionDetailFields.sql",
                 "20261014_SeedStringTextboxSettings.sql",
+                "20261020_SeedStringDropdownDateFormat.sql",
                 "20261016_SeedDatePickerSettings.sql",
                 "20261016_SetDatePickerExtraAttributes.sql",
                 "20261016_SeedRemainingFieldTypeSettings.sql",
