@@ -177,10 +177,10 @@ public static class Program
 
 public static class SeedRelease
 {
-    // Increment only when the cumulative seed snapshot changes. Version 11
-    // enables multiple DropdownOptions selections for List--Dropdown fields.
+    // Increment only when the cumulative seed snapshot changes. Version 12
+    // applies String--Chips and String--dropDownList type/setting updates.
     // This is not an EF schema version.
-    public const int RequiredVersion = 11;
+    public const int RequiredVersion = 12;
 }
 
 public sealed record Target(string Label, string ConnectionString, string Identity)
