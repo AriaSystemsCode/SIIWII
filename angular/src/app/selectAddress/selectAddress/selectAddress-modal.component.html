@@ -22,7 +22,9 @@
                     <p>{{'Please select from the saved addresses below.' | localize}}</p>
                     <div class="form-group has-search">
                         <i  class="form-control-icon-search flaticon-search" ></i>
-                        <input type="text" (change)="onChangeSearch($event)" class="form-control bg-white form-control-sm aria-input-text" id="colFormLabelSm"
+                        <input type="text"     (input)="onChangeSearch($event)"
+    (keydown.enter)="$event.preventDefault()"
+ class="form-control bg-white form-control-sm aria-input-text" id="colFormLabelSm"
                             placeholder="{{'looking in company Address…'|localize}}">
                     </div>
                     <button  style="position: absolute;top: 8px; width: 70px;" [ngStyle]="isArabic ? {'left':'0'} : {'right':'0'}" type="button" class="close" (click)="cancel()"
