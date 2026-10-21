@@ -1306,7 +1306,6 @@ private preparePrintUrl(url: string): string {
 
 private delay(ms: number) { return new Promise<void>(r => setTimeout(r, ms)); }
 
-/** Calls BE for role info, creates the viewer, and resolves with the viewer ref once the BE call succeeded and the viewer is created. */
 private startReportForPrint(): Promise<ComponentRef<ReportViewerComponent>> {
   return new Promise((resolve, reject) => {
     this.printInfoParam = new ProductCatalogueReportParams();
