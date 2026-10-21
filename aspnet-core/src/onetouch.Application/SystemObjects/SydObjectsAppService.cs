@@ -493,7 +493,11 @@ namespace onetouch.SystemObjects
                             var sectionEntity = await _appEntityRepository.GetAll().Where(z => z.Id == long.Parse(sectionTypeExtraDate.AttributeValueId.ToString())).FirstOrDefaultAsync();
                             if (sectionEntity != null)
                             {
-                                item.Type = (SliderEnum)Enum.Parse(typeof(SliderEnum), sectionEntity.Code);
+                                try
+                                {
+                                    item.Type = (SliderEnum)Enum.Parse(typeof(SliderEnum), sectionEntity.Code);
+                                }
+                                catch { }
                                 
                             }
                         }
@@ -501,7 +505,11 @@ namespace onetouch.SystemObjects
                         var sectionBlockTypeExtraDate = section.EntityExtraData.FirstOrDefault(z => z.AttributeId == 1009);
                         if (sectionBlockTypeExtraDate != null && !string.IsNullOrEmpty(sectionBlockTypeExtraDate.AttributeValue))   
                         {
-                            item.BlockTypeIsSingleOrMixed = sectionBlockTypeExtraDate.AttributeValue;
+                            try
+                            {
+                                item.BlockTypeIsSingleOrMixed = sectionBlockTypeExtraDate.AttributeValue;
+                            }
+                            catch { }
                         }
                         item.Name = section.Name;
                         item.Description = section.Name;
