@@ -1020,3 +1020,52 @@ input[type='password']::-webkit-contacts-auto-fill-button {
     background-position: center;
     background-size: contain;
 }
+
+
+
+
+.clear-data-confirm-dialog {
+
+    .p-dialog-header {
+        padding: 1.25rem 1.5rem;
+        border-bottom: 1px solid #edf0f4;
+
+        .p-dialog-title {
+            font-size: 17px;
+            font-weight: 600;
+            color: #252b37;
+        }
+    }
+
+    .p-dialog-content {
+        padding: 1.5rem;
+        display: flex;
+        align-items: flex-start;
+        gap: 14px;
+        line-height: 1.6;
+        color: #555;
+        font-size: 14px;
+
+        .p-confirm-dialog-icon {
+            color: #e67e22;
+            font-size: 25px;
+        }
+    }
+
+    .p-dialog-footer {
+        padding: 1rem 1.5rem;
+        border-top: 1px solid #edf0f4;
+
+        button {
+            border-radius: 7px;
+            font-weight: 500;
+            padding: 9px 18px;
+        }
+    }
+
+    .p-button-transparent {
+        background: transparent !important;
+    border: 1px solid gainsboro !important;
+    color:#4A0D4A !important;
+    }
+}

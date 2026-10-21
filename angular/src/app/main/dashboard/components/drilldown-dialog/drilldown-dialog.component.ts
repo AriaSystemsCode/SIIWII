@@ -1,4 +1,4 @@
-import { Component, EventEmitter, Input, OnChanges, Output, ViewEncapsulation } from '@angular/core';
+import { Component, EventEmitter, Input, OnChanges, Output, SimpleChanges, ViewEncapsulation } from '@angular/core';
 
 @Component({
     selector: 'app-drilldown-dialog',
@@ -15,11 +15,32 @@ export class DrilldownDialogComponent implements OnChanges {
 
     columns: string[] = [];
 
-    ngOnChanges(): void {
-        this.columns = this.records?.length
-            ? Object.keys(this.records[0]).filter(field => field.toLowerCase() !== 'id')
-            : [];
-    }
+ first = 0;
+ sortField: string | undefined = undefined;
+sortOrder = 1;
+
+
+
+ngOnChanges(changes: SimpleChanges): void {
+if (
+    changes['records'] ||
+    (changes['visible'] && this.visible)
+) {
+    this.first = 0;
+    this.sortField = undefined;
+    this.sortOrder = 1;
+}
+
+    this.columns = this.records?.length
+        ? Object.keys(this.records[0])
+            .filter(field => field.toLowerCase() !== 'id')
+        : [];
+}
+
+onTableSort(event: { field?: string; order?: number }): void {
+    this.sortField = event.field;
+    this.sortOrder = event.order ?? 1;
+}
 
     close(): void {
         this.visible = false;

@@ -28,6 +28,10 @@
     <!-- Records -->
     <div class="drilldown-table-wrapper">
         <p-table
+        [(first)]="first"
+        [sortField]="sortField"
+[sortOrder]="sortOrder"
+(onSort)="onTableSort($event)"
             [value]="records"
             [columns]="columns"
             [paginator]="true"
@@ -45,7 +49,7 @@
                     <th *ngFor="let field of columns" [pSortableColumn]="field">
                         <div class="drilldown-column-header">
                             <span>{{ field }}</span>
-                            <!-- <p-sortIcon [field]="field"></p-sortIcon> -->
+                            <p-sortIcon [field]="field"></p-sortIcon>
                         </div>
                     </th>
                 </tr>

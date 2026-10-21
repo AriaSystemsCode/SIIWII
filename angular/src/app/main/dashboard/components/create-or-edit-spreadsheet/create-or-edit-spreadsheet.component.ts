@@ -1578,7 +1578,10 @@ export class CreateOrEditSpreadsheetComponent extends AppComponentBase implement
         try {
             this.updateAnalysis();
 
-            const matrix = this.getPivotResultMatrix();
+            // const matrix = this.getPivotResultMatrix();
+            const matrix = this.refreshService.removeGrandTotalFromChart(
+    this.getPivotResultMatrix()
+);
             const maxColumns = matrix.reduce((max, row) => Math.max(max, row?.length ?? 0), 0);
 
             if (matrix.length < 2 || maxColumns < 2) {
@@ -1626,7 +1629,10 @@ export class CreateOrEditSpreadsheetComponent extends AppComponentBase implement
         try {
             this.updateAnalysis();
 
-            const matrix = this.getPivotResultMatrix();
+            // const matrix = this.getPivotResultMatrix();
+            const matrix = this.refreshService.removeGrandTotalFromChart(
+    this.getPivotResultMatrix()
+);
 
             if (!matrix.length || !matrix[0]?.length) {
                 return;

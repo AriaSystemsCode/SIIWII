@@ -536,7 +536,24 @@ export class SpreadsheetRefreshService {
     // =====================================================
     // 3. PIVOT CHARTS ON THE DASHBOARD
     // =====================================================
+removeGrandTotalFromChart(matrix: any[][]): any[][] {
+    if (!matrix?.length) {
+        return [];
+    }
 
+    const [header, ...rows] = matrix;
+
+    return [
+        header,
+        ...rows.filter(row => {
+            const label = String(row?.[0] ?? '')
+                .replace(/[\s_-]/g, '')
+                .toLowerCase();
+
+            return label !== 'grandtotal';
+        })
+    ];
+}
   
 private refreshPivotCharts(
     state: SpreadsheetPayload,
@@ -579,10 +596,9 @@ private refreshPivotCharts(
             continue;
         }
 
-        const matrix = this.buildPivotMatrix(
-            analysis.pivot,
-            records
-        );
+       const matrix = this.removeGrandTotalFromChart(
+    this.buildPivotMatrix(analysis.pivot, records)
+);
 
         if (!matrix?.length) {
             continue;
@@ -617,8 +633,8 @@ private refreshPivotCharts(
             matrix
         );
 
-        const lastColumn =
-            toColumnName(old.startColumnIndex + width - 1);
+     const lastColumn =
+    toColumnName(old.startColumnIndex + width);
 
         const newRange =
             `${old.startColumn}1:${lastColumn}${matrix.length}`;
