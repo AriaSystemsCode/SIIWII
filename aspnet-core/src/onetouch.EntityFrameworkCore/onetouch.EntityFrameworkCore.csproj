@@ -58,6 +58,7 @@
     <EmbeddedResource Include="Migrations\20261018_SeedSingleValueFieldSettings.sql" LogicalName="onetouch.Migrations.Seed.20261018_SeedSingleValueFieldSettings.sql" />
     <EmbeddedResource Include="Migrations\20261019_SeedStringChipsSettings.sql" LogicalName="onetouch.Migrations.Seed.20261019_SeedStringChipsSettings.sql" />
     <EmbeddedResource Include="Migrations\20261021_PromoteDropdownOptionsToChips.sql" LogicalName="onetouch.Migrations.Seed.20261021_PromoteDropdownOptionsToChips.sql" />
+    <EmbeddedResource Include="Migrations\20261021_SeedHeaderFieldSettings.sql" LogicalName="onetouch.Migrations.Seed.20261021_SeedHeaderFieldSettings.sql" />
     <EmbeddedResource Include="Migrations\20261020_SeedStringDropdownDateFormat.sql" LogicalName="onetouch.Migrations.Seed.20261020_SeedStringDropdownDateFormat.sql" />
   </ItemGroup>
 </Project>

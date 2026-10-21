@@ -180,7 +180,7 @@ public static class SeedRelease
     // Increment only when the cumulative seed snapshot changes. Version 13
     // promotes DropdownOptions to the String--Chips value type.
     // This is not an EF schema version.
-    public const int RequiredVersion = 13;
+    public const int RequiredVersion = 14;
 }
 
 public sealed record Target(string Label, string ConnectionString, string Identity)
