@@ -46,6 +46,7 @@ export interface SpreadsheetDataSource {
 export interface SpreadsheetSheetDataSource {
     sheetId?: number;
     sheetName: string;
+    sheetRecordIds:any[]
     source: SpreadsheetDataSource;
 }
 

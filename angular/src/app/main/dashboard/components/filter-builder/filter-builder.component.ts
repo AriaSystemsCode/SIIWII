@@ -727,27 +727,21 @@ export class FilterBuilderComponent implements OnChanges {
     // APPLY / CLEAR / CANCEL
     // =====================================================
 
+
 applyFilters(): void {
+
     if (!this.canApply) {
         return;
     }
 
     const tree = this.buildFilterTree(this.rootGroup);
 
-    this.filterTreeChange.emit(tree);
-
     this.matchMode = tree.matchMode;
+
     this.matchModeChange.emit(tree.matchMode);
 
-    if (this.hasNestedGroups(tree)) {
-        // Nested filters go to the parent as a tree, never flattened
-        this.applyTree.emit(tree);
-        return;
-    }
-
-    const conditions = this.buildFlatConditions(tree);
-    this.conditionsChange.emit(conditions);
-    this.apply.emit(conditions);
+    // Always send the complete tree, nested or flat.
+    this.applyTree.emit(tree);
 }
 
 private nextRuleId = 0;

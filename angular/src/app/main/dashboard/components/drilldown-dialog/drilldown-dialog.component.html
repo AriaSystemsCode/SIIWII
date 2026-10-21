@@ -1,0 +1,78 @@
+<p-dialog
+    [visible]="visible"
+    (visibleChange)="visibleChange.emit($event)"
+    [modal]="true"
+    [draggable]="false"
+    [resizable]="true"
+    [closable]="true"
+    [dismissableMask]="true"
+    [closeOnEscape]="true"
+    appendTo="body"
+    [style]="{ width: '1000px', maxWidth: '95vw' }"
+    [contentStyle]="{ padding: '0', overflow: 'hidden' }"
+    styleClass="dashboard-drilldown-dialog">
+
+    <!-- Header -->
+    <ng-template pTemplate="header">
+        <div class="drilldown-header">
+
+
+            <div class="drilldown-header-info">
+                <h5 class="drilldown-title" [title]="title">{{ title }}</h5>
+            </div>
+        </div>
+    </ng-template>
+
+  
+
+    <!-- Records -->
+    <div class="drilldown-table-wrapper">
+        <p-table
+            [value]="records"
+            [columns]="columns"
+            [paginator]="true"
+            [rows]="10"
+            [rowsPerPageOptions]="[10, 25, 50]"
+            [scrollable]="true"
+            scrollHeight="450px"
+            [responsiveLayout]="'scroll'"
+            [showCurrentPageReport]="true"
+            currentPageReportTemplate="Showing {first} to {last} of {totalRecords} records"
+            styleClass="p-datatable-sm p-datatable-striped drilldown-records-table">
+
+            <ng-template pTemplate="header" let-columns>
+                <tr>
+                    <th *ngFor="let field of columns" [pSortableColumn]="field">
+                        <div class="drilldown-column-header">
+                            <span>{{ field }}</span>
+                            <!-- <p-sortIcon [field]="field"></p-sortIcon> -->
+                        </div>
+                    </th>
+                </tr>
+            </ng-template>
+
+            <ng-template pTemplate="body" let-record let-columns="columns">
+                <tr>
+                    <td *ngFor="let field of columns" [title]="record[field]">
+                        <span class="drilldown-cell-value">
+                            {{ record[field] === null || record[field] === undefined || record[field] === '' ? '-' : record[field] }}
+                        </span>
+                    </td>
+                </tr>
+            </ng-template>
+
+            <ng-template pTemplate="emptymessage">
+                <tr>
+                    <td [attr.colspan]="columns.length || 1">
+                        <div class="drilldown-empty-state">
+                            <i class="pi pi-inbox"></i>
+                            <h6>No Matching Records</h6>
+                            <p>No source records were found for the selected chart section.</p>
+                        </div>
+                    </td>
+                </tr>
+            </ng-template>
+        </p-table>
+    </div>
+
+</p-dialog>

@@ -44,7 +44,12 @@ import { AppDashboardServiceProxy, MarketplaceAccountsServiceProxy } from '@shar
 import { DashboardShareComponent } from './components/dashboard-share/dashboard-share.component';
 import { SpreadsheetDataPanelComponent } from './components/spreadsheet-data-panel/spreadsheet-data-panel.component';
 import { FilterBuilderComponent } from './components/filter-builder/filter-builder.component';
+import { DrilldownDialogComponent } from './components/drilldown-dialog/drilldown-dialog.component';
 
+
+import { SpreadsheetRefreshService } from
+    './services/spreadsheet-refresh.service';
+import { DrilldownService } from './services/drilldown.service';
 
 @NgModule({
     declarations: [
@@ -54,6 +59,7 @@ import { FilterBuilderComponent } from './components/filter-builder/filter-build
         DashboardShareComponent,
         SpreadsheetDataPanelComponent,
         FilterBuilderComponent,
+        DrilldownDialogComponent,
    
     ],
     imports: [
@@ -102,6 +108,8 @@ import { FilterBuilderComponent } from './components/filter-builder/filter-build
     ],
     providers: [
           AppDashboardServiceProxy,
+          SpreadsheetRefreshService,
+          DrilldownService,
           MarketplaceAccountsServiceProxy,
         { provide: BsDatepickerConfig, useFactory: NgxBootstrapDatePickerConfigService.getDatepickerConfig },
         { provide: BsDaterangepickerConfig, useFactory: NgxBootstrapDatePickerConfigService.getDaterangepickerConfig },

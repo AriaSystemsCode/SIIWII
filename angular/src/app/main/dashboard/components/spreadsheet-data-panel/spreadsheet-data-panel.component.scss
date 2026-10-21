@@ -35,6 +35,7 @@ $danger-bg: #fff0f0;
     background: #fff;
 
     border-left: 1px solid #e5e7eb;
+    align-items: center !important;
 
     overflow-y: auto;
     overflow-x: hidden;
@@ -127,7 +128,7 @@ $danger-bg: #fff0f0;
    ========================================================= */
 
 .spreadsheet-side-panel > .p-3 {
-    padding: 18px !important;
+    padding: 12px !important;
 }
 
 .spreadsheet-side-panel .form-group {
@@ -655,5 +656,24 @@ $danger-bg: #fff0f0;
     &.join-or {
         background: #fef3c7;
         color: #b45309;
+    }
+}
+
+.btn-clear-danger {
+    border-radius: 7px;
+    font-size: 12px;
+    font-weight: 600;
+    padding: 7px 12px;
+    border: 1px solid #F6851D;
+    color: #F6851D;
+    transition: all 0.2s ease;
+
+    i {
+        font-size: 12px;
+    }
+
+    &:hover {
+        background: #F6851D;
+        color: #fff;
     }
 }
