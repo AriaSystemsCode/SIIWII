@@ -1,13 +1,13 @@
-
 import {
     Component,
     EventEmitter,
     Input,
     OnChanges,
-    Output,
-    SimpleChanges
+    Output
 } from '@angular/core';
+import { finalize } from 'rxjs/operators';
 
+import { DynamicApiDispatcherService } from '@shared/dynamicApiDispatcherService ';
 import {
     FilterBuilderCondition,
     FilterBuilderField,
@@ -17,10 +17,15 @@ import {
     FilterConditionRule,
     FilterMatchMode
 } from '../../models/dashboard.model';
-import { DynamicApiDispatcherService }
-    from '@shared/dynamicApiDispatcherService ';
 
-import { finalize } from 'rxjs/operators';
+type SelectOption = { label: string; value: any };
+
+interface LookupState {
+    items: SelectOption[];
+    totalCount: number;
+    isLoading: boolean;
+    isLoaded: boolean;
+}
 
 @Component({
     selector: 'app-filter-builder',
@@ -29,35 +34,31 @@ import { finalize } from 'rxjs/operators';
 })
 export class FilterBuilderComponent implements OnChanges {
 
+    // ---- Inputs / outputs ----
     @Input() fields: FilterBuilderField[] = [];
-    @Input() conditions: FilterBuilderCondition[] = [];
+    @Input() conditions: FilterBuilderCondition[] = [];   // flat conditions, used when there is no tree
     @Input() matchMode: FilterMatchMode = 'all';
     @Input() filterTree: FilterConditionGroup | null = null;
 
-    @Output() apply = new EventEmitter<FilterBuilderCondition[]>();
-    @Output() cancel = new EventEmitter<void>();
-    @Output() conditionsChange = new EventEmitter<FilterBuilderCondition[]>();
-    @Output() matchModeChange = new EventEmitter<FilterMatchMode>();
-    @Output() filterTreeChange = new EventEmitter<FilterConditionGroup>();
     @Output() applyTree = new EventEmitter<FilterConditionGroup>();
+    @Output() matchModeChange = new EventEmitter<FilterMatchMode>();
+    @Output() cancel = new EventEmitter<void>();
 
-    rootGroup: FilterConditionGroup = {
-        type: 'group',
-        matchMode: 'all',
-        children: []
-    };
+    /** The filter being edited. Nested groups live inside `children`. */
+    rootGroup: FilterConditionGroup = { type: 'group', matchMode: 'all', children: [] };
 
-    readonly matchOptions = [
+    // ---- Dropdown options ----
+    readonly matchOptions: SelectOption[] = [
         { label: 'all', value: 'all' },
         { label: 'any', value: 'any' }
     ];
 
-    readonly booleanOptions = [
+    readonly booleanOptions: SelectOption[] = [
         { label: 'Yes', value: true },
         { label: 'No', value: false }
     ];
 
-    readonly comparisonOperators = [
+    private readonly comparisonOperators: SelectOption[] = [
         { label: 'Equal', value: 'eq' },
         { label: 'Not equal', value: 'neq' },
         { label: 'Less than', value: 'lt' },
@@ -66,7 +67,7 @@ export class FilterBuilderComponent implements OnChanges {
         { label: 'Greater than or equal', value: 'gte' }
     ];
 
-    readonly textOperators = [
+    private readonly textOperators: SelectOption[] = [
         { label: 'Equal', value: 'eq' },
         { label: 'Not equal', value: 'neq' },
         { label: 'Contains', value: 'contains' },
@@ -75,12 +76,12 @@ export class FilterBuilderComponent implements OnChanges {
         { label: 'Ends with', value: 'endswith' }
     ];
 
-    readonly booleanOperators = [
+    private readonly equalityOperators: SelectOption[] = [
         { label: 'Equal', value: 'eq' },
         { label: 'Not equal', value: 'neq' }
     ];
 
-    readonly dateOperators = [
+    private readonly dateOperators: SelectOption[] = [
         { label: 'Is in', value: 'in' },
         { label: 'Is not in', value: 'notin' },
         { label: 'Equal', value: 'eq' },
@@ -91,7 +92,12 @@ export class FilterBuilderComponent implements OnChanges {
         { label: 'After or equal', value: 'gte' }
     ];
 
-    readonly datePeriodOptions = [
+    private readonly nullOperators: SelectOption[] = [
+        { label: 'Is Set', value: 'isnotnull' },
+        { label: 'Is Not Set', value: 'isnull' }
+    ];
+
+    readonly datePeriodOptions: SelectOption[] = [
         { label: 'Today', value: 'today' },
         { label: 'Last 7 days', value: 'last7days' },
         { label: 'Last 30 days', value: 'last30days' },
@@ -102,111 +108,89 @@ export class FilterBuilderComponent implements OnChanges {
         { label: 'Date range', value: 'dateRange' }
     ];
 
-    readonly nullOperators = [
-        { label: 'Is Set', value: 'isnotnull' },
-        { label: 'Is Not Set', value: 'isnull' }
-    ];
+    // ---- Lookup fields (dropdown values loaded from an API) ----
+    private readonly lookupPageSize = 10;
+    private lookups = new Map<string, LookupState>();
 
-    constructor(
-        private dynamicApi: DynamicApiDispatcherService
-    ) { }
+    // ---- Unique ids for the inputs ----
+    private lastRuleId = 0;
+
+    constructor(private dynamicApi: DynamicApiDispatcherService) { }
 
     // =====================================================
     // INITIALIZATION
     // =====================================================
 
-    ngOnChanges(changes: SimpleChanges): void {
-
-        if (
-            changes['filterTree'] ||
-            changes['conditions'] ||
-            changes['fields'] ||
-            changes['matchMode']
-        ) {
-
-            if (this.filterTree) {
-                this.rootGroup = this.restoreGroup(this.filterTree);
-            } else {
-                this.rootGroup = {
-                    type: 'group',
-                    matchMode: this.matchMode,
-                    children: (this.conditions || []).map(condition => ({
-                        type: 'rule' as const,
-                        field: condition.field,
-                        operator: condition.operator || 'eq',
-                        value: this.restoreValue(
-                            condition.field,
-                            condition.value
-                        )
-                    }))
-                };
-            }
-        }
+    ngOnChanges(): void {
+        this.rootGroup = this.filterTree
+            ? this.restoreGroup(this.filterTree)
+            : {
+                type: 'group',
+                matchMode: this.matchMode,
+                children: (this.conditions || []).map(condition => ({
+                    type: 'rule' as const,
+                    field: condition.field,
+                    operator: condition.operator || 'eq',
+                    value: this.restoreValue(condition.field, condition.value)
+                }))
+            };
     }
 
-    private restoreGroup(
-        group: FilterConditionGroup
-    ): FilterConditionGroup {
-
+    /** Copies a saved group and turns saved date strings back into Date objects. */
+    private restoreGroup(group: FilterConditionGroup): FilterConditionGroup {
         return {
             type: 'group',
             matchMode: group.matchMode,
             children: group.children.map(node => {
-
                 if (node.type === 'group') {
                     return this.restoreGroup(node);
                 }
 
                 return {
                     ...node,
-                    value: this.restoreValue(
-                        node.field,
-                        node.value
-                    ),
-                    dateRange: node.dateRange?.map(
-                        date => new Date(date)
-                    )
+                    value: this.restoreValue(node.field, node.value),
+                    dateRange: node.dateRange?.map(date => new Date(date))
                 };
             })
         };
     }
 
+    private restoreValue(fieldName: string, value: any): any {
+        if (value === null || value === undefined || value === '') {
+            return value;
+        }
+
+        if (this.getFieldType(fieldName) !== 'date') {
+            return value;
+        }
+
+        const date = value instanceof Date ? value : new Date(value);
+        return isNaN(date.getTime()) ? null : date;
+    }
+
     // =====================================================
-    // GROUP MANAGEMENT
+    // ADD / REMOVE CONDITIONS AND GROUPS
     // =====================================================
 
-    createConditionRule(): FilterConditionRule {
-        return {
-            type: 'rule',
-            field: '',
-            operator: 'eq',
-            value: null
-        };
+    private createRule(): FilterConditionRule {
+        return { type: 'rule', field: '', operator: 'eq', value: null };
     }
 
-    addRuleToGroup(group: FilterConditionGroup): void {
-        group.children.push(this.createConditionRule());
+    addRule(group: FilterConditionGroup): void {
+        group.children.push(this.createRule());
     }
 
-    addRuleAfterInGroup(
-        group: FilterConditionGroup,
-        index: number
-    ): void {
-
-        group.children.splice(
-            index + 1,
-            0,
-            this.createConditionRule()
-        );
+    addRuleAfter(group: FilterConditionGroup, index: number): void {
+        group.children.splice(index + 1, 0, this.createRule());
     }
 
-    // Only one nested group is allowed, directly under the root group.
+    /** Only one nested group is allowed, directly under the root group. */
     get hasNestedGroup(): boolean {
         return this.rootGroup.children.some(node => node.type === 'group');
     }
 
-    // The branching icon adds a group containing exactly one rule.
-    addGroupAfter(group: FilterConditionGroup, index: number): void {
+    /** Adds a nested group that contains one empty condition. */
+    addNestedGroupAfter(group: FilterConditionGroup, index: number): void {
         if (group !== this.rootGroup || this.hasNestedGroup) {
             return;
         }
@@ -214,60 +198,89 @@ export class FilterBuilderComponent implements OnChanges {
         group.children.splice(index + 1, 0, {
             type: 'group',
             matchMode: 'all',
-            children: [this.createConditionRule()]
+            children: [this.createRule()]
         });
     }
 
-    removeGroupItem(
-        group: FilterConditionGroup,
-        index: number
-    ): void {
-
+    removeNode(group: FilterConditionGroup, index: number): void {
         group.children.splice(index, 1);
     }
 
-    isGroup(
-        node: FilterConditionNode
-    ): node is FilterConditionGroup {
+    clearFilters(): void {
+        this.rootGroup.children = [];
+    }
 
+    // ---- type helpers used by the template ----
+
+    isGroup(node: FilterConditionNode): node is FilterConditionGroup {
         return node.type === 'group';
     }
 
-    isRule(
-        node: FilterConditionNode
-    ): node is FilterConditionRule {
-
+    isRule(node: FilterConditionNode): node is FilterConditionRule {
         return node.type === 'rule';
     }
 
-    asGroup(
-        node: FilterConditionNode
-    ): FilterConditionGroup {
-
+    asGroup(node: FilterConditionNode): FilterConditionGroup {
         return node as FilterConditionGroup;
     }
 
-    asRule(
-        node: FilterConditionNode
-    ): FilterConditionRule {
-
+    asRule(node: FilterConditionNode): FilterConditionRule {
         return node as FilterConditionRule;
     }
 
+    getRuleId(rule: FilterBuilderRule): string {
+        const item = rule as FilterBuilderRule & { _uiId?: string };
+
+        if (!item._uiId) {
+            item._uiId = `filter-rule-${++this.lastRuleId}`;
+        }
+
+        return item._uiId;
+    }
+
     // =====================================================
-    // FIELD / OPERATOR
+    // FIELD / OPERATOR / VALUE TYPE
     // =====================================================
+
+    private getField(fieldName: string): FilterBuilderField | undefined {
+        return this.fields.find(field => field.name === fieldName);
+    }
+
+    /** Groups the many data type names into: date, number, boolean, list or string. */
+    private getFieldType(fieldName: string): 'date' | 'number' | 'boolean' | 'list' | 'string' {
+        const type = (this.getField(fieldName)?.dataType || '').trim().toLowerCase();
+        const startsWith = (...prefixes: string[]) => prefixes.some(prefix => type.startsWith(prefix));
+
+        if (startsWith('date') || type.includes('datetime') || type.includes('timestamp')) {
+            return 'date';
+        }
+
+        if (startsWith('integer', 'numeric', 'decimal', 'number', 'float', 'double') || type.includes('currency')) {
+            return 'number';
+        }
+
+        if (startsWith('boolean', 'bool', 'bit')) {
+            return 'boolean';
+        }
+
+        if (startsWith('list') || type.includes('dropdown')) {
+            return 'list';
+        }
+
+        return 'string';
+    }
+
+    getValueType(rule: FilterBuilderRule): string {
+        return this.getFieldType(rule.field);
+    }
 
     onFieldChange(rule: FilterBuilderRule): void {
-
         rule.operator = 'eq';
         rule.value = null;
         rule.datePeriod = undefined;
         rule.dateRange = [];
 
-        const field = this.getField(rule);
-
-        if (field?.dataSource) {
+        if (this.getField(rule.field)?.dataSource) {
             this.onLookupOpen(rule);
         }
     }
@@ -275,252 +288,39 @@ export class FilterBuilderComponent implements OnChanges {
     onOperatorChange(rule: FilterBuilderRule): void {
         rule.datePeriod = undefined;
         rule.dateRange = [];
-
-        rule.value = this.isNullOperator(rule)
-            ? rule.operator
-            : null;
+        rule.value = this.isNullOperator(rule) ? rule.operator : null;
     }
 
-    getField(
-        rule: FilterBuilderRule
-    ): FilterBuilderField | undefined {
+    getOperators(rule: FilterBuilderRule): SelectOption[] {
+        const type = this.getValueType(rule);
 
-        return this.fields.find(
-            field => field.name === rule.field
-        );
-    }
+        let operators: SelectOption[];
 
-    getType(rule: FilterBuilderRule): string {
-
-        const field = this.getField(rule);
-
-        const type = (field?.dataType || '')
-            .trim()
-            .toLowerCase();
-
-        if (
-            type.startsWith('date') ||
-            type.includes('datetime') ||
-            type.includes('timestamp')
-        ) {
-            return 'date';
-        }
-
-        if (
-            type.startsWith('integer') ||
-            type.startsWith('numeric') ||
-            type.startsWith('decimal') ||
-            type.startsWith('number') ||
-            type.startsWith('float') ||
-            type.startsWith('double') ||
-            type.includes('currency')
-        ) {
-            return 'number';
-        }
-
-        if (
-            type.startsWith('boolean') ||
-            type.startsWith('bool') ||
-            type.startsWith('bit')
-        ) {
-            return 'boolean';
-        }
-
-        if (
-            type.startsWith('list') ||
-            type.includes('dropdown')
-        ) {
-            return 'list';
-        }
-
-        return 'string';
-    }
-
-    getOperators(
-        rule: FilterBuilderRule
-    ): Array<{ label: string; value: string }> {
-
-        let operators: Array<{ label: string; value: string }>;
-
-        if (this.isOptionField(rule)) {
-            operators = this.booleanOperators;
+        if (this.isOptionField(rule) || type === 'boolean' || type === 'list') {
+            operators = this.equalityOperators;
+        } else if (type === 'date') {
+            operators = this.dateOperators;
+        } else if (type === 'number') {
+            operators = this.comparisonOperators;
         } else {
-            const type = this.getType(rule);
-
-            if (type === 'boolean' || type === 'list') {
-                operators = this.booleanOperators;
-            } else if (type === 'date') {
-                operators = this.dateOperators;
-            } else if (type === 'number') {
-                operators = this.comparisonOperators;
-            } else {
-                operators = this.textOperators;
-            }
+            operators = this.textOperators;
         }
 
         return [...operators, ...this.nullOperators];
     }
-    getValueOptionsWithSelection(
-        rule: FilterBuilderRule
-    ): Array<{ label: string; value: any }> {
 
-        const options = this.getValueOptions(rule);
-
-        if (
-            rule.value === null ||
-            rule.value === undefined ||
-            rule.value === ''
-        ) {
-            return options;
-        }
-
-        const exists = options.some(
-            option => String(option.value) === String(rule.value)
-        );
-
-        if (exists) {
-            return options;
-        }
-
-        return [
-            {
-                label: String(rule.value),
-                value: rule.value
-            },
-            ...options
-        ];
-    }
-
+    /** "Is Set" / "Is Not Set" need no value. */
     isNullOperator(rule: FilterBuilderRule): boolean {
-        return rule.operator === 'isnull' ||
-            rule.operator === 'isnotnull';
-    }
-    hasValidEntries(rule: FilterBuilderRule): boolean {
-        return !!this.getField(rule)?.options?.length;
+        return rule.operator === 'isnull' || rule.operator === 'isnotnull';
     }
 
     // =====================================================
-    // RESTORE VALUES
+    // DATE PERIODS
     // =====================================================
 
-    private restoreValue(
-        fieldName: string,
-        value: any
-    ): any {
-
-        if (
-            value === null ||
-            value === undefined ||
-            value === ''
-        ) {
-            return value;
-        }
-
-        const rule: FilterBuilderRule = {
-            field: fieldName,
-            operator: 'eq',
-            value
-        };
-
-        if (this.getType(rule) === 'date') {
-
-            const date = value instanceof Date
-                ? value
-                : new Date(value);
-
-            return isNaN(date.getTime())
-                ? null
-                : date;
-        }
-
-        return value;
-    }
-
-    // =====================================================
-    // VALIDATION
-    // =====================================================
-
-    isValid(rule: FilterBuilderRule): boolean {
-
-        // Field and operator are required
-        if (!rule.field || !rule.operator) {
-            return false;
-        }
-
-        // Validate operator
-        const allowedOperators = this.getOperators(rule)
-            .map(operator => operator.value);
-
-        if (!allowedOperators.includes(rule.operator)) {
-            return false;
-        }
-
-        // IMPORTANT:
-        // Is Set / Is Not Set do not require a value input
-        if (this.isNullOperator(rule)) {
-            return true;
-        }
-
-        // Date period validation
-        if (this.isDatePeriodOperator(rule)) {
-            return this.getDateRange(rule) !== null;
-        }
-
-        // Normal value validation
-        if (
-            rule.value === null ||
-            rule.value === undefined ||
-            rule.value === ''
-        ) {
-            return false;
-        }
-
-        // Number validation
-        if (this.getType(rule) === 'number') {
-            return Number.isFinite(Number(rule.value));
-        }
-
-        // Date validation
-        if (this.getType(rule) === 'date') {
-
-            const date = rule.value instanceof Date
-                ? rule.value
-                : new Date(rule.value);
-
-            return !isNaN(date.getTime());
-        }
-
-        return true;
-    }
-
-    private isGroupValid(
-        group: FilterConditionGroup
-    ): boolean {
-
-        return group.children.every(node => {
-
-            if (node.type === 'group') {
-                return this.isGroupValid(node);
-            }
-
-            return this.isValid(node);
-        });
-    }
-
-    get canApply(): boolean {
-        return this.isGroupValid(this.rootGroup);
-    }
-
-    // =====================================================
-    // DATE HANDLING
-    // =====================================================
-
-    isDatePeriodOperator(
-        rule: FilterBuilderRule
-    ): boolean {
-
-        return this.getType(rule) === 'date' &&
-            ['in', 'notin'].includes(rule.operator);
+    /** "Is in" / "Is not in" on a date field use a period instead of one date. */
+    isDatePeriodOperator(rule: FilterBuilderRule): boolean {
+        return this.getValueType(rule) === 'date' && ['in', 'notin'].includes(rule.operator);
     }
 
     onDatePeriodChange(rule: FilterBuilderRule): void {
@@ -529,224 +329,166 @@ export class FilterBuilderComponent implements OnChanges {
     }
 
     private startOfDay(date: Date): Date {
-        return new Date(
-            date.getFullYear(),
-            date.getMonth(),
-            date.getDate(),
-            0, 0, 0, 0
-        );
+        return new Date(date.getFullYear(), date.getMonth(), date.getDate(), 0, 0, 0, 0);
     }
 
     private endOfDay(date: Date): Date {
-        return new Date(
-            date.getFullYear(),
-            date.getMonth(),
-            date.getDate(),
-            23, 59, 59, 999
-        );
+        return new Date(date.getFullYear(), date.getMonth(), date.getDate(), 23, 59, 59, 999);
     }
 
-    getDateRange(
-        rule: FilterBuilderRule
-    ): Date[] | null {
-
+    /** Returns [start, end] for the chosen period, or null when it is not complete. */
+    private getDateRange(rule: FilterBuilderRule): Date[] | null {
         const today = this.startOfDay(new Date());
-        const end = this.endOfDay(new Date());
+        const endOfToday = this.endOfDay(new Date());
 
-        let start: Date;
+        const daysAgo = (days: number): Date => {
+            const date = new Date(today);
+            date.setDate(date.getDate() - days);
+            return date;
+        };
 
         switch (rule.datePeriod) {
-
             case 'today':
-                return [today, end];
+                return [today, endOfToday];
 
             case 'last7days':
-                start = new Date(today);
-                start.setDate(start.getDate() - 6);
-                return [start, end];
+                return [daysAgo(6), endOfToday];
 
             case 'last30days':
-                start = new Date(today);
-                start.setDate(start.getDate() - 29);
-                return [start, end];
+                return [daysAgo(29), endOfToday];
 
             case 'monthToDate':
-                return [
-                    new Date(
-                        today.getFullYear(),
-                        today.getMonth(),
-                        1
-                    ),
-                    end
-                ];
+                return [new Date(today.getFullYear(), today.getMonth(), 1), endOfToday];
 
             case 'lastMonth':
                 return [
-                    new Date(
-                        today.getFullYear(),
-                        today.getMonth() - 1,
-                        1
-                    ),
-                    this.endOfDay(
-                        new Date(
-                            today.getFullYear(),
-                            today.getMonth(),
-                            0
-                        )
-                    )
+                    new Date(today.getFullYear(), today.getMonth() - 1, 1),
+                    this.endOfDay(new Date(today.getFullYear(), today.getMonth(), 0))
                 ];
 
             case 'yearToDate':
-                return [
-                    new Date(
-                        today.getFullYear(),
-                        0,
-                        1
-                    ),
-                    end
-                ];
+                return [new Date(today.getFullYear(), 0, 1), endOfToday];
 
             case 'last365days':
-                start = new Date(today);
-                start.setDate(start.getDate() - 364);
-                return [start, end];
+                return [daysAgo(364), endOfToday];
 
-            case 'dateRange':
-                return rule.dateRange?.length === 2 &&
-                    rule.dateRange[0] &&
-                    rule.dateRange[1]
-                    ? [
-                        this.startOfDay(
-                            new Date(rule.dateRange[0])
-                        ),
-                        this.endOfDay(
-                            new Date(rule.dateRange[1])
-                        )
-                    ]
+            case 'dateRange': {
+                const [from, to] = rule.dateRange ?? [];
+
+                return from && to
+                    ? [this.startOfDay(new Date(from)), this.endOfDay(new Date(to))]
                     : null;
+            }
 
             default:
                 return null;
         }
     }
 
-    formatDateValue(date: Date): string {
-
+    /** yyyy-MM-dd */
+    private formatDate(date: Date): string {
         const year = date.getFullYear();
-
-        const month = String(
-            date.getMonth() + 1
-        ).padStart(2, '0');
-
-        const day = String(
-            date.getDate()
-        ).padStart(2, '0');
+        const month = String(date.getMonth() + 1).padStart(2, '0');
+        const day = String(date.getDate()).padStart(2, '0');
 
         return `${year}-${month}-${day}`;
     }
 
     // =====================================================
-    // FORMAT RULE VALUE
+    // VALIDATION
     // =====================================================
 
-    private formatValue(
-        rule: FilterBuilderRule
-    ): any {
-
-        if (this.getType(rule) === 'date') {
-
-            const date = rule.value instanceof Date
-                ? rule.value
-                : new Date(rule.value);
-
-            return this.formatDateValue(date);
+    private isRuleValid(rule: FilterBuilderRule): boolean {
+        if (!rule.field || !rule.operator) {
+            return false;
         }
 
-        if (this.getType(rule) === 'number') {
-            return Number(rule.value);
+        const allowedOperators = this.getOperators(rule).map(operator => operator.value);
+
+        if (!allowedOperators.includes(rule.operator)) {
+            return false;
         }
 
-        return rule.value;
+        if (this.isNullOperator(rule)) {
+            return true;
+        }
+
+        if (this.isDatePeriodOperator(rule)) {
+            return this.getDateRange(rule) !== null;
+        }
+
+        if (rule.value === null || rule.value === undefined || rule.value === '') {
+            return false;
+        }
+
+        const type = this.getValueType(rule);
+
+        if (type === 'number') {
+            return Number.isFinite(Number(rule.value));
+        }
+
+        if (type === 'date') {
+            const date = rule.value instanceof Date ? rule.value : new Date(rule.value);
+            return !isNaN(date.getTime());
+        }
+
+        return true;
+    }
+
+    private isGroupValid(group: FilterConditionGroup): boolean {
+        return group.children.every(node =>
+            node.type === 'group' ? this.isGroupValid(node) : this.isRuleValid(node)
+        );
+    }
+
+    get canApply(): boolean {
+        return this.isGroupValid(this.rootGroup);
     }
 
     // =====================================================
-    // BUILD NESTED FILTER TREE
+    // APPLY / CLOSE
     // =====================================================
 
-    private buildFilterTree(
-        group: FilterConditionGroup
-    ): FilterConditionGroup {
+    applyFilters(): void {
+        if (!this.canApply) {
+            return;
+        }
 
+        const tree = this.buildFilterTree(this.rootGroup);
+
+        this.matchModeChange.emit(tree.matchMode);
+        this.applyTree.emit(tree);
+    }
+
+    close(): void {
+        this.cancel.emit();
+    }
+
+    /** Converts the edited group into the clean tree that is saved and sent to the API. */
+    private buildFilterTree(group: FilterConditionGroup): FilterConditionGroup {
         const children: FilterConditionNode[] = [];
 
         for (const node of group.children) {
-
             if (node.type === 'group') {
-
-                children.push(
-                    this.buildFilterTree(node)
-                );
-
+                children.push(this.buildFilterTree(node));
                 continue;
             }
 
-            if (!this.isValid(node)) {
+            if (!this.isRuleValid(node)) {
                 continue;
             }
-            // Is Set / Is Not Set
+
             if (this.isNullOperator(node)) {
-
-                children.push({
-                    type: 'rule',
-                    field: node.field,
-                    operator: node.operator,
-                    value: node.operator
-                });
-
+                children.push({ type: 'rule', field: node.field, operator: node.operator, value: node.operator });
                 continue;
             }
 
             if (this.isDatePeriodOperator(node)) {
+                const period = this.buildDatePeriodGroup(node);
 
-                const range = this.getDateRange(node);
-
-                if (!range) {
-                    continue;
+                if (period) {
+                    children.push(period);
                 }
-
-                const start = this.formatDateValue(
-                    range[0]
-                );
-
-                const end = this.formatDateValue(
-                    range[1]
-                );
-
-                children.push({
-                    type: 'group',
-                    matchMode: node.operator === 'in'
-                        ? 'all'
-                        : 'any',
-                    children: [
-                        {
-                            type: 'rule',
-                            field: node.field,
-                            operator: node.operator === 'in'
-                                ? 'gte'
-                                : 'lt',
-                            value: start
-                        },
-                        {
-                            type: 'rule',
-                            field: node.field,
-                            operator: node.operator === 'in'
-                                ? 'lte'
-                                : 'gt',
-                            value: end
-                        }
-                    ]
-                });
-
                 continue;
             }
 
@@ -754,125 +496,94 @@ export class FilterBuilderComponent implements OnChanges {
                 type: 'rule',
                 field: node.field,
                 operator: node.operator,
-                value: this.formatValue(node)
+                value: this.formatRuleValue(node)
             });
         }
 
+        return { type: 'group', matchMode: group.matchMode, children };
+    }
+
+    /**
+     * "is in"     -> date >= start AND date <= end
+     * "is not in" -> date <  start OR  date >  end
+     */
+    private buildDatePeriodGroup(rule: FilterBuilderRule): FilterConditionGroup | null {
+        const range = this.getDateRange(rule);
+
+        if (!range) {
+            return null;
+        }
+
+        const isIn = rule.operator === 'in';
+
         return {
             type: 'group',
-            matchMode: group.matchMode,
-            children
+            matchMode: isIn ? 'all' : 'any',
+            children: [
+                { type: 'rule', field: rule.field, operator: isIn ? 'gte' : 'lt', value: this.formatDate(range[0]) },
+                { type: 'rule', field: rule.field, operator: isIn ? 'lte' : 'gt', value: this.formatDate(range[1]) }
+            ]
         };
     }
 
-    applyFilters(): void {
+    private formatRuleValue(rule: FilterBuilderRule): any {
+        const type = this.getValueType(rule);
 
-        if (!this.canApply) {
-            return;
-        }
-        const tree = this.buildFilterTree(this.rootGroup);
-        this.matchMode = tree.matchMode;
-        this.matchModeChange.emit(tree.matchMode);
-        this.applyTree.emit(tree);
-    }
-
-    private nextRuleId = 0;
-
-    getRuleId(rule: FilterBuilderRule): string {
-        const item = rule as FilterBuilderRule & {
-            _uiId?: string;
-        };
-
-        if (!item._uiId) {
-            item._uiId = `filter-rule-${++this.nextRuleId}`;
+        if (type === 'date') {
+            return this.formatDate(rule.value instanceof Date ? rule.value : new Date(rule.value));
         }
 
-        return item._uiId;
+        if (type === 'number') {
+            return Number(rule.value);
+        }
+
+        return rule.value;
     }
 
-    typePlaceholder = 'Select value';
+    // =====================================================
+    // DROPDOWN VALUES (valid entries, static options, API lookups)
+    // =====================================================
 
-    lookupOptions = new Map<string, {
-        items: Array<{ label: string; value: any }>;
-        totalCount: number;
-        loading: boolean;
-        loaded: boolean;
-    }>();
-
-    private lookupRequests = new Set<string>();
-
-    private fieldKey(field: FilterBuilderField): string {
-        return field.name;
-    }
-
-    private getByPath(obj: any, path: string): any {
-        return String(path || '')
-            .split('.')
-            .reduce((current, key) => current?.[key], obj);
-    }
-
+    /** True when the value is picked from a list instead of typed. */
     isOptionField(rule: FilterBuilderRule): boolean {
-
-        const field = this.getField(rule);
+        const field = this.getField(rule.field);
 
         if (!field) {
             return false;
         }
 
-        const hasValidEntries =
-            !!field.validEntries?.trim();
+        const hasValidEntries = !!field.validEntries?.trim();
+        const hasDynamicApi = !!field.dataSource?.service && !!field.dataSource?.api;
+        const hasStaticOptions = !!field.options?.length || !!field.paginationSetting?.list?.length;
 
-        const hasDynamicApi =
-            !!field.dataSource?.service &&
-            !!field.dataSource?.api;
-
-        const hasStaticOptions =
-            !!field.options?.length ||
-            !!field.paginationSetting?.list?.length;
-
-        return (
-            field.isLookup === true ||
-            hasValidEntries ||
-            hasDynamicApi ||
-            hasStaticOptions
-        );
+        return field.isLookup === true || hasValidEntries || hasDynamicApi || hasStaticOptions;
     }
 
-    getValueOptions(
-        rule: FilterBuilderRule
-    ): Array<{ label: string; value: any }> {
-
-        const field = this.getField(rule);
+    private getValueOptions(rule: FilterBuilderRule): SelectOption[] {
+        const field = this.getField(rule.field);
 
         if (!field) {
             return [];
         }
 
-        // Same priority as dynamicInputs:
-        // validEntries without a dataSource is a static list.
+        // "a|b|c" without an API is a fixed list.
         if (field.validEntries?.trim() && !field.dataSource) {
             return field.validEntries
                 .split('|')
                 .map(value => value.trim())
                 .filter(Boolean)
-                .map(value => ({
-                    label: value,
-                    value
-                }));
+                .map(value => ({ label: value, value }));
         }
 
-        const cached = this.lookupOptions.get(
-            this.fieldKey(field)
-        );
+        const loaded = this.lookups.get(field.name);
 
-        if (cached) {
-            return cached.items;
+        if (loaded) {
+            return loaded.items;
         }
 
-        const options =
-            field.paginationSetting?.list?.length
-                ? field.paginationSetting.list
-                : field.options ?? [];
+        const options = field.paginationSetting?.list?.length
+            ? field.paginationSetting.list
+            : field.options ?? [];
 
         return options.map((option: any) => ({
             label: String(option.label ?? option.value ?? ''),
@@ -880,207 +591,140 @@ export class FilterBuilderComponent implements OnChanges {
         }));
     }
 
-    isLookupLoading(rule: FilterBuilderRule): boolean {
-        const field = this.getField(rule);
+    /** Same options, plus the current value when it has not been loaded yet (so it is still shown). */
+    getValueOptionsWithSelection(rule: FilterBuilderRule): SelectOption[] {
+        const options = this.getValueOptions(rule);
 
-        return field
-            ? !!this.lookupOptions.get(
-                this.fieldKey(field)
-            )?.loading
-            : false;
+        if (rule.value === null || rule.value === undefined || rule.value === '') {
+            return options;
+        }
+
+        const isInOptions = options.some(option => String(option.value) === String(rule.value));
+
+        return isInOptions
+            ? options
+            : [{ label: String(rule.value), value: rule.value }, ...options];
+    }
+
+    isLookupLoading(rule: FilterBuilderRule): boolean {
+        return !!this.lookups.get(rule.field)?.isLoading;
     }
 
     hasMoreLookupOptions(rule: FilterBuilderRule): boolean {
-        const field = this.getField(rule);
-
-        if (!field?.dataSource) {
+        if (!this.getField(rule.field)?.dataSource) {
             return false;
         }
 
-        const state = this.lookupOptions.get(
-            this.fieldKey(field)
-        );
+        const state = this.lookups.get(rule.field);
 
-        return !!state &&
-            !state.loading &&
-            state.items.length < state.totalCount;
+        return !!state && !state.isLoading && state.items.length < state.totalCount;
     }
 
     onLookupOpen(rule: FilterBuilderRule): void {
-        const field = this.getField(rule);
+        const field = this.getField(rule.field);
 
         if (!field?.dataSource) {
             return;
         }
 
-        const state = this.lookupOptions.get(
-            this.fieldKey(field)
-        );
+        const state = this.lookups.get(field.name);
 
-        if (!state?.loaded && !state?.loading) {
+        if (!state?.isLoaded && !state?.isLoading) {
             this.loadLookupOptions(field, false);
         }
     }
 
     loadMoreLookupOptions(rule: FilterBuilderRule): void {
-        const field = this.getField(rule);
+        const field = this.getField(rule.field);
 
         if (field?.dataSource) {
             this.loadLookupOptions(field, true);
         }
     }
 
-    private loadLookupOptions(
-        field: FilterBuilderField,
-        append: boolean
-    ): void {
-
+    private loadLookupOptions(field: FilterBuilderField, append: boolean): void {
         const source = field.dataSource;
 
         if (!source?.service || !source?.api) {
             return;
         }
 
-        const key = this.fieldKey(field);
+        const previous = this.lookups.get(field.name);
 
-        if (this.lookupRequests.has(key)) {
+        if (previous?.isLoading) {
             return;
         }
 
-        const previous = this.lookupOptions.get(key);
-
-        if (
-            append &&
-            previous?.loaded &&
-            previous.items.length >= previous.totalCount
-        ) {
+        if (append && previous?.isLoaded && previous.items.length >= previous.totalCount) {
             return;
         }
 
-        const existingItems = append
-            ? previous?.items ?? []
-            : [];
+        const existingItems = append ? previous?.items ?? [] : [];
 
-        const skipCount = existingItems.length;
-        const maxResultCount = 10;
-
-        this.lookupRequests.add(key);
-
-        this.lookupOptions.set(key, {
+        this.lookups.set(field.name, {
             items: existingItems,
             totalCount: previous?.totalCount ?? 0,
-            loading: true,
-            loaded: previous?.loaded ?? false
+            isLoading: true,
+            isLoaded: previous?.isLoaded ?? false
         });
 
-        const serviceName =
-            source.service.endsWith('ServiceProxy')
-                ? source.service
-                : `${source.service}ServiceProxy`;
+        const serviceName = source.service.endsWith('ServiceProxy')
+            ? source.service
+            : `${source.service}ServiceProxy`;
 
-        this.dynamicApi.dispatch(
-            serviceName,
-            source.api,
-            {
-                skipCount,
-                maxResultCount
-            }
-        )
-            .pipe(
-                finalize(() => {
-                    this.lookupRequests.delete(key);
-
-                    const current = this.lookupOptions.get(key);
-
-                    if (current) {
-                        this.lookupOptions.set(key, {
-                            ...current,
-                            loading: false
-                        });
-                    }
-                })
-            )
+        this.dynamicApi
+            .dispatch(serviceName, source.api, {
+                skipCount: existingItems.length,
+                maxResultCount: this.lookupPageSize
+            })
+            .pipe(finalize(() => this.setLookupLoading(field.name, false)))
             .subscribe({
-                next: (result: any) => {
-
-                    const records: any[] =
-                        result?.items ??
-                        result?.result?.items ??
-                        [];
-
-                    const labelPath =
-                        source.parameter || 'name';
-
-                    // dynamicInputs currently uses item.account.id.
-                    // Preserve that as the fallback, but allow
-                    // different dynamic API response shapes.
-                    const valuePath =
-                        source.valueField || 'account.id';
-
-                    const newOptions = records.map(
-                        (item: any) => {
-
-                            const label = this.getByPath(
-                                item,
-                                labelPath
-                            );
-
-                            const value =
-                                this.getByPath(item, valuePath) ??
-                                item.id ??
-                                item.value;
-
-                            return {
-                                label: String(label ?? value ?? ''),
-                                value
-                            };
-                        }
-                    ).filter(option =>
-                        option.value !== null &&
-                        option.value !== undefined
-                    );
-
-                    const combined = new Map<string, {
-                        label: string;
-                        value: any;
-                    }>();
-
-                    [...existingItems, ...newOptions].forEach(
-                        option => {
-                            combined.set(
-                                String(option.value),
-                                option
-                            );
-                        }
-                    );
-
-                    this.lookupOptions.set(key, {
-                        items: Array.from(combined.values()),
-                        totalCount: Number(
-                            result?.totalCount ??
-                            result?.result?.totalCount ??
-                            newOptions.length
-                        ),
-                        loading: false,
-                        loaded: true
-                    });
-                },
-
-                error: (error: any) => {
-                    console.error(
-                        '[Filter Builder] Lookup loading failed:',
-                        field.name,
-                        error
-                    );
-                }
+                next: (result: any) => this.onLookupLoaded(field, existingItems, result),
+                error: (error: any) =>
+                    console.error('[Filter Builder] Lookup loading failed:', field.name, error)
             });
     }
 
-    clearFilters(): void {
-        this.rootGroup.children = [];
+    private onLookupLoaded(field: FilterBuilderField, existingItems: SelectOption[], result: any): void {
+        const source = field.dataSource!;
+        const records: any[] = result?.items ?? result?.result?.items ?? [];
+
+        const labelPath = source.parameter || 'name';
+        const valuePath = source.valueField || 'account.id';   // same default as dynamicInputs
+
+        const newItems: SelectOption[] = records
+            .map(record => {
+                const label = this.getByPath(record, labelPath);
+                const value = this.getByPath(record, valuePath) ?? record.id ?? record.value;
+
+                return { label: String(label ?? value ?? ''), value };
+            })
+            .filter(option => option.value !== null && option.value !== undefined);
+
+        // keep one item per value
+        const uniqueItems = new Map<string, SelectOption>();
+        [...existingItems, ...newItems].forEach(item => uniqueItems.set(String(item.value), item));
+
+        this.lookups.set(field.name, {
+            items: Array.from(uniqueItems.values()),
+            totalCount: Number(result?.totalCount ?? result?.result?.totalCount ?? newItems.length),
+            isLoading: false,
+            isLoaded: true
+        });
     }
 
-    close(): void {
-        this.cancel.emit();
+    private setLookupLoading(fieldName: string, isLoading: boolean): void {
+        const state = this.lookups.get(fieldName);
+
+        if (state) {
+            this.lookups.set(fieldName, { ...state, isLoading });
+        }
+    }
+
+    /** getByPath(item, 'account.id') -> item.account.id */
+    private getByPath(object: any, path: string): any {
+        return String(path || '')
+            .split('.')
+            .reduce((current, key) => current?.[key], object);
     }
 }

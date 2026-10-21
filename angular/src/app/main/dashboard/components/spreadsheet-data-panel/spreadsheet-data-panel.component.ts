@@ -8,7 +8,9 @@ import {
     Output,
     SimpleChanges
 } from '@angular/core';
+import { ConfirmationService } from 'primeng/api';
 import { firstValueFrom } from 'rxjs';
+
 import { AppComponentBase } from '@shared/common/app-component-base';
 import {
     AppDashboardServiceProxy,
@@ -21,52 +23,36 @@ import {
     FilterConditionGroup,
     FilterConditionNode,
     FilterConditionRule,
+    FilterMatchMode,
     SpreadsheetDataBatch,
     SpreadsheetSheetDataSource
 } from '../../models/dashboard.model';
-import { ConfirmationService } from 'primeng/api';
+
+type NestedListName = 'orWithList' | 'andWithList';
+
 @Component({
     selector: 'app-spreadsheet-data-panel',
     templateUrl: './spreadsheet-data-panel.component.html',
     styleUrls: ['./spreadsheet-data-panel.component.scss'],
-     providers: [ConfirmationService]
+    providers: [ConfirmationService]
 })
-export class SpreadsheetDataPanelComponent
-    extends AppComponentBase
-    implements OnChanges {
+export class SpreadsheetDataPanelComponent extends AppComponentBase implements OnChanges {
+
+    // ---- Inputs / outputs ----
     @Input() visible = false;
     @Input() editSource: SpreadsheetSheetDataSource | null = null;
-    @Output() close = new EventEmitter<void>();
-    @Output() batchLoaded = new EventEmitter<SpreadsheetDataBatch>();
-    @Output() loadingFailed = new EventEmitter<any>();
-    readonly batchSize = 10;
-    step: 1 | 2 = 1;
-    tables: string[] = [];
-    selectedTable = '';
-    tableColumns: ExtraAttribute[] = [];
-    selectedColumns: ExtraAttribute[] = [];
-    filterValues: Record<string, any> = {};
-    filters: any[] = [];
-    filterFields: ExtraAttribute[] = [];
-    activeFilterValues: any[] = [];
-        @Output() dataSourceCleared = new EventEmitter<string>();
-
-    @Input() filterFieldKey: 'code' | 'name' = 'code';
-    @Input() conditionFactory: ((filter: any) => DynamicCondition) | null = null;
-
     @Input() targetSheetName = '';
     @Input() targetSheetHasData = false;
 
-    insertAsNewSheet = true;
-    isEditMode = false;
+    @Output() close = new EventEmitter<void>();
+    @Output() batchLoaded = new EventEmitter<SpreadsheetDataBatch>();
+    @Output() loadingFailed = new EventEmitter<any>();
+    @Output() dataSourceCleared = new EventEmitter<string>();
 
-    onFilterValuesChanged(values: any[]): void {
-        this.activeFilterValues = values;
-    }
-    isAdding = false;
-    isLoadingTables = false;
-    isLoadingColumns = false;
-    tableIcons: Record<string, string> = {
+    // ---- Settings ----
+    private readonly batchSize = 10;
+
+    private readonly tableIcons: Record<string, string> = {
         AppContacts: 'fa fa-address-book',
         APPFields: 'fa fa-list-alt',
         AppFieldsHistory: 'fa fa-history',
@@ -83,215 +69,192 @@ export class SpreadsheetDataPanelComponent
         AppTransactionHeaders: 'fa fa-exchange-alt'
     };
 
-    filterBuilderFields: FilterBuilderField[] = [];
+    private readonly operatorLabels: Record<string, string> = {
+        eq: '=',
+        neq: '≠',
+        gt: '>',
+        gte: '>=',
+        lt: '<',
+        lte: '<=',
+        contains: 'contains',
+        notcontains: 'does not contain',
+        startswith: 'starts with',
+        endswith: 'ends with',
+        in: 'is in',
+        notin: 'is not in'
+    };
 
-    selectedConditions: FilterBuilderCondition[] = [];
+    // ---- Wizard state ----
+    step: 1 | 2 = 1;
+    isEditMode = false;
+    isAdding = false;
+    isLoadingTables = false;
+    isLoadingColumns = false;
+
+    // ---- Step 1: table ----
+    tables: string[] = [];
+    pendingTable: string | null = null;   // highlighted in step 1, not confirmed yet
+
+    // ---- Step 2: columns, filters, destination ----
+    selectedTable = '';
+    tableColumns: ExtraAttribute[] = [];
+    selectedColumns: ExtraAttribute[] = [];
+    filterBuilderFields: FilterBuilderField[] = [];
+    filterTree: FilterConditionGroup | null = null;
     showFilterDialog = false;
-    selectedMatchMode: 'all' | 'any' = 'all';
+    insertAsNewSheet = true;
+
     constructor(
         injector: Injector,
-        private appDashboardService:
-            AppDashboardServiceProxy,
+        private appDashboardService: AppDashboardServiceProxy,
         private cdr: ChangeDetectorRef,
-         private confirmationService: ConfirmationService
+        private confirmationService: ConfirmationService
     ) {
         super(injector);
     }
+
+    // =====================================================
+    // OPEN / RESET
+    // =====================================================
+
     ngOnChanges(changes: SimpleChanges): void {
-        if (changes['visible'] && this.visible) {
-            if (this.editSource) {
-                void this.loadEditSource();
-            } else {
-                this.isEditMode = false;
-                this.getTablesList()
-                this.reset();
-            }
-        }
-    }
-
-
-    private async loadEditSource(): Promise<void> {
-
-        if (!this.editSource?.source) {
+        if (!changes['visible'] || !this.visible) {
             return;
         }
 
-        const source = this.editSource.source;
+        if (this.editSource) {
+            void this.loadEditSource();
+            return;
+        }
 
-        this.isEditMode = true;
-        this.insertAsNewSheet = false;
+        this.isEditMode = false;
+        this.loadTables();
+        this.reset();
+    }
+
+    reset(): void {
+        this.step = 1;
+        this.isEditMode = false;
+        this.insertAsNewSheet = true;
+        this.isLoadingColumns = false;
+        this.pendingTable = null;
+        this.selectedTable = '';
         this.showFilterDialog = false;
+        this.clearTableSelection();
+    }
 
-        this.selectedTable = source.sourceKey || source.type;
-
-        const savedColumns: string[] = [
-            ...(source.columns ?? [])
-        ];
-
-        const filters = source.filters as {
-            conditions?: FilterBuilderCondition[];
-            matchMode?: 'all' | 'any';
-            filterTree?: FilterConditionGroup | null;
-        } | null;
-
-        const savedConditions: FilterBuilderCondition[] =
-            (filters?.conditions ?? []).map(condition => ({
-                field: condition.field,
-                operator: condition.operator,
-                value: condition.value
-            }));
-
-        // Restore nested tree, if one was saved.
-        const savedTree = this.restoreSavedFilterTree(
-            filters,
-            source.mode === 'any' ? 'any' : 'all'
-        );
-
-        this.selectedColumns = [];
-        this.selectedConditions = [];
-        this.selectedFilterTree = null;
+    /** Clears everything that depends on the selected table. */
+    private clearTableSelection(): void {
         this.tableColumns = [];
+        this.selectedColumns = [];
         this.filterBuilderFields = [];
-        this.previewCache = null;
-
-        try {
-
-            await this.loadEditTableFields(this.selectedTable);
-
-            this.selectedColumns = this.tableColumns.filter(column =>
-                savedColumns.includes(column.name)
-            );
-
-            if (savedTree?.type === 'group') {
-
-                // Copy the tree so editing does not mutate saved metadata.
-                this.selectedFilterTree = JSON.parse(
-                    JSON.stringify(savedTree)
-                ) as FilterConditionGroup;
-
-                this.selectedConditions =
-                    this.collectRules(this.selectedFilterTree);
-
-                this.selectedMatchMode =
-                    this.selectedFilterTree.matchMode;
-
-            } else {
-
-                this.selectedFilterTree = null;
-                this.selectedConditions = savedConditions;
-
-                this.selectedMatchMode =
-                    filters?.matchMode ??
-                    (source.mode === 'any' ? 'any' : 'all');
-            }
-
-            this.step = 2;
-
-            this.cdr.detectChanges();
-
-        } catch (error) {
-
-            console.error(
-                'Failed to load existing list data:',
-                error
-            );
-
-            this.loadingFailed.emit(error);
-        }
+        this.filterTree = null;
     }
 
-    private async loadEditTableFields(tableName: string): Promise<void> {
-        this.isLoadingColumns = true;
-
-        try {
-            const result: ExtraAttribute[] = await firstValueFrom(
-                this.appDashboardService.getTableFieldsList(tableName)
-            );
-
-            this.tableColumns = result ?? [];
-            this.filterFields = [...this.tableColumns];
-
-            this.filterBuilderFields = this.tableColumns.map(field => ({
-                name: field.name,
-                label: field.description || field.name,
-                dataType: field.dataType || 'String--Textbox',
-                options: this.mapValidEntries(field.validEntries),
-                acceptMultipleValues: field.acceptMultipleValues === true
-            }));
-        } finally {
-            this.isLoadingColumns = false;
+    closePanel(): void {
+        if (this.isAdding) {
+            return;
         }
+
+        this.reset();
+        this.close.emit();
     }
-    getTablesList(): void {
+
+    // =====================================================
+    // STEP 1: TABLES
+    // =====================================================
+
+    private loadTables(): void {
         this.isLoadingTables = true;
-        this.appDashboardService
-            .getTablesList()
-            .subscribe({
-                next: (result: any) => {
-                    this.tables =
-                        Array.isArray(result)
-                            ? result
-                            : [];
-                    this.isLoadingTables = false;
-                    this.cdr.detectChanges();
-                },
-                error: error => {
-                    this.isLoadingTables = false;
-                    this.loadingFailed.emit(
-                        error
-                    );
-                    this.cdr.detectChanges();
-                }
-            });
+
+        this.appDashboardService.getTablesList().subscribe({
+            next: (result: any) => {
+                this.tables = Array.isArray(result) ? result : [];
+                this.isLoadingTables = false;
+                this.cdr.detectChanges();
+            },
+            error: error => {
+                this.isLoadingTables = false;
+                this.loadingFailed.emit(error);
+                this.cdr.detectChanges();
+            }
+        });
     }
-    selectTable(table: string): void {
+
+    getTableIcon(tableName: string): string {
+        return this.tableIcons[tableName] || 'fa fa-database';
+    }
+
+    chooseTable(table: string): void {
+        this.pendingTable = table;
+    }
+
+    goToColumnsStep(): void {
+        if (this.pendingTable) {
+            void this.openTable(this.pendingTable);
+        }
+    }
+
+    backToTables(): void {
+        if (this.isAdding || this.isEditMode) {
+            return;
+        }
+
+        this.step = 1;
+        this.selectedTable = '';
+        this.clearTableSelection();
+    }
+
+    // =====================================================
+    // STEP 2: COLUMNS
+    // =====================================================
+
+    private async openTable(table: string): Promise<void> {
         if (!table || this.isLoadingColumns) {
             return;
         }
-        this.selectedTable = table;
-        this.tableColumns = [];
-        this.selectedColumns = [];
-        this.filterValues = {};
-        this.filters = [];
-        this.filterFields = [];
-        this.activeFilterValues = [];
-        this.selectedConditions = [];
-        this.selectedFilterTree = null;
-        this.selectedMatchMode = 'all';
-        this.previewCache = null;
-        this.step = 2;
-        this.isLoadingColumns = true;
-        this.appDashboardService
-            .getTableFieldsList(table)
-            .subscribe({
-                next: (
-                    result: ExtraAttribute[]
-                ) => {
-                    this.tableColumns = result ?? [];
-                    // this.selectedColumns = [...this.tableColumns];
-                    this.filterFields = [...this.tableColumns];
 
-                    this.filterBuilderFields = this.filterFields.map((field: any) => ({
-                        name: field.name,
-                        label: field.description || field.name,
-                        dataType: field.dataType || 'String--Textbox',
-                        options: this.mapValidEntries(field.validEntries),
-                        acceptMultipleValues: field.acceptMultipleValues === true
-                    }));
-                    this.isLoadingColumns = false;
-                    this.cdr.detectChanges();
-                },
-                error: error => {
-                    this.tableColumns = [];
-                    this.selectedColumns = [];
-                    this.isLoadingColumns = false;
-                    this.loadingFailed.emit(
-                        error
-                    );
-                    this.cdr.detectChanges();
-                }
-            });
+        this.selectedTable = table;
+        this.clearTableSelection();
+        this.step = 2;
+
+        await this.loadTableFields(table);
     }
+
+    /** Loads the table columns and the matching filter fields. Returns false when it fails. */
+    private async loadTableFields(table: string): Promise<boolean> {
+        this.isLoadingColumns = true;
+
+        try {
+            const fields: ExtraAttribute[] = await firstValueFrom(
+                this.appDashboardService.getTableFieldsList(table)
+            );
+
+            this.tableColumns = fields ?? [];
+            this.filterBuilderFields = this.tableColumns.map(field => this.toFilterField(field));
+            return true;
+
+        } catch (error) {
+            this.clearTableSelection();
+            this.loadingFailed.emit(error);
+            return false;
+
+        } finally {
+            this.isLoadingColumns = false;
+            this.cdr.detectChanges();
+        }
+    }
+
+    private toFilterField(field: ExtraAttribute): FilterBuilderField {
+        return {
+            name: field.name,
+            label: field.description || field.name,
+            dataType: field.dataType || 'String--Textbox',
+            options: this.mapValidEntries(field.validEntries),
+            acceptMultipleValues: field.acceptMultipleValues === true
+        };
+    }
+
     private mapValidEntries(entries: any): Array<{ label: string; value: any }> {
         if (!entries) {
             return [];
@@ -313,124 +276,86 @@ export class SpreadsheetDataPanelComponent
 
         return values.map((item: any) => {
             if (typeof item !== 'object' || item === null) {
-                return {
-                    label: String(item),
-                    value: item
-                };
+                return { label: String(item), value: item };
             }
 
             return {
                 label: String(
-                    item.label ??
-                    item.description ??
-                    item.name ??
-                    item.text ??
-                    item.value ??
-                    item.code ??
-                    item.id
+                    item.label ?? item.description ?? item.name ?? item.text ?? item.value ?? item.code ?? item.id
                 ),
-                value:
-                    item.value ??
-                    item.code ??
-                    item.id ??
-                    item.name
+                value: item.value ?? item.code ?? item.id ?? item.name
             };
         });
     }
-    backToEntities(): void {
-        if (this.isAdding || this.isEditMode) {
+
+    isColumnSelected(column: ExtraAttribute): boolean {
+        return this.selectedColumns.some(selected => selected.attributeId === column.attributeId);
+    }
+
+    toggleColumn(column: ExtraAttribute, event: Event): void {
+        const isChecked = (event.target as HTMLInputElement).checked;
+
+        if (!isChecked) {
+            this.selectedColumns = this.selectedColumns.filter(
+                selected => selected.attributeId !== column.attributeId
+            );
             return;
         }
 
-        this.step = 1;
-        this.selectedTable = '';
-        this.tableColumns = [];
-        this.selectedColumns = [];
-        this.filterValues = {};
-        this.filters = [];
-        this.filterFields = [];
-        this.activeFilterValues = [];
-    }
-    getColumnKey(column: ExtraAttribute): string {
-        return column?.name ?? '';
-    }
-    getColumnLabel(
-        column: ExtraAttribute
-    ): string {
-        return column?.description ?? '';
-    }
-    isColumnSelected(
-        column: ExtraAttribute
-    ): boolean {
-        return this.selectedColumns.some(
-            selected =>
-                selected.attributeId ===
-                column.attributeId
-        );
-    }
-    toggleColumn(
-        column: ExtraAttribute,
-        event: Event
-    ): void {
-        const input =
-            event.target as HTMLInputElement;
-        if (input.checked) {
-            if (
-                !this.selectedColumns.some(
-                    selected =>
-                        selected.attributeId ===
-                        column.attributeId
-                )
-            ) {
-                this.selectedColumns = [
-                    ...this.selectedColumns,
-                    column
-                ];
-            }
-            return;
+        if (!this.isColumnSelected(column)) {
+            this.selectedColumns = [...this.selectedColumns, column];
         }
-        this.selectedColumns =
-            this.selectedColumns.filter(
-                selected =>
-                    selected.attributeId !==
-                    column.attributeId
-            );
     }
+
     selectAllColumns(): void {
-        this.selectedColumns = [
-            ...this.tableColumns
-        ];
+        this.selectedColumns = [...this.tableColumns];
     }
+
     clearColumns(): void {
         this.selectedColumns = [];
     }
 
+    // =====================================================
+    // STEP 2: FILTERS
+    // =====================================================
+
+    /** The filter tree to show in the summary, or null when nothing is applied. */
+    get filterPreview(): FilterConditionGroup | null {
+        return this.filterTree?.children?.length ? this.filterTree : null;
+    }
+
+    get hasFilters(): boolean {
+        return !!this.filterPreview;
+    }
+
+    openFilterDialog(): void {
+        if (!this.isAdding) {
+            this.showFilterDialog = true;
+        }
+    }
+
+    closeFilterDialog(): void {
+        this.showFilterDialog = false;
+    }
+
+    onApplyTree(tree: FilterConditionGroup): void {
+        this.filterTree = this.copyTree(tree);
+        this.showFilterDialog = false;
+    }
+
+    private copyTree(tree: FilterConditionGroup): FilterConditionGroup {
+        return JSON.parse(JSON.stringify(tree)) as FilterConditionGroup;
+    }
+
+    // ---- labels for the summary ----
 
     getConditionFieldLabel(fieldName: string): string {
-        const field = this.filterBuilderFields.find(
-            f => f.name === fieldName
-        );
-
+        const field = this.filterBuilderFields.find(item => item.name === fieldName);
         return field?.label || fieldName;
     }
 
     getConditionOperatorLabel(operator: string): string {
-        const operators: Record<string, string> = {
-            eq: '=',
-            neq: '≠',
-            gt: '>',
-            gte: '>=',
-            lt: '<',
-            lte: '<=',
-            contains: 'contains',
-            notcontains: 'does not contain',
-            startswith: 'starts with',
-            endswith: 'ends with',
-            in: 'is in',
-            notin: 'is not in'
-        };
-
-        return operators[operator] || operator;
+        return this.operatorLabels[operator] || operator;
     }
 
     getConditionValueLabel(condition: FilterBuilderCondition): string {
@@ -440,15 +365,12 @@ export class SpreadsheetDataPanelComponent
             return '""';
         }
 
-        const field = this.filterBuilderFields.find(
-            f => f.name === condition.field
-        );
+        const field = this.filterBuilderFields.find(item => item.name === condition.field);
+        const option = field?.options?.find(item => String(item.value) === String(value));
 
-        const option = field?.options?.find(
-            o => String(o.value) === String(value)
-        );
-
-        if (option) return option.label;
+        if (option) {
+            return option.label;
+        }
 
         if (typeof value === 'boolean') {
             return value ? 'Yes' : 'No';
@@ -457,109 +379,45 @@ export class SpreadsheetDataPanelComponent
         return String(value);
     }
 
-    private gatherConditions(): DynamicCondition[] {
-        if (this.selectedFilterTree) {
-            return this.nodesToDtos(this.selectedFilterTree.children);
-        }
-        return this.selectedConditions.map(c => this.ruleToDto(c));
-    }
+    // =====================================================
+    // EDIT MODE
+    // =====================================================
 
-    private nodesToDtos(nodes: FilterConditionNode[]): DynamicCondition[] {
-        const result: DynamicCondition[] = [];
+    private async loadEditSource(): Promise<void> {
+        const source = this.editSource?.source;
 
-        for (const node of nodes) {
-            if (node.type === 'rule') {
-                result.push(this.ruleToDto(node));
-                continue;
-            }
-
-            const rules = this.flattenRules(node);
-            if (!rules.length) {
-                continue;
-            }
-
-            const listName: 'orWithList' | 'andWithList' =
-                node.matchMode === 'any' ? 'orWithList' : 'andWithList';
-
-            let parent = result[result.length - 1];
-
-            // no condition before the group: its first rule becomes the parent
-            if (!parent) {
-                parent = this.ruleToDto(rules.shift()!);
-                result.push(parent);
-            }
-
-            // every nested rule becomes a direct child of the parent (one level)
-            rules.forEach(rule =>
-                this.attachChild(parent, listName, this.ruleToDto(rule))
-            );
+        if (!source) {
+            return;
         }
 
-        return result;
-    }
+        this.isEditMode = true;
+        this.insertAsNewSheet = false;
+        this.showFilterDialog = false;
+        this.selectedTable = source.sourceKey || source.type;
+        this.clearTableSelection();
 
-    private flattenRules(group: FilterConditionGroup): FilterConditionRule[] {
-        const rules: FilterConditionRule[] = [];
-        for (const node of group.children) {
-            if (node.type === 'rule') {
-                rules.push(node);
-            } else {
-                rules.push(...this.flattenRules(node));
-            }
-        }
-        return rules;
-    }
+        const isLoaded = await this.loadTableFields(this.selectedTable);
 
-    private ruleToDto(rule: { field: string; operator: string; value: any }): DynamicCondition {
-        const dto = new DynamicCondition();
-        dto.field = rule.field;
-        dto.operator = rule.operator;
-        dto.value = this.formatConditionValue(rule.value);
-        return dto;
-    }
-
-    private attachChild(
-        parent: DynamicCondition,
-        listName: 'orWithList' | 'andWithList',
-        child: DynamicCondition
-    ): void {
-        // next free index in this list
-        const pattern = new RegExp(`^${listName}\\[(\\d+)\\]\\.field$`);
-        const index = Object.keys(parent).filter(k => pattern.test(k)).length;
-
-        // The generated proxy does "" + item[attr], so arrays would be sent as
-        // "[object Object]". Use flat keys that ASP.NET model binding understands.
-        Object.keys(child).forEach(key => {
-            const value = (child as any)[key];
-            if (value !== undefined && value !== null) {
-                parent[`${listName}[${index}].${key}`] = value;
-            }
-        });
-    }
-
-    /** Dates -> "yyyy-MM-dd", everything else -> string (matches the API format). */
-    private formatConditionValue(value: any): string {
-        if (value instanceof Date) {
-            const y = value.getFullYear();
-            const m = String(value.getMonth() + 1).padStart(2, '0');
-            const d = String(value.getDate()).padStart(2, '0');
-            return `${y}-${m}-${d}`;
+        if (!isLoaded) {
+            return;
         }
 
-        return String(value);
+        const savedColumnNames: string[] = source.columns ?? [];
+
+        this.selectedColumns = this.tableColumns.filter(column => savedColumnNames.includes(column.name));
+        this.filterTree = this.restoreSavedFilterTree(source.filters, source.mode === 'any' ? 'any' : 'all');
+        this.step = 2;
+
+        this.cdr.detectChanges();
     }
 
-
-
-    private restoreSavedFilterTree(
-        filters: any,
-        fallbackMode: 'all' | 'any' = 'all'
-    ): FilterConditionGroup | null {
-
+    /**
+     * Returns the saved nested tree. Older data only has flat conditions
+     * (with andWithList[n].* / orWithList[n].* keys), so those are converted to a tree.
+     */
+    private restoreSavedFilterTree(filters: any, fallbackMode: FilterMatchMode): FilterConditionGroup | null {
         if (filters?.filterTree?.type === 'group') {
-            return JSON.parse(
-                JSON.stringify(filters.filterTree)
-            ) as FilterConditionGroup;
+            return this.copyTree(filters.filterTree);
         }
 
         const conditions: any[] = filters?.conditions ?? [];
@@ -575,8 +433,6 @@ export class SpreadsheetDataPanelComponent
         };
 
         for (const condition of conditions) {
-
-            // Parent rule
             root.children.push({
                 type: 'rule',
                 field: condition.field,
@@ -584,132 +440,219 @@ export class SpreadsheetDataPanelComponent
                 value: condition.value
             });
 
-            // Restore legacy flattened nested conditions.
-            for (const config of [
-                { prefix: 'andWithList', mode: 'all' as const },
-                { prefix: 'orWithList', mode: 'any' as const }
-            ]) {
-
-                const indices = new Set<number>();
-
-                Object.keys(condition).forEach(key => {
-
-                    const match = key.match(
-                        new RegExp(
-                            '^' + config.prefix +
-                            '\\[(\\d+)\\]\\.field$'
-                        )
-                    );
-
-                    if (match) {
-                        indices.add(Number(match[1]));
-                    }
-                });
-
-                const children: FilterConditionNode[] = [];
-
-                Array.from(indices)
-                    .sort((a, b) => a - b)
-                    .forEach(index => {
-
-                        const prefix =
-                            `${config.prefix}[${index}]`;
-
-                        const field =
-                            condition[`${prefix}.field`];
-
-                        if (!field) {
-                            return;
-                        }
-
-                        children.push({
-                            type: 'rule',
-                            field,
-                            operator:
-                                condition[`${prefix}.operator`] || 'eq',
-                            value:
-                                condition[`${prefix}.value`]
-                        });
-                    });
-
-                if (children.length) {
-                    root.children.push({
-                        type: 'group',
-                        matchMode: config.mode,
-                        children
-                    });
-                }
-            }
+            this.restoreNestedGroup(root, condition, 'andWithList', 'all');
+            this.restoreNestedGroup(root, condition, 'orWithList', 'any');
         }
 
         return root;
     }
 
+    private restoreNestedGroup(
+        root: FilterConditionGroup,
+        condition: any,
+        listName: NestedListName,
+        matchMode: FilterMatchMode
+    ): void {
+        const fieldKey = new RegExp(`^${listName}\\[(\\d+)\\]\\.field$`);
+
+        const indexes = Object.keys(condition)
+            .map(key => key.match(fieldKey))
+            .filter((match): match is RegExpMatchArray => !!match)
+            .map(match => Number(match[1]))
+            .sort((a, b) => a - b);
+
+        const children: FilterConditionNode[] = [];
+
+        for (const index of indexes) {
+            const prefix = `${listName}[${index}]`;
+            const field = condition[`${prefix}.field`];
+
+            if (field) {
+                children.push({
+                    type: 'rule',
+                    field,
+                    operator: condition[`${prefix}.operator`] || 'eq',
+                    value: condition[`${prefix}.value`]
+                });
+            }
+        }
+
+        if (children.length) {
+            root.children.push({ type: 'group', matchMode, children });
+        }
+    }
+
+    clearDataSource(): void {
+        const sheetName = this.editSource?.sheetName;
+
+        if (this.isAdding || !this.isEditMode || !sheetName) {
+            return;
+        }
+
+        this.confirmationService.confirm({
+            key: 'clearDataSourceConfirm',
+            header: 'Clear Data Source',
+            message:
+                `Are you sure you want to clear all data and remove ` +
+                `the linked data source from "${sheetName}"? ` +
+                `Click Save on the spreadsheet to persist this change.`,
+            icon: 'pi pi-exclamation-triangle',
+            acceptLabel: 'Yes',
+            rejectLabel: 'Cancel',
+            acceptButtonStyleClass: 'p-button-text p-button-secondary',
+            rejectButtonStyleClass: 'p-button-text p-button-transparent',
+            accept: () => this.dataSourceCleared.emit(sheetName)
+        });
+    }
+
+    // =====================================================
+    // FILTER TREE -> API CONDITIONS
+    // =====================================================
+
+    private buildApiConditions(): DynamicCondition[] {
+        return this.filterTree ? this.nodesToConditions(this.filterTree.children) : [];
+    }
+
+    private nodesToConditions(nodes: FilterConditionNode[]): DynamicCondition[] {
+        const conditions: DynamicCondition[] = [];
+
+        for (const node of nodes) {
+            if (node.type === 'rule') {
+                conditions.push(this.ruleToCondition(node));
+                continue;
+            }
+
+            const rules = this.flattenRules(node);
+
+            if (!rules.length) {
+                continue;
+            }
+
+            const listName: NestedListName = node.matchMode === 'any' ? 'orWithList' : 'andWithList';
+
+            // A group belongs to the condition before it.
+            // If there is none, the first rule of the group becomes that condition.
+            let parent = conditions[conditions.length - 1];
+
+            if (!parent) {
+                parent = this.ruleToCondition(rules.shift()!);
+                conditions.push(parent);
+            }
+
+            rules.forEach(rule => this.addNestedCondition(parent, listName, this.ruleToCondition(rule)));
+        }
+
+        return conditions;
+    }
+
+    private flattenRules(group: FilterConditionGroup): FilterConditionRule[] {
+        const rules: FilterConditionRule[] = [];
+
+        for (const node of group.children) {
+            if (node.type === 'rule') {
+                rules.push(node);
+            } else {
+                rules.push(...this.flattenRules(node));
+            }
+        }
+
+        return rules;
+    }
+
+    private ruleToCondition(rule: { field: string; operator: string; value: any }): DynamicCondition {
+        const condition = new DynamicCondition();
+        condition.field = rule.field;
+        condition.operator = rule.operator;
+        condition.value = this.formatConditionValue(rule.value);
+        return condition;
+    }
+
+    /**
+     * The generated proxy sends arrays as "[object Object]", so nested conditions
+     * are added as flat keys (orWithList[0].field ...) that ASP.NET model binding understands.
+     */
+    private addNestedCondition(parent: DynamicCondition, listName: NestedListName, child: DynamicCondition): void {
+        const fieldKey = new RegExp(`^${listName}\\[(\\d+)\\]\\.field$`);
+        const nextIndex = Object.keys(parent).filter(key => fieldKey.test(key)).length;
+
+        Object.keys(child).forEach(key => {
+            const value = (child as any)[key];
+
+            if (value !== undefined && value !== null) {
+                (parent as any)[`${listName}[${nextIndex}].${key}`] = value;
+            }
+        });
+    }
+
+    /** Dates become "yyyy-MM-dd", everything else becomes a string. */
+    private formatConditionValue(value: any): string {
+        if (!(value instanceof Date)) {
+            return String(value);
+        }
+
+        const year = value.getFullYear();
+        const month = String(value.getMonth() + 1).padStart(2, '0');
+        const day = String(value.getDate()).padStart(2, '0');
+
+        return `${year}-${month}-${day}`;
+    }
+
+    // =====================================================
+    // LOAD DATA INTO THE SPREADSHEET
+    // =====================================================
+
+    get submitButtonLabel(): string {
+        if (this.isAdding) {
+            return this.isEditMode ? 'Applying' : 'Adding';
+        }
+
+        if (this.isEditMode) {
+            return 'ApplyChanges';
+        }
+
+        return this.insertAsNewSheet ? 'AddAsNewSheet' : 'InsertIntoCurrentSheet';
+    }
 
     async addSheet(): Promise<void> {
-        console.log('tree', JSON.stringify(this.selectedFilterTree));
-        console.log('conditions', JSON.stringify(this.gatherConditions()));
-        const destinationSheetName = this.isEditMode
-            ? this.editSource?.sheetName
-            : this.targetSheetName;
+        const destinationSheetName = this.isEditMode ? this.editSource?.sheetName : this.targetSheetName;
+        const replacesExistingSheet = this.isEditMode || !this.insertAsNewSheet;
 
-        const shouldReplaceExistingSheet =
-            this.isEditMode || !this.insertAsNewSheet;
-
-        if (shouldReplaceExistingSheet && !destinationSheetName) {
+        if (replacesExistingSheet && !destinationSheetName) {
             this.notify.warn('Please select a destination worksheet.');
             return;
         }
 
-        if (
-            !this.isEditMode &&
-            !this.insertAsNewSheet &&
-            this.targetSheetHasData
-        ) {
-            const confirmed = window.confirm(
+        if (!this.isEditMode && !this.insertAsNewSheet && this.targetSheetHasData) {
+            const isConfirmed = window.confirm(
                 `The worksheet "${destinationSheetName}" already contains data.\n\n` +
                 'Inserting this list will replace its existing contents and linked data source, if any.\n\n' +
                 'Do you want to continue?'
             );
 
-            if (!confirmed) {
+            if (!isConfirmed) {
                 return;
             }
         }
 
-        if (
-            !this.selectedTable ||
-            !this.selectedColumns.length ||
-            this.isAdding
-        ) {
+        if (!this.selectedTable || !this.selectedColumns.length || this.isAdding) {
             return;
         }
 
-        const tenantId = this.appSession?.tenantId;
-
-        const selectedFields: string[] = this.selectedColumns
+        const selectedFields = this.selectedColumns
             .map(column => column.name)
-            .filter((field): field is string => !!field);
+            .filter((name): name is string => !!name);
 
-        const requestFields: string[] = [...selectedFields];
+        // The Id column is always loaded.
+        const requestedFields = selectedFields.some(name => name.toLowerCase() === 'id')
+            ? [...selectedFields]
+            : [...selectedFields, 'Id'];
 
-        if (!requestFields.some(field => field.toLowerCase() === 'id')) {
-            requestFields.push('Id');
-        }
-
-        // Uses the nested tree when present, otherwise the flat conditions
-        const conditions = this.gatherConditions();
-
-        // Root match mode comes from the tree when there is one
-        const matchMode: 'all' | 'any' = this.selectedFilterTree
-            ? this.selectedFilterTree.matchMode
-            : this.selectedMatchMode;
-
-        const isOr = matchMode === 'any';
+        const conditions = this.buildApiConditions();
+        const matchMode: FilterMatchMode = this.filterTree?.matchMode ?? 'all';
 
         let skip = 0;
         let loaded = 0;
-        let firstBatch = true;
+        let isFirstBatch = true;
 
         this.isAdding = true;
 
@@ -717,12 +660,12 @@ export class SpreadsheetDataPanelComponent
             while (true) {
                 const result: any = await firstValueFrom(
                     this.appDashboardService.getAllTableData(
-                        tenantId,
+                        this.appSession?.tenantId,
                         this.selectedTable,
-                        requestFields,
+                        requestedFields,
                         conditions,
                         undefined,
-                        isOr,
+                        matchMode === 'any',
                         undefined,
                         skip,
                         this.batchSize
@@ -736,25 +679,9 @@ export class SpreadsheetDataPanelComponent
                     break;
                 }
 
-                const rows = this.buildRows(records);
-
-                if (firstBatch) {
-                    console.log(
-                        '[Spreadsheet] Backend columns:',
-                        Object.keys(records[0] ?? {})
-                    );
-
-                    console.log(
-                        '[Spreadsheet] Emitted columns:',
-                        Object.keys(rows[0] ?? {})
-                    );
-                }
-
                 loaded += records.length;
 
-                const isLastBatch =
-                    records.length < this.batchSize ||
-                    (total > 0 && loaded >= total);
+                const isLastBatch = records.length < this.batchSize || (total > 0 && loaded >= total);
 
                 this.batchLoaded.emit({
                     table: this.selectedTable,
@@ -762,20 +689,16 @@ export class SpreadsheetDataPanelComponent
                     selectedColumns: [...this.selectedColumns],
                     conditions: [...conditions],
                     matchMode,
-                    filterTree: this.selectedFilterTree,
-
-                    insertAsNewSheet:
-                        !this.isEditMode && this.insertAsNewSheet,
-
+                    filterTree: this.filterTree,
+                    insertAsNewSheet: !this.isEditMode && this.insertAsNewSheet,
                     targetSheetName: destinationSheetName,
-
-                    rows,
+                    rows: this.buildRows(records),
                     loaded,
                     total,
-                    isFirstBatch: firstBatch,
+                    isFirstBatch,
                     isLastBatch
                 } as SpreadsheetDataBatch & {
-                    matchMode: 'all' | 'any';
+                    matchMode: FilterMatchMode;
                     filterTree: FilterConditionGroup | null;
                     insertAsNewSheet: boolean;
                     targetSheetName?: string;
@@ -783,7 +706,7 @@ export class SpreadsheetDataPanelComponent
 
                 await this.waitForPaint();
 
-                firstBatch = false;
+                isFirstBatch = false;
                 skip += records.length;
 
                 if (isLastBatch) {
@@ -796,11 +719,7 @@ export class SpreadsheetDataPanelComponent
             }
 
         } catch (error) {
-            console.error(
-                '[Spreadsheet Data Panel] load failed:',
-                error
-            );
-
+            console.error('[Spreadsheet Data Panel] load failed:', error);
             this.loadingFailed.emit(error);
 
         } finally {
@@ -809,334 +728,65 @@ export class SpreadsheetDataPanelComponent
         }
     }
 
+    /** One row per record: Id first, then the selected columns. */
+    private buildRows(records: Array<{ [key: string]: any }>): any[] {
+        const columnNames = this.selectedColumns
+            .map(column => column.name)
+            .filter(name => !!name && name.toLowerCase() !== 'id');
 
-    private buildRows(records: { [key: string]: any }[]): any[] {
         return records.map(record => {
-            const row: any = {};
+            const row: any = { Id: this.readValue(record, 'Id') };
 
-            // Always include Id as the first column.
-            row['Id'] = this.getRecordValue(record, 'Id');
-
-            // Include the selected fields after Id.
-            this.selectedColumns.forEach(column => {
-                const field = this.getColumnKey(column);
-
-                if (!field || field.toLowerCase() === 'id') {
-                    return;
-                }
-
-                row[field] = this.getRecordValue(record, field);
+            columnNames.forEach(name => {
+                row[name] = this.readValue(record, name);
             });
 
             return row;
         });
     }
-    private getRecordValue(
-        record: any,
-        key: string
-    ): any {
-        if (
-            !record ||
-            !key
-        ) {
+
+    /** Reads a property ignoring the letter case of its name. */
+    private readValue(record: any, key: string): any {
+        if (!record || !key) {
             return '';
         }
-        if (
-            record[key] !== undefined
-        ) {
-            return this.normalizeCellValue(
-                record[key]
-            );
-        }
-        const actualKey =
-            Object.keys(record)
-                .find(
-                    property =>
-                        property
-                            .toLowerCase() ===
-                        key.toLowerCase()
-                );
-        if (!actualKey) {
-            return '';
-        }
-        return this.normalizeCellValue(
-            record[actualKey]
-        );
+
+        const actualKey = key in record
+            ? key
+            : Object.keys(record).find(property => property.toLowerCase() === key.toLowerCase());
+
+        return actualKey === undefined ? '' : this.toCellValue(record[actualKey]);
     }
-    private normalizeCellValue(
-        value: any
-    ): any {
-        if (
-            value === null ||
-            value === undefined
-        ) {
+
+    /** Converts any API value into something a spreadsheet cell can show. */
+    private toCellValue(value: any): any {
+        if (value === null || value === undefined) {
             return '';
         }
-        if (
-            typeof value === 'string' ||
-            typeof value === 'number' ||
-            typeof value === 'boolean'
-        ) {
+
+        if (['string', 'number', 'boolean'].includes(typeof value)) {
             return value;
         }
+
         if (value instanceof Date) {
-            return this.formatDate(
-                value
-            );
+            return Number.isNaN(value.getTime()) ? String(value) : value.toLocaleDateString();
         }
+
         if (Array.isArray(value)) {
-            return value
-                .map(item =>
-                    this.normalizeCellValue(
-                        item
-                    )
-                )
-                .join(', ');
+            return value.map(item => this.toCellValue(item)).join(', ');
         }
-        if (
-            typeof value === 'object'
-        ) {
-            if (
-                value.name !== undefined
-            ) {
-                return value.name;
-            }
-            if (
-                value.label !== undefined
-            ) {
-                return value.label;
-            }
-            if (
-                value.value !== undefined
-            ) {
-                return value.value;
-            }
-            return JSON.stringify(
-                value
-            );
+
+        if (typeof value === 'object') {
+            return value.name ?? value.label ?? value.value ?? JSON.stringify(value);
         }
+
         return String(value);
     }
 
-    getTableIcon(
-        tableName: string
-    ): string {
-        return (
-            this.tableIcons[
-            tableName
-            ] ||
-            'fa fa-database'
-        );
+    /** Lets the browser paint between two batches so the spreadsheet stays responsive. */
+    private waitForPaint(): Promise<void> {
+        return new Promise(resolve => {
+            requestAnimationFrame(() => requestAnimationFrame(() => resolve()));
+        });
     }
-    private formatDate(
-        value: any
-    ): string {
-        if (!value) {
-            return '';
-        }
-        const date =
-            new Date(value);
-        return Number.isNaN(
-            date.getTime()
-        )
-            ? String(value)
-            : date.toLocaleDateString();
-    }
-    private waitForPaint():
-        Promise<void> {
-        return new Promise(
-            resolve => {
-                requestAnimationFrame(
-                    () => {
-                        requestAnimationFrame(
-                            () =>
-                                resolve()
-                        );
-                    }
-                );
-            }
-        );
-    }
-    closePanel(): void {
-        if (this.isAdding) {
-            return;
-        }
-        this.reset();
-        this.close.emit();
-    }
-
-
-    openFilterDialog(): void {
-        if (this.isAdding) {
-            return;
-        }
-
-        this.showFilterDialog = true;
-    }
-
-    closeFilterDialog(): void {
-        this.showFilterDialog = false;
-    }
-
-
-
-
-    onFilterMatchModeChanged(mode: 'all' | 'any'): void {
-        this.selectedMatchMode = mode;
-    }
-    reset(): void {
-        this.step = 1;
-        this.selectedTable = '';
-        this.tableColumns = [];
-        this.selectedColumns = [];
-        this.filterValues = {};
-        this.filters = [];
-        this.filterFields = [];
-        this.activeFilterValues = [];
-        this.isLoadingColumns = false;
-        this.selectedConditions = [];
-        this.filterBuilderFields = [];
-        this.selectedMatchMode = 'all';
-        this.showFilterDialog = false;
-        this.isEditMode = false;
-        this.selectedFilterTree = null;
-        this.previewCache = null;
-        this.selectedTableForNext = null;
-        this.insertAsNewSheet = true;
-    }
-
-
-
-    onApplyTree(tree: FilterConditionGroup): void {
-
-        this.selectedFilterTree = JSON.parse(
-            JSON.stringify(tree)
-        ) as FilterConditionGroup;
-
-        this.selectedMatchMode = tree.matchMode;
-        this.selectedConditions = this.collectRules(tree);
-
-        this.previewCache = null;
-        this.showFilterDialog = false;
-    }
-
-    private collectRules(group: FilterConditionGroup): FilterBuilderCondition[] {
-        const result: FilterBuilderCondition[] = [];
-        for (const node of group.children) {
-            if (node.type === 'group') {
-                result.push(...this.collectRules(node));
-            } else {
-                result.push({
-                    field: node.field,
-                    operator: node.operator,
-                    value: node.value
-                });
-            }
-        }
-        return result;
-    }
-
-    selectedTableForNext: string | null = null;
-
-    chooseTable(table: string): void {
-        this.selectedTableForNext = table;
-    }
-
-    goToColumnsStep(): void {
-        if (!this.selectedTableForNext) return;
-
-        // Existing function loads columns and moves to step 2
-        this.selectTable(this.selectedTableForNext);
-    }
-
-    selectedFilterTree: FilterConditionGroup | null = null;
-
-    onFilterTreeChanged(tree: FilterConditionGroup): void {
-        this.selectedFilterTree = tree;
-    }
-
-
-
-    private previewCache: {
-        tree: FilterConditionGroup | null;
-        conditions: FilterBuilderCondition[];
-        mode: 'all' | 'any';
-        result: FilterConditionGroup | null;
-    } | null = null;
-
-    // Uses the tree when present, otherwise wraps the flat conditions (edit mode, old data).
-    // Cached by reference so the template does not re-render on every change detection.
-    get previewRoot(): FilterConditionGroup | null {
-        const c = this.previewCache;
-        if (
-            c &&
-            c.tree === this.selectedFilterTree &&
-            c.conditions === this.selectedConditions &&
-            c.mode === this.selectedMatchMode
-        ) {
-            return c.result;
-        }
-
-        let result: FilterConditionGroup | null = null;
-
-        if (this.selectedFilterTree?.children?.length) {
-            result = this.selectedFilterTree;
-        } else if (this.selectedConditions.length) {
-            result = {
-                type: 'group',
-                matchMode: this.selectedMatchMode,
-                children: this.selectedConditions.map(condition => ({
-                    type: 'rule' as const,
-                    field: condition.field,
-                    operator: condition.operator,
-                    value: condition.value
-                }))
-            };
-        }
-
-        this.previewCache = {
-            tree: this.selectedFilterTree,
-            conditions: this.selectedConditions,
-            mode: this.selectedMatchMode,
-            result
-        };
-
-        return result;
-    }
-
-
-clearDataSource(): void {
-
-    if (this.isAdding) {
-        return;
-    }
-
-    const sheetName = this.editSource?.sheetName;
-
-    if (!this.isEditMode || !sheetName) {
-        return;
-    }
-
-    this.confirmationService.confirm({
-        key: 'clearDataSourceConfirm',
-        header: 'Clear Data Source',
-        message:
-            `Are you sure you want to clear all data and remove ` +
-            `the linked data source from "${sheetName}"? ` +
-            `Click Save on the spreadsheet to persist this change.`,
-        icon: 'pi pi-exclamation-triangle',
-
-        acceptLabel: 'Yes',
-        rejectLabel: 'Cancel',
-
-        acceptButtonStyleClass: 'p-button-text p-button-secondary',
-        rejectButtonStyleClass: 'p-button-text p-button-transparent',
-
-        accept: () => {
-            this.dataSourceCleared.emit(sheetName);
-        }
-    });
-}
-
-
 }
