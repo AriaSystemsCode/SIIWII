@@ -168,6 +168,21 @@ export interface FilterBuilderField {
         value: any;
     }>;
     acceptMultipleValues?: boolean;
+    isLookup?: boolean;
+validEntries?: string;
+dataSource?: {
+    service: string;
+    api: string;
+    parameter: string;
+    valueField?: string;
+};
+paginationSetting?: {
+    list?: Array<{
+        label: string;
+        value: any;
+    }>;
+};
+
 }
 
 export interface FilterBuilderCondition {

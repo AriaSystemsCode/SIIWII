@@ -1,9 +1,8 @@
-
 <div class="filter-builder">
 
     <div class="filter-content">
-        <ng-container
-            *ngTemplateOutlet="
+
+        <ng-container *ngTemplateOutlet="
                 groupTemplate;
                 context: {
                     $implicit: rootGroup,
@@ -11,56 +10,47 @@
                 }
             ">
         </ng-container>
+
     </div>
 
+    <!-- ========================================= -->
     <!-- GROUP TEMPLATE -->
-    <ng-template
-        #groupTemplate
-        let-group
-        let-isRoot="isRoot">
+    <!-- ========================================= -->
 
-        <div
-            class="filter-group"
-            [class.filter-group-root]="isRoot"
-            [class.filter-group-nested]="!isRoot">
+    <ng-template #groupTemplate let-group let-isRoot="isRoot">
+
+        <div class="filter-group" [class.filter-group-root]="isRoot" [class.filter-group-nested]="!isRoot">
 
             <!-- ALL / ANY -->
+
             <div class="filter-match-row">
 
                 <span *ngIf="isRoot">
                     {{ 'Match' | localize }}
                 </span>
 
-                <p-dropdown
-                    [inputId]="isRoot
+                <p-dropdown [inputId]="isRoot
                         ? 'filter-root-match'
-                        : 'filter-nested-match'"
-                    [name]="isRoot
+                        : 'filter-nested-match'" [name]="isRoot
                         ? 'filter-root-match'
-                        : 'filter-nested-match'"
-                    [options]="matchOptions"
-                    [(ngModel)]="group.matchMode"
-                    [ngModelOptions]="{ standalone: true }"
-                    optionLabel="label"
-                    optionValue="value"
-                    appendTo="body"
+                        : 'filter-nested-match'" [options]="matchOptions" [(ngModel)]="group.matchMode"
+                    [ngModelOptions]="{ standalone: true }" optionLabel="label" optionValue="value" appendTo="body"
                     styleClass="match-dropdown">
                 </p-dropdown>
 
                 <span>
                     {{
-                        (isRoot
-                            ? 'of the following conditions'
-                            : 'of') | localize
+                    (isRoot
+                    ? 'of the following conditions'
+                    : 'of') | localize
                     }}:
                 </span>
 
             </div>
 
             <!-- COLUMN HEADERS -->
-            <div
-                class="filter-rule-header"
-                *ngIf="group.children.length">
+
+            <div class="filter-rule-header" *ngIf="group.children.length">
 
                 <span>{{ 'Field' | localize }}</span>
                 <span>{{ 'Operator' | localize }}</span>
@@ -69,20 +59,20 @@
 
             </div>
 
-            <!-- CONDITIONS -->
-            <ng-container
-                *ngFor="
+            <!-- ================================= -->
+            <!-- CONDITIONS AND NESTED GROUPS -->
+            <!-- ================================= -->
+
+            <ng-container *ngFor="
                     let node of group.children;
                     let i = index
                 ">
 
                 <!-- NORMAL CONDITION -->
-                <div
-                    *ngIf="isRule(node)"
-                    class="filter-rule-row">
 
-                    <ng-container
-                        *ngTemplateOutlet="
+                <div *ngIf="isRule(node)" class="filter-rule-row">
+
+                    <ng-container *ngTemplateOutlet="
                             ruleTemplate;
                             context: {
                                 $implicit: asRule(node)
@@ -93,35 +83,30 @@
                     <div class="filter-actions">
 
                         <!-- PLUS: NESTED ONLY -->
-                        <button
-                            *ngIf="!isRoot"
-                            type="button"
-                            class="filter-icon-btn add-btn"
-                            (click)="addRuleAfterInGroup(group, i)"
-                            title="Add Condition">
+
+                        <button *ngIf="!isRoot" type="button" class="filter-icon-btn add-btn"
+                            (click)="addRuleAfterInGroup(group, i)" title="Add Condition">
 
                             <i class="fa fa-plus"></i>
+
                         </button>
 
-                        <!-- NESTED GROUP: ROOT ONLY -->
-                        <button
-                            *ngIf="isRoot && !hasNestedGroup"
-                            type="button"
-                            class="filter-icon-btn group-btn"
-                            (click)="addGroupAfter(group, i)"
-                            title="Add nested group">
+                        <!-- CREATE NESTED GROUP: ROOT ONLY -->
+
+                        <button *ngIf="isRoot && !hasNestedGroup" type="button" class="filter-icon-btn group-btn"
+                            (click)="addGroupAfter(group, i)" title="Add nested group">
 
                             <i class="fa fa-sitemap"></i>
+
                         </button>
 
                         <!-- DELETE CONDITION -->
-                        <button
-                            type="button"
-                            class="filter-icon-btn delete-btn"
-                            (click)="removeGroupItem(group, i)"
+
+                        <button type="button" class="filter-icon-btn delete-btn" (click)="removeGroupItem(group, i)"
                             title="Delete Condition">
 
                             <i class="fa fa-trash"></i>
+
                         </button>
 
                     </div>
@@ -129,21 +114,17 @@
                 </div>
 
                 <!-- NESTED GROUP -->
-                <div
-                    *ngIf="isGroup(node)"
-                    class="nested-group-container">
 
-                    <button
-                        type="button"
-                        class="filter-icon-btn delete-btn group-delete-btn"
-                        (click)="removeGroupItem(group, i)"
-                        title="Delete group">
+                <div *ngIf="isGroup(node)" class="nested-group-container">
+
+                    <button type="button" class="filter-icon-btn delete-btn group-delete-btn"
+                        (click)="removeGroupItem(group, i)" title="Delete group">
 
                         <i class="fa fa-trash"></i>
+
                     </button>
 
-                    <ng-container
-                        *ngTemplateOutlet="
+                    <ng-container *ngTemplateOutlet="
                             groupTemplate;
                             context: {
                                 $implicit: asGroup(node),
@@ -157,16 +138,13 @@
             </ng-container>
 
             <!-- NEW CONDITION: ROOT ONLY -->
-            <div
-                class="filter-group-actions"
-                *ngIf="isRoot">
 
-                <button
-                    type="button"
-                    class="new-rule-btn"
-                    (click)="addRuleToGroup(group)">
+            <div class="filter-group-actions" *ngIf="isRoot">
+
+                <button type="button" class="new-rule-btn" (click)="addRuleToGroup(group)">
 
                     <i class="fa fa-plus mr-2"></i>
+
                     {{ 'New Condition' | localize }}
 
                 </button>
@@ -177,266 +155,183 @@
 
     </ng-template>
 
-    <!-- FIELD / OPERATOR / VALUE -->
+    <!-- ========================================= -->
+    <!-- FIELD / OPERATOR / VALUE TEMPLATE -->
+    <!-- ========================================= -->
+
     <ng-template #ruleTemplate let-rule>
 
         <!-- FIELD -->
-        <div
-            class="filter-field"
-            [attr.data-label]="'Field' | localize">
 
-            <p-dropdown
-                [inputId]="getRuleId(rule) + '-field'"
-                [name]="getRuleId(rule) + '-field'"
-                [options]="fields"
-                [(ngModel)]="rule.field"
-                [ngModelOptions]="{ standalone: true }"
-                optionLabel="label"
-                optionValue="name"
-                [filter]="true"
-                filterBy="label,name"
-                [showClear]="true"
-                placeholder="Select field"
-                appendTo="body"
-                styleClass="w-100"
-                (onChange)="onFieldChange(rule)">
+        <div class="filter-field" [attr.data-label]="'Field' | localize">
+
+            <p-dropdown [inputId]="getRuleId(rule) + '-field'" [name]="getRuleId(rule) + '-field'" [options]="fields"
+                [(ngModel)]="rule.field" [ngModelOptions]="{ standalone: true }" optionLabel="label" optionValue="name"
+                [filter]="true" filterBy="label,name" [showClear]="true" placeholder="Select field" appendTo="body"
+                styleClass="w-100" (onChange)="onFieldChange(rule)">
             </p-dropdown>
 
         </div>
 
         <!-- OPERATOR -->
-        <div
-            class="filter-operator"
-            [attr.data-label]="'Operator' | localize">
 
-            <p-dropdown
-                [inputId]="getRuleId(rule) + '-operator'"
-                [name]="getRuleId(rule) + '-operator'"
-                [options]="getOperators(rule)"
-                [(ngModel)]="rule.operator"
-                [ngModelOptions]="{ standalone: true }"
-                optionLabel="label"
-                optionValue="value"
-                appendTo="body"
-                styleClass="w-100"
+        <div class="filter-operator" [attr.data-label]="'Operator' | localize">
+
+            <p-dropdown [inputId]="getRuleId(rule) + '-operator'" [name]="getRuleId(rule) + '-operator'"
+                [options]="getOperators(rule)" [(ngModel)]="rule.operator" [ngModelOptions]="{ standalone: true }"
+                optionLabel="label" optionValue="value" appendTo="body" styleClass="w-100"
                 (onChange)="onOperatorChange(rule)">
             </p-dropdown>
 
         </div>
 
-        <!-- VALUE -->
-        <div
-            class="filter-value"
-            [attr.data-label]="'Value' | localize">
+        <!-- ================================= -->
+        <!-- DYNAMIC VALUE CONTROL -->
+        <!-- ================================= -->
 
-            <ng-container [ngSwitch]="getType(rule)">
+        <div class="filter-value" [attr.data-label]="'Value' | localize">
+            <ng-container *ngIf="!isNullOperator(rule)">
+                <!-- LOOKUP / DYNAMIC API / VALID ENTRIES -->
 
-                <!-- DATE -->
-                <ng-container *ngSwitchCase="'date'">
+                <ng-container *ngIf="isOptionField(rule); else normalValueInput">
 
-                    <ng-container
-                        *ngIf="
-                            isDatePeriodOperator(rule);
-                            else singleDate
-                        ">
+                    <div class="lookup-dropdown-wrapper">
 
-                        <div class="date-period-wrapper">
+                        <p-dropdown [inputId]="getRuleId(rule) + '-lookup'" [name]="getRuleId(rule) + '-lookup'"
+                            [options]="getValueOptionsWithSelection(rule)" [(ngModel)]="rule.value"
+                            [ngModelOptions]="{ standalone: true }" optionLabel="label" optionValue="value"
+                            [filter]="true" filterBy="label" [showClear]="true" placeholder="Select value"
+                            appendTo="body" styleClass="w-100" (onShow)="onLookupOpen(rule)">
+                        </p-dropdown>
 
-                            <p-dropdown
-                                [inputId]="getRuleId(rule) + '-period'"
-                                [name]="getRuleId(rule) + '-period'"
-                                [options]="datePeriodOptions"
-                                [(ngModel)]="rule.datePeriod"
-                                [ngModelOptions]="{ standalone: true }"
-                                optionLabel="label"
-                                optionValue="value"
-                                placeholder="Select period"
-                                appendTo="body"
-                                styleClass="w-100"
-                                (onChange)="onDatePeriodChange(rule)">
-                            </p-dropdown>
+                        <!-- LOADING INDICATOR -->
 
-                            <p-calendar
-                                *ngIf="rule.datePeriod === 'dateRange'"
-                                [inputId]="getRuleId(rule) + '-range'"
-                                [name]="getRuleId(rule) + '-range'"
-                                [(ngModel)]="rule.dateRange"
-                                [ngModelOptions]="{ standalone: true }"
-                                selectionMode="range"
-                                dateFormat="yy-mm-dd"
-                                [showIcon]="true"
-                                [readonlyInput]="true"
-                                placeholder="Select date range"
-                                appendTo="body"
-                                styleClass="w-100">
-                            </p-calendar>
+                        <i *ngIf="isLookupLoading(rule)" class="pi pi-spin pi-spinner lookup-loading-icon">
+                        </i>
 
-                        </div>
+                    </div>
+
+                    <!-- PAGINATED LOOKUP -->
+
+                    <button *ngIf="hasMoreLookupOptions(rule)" type="button" class="btn btn-link btn-sm mt-1"
+                        [disabled]="isLookupLoading(rule)" (click)="loadMoreLookupOptions(rule)">
+
+                        {{ 'Load More' | localize }}
+
+                    </button>
+
+                </ng-container>
+
+                <!-- ================================= -->
+                <!-- NORMAL VALUE INPUTS -->
+                <!-- ================================= -->
+
+                <ng-template #normalValueInput>
+
+                    <ng-container [ngSwitch]="getType(rule)">
+
+                        <!-- NUMBER -->
+
+                        <input *ngSwitchCase="'number'" type="number" class="form-control" [(ngModel)]="rule.value"
+                            [ngModelOptions]="{ standalone: true }" [id]="getRuleId(rule) + '-number'"
+                            [name]="getRuleId(rule) + '-number'" placeholder="Enter number" />
+
+                        <!-- BOOLEAN -->
+
+                        <p-dropdown *ngSwitchCase="'boolean'" [inputId]="getRuleId(rule) + '-boolean'"
+                            [name]="getRuleId(rule) + '-boolean'" [options]="booleanOptions" [(ngModel)]="rule.value"
+                            [ngModelOptions]="{ standalone: true }" optionLabel="label" optionValue="value"
+                            [showClear]="true" placeholder="Select value" appendTo="body" styleClass="w-100">
+                        </p-dropdown>
+
+                        <!-- DATE -->
+
+                        <ng-container *ngSwitchCase="'date'">
+
+                            <!-- DATE PERIOD: IN / NOT IN -->
+
+                            <ng-container *ngIf="
+                                isDatePeriodOperator(rule);
+                                else singleDate
+                            ">
+
+                                <p-dropdown [inputId]="getRuleId(rule) + '-period'" [name]="getRuleId(rule) + '-period'"
+                                    [options]="datePeriodOptions" [(ngModel)]="rule.datePeriod"
+                                    [ngModelOptions]="{ standalone: true }" optionLabel="label" optionValue="value"
+                                    placeholder="Select period" appendTo="body" styleClass="w-100"
+                                    (onChange)="onDatePeriodChange(rule)">
+                                </p-dropdown>
+
+                                <!-- CUSTOM DATE RANGE -->
+
+                                <p-calendar *ngIf="rule.datePeriod === 'dateRange'"
+                                    [inputId]="getRuleId(rule) + '-range'" [name]="getRuleId(rule) + '-range'"
+                                    [(ngModel)]="rule.dateRange" [ngModelOptions]="{ standalone: true }"
+                                    selectionMode="range" dateFormat="yy-mm-dd" [showIcon]="true" [showButtonBar]="true"
+                                    appendTo="body" styleClass="w-100 mt-2">
+                                </p-calendar>
+
+                            </ng-container>
+
+                            <!-- SINGLE DATE -->
+
+                            <ng-template #singleDate>
+
+                                <p-calendar [inputId]="getRuleId(rule) + '-date'" [name]="getRuleId(rule) + '-date'"
+                                    [(ngModel)]="rule.value" [ngModelOptions]="{ standalone: true }"
+                                    dateFormat="yy-mm-dd" [showIcon]="true" [showButtonBar]="true" appendTo="body"
+                                    styleClass="w-100">
+                                </p-calendar>
+
+                            </ng-template>
+
+                        </ng-container>
+
+                        <!-- LIST WITHOUT LOOKUP OPTIONS -->
+
+                        <input *ngSwitchCase="'list'" type="text" class="form-control" [(ngModel)]="rule.value"
+                            [ngModelOptions]="{ standalone: true }" [id]="getRuleId(rule) + '-list'"
+                            [name]="getRuleId(rule) + '-list'" placeholder="Enter value" />
+
+                        <!-- STRING / DEFAULT -->
+
+                        <input *ngSwitchDefault type="text" class="form-control" [(ngModel)]="rule.value"
+                            [ngModelOptions]="{ standalone: true }" [id]="getRuleId(rule) + '-text'"
+                            [name]="getRuleId(rule) + '-text'" placeholder="Enter value" />
 
                     </ng-container>
 
-                    <ng-template #singleDate>
-
-                        <p-calendar
-                            [inputId]="getRuleId(rule) + '-date'"
-                            [name]="getRuleId(rule) + '-date'"
-                            [(ngModel)]="rule.value"
-                            [ngModelOptions]="{ standalone: true }"
-                            dateFormat="yy-mm-dd"
-                            [showIcon]="true"
-                            appendTo="body"
-                            styleClass="w-100">
-                        </p-calendar>
-
-                    </ng-template>
-
-                </ng-container>
-
-                <!-- BOOLEAN -->
-                <p-dropdown
-                    *ngSwitchCase="'boolean'"
-                    [inputId]="getRuleId(rule) + '-boolean'"
-                    [name]="getRuleId(rule) + '-boolean'"
-                    [options]="booleanOptions"
-                    [(ngModel)]="rule.value"
-                    [ngModelOptions]="{ standalone: true }"
-                    optionLabel="label"
-                    optionValue="value"
-                    placeholder="Select value"
-                    appendTo="body"
-                    styleClass="w-100">
-                </p-dropdown>
-
-                <!-- NUMBER -->
-                <ng-container *ngSwitchCase="'number'">
-
-                    <p-dropdown
-                        *ngIf="hasValidEntries(rule); else numberInput"
-                        [inputId]="getRuleId(rule) + '-number-list'"
-                        [name]="getRuleId(rule) + '-number-list'"
-                        [options]="getField(rule)?.options"
-                        [(ngModel)]="rule.value"
-                        [ngModelOptions]="{ standalone: true }"
-                        optionLabel="label"
-                        optionValue="value"
-                        [filter]="true"
-                        appendTo="body"
-                        styleClass="w-100">
-                    </p-dropdown>
-
-                    <ng-template #numberInput>
-
-                        <input
-                            type="number"
-                            class="form-control"
-                            [id]="getRuleId(rule) + '-number'"
-                            [name]="getRuleId(rule) + '-number'"
-                            [(ngModel)]="rule.value"
-                            [ngModelOptions]="{ standalone: true }"
-                            placeholder="Enter number" />
-
-                    </ng-template>
-
-                </ng-container>
-
-                <!-- LIST -->
-                <ng-container *ngSwitchCase="'list'">
-
-                    <p-dropdown
-                        *ngIf="hasValidEntries(rule); else listInput"
-                        [inputId]="getRuleId(rule) + '-list'"
-                        [name]="getRuleId(rule) + '-list'"
-                        [options]="getField(rule)?.options"
-                        [(ngModel)]="rule.value"
-                        [ngModelOptions]="{ standalone: true }"
-                        optionLabel="label"
-                        optionValue="value"
-                        [filter]="true"
-                        placeholder="Select value"
-                        appendTo="body"
-                        styleClass="w-100">
-                    </p-dropdown>
-
-                    <ng-template #listInput>
-
-                        <input
-                            type="text"
-                            class="form-control"
-                            [id]="getRuleId(rule) + '-list-text'"
-                            [name]="getRuleId(rule) + '-list-text'"
-                            [(ngModel)]="rule.value"
-                            [ngModelOptions]="{ standalone: true }"
-                            placeholder="Enter value" />
-
-                    </ng-template>
-
-                </ng-container>
-
-                <!-- TEXT -->
-                <ng-container *ngSwitchDefault>
-
-                    <p-dropdown
-                        *ngIf="hasValidEntries(rule); else textInput"
-                        [inputId]="getRuleId(rule) + '-text-list'"
-                        [name]="getRuleId(rule) + '-text-list'"
-                        [options]="getField(rule)?.options"
-                        [(ngModel)]="rule.value"
-                        [ngModelOptions]="{ standalone: true }"
-                        optionLabel="label"
-                        optionValue="value"
-                        [filter]="true"
-                        placeholder="Select value"
-                        appendTo="body"
-                        styleClass="w-100">
-                    </p-dropdown>
-
-                    <ng-template #textInput>
-
-                        <input
-                            type="text"
-                            class="form-control"
-                            [id]="getRuleId(rule) + '-text'"
-                            [name]="getRuleId(rule) + '-text'"
-                            [(ngModel)]="rule.value"
-                            [ngModelOptions]="{ standalone: true }"
-                            placeholder="Enter value" />
-
-                    </ng-template>
-
-                </ng-container>
-
+                </ng-template>
             </ng-container>
-
         </div>
 
     </ng-template>
 
+    <!-- ========================================= -->
     <!-- FOOTER -->
+    <!-- ========================================= -->
+
     <div class="filter-footer">
 
-        <button
-            type="button"
-            class="btn btn-light"
-            (click)="close()">
+        <!-- DISCARD -->
+
+        <button type="button" class="btn btn-light" (click)="close()">
 
             {{ 'Discard' | localize }}
 
         </button>
 
-        <button
-            type="button"
-            class="btn btn-outline-secondary"
-            (click)="clearFilters()">
+        <!-- CLEAR ALL -->
+
+        <button type="button" class="btn btn-outline-secondary" (click)="clearFilters()">
 
             {{ 'ClearAll' | localize }}
 
         </button>
 
-        <button
-            type="button"
-            class="btn btn-primary"
-            [disabled]="!canApply"
-            (click)="applyFilters()">
+        <!-- CONFIRM -->
+
+        <button type="button" class="btn btn-primary" [disabled]="!canApply" (click)="applyFilters()">
 
             {{ 'Confirm' | localize }}
 

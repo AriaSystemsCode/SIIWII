@@ -10,16 +10,8 @@
             <h5 class="mb-1">
                 {{ 'New Data' | localize }}
             </h5>
-            <!-- <small class="text-muted">
-                {{
-                'InsertApplicationDataIntoNewSheet'
-                | localize
-                }}
-            </small> -->
         </div>
-        <!-- <button type="button" class="btn btn-sm btn-light" (click)="closePanel()">
-            <i class="fa fa-times"></i>
-        </button> -->
+
         <div class="d-flex align-items-center gap-2">
 
     <button
@@ -456,3 +448,14 @@
         </ng-container>
     </div>
 </div>
+
+
+
+<p-confirmDialog
+    key="clearDataSourceConfirm"
+    [appendTo]="'body'"
+    [closable]="false"
+    [dismissableMask]="false"
+    [style]="{ width: '440px', maxWidth: '95vw' }"
+    styleClass="clear-data-confirm-dialog">
+</p-confirmDialog>

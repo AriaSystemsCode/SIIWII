@@ -24,10 +24,12 @@ import {
     SpreadsheetDataBatch,
     SpreadsheetSheetDataSource
 } from '../../models/dashboard.model';
+import { ConfirmationService } from 'primeng/api';
 @Component({
     selector: 'app-spreadsheet-data-panel',
     templateUrl: './spreadsheet-data-panel.component.html',
-    styleUrls: ['./spreadsheet-data-panel.component.scss']
+    styleUrls: ['./spreadsheet-data-panel.component.scss'],
+     providers: [ConfirmationService]
 })
 export class SpreadsheetDataPanelComponent
     extends AppComponentBase
@@ -47,7 +49,8 @@ export class SpreadsheetDataPanelComponent
     filters: any[] = [];
     filterFields: ExtraAttribute[] = [];
     activeFilterValues: any[] = [];
-    // Optional override for backend-specific field/operator mapping.
+        @Output() dataSourceCleared = new EventEmitter<string>();
+
     @Input() filterFieldKey: 'code' | 'name' = 'code';
     @Input() conditionFactory: ((filter: any) => DynamicCondition) | null = null;
 
@@ -90,6 +93,7 @@ export class SpreadsheetDataPanelComponent
         private appDashboardService:
             AppDashboardServiceProxy,
         private cdr: ChangeDetectorRef,
+         private confirmationService: ConfirmationService
     ) {
         super(injector);
     }
@@ -1101,54 +1105,37 @@ export class SpreadsheetDataPanelComponent
     }
 
 
-    clearDataSource(): void {
+clearDataSource(): void {
 
     if (this.isAdding) {
         return;
     }
 
-    // const confirmed = window.confirm(
-    //     'Clear the selected data source, table, columns, and all filters?'
-    // );
+    const sheetName = this.editSource?.sheetName;
 
-    // if (!confirmed) {
-    //     return;
-    // }
+    if (!this.isEditMode || !sheetName) {
+        return;
+    }
 
-    // Clear table selection
-    this.selectedTable = '';
-    this.selectedTableForNext = null;
+    this.confirmationService.confirm({
+        key: 'clearDataSourceConfirm',
+        header: 'Clear Data Source',
+        message:
+            `Are you sure you want to clear all data and remove ` +
+            `the linked data source from "${sheetName}"? ` +
+            `Click Save on the spreadsheet to persist this change.`,
+        icon: 'pi pi-exclamation-triangle',
 
-    // Clear columns
-    this.tableColumns = [];
-    this.selectedColumns = [];
+        acceptLabel: 'Yes',
+        rejectLabel: 'Cancel',
 
-    // Clear filters
-    this.filterValues = {};
-    this.filters = [];
-    this.filterFields = [];
-    this.activeFilterValues = [];
+        acceptButtonStyleClass: 'p-button-text p-button-secondary',
+        rejectButtonStyleClass: 'p-button-text p-button-transparent',
 
-    // Clear nested filter builder
-    this.selectedConditions = [];
-    this.selectedFilterTree = null;
-    this.selectedMatchMode = 'all';
-    this.filterBuilderFields = [];
-    this.previewCache = null;
-    this.showFilterDialog = false;
-
-    // Return to table selection
-    this.step = 1;
-
-    // Allow selecting a new table
-    this.isEditMode = false;
-
-    // Preserve the current worksheet as destination
-    this.insertAsNewSheet = false;
-
-    this.getTablesList();
-
-    this.cdr.detectChanges();
+        accept: () => {
+            this.dataSourceCleared.emit(sheetName);
+        }
+    });
 }
 
 }

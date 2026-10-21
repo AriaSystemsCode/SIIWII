@@ -1,4 +1,4 @@
-import { ChangeDetectorRef, Component, Injector, OnDestroy, OnInit, ViewChild } from '@angular/core';
+import { ChangeDetectorRef, Component, EventEmitter, Injector, OnDestroy, OnInit, Output, ViewChild } from '@angular/core';
 import { ActivatedRoute } from '@angular/router';
 import { firstValueFrom } from 'rxjs';
 import * as moment from 'moment';
@@ -65,6 +65,7 @@ export class CreateOrEditSpreadsheetComponent extends AppComponentBase implement
     @ViewChild('spreadsheet') spreadsheet?: SyncfusionSpreadsheetComponent;
     @ViewChild('pivotView') pivotView: any;
     @ViewChild('pivotFieldList') pivotFieldList?: PivotFieldListComponent;
+
 
     dashboardId: number | null = null;
     dashboardTtle = '';
@@ -582,7 +583,7 @@ export class CreateOrEditSpreadsheetComponent extends AppComponentBase implement
     /**
      * Copies category + series columns (aggregated if requested) into a far-right helper
      * block of the chart's sheet so Syncfusion can chart non-adjacent ranges.
-     * The table itself is built by the shared refresh service (same code as Refresh).
+     * The table itself is built by the shared refresh service.
      */
     private async buildHelperRange(
         ownerSheetName: string,
@@ -606,8 +607,6 @@ export class CreateOrEditSpreadsheetComponent extends AppComponentBase implement
         const lastUsedRow = Number(ownerSheet.usedRange?.rowIndex ?? 0) + 1;
 
         await this.activateSheet(ownerSheetName);
-
-        // Clear the previous result first (it may have been longer).
         this.grid.clear({ type: 'Clear Contents', range: `${first}1:${last}${Math.max(rows.length, lastUsedRow)}` });
 
         rows.forEach((row, r) =>
@@ -1263,7 +1262,6 @@ export class CreateOrEditSpreadsheetComponent extends AppComponentBase implement
         this.resizeLater();
     }
 
-    /** Returns { sourceSheetName, pivotSheetName } or null (after warning the user). */
     private resolvePivotTarget(
         activeName: string,
         saved?: SavedSheetAnalysis
@@ -2454,7 +2452,6 @@ export class CreateOrEditSpreadsheetComponent extends AppComponentBase implement
                 (sheet?.rows ?? []).forEach((row: any) => (row?.cells ?? []).forEach(callback))
             );
 
-        // One canonical saved model per chart id.
         const chartById = new Map<string, any>();
 
         forEachCell(cell => {
@@ -2547,16 +2544,6 @@ export class CreateOrEditSpreadsheetComponent extends AppComponentBase implement
 
         return cleaned;
     }
-
-    // =====================================================
-    // REFRESH (same service as the Dashboard view)
-    // =====================================================
-
-    /**
-     * Save current state to JSON -> refresh the JSON (data, aggregated charts, pivot charts)
-     * -> re-open it. New rows are green, changed cells are yellow.
-     */
-    
 async refreshSpreadsheet(): Promise<void> {
     if (this.isRefreshing || !this.spreadsheet || !this.dashboardId) {
         return;
@@ -2636,6 +2623,58 @@ async refreshSpreadsheet(): Promise<void> {
         this.hideLoading();
         this.cdr.detectChanges();
         this.resizeLater(100);
+    }
+}
+
+async onDataSourceCleared(sheetName: string): Promise<void> {
+
+    if (!this.spreadsheet || !sheetName) {
+        return;
+    }
+
+    const sheet = this.findSheet(sheetName);
+
+    if (!sheet) {
+        this.notify.warn('Worksheet not found.');
+        return;
+    }
+
+    const hasSource = this.sheetSources.some(
+        source => source.sheetName === sheetName
+    );
+
+    if (!hasSource) {
+        this.notify.warn('No linked data source found.');
+        return;
+    }
+
+    try {
+
+        await this.clearSheetForEdit(sheetName);
+        this.sheetSources = this.sheetSources.filter(
+            source => source.sheetName !== sheetName
+        );
+        delete this.sheetRecordIds[sheetName];
+        this.newDataSheetName = null;
+        this.newDataSheetFields = [];
+        this.newDataSheetLoadedRows = 0;
+        this.closeDataPanel();
+        this.updateListRibbonButton();
+        this.markDirty();
+        this.notify.success(
+            'Data source removed and worksheet cleared. Click Save to persist.'
+        );
+
+    } catch (error) {
+
+        console.error(
+            '[Spreadsheet] Failed to clear data source:',
+            error
+        );
+
+        this.notify.error(
+            'Unable to clear worksheet data.'
+        );
     }
 }
 

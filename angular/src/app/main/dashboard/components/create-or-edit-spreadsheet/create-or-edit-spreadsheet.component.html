@@ -106,15 +106,16 @@
 
         <!-- ================= ADD DATA PANEL ================= -->
         <app-spreadsheet-data-panel
-            [class.panel-open]="showDataPanel"
-            [visible]="showDataPanel"
-            [editSource]="editingSheetSource"
-            [targetSheetName]="dataPanelTargetSheetName"
-            [targetSheetHasData]="dataPanelTargetHasData"
-            (close)="closeDataPanel()"
-            (batchLoaded)="onDataBatchLoaded($event)"
-            (loadingFailed)="onDataLoadingFailed($event)">
-        </app-spreadsheet-data-panel>
+    [class.panel-open]="showDataPanel"
+    [visible]="showDataPanel"
+    [editSource]="editingSheetSource"
+    [targetSheetName]="dataPanelTargetSheetName"
+    [targetSheetHasData]="dataPanelTargetHasData"
+    (close)="closeDataPanel()"
+    (dataSourceCleared)="onDataSourceCleared($event)"
+    (batchLoaded)="onDataBatchLoaded($event)"
+    (loadingFailed)="onDataLoadingFailed($event)">
+</app-spreadsheet-data-panel>
 
         <!-- ================= CHART PANEL ================= -->
         <div *ngIf="showChartPanel" class="spreadsheet-side-panel">
