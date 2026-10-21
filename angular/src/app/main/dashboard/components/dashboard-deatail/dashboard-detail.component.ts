@@ -1,611 +1,852 @@
-import {
-    ChangeDetectorRef,
-    Component,
-    ElementRef,
-    Injector,
-    OnDestroy,
-    OnInit,
-    ViewChild
-} from '@angular/core';
+import { ChangeDetectorRef, Component, ElementRef, HostListener, Injector, OnDestroy, OnInit, ViewChild } from '@angular/core';
+import { ActivatedRoute } from '@angular/router';
+import { MessageService } from 'primeng/api';
+import { SpreadsheetComponent } from '@syncfusion/ej2-angular-spreadsheet';
+import jsPDF from 'jspdf';
 
-import {ActivatedRoute} from '@angular/router';
-import {MenuItem, MessageService } from 'primeng/api';
-import {AppComponentBase} from '@shared/common/app-component-base';
-import {SpreadsheetComponent} from '@syncfusion/ej2-angular-spreadsheet';
+import { AppComponentBase } from '@shared/common/app-component-base';
 import { AppDashboardServiceProxy } from '@shared/service-proxies/service-proxies';
+
+import { clone } from '../../models/spreadsheet.model';
+import { DrilldownService } from '../../services/drilldown.service';
+import { SpreadsheetPayload, SpreadsheetRefreshService } from '../../services/spreadsheet-refresh.service';
+import { getWorkbookRoot } from '../../models/spreadsheet.utils';
+
 import { firstValueFrom } from 'rxjs';
+import * as moment from 'moment';
+
+import {
+    Chart,
+    AccumulationChart
+} from '@syncfusion/ej2-charts';
+
+interface ChartExportItem {
+    svg: SVGSVGElement;
+    w: number;
+    h: number;
+    left: number;
+    top: number;
+}
 
 @Component({
     selector: 'app-dashboard-detail',
-    templateUrl:'./dashboard-detail.component.html',
+    templateUrl: './dashboard-detail.component.html',
     styleUrls: ['./dashboard-detail.component.scss'],
     providers: [MessageService]
 })
-export class DashboardDetailComponent
-    extends AppComponentBase
-    implements OnInit, OnDestroy {
+export class DashboardDetailComponent extends AppComponentBase implements OnInit, OnDestroy {
 
     @ViewChild('dashboardSpreadsheet') dashboardSpreadsheet?: SpreadsheetComponent;
-    @ViewChild('dashboardExportArea')dashboardExportArea?: ElementRef<HTMLElement>;
-
-exportingPdf = false;
+    @ViewChild('dashboardExportArea') dashboardExportArea?: ElementRef<HTMLElement>;
 
     readonly dashboardSheetName = 'Dashboard';
-    dashboardSheets: any[] = [];
-    dashboardActiveSheetIndex = 0;
 
+    dashboardId = 1;
+    dashboard: any;
 
+    /** The saved spreadsheet (kept up to date by Refresh). */
+    private saved: SpreadsheetPayload | null = null;
+
+    // ---- State ----
     loading = false;
     refreshing = false;
+    exportingPdf = false;
     dashboardWorkbookReady = false;
     dashboardLoadError = '';
 
-    dashboardId = 1;
-    sourceSpreadsheetId: number | null = null;
-    dashboard: any
-    actionsMenuItems: MenuItem[] = [];
+    /** True when the Dashboard tab contains at least one chart (drives the borderless style). */
+    dashboardHasCharts = false;
 
-    private savedSheetSources: any[] = [];
-private savedAnalyses: any[] = [];
-private savedWidgets: any[] = [];
+    // ---- Visible spreadsheet ----
+    dashboardSheets: any[] = [];
+    dashboardActiveSheetIndex = 0;
 
-private readonly refreshBatchSize = 500;
+    // ---- Mobile layout ----
+    private readonly mobileBreakpoint = 768;
+    private lastWidth = window.innerWidth;
+    private resizeTimer?: any;
+    private layoutTimers: any[] = [];
+
+    // ---- Drilldown ----
+    drilldownVisible = false;
+    drilldownTitle = '';
+    drilldownRecords: any[] = [];
 
     constructor(
         injector: Injector,
         private route: ActivatedRoute,
         private appDashboardService: AppDashboardServiceProxy,
+        private refreshService: SpreadsheetRefreshService,
+        private drilldown: DrilldownService,
         private cdr: ChangeDetectorRef
-
     ) {
         super(injector);
     }
 
+    // =====================================================
+    // LOAD
+    // =====================================================
 
     ngOnInit(): void {
-        const routeId =Number(this.route.snapshot.paramMap.get('id'));
+        const routeId = Number(this.route.snapshot.paramMap.get('id'));
+
         if (Number.isFinite(routeId) && routeId > 0) {
             this.dashboardId = routeId;
         }
-        this.buildActionsMenu();
+
         this.loadDashboard();
     }
 
+    ngOnDestroy(): void {
+        this.dashboardSheets = [];
+        clearTimeout(this.resizeTimer);
+        this.layoutTimers.forEach(t => clearTimeout(t));
+    }
 
-     loadDashboard(): void {
-        if (!this.dashboardId) {
-            return;
-        }
-
+    loadDashboard(): void {
         this.loading = true;
         this.dashboardWorkbookReady = false;
         this.dashboardLoadError = '';
-
         this.dashboardSheets = [];
-        this.sourceSpreadsheetId = null;
 
-        this.appDashboardService
-            .getDashboardForView(this.dashboardId)
-            .subscribe({
-                next: (result: any) => {
-                    try {
-                         this.dashboard = result;
-
-                        const saved = this.dashboard?.spreadsheet;
-
-                           if (!saved) {
-                            throw new Error(
-                                ''
-                            );
-                        }
-
-                        if (!saved.workbookJson) {
-                            throw new Error(
-                                'The saved Spreadsheet does not contain workbook data.'
-                            );
-                        }
-
-
-                        // =============================================
-                        // GET WORKBOOK
-                        // =============================================
-
-                        const workbook =
-                            this.getWorkbook(
-                                saved.workbookJson
-                            );
-
-                        if (
-                            !workbook ||
-                            !Array.isArray(workbook.sheets) ||
-                            !workbook.sheets.length
-                        ) {
-                            throw new Error(
-                                'The saved Spreadsheet does not contain any sheets.'
-                            );
-                        }
-
-                        // =============================================
-                        // FIND DASHBOARD
-                        // =============================================
-
-                        const dashboardIndex =
-                            this.findDashboardSheetIndex(
-                                workbook.sheets
-                            );
-
-                        if (dashboardIndex < 0) {
-                            throw new Error(
-                                `Sheet "${this.dashboardSheetName}" was not found.`
-                            );
-                        }
-
-                        this.dashboardSheets =
-                            workbook.sheets.map(
-                                (sheet: any, index: number) => ({
-                                    ...sheet,
-
-                                    state:
-                                        index === dashboardIndex
-                                            ? 'Visible'
-                                            : 'Hidden'
-                                })
-                            );
-
-                        this.dashboardActiveSheetIndex =   dashboardIndex;
-
-                        this.sourceSpreadsheetId = null;
-
-                        this.loading = false;
-                        this.dashboardWorkbookReady = true;
-
-                        this.cdr.detectChanges();
-
-                    } catch (error) {
-                        console.error(
-                            '[Dashboard] Load failed:',
-                            error
-                        );
-
-                        this.dashboardLoadError =
-                            error instanceof Error
-                                ? error.message
-                                : 'Unable to load the dashboard.';
-
-                        this.dashboardWorkbookReady = false;
-                        this.loading = false;
-
-                        this.dashboardSheets = [];
-
-                        this.cdr.detectChanges();
-                    }
-                },
-
-                error: (error: any) => {
-                    console.error(
-                        '[Dashboard] Dashboard API failed:',
-                        error
-                    );
-
-                    this.dashboardLoadError =
-                        'Unable to load the dashboard.';
-
+        this.appDashboardService.getDashboardForView(this.dashboardId).subscribe({
+            next: (result: any) => {
+                try {
+                    this.dashboard = result?.dashboard ?? result;
+                    this.saved = this.parseSaved(this.dashboard?.spreadsheet);
+                    this.showWorkbook(this.saved);
+                } catch (error) {
+                    console.error('[Dashboard] Load failed:', error);
+                    this.dashboardLoadError = error instanceof Error ? error.message : 'Unable to load the dashboard.';
                     this.dashboardWorkbookReady = false;
-                    this.loading = false;
-
                     this.dashboardSheets = [];
-
-
+                } finally {
+                    this.loading = false;
                     this.cdr.detectChanges();
                 }
-            });
+            },
+            error: (error: any) => {
+                console.error('[Dashboard] Dashboard API failed:', error);
+                this.dashboardLoadError = 'Unable to load the dashboard.';
+                this.loading = false;
+                this.cdr.detectChanges();
+            }
+        });
+    }
+
+    private parseSaved(raw: any): SpreadsheetPayload {
+        const saved = typeof raw === 'string' ? JSON.parse(raw) : raw;
+
+        if (!saved?.workbookJson) {
+            throw new Error('The saved Spreadsheet does not contain workbook data.');
+        }
+
+        return {
+            workbookJson: saved.workbookJson,
+            sheetDataSources: saved.sheetDataSources ?? [],
+            sheetAnalyses: saved.sheetAnalyses ?? [],
+            dashboardWidgets: saved.dashboardWidgets ?? [],
+            updatedDate: saved.updatedDate ?? null
+        };
+    }
+
+    /** Shows ONLY the Dashboard tab. The other sheets stay hidden because the charts read from them. */
+    private showWorkbook(saved: SpreadsheetPayload): void {
+        const sheets: any[] = getWorkbookRoot(saved.workbookJson)?.sheets;
+
+        if (!Array.isArray(sheets) || !sheets.length) {
+            throw new Error('The saved Spreadsheet does not contain any sheets.');
+        }
+
+        const index = this.findDashboardIndex(sheets);
+
+        if (index < 0) {
+            throw new Error(`Sheet "${this.dashboardSheetName}" was not found.`);
+        }
+
+        // Charts present => borderless dashboard look. No charts => normal cell borders.
+        this.dashboardHasCharts = this.collectCharts(sheets[index]).length > 0;
+
+        // Copy: Syncfusion mutates the models it receives.
+        this.dashboardSheets = clone(sheets).map((sheet: any, i: number) => ({
+            ...sheet,
+            state: i === index ? 'Visible' : 'Hidden'
+        }));
+
+        this.dashboardActiveSheetIndex = index;
+        this.dashboardWorkbookReady = true;
+    }
+
+    private findDashboardIndex(sheets: any[]): number {
+        const wanted = this.dashboardSheetName.toLowerCase();
+        return (sheets ?? []).findIndex(s => String(s?.name ?? '').trim().toLowerCase() === wanted);
     }
 
     onDashboardCreated(): void {
-        if (!this.dashboardSpreadsheet) {
+        const spreadsheet = this.dashboardSpreadsheet;
+        const index = this.findDashboardIndex((spreadsheet?.sheets as any[]) ?? []);
+
+        if (!spreadsheet) {
             return;
         }
-        const sheets =  this.dashboardSpreadsheet.sheets;
-        if (!Array.isArray(sheets) || !sheets.length) {
-            return;
-        }
-        const dashboardIndex = this.findDashboardSheetIndex(sheets);
-        if (dashboardIndex < 0) {
-            this.dashboardLoadError =
-                `Sheet "${this.dashboardSheetName}" was not found.`;
+
+        if (index < 0) {
+            this.dashboardLoadError = `Sheet "${this.dashboardSheetName}" was not found.`;
             this.cdr.detectChanges();
             return;
         }
 
-        // =============================================
-        // VIEW MODE:
-        // Dashboard visible, everything else hidden
-        // =============================================
-
-        sheets.forEach(
-            (sheet: any, index: number) => {
-                sheet.state =
-                    index === dashboardIndex
-                        ? 'Visible'
-                        : 'Hidden';
-            }
-        );
-
-        this.dashboardActiveSheetIndex =  dashboardIndex;
-
-        this.dashboardSpreadsheet.activeSheetIndex =   dashboardIndex;
+        (spreadsheet.sheets as any[]).forEach((sheet, i) => (sheet.state = i === index ? 'Visible' : 'Hidden'));
+        spreadsheet.activeSheetIndex = index;
 
         setTimeout(() => {
-            if (!this.dashboardSpreadsheet) {
-                return;
-            }
-
-            this.dashboardSpreadsheet.activeSheetIndex =   dashboardIndex;
-
-            this.dashboardSpreadsheet.refresh();
+            spreadsheet.activeSheetIndex = index;
+            spreadsheet.refresh();
+            this.scheduleMobileLayout();
         }, 0);
     }
 
-    private findDashboardSheetIndex(sheets: any[]): number {
-        if (!Array.isArray(sheets)) {
-            return -1;
+    // =====================================================
+    // MOBILE LAYOUT (one chart per row)
+    // =====================================================
+
+    private get isMobile(): boolean {
+        return window.innerWidth <= this.mobileBreakpoint;
+    }
+
+    @HostListener('window:resize')
+    onWindowResize(): void {
+        // Mobile browsers fire resize when the address bar hides, so react only to width changes.
+        if (window.innerWidth === this.lastWidth) {
+            return;
         }
-        return sheets.findIndex(
-            (sheet: any) =>
-                String(sheet?.name ?? '').trim().toLowerCase() ===
-                this.dashboardSheetName.trim().toLowerCase()
+
+        this.lastWidth = window.innerWidth;
+
+        clearTimeout(this.resizeTimer);
+        this.resizeTimer = setTimeout(() => {
+            this.dashboardSpreadsheet?.refresh();   // restores the desktop positions
+            this.scheduleMobileLayout();            // re-stacks them if now on mobile
+        }, 300);
+    }
+
+    private scheduleMobileLayout(): void {
+        this.layoutTimers.forEach(t => clearTimeout(t));
+
+        // Charts render asynchronously, so apply a few times (the method is idempotent).
+        this.layoutTimers = [400, 1000, 2000].map(delay =>
+            setTimeout(() => this.applyMobileChartLayout(), delay)
+        );
+    }
+
+    /** Mobile: stack every chart full-width, one per row. */
+    private applyMobileChartLayout(): void {
+        if (!this.isMobile || !this.dashboardHasCharts) {
+            return;
+        }
+
+        const host = this.dashboardExportArea?.nativeElement;
+
+        if (!host) {
+            return;
+        }
+
+        const overlays = (Array.from(host.querySelectorAll('.e-ss-overlay')) as HTMLElement[])
+            .filter(o => o.querySelector('.e-chart, .e-accumulationchart'));
+
+        if (!overlays.length) {
+            return;
+        }
+
+        // Remember the original desktop position so the order stays stable.
+        overlays.forEach(o => {
+            if (o.dataset.origTop === undefined) {
+                o.dataset.origTop = String(parseFloat(o.style.top) || 0);
+                o.dataset.origLeft = String(parseFloat(o.style.left) || 0);
+            }
+        });
+
+        overlays.sort((a, b) =>
+            (Number(a.dataset.origTop) - Number(b.dataset.origTop)) ||
+            (Number(a.dataset.origLeft) - Number(b.dataset.origLeft))
         );
 
+        const gap = 8;
+        const content = host.querySelector('.e-sheet-content') as HTMLElement;
+        const width = Math.floor((content?.clientWidth || host.clientWidth) - gap * 2);
+        const height = 300;
+
+        let top = gap;
+
+        overlays.forEach(overlay => {
+            overlay.style.left = `${gap}px`;
+            overlay.style.top = `${top}px`;
+            overlay.style.width = `${width}px`;
+            overlay.style.height = `${height}px`;
+
+            const chartEl: any = overlay.querySelector('.e-chart, .e-accumulationchart');
+            const chart: any = chartEl?.ej2_instances?.[0];
+
+            if (chart && (chart.width !== `${width - 2}px` || chart.height !== `${height - 2}px`)) {
+                chart.width = `${width - 2}px`;
+                chart.height = `${height - 2}px`;
+                chart.refresh();
+            }
+
+            top += height + gap;
+        });
     }
 
-    private async fetchSourceRecords(
-    source: any
-): Promise<{
-    fields: string[];
-    records: any[];
-}> {
+    // =====================================================
+    // REFRESH (same pipeline as the editor)
+    // =====================================================
 
-    const tableName =
-        source?.sourceKey ?? source?.type;
-
-    if (!tableName) {
-        throw new Error('Source table is missing.');
-    }
-
-    const fields: string[] = Array.from(
-        new Set<string>([
-            'Id',
-            ...(source?.columns ?? [])
-        ])
-    );
-
-    const conditions =
-        source?.filters?.conditions ?? [];
-
-    const records: any[] = [];
-
-    let skipCount = 0;
-
-    while (true) {
-
-        const result: any = await firstValueFrom(
-            this.appDashboardService.getAllTableData(
-                this.appSession.tenantId,
-                tableName,
-                fields,
-                conditions,
-                undefined,
-                undefined,
-                'Id',
-                skipCount,
-                this.refreshBatchSize
-            )
-        );
-
-        const batch: any[] =
-            result?.items ?? [];
-
-        records.push(...batch);
-
-        skipCount += batch.length;
-
-        if (
-            batch.length === 0 ||
-            batch.length < this.refreshBatchSize ||
-            (
-                result?.totalCount != null &&
-                skipCount >= Number(result.totalCount)
-            )
-        ) {
-            break;
+    async refreshDashboard(): Promise<void> {
+        if (this.refreshing || this.loading || !this.saved) {
+            return;
         }
-    }
 
-    return {
-        fields,
-        records
-    };
-}
+        this.refreshing = true;
 
-private replaceSourceSheetData(
-    sheet: any,
-    fields: string[],
-    records: any[]
-): void {
+        try {
+            const refreshed = await this.refreshService.refresh(
+                this.saved,
+                {
+                    tenantId: this.appSession.tenantId
+                }
+            );
 
-    // Preserve the original columns where possible.
-    const existingHeaders: string[] =
-        (sheet.rows?.[0]?.cells ?? [])
-            .map((cell: any) =>
-                String(cell?.value ?? '').trim()
-            )
-            .filter(Boolean);
+            // Update the last successful refresh timestamp.
+            refreshed.updatedDate =
+                moment().format('YYYY-MM-DDTHH:mm:ss.SSS') + '0000';
 
-    const columns = existingHeaders.length
-        ? existingHeaders
-        : fields;
-
-    // Keep chart/helper cells outside the source data area.
-    const oldRows = sheet.rows ?? [];
-    const oldDataColumnCount = columns.length;
-
-    const newRows: any[] = [
-        {
-            cells: columns.map(field => ({
-                value: field
-            }))
-        }
-    ];
-
-    for (const record of records) {
-
-        newRows.push({
-            cells: columns.map(field => {
-
-                const key = Object.keys(record).find(
-                    name =>
-                        name.toLowerCase() ===
-                        field.toLowerCase()
+            // Count records from source metadata, not chart/helper rows.
+            const recordCount = (refreshed.sheetDataSources ?? [])
+                .reduce(
+                    (total, source) =>
+                        total + (source.sheetRecordIds?.length ?? 0),
+                    0
                 );
+
+            // Persist the entire refreshed workbook.
+            await firstValueFrom(
+                this.appDashboardService.saveSpreadSheetJson(
+                    this.dashboardId,
+                    {
+                        ...refreshed,
+                        recordCount
+                    } as any
+                )
+            );
+
+            // Update local state only after successful API save.
+            this.saved = refreshed;
+
+            // Re-create viewer using the newly saved workbook.
+            this.dashboardWorkbookReady = false;
+            this.cdr.detectChanges();
+
+            this.showWorkbook(this.saved);
+            this.cdr.detectChanges();
+
+            await new Promise<void>(
+                resolve => setTimeout(resolve, 300)
+            );
+
+            this.dashboardSpreadsheet?.refresh();
+            this.scheduleMobileLayout();
+
+            this.notify.success(
+                'Dashboard refreshed and saved successfully.'
+            );
+
+        } catch (error) {
+            console.error('[Dashboard] Refresh or save failed:', error);
+            this.notify.error(
+                'Unable to complete Dashboard refresh and save.'
+            );
+        } finally {
+            this.refreshing = false;
+            this.cdr.detectChanges();
+        }
+    }
+
+    // =====================================================
+    // DRILLDOWN
+    // =====================================================
+
+    private registerChartDrilldownEvents(): void {
+        const container =
+            this.dashboardExportArea?.nativeElement as HTMLElement;
+
+        if (!container) {
+            return;
+        }
+
+        const chartElements = container.querySelectorAll(
+            '.e-chart, .e-accumulationchart'
+        );
+
+        chartElements.forEach((element: Element) => {
+            const instances =
+                (element as any).ej2_instances ?? [];
+
+            const chart = instances.find((instance: any) =>
+                instance instanceof Chart ||
+                instance instanceof AccumulationChart
+            );
+
+            if (!chart) {
+                return;
+            }
+
+            // Avoid registering repeatedly on the same chart instance.
+            if ((chart as any).__drilldownRegistered) {
+                return;
+            }
+
+            (chart as any).__drilldownRegistered = true;
+
+            const previousHandler = chart.pointClick;
+
+            chart.pointClick = (args: any) => {
+                if (typeof previousHandler === 'function') {
+                    previousHandler.call(chart, args);
+                }
+
+                this.handleChartPointClick(args, element as HTMLElement);
+            };
+        });
+    }
+
+    private handleChartPointClick(
+        args: any,
+        chartElement: HTMLElement
+    ): void {
+        const category = args.point?.x;
+        const value = args.point?.y;
+
+        if (category === undefined || category === null) {
+            return;
+        }
+
+        console.log('[Dashboard Point Click]', {
+            category,
+            value,
+            pointIndex: args.pointIndex
+        });
+
+        const result = this.drilldown.fromPoint(
+            chartElement,
+            category,
+            {
+                container: this.dashboardExportArea?.nativeElement,
+                sheets: (this.dashboardSpreadsheet?.sheets as any[]) ?? [],
+                analyses: this.saved?.sheetAnalyses ?? [],
+                sheetName: this.dashboardSheetName
+            }
+        );
+
+        if (!result) {
+            return;
+        }
+
+        this.drilldownTitle = result.title;
+        this.drilldownRecords = result.records;
+        this.drilldownVisible = true;
+
+        this.cdr.detectChanges();
+    }
+
+    onDashboardChartClick(event: MouseEvent): void {
+        const result = this.drilldown.fromClick(event, {
+            container: this.dashboardExportArea?.nativeElement,
+            sheets: (this.dashboardSpreadsheet?.sheets as any[]) ?? [],
+            analyses: this.saved?.sheetAnalyses ?? [],
+            sheetName: this.dashboardSheetName
+        });
+
+        console.log('[Dashboard Drilldown]', {
+            clickedElement: (event.target as Element)?.id,
+            result
+        });
+
+        if (!result) {
+            return;
+        }
+
+        if (!result.records.length) {
+            this.notify.warn(
+                'No matching source records could be resolved.'
+            );
+            return;
+        }
+
+        this.drilldownTitle = result.title;
+        this.drilldownRecords = result.records;
+        this.drilldownVisible = true;
+
+        this.cdr.detectChanges();
+    }
+
+    // =====================================================
+    // PDF EXPORT
+    //   - Dashboard has charts  => charts are exported (SVG -> PNG), fast
+    //   - Dashboard has no charts => the cell data is exported as a table
+    // =====================================================
+
+    /** Collects every floating chart defined on a sheet. */
+    private collectCharts(sheet: any): any[] {
+        const charts: any[] = [];
+
+        for (const row of sheet?.rows ?? []) {
+            for (const cell of row?.cells ?? []) {
+                if (Array.isArray(cell?.chart)) {
+                    charts.push(...cell.chart);
+                } else if (cell?.chart) {
+                    charts.push(cell.chart);
+                }
+            }
+        }
+
+        return charts;
+    }
+
+    private get pdfFileName(): string {
+        const name = String(this.dashboard?.title || 'Dashboard').replace(/[\\/:*?"<>|]/g, '_');
+        return `${name}.pdf`;
+    }
+
+    async exportDashboardPdf(): Promise<void> {
+        if (this.exportingPdf || !this.saved) {
+            return;
+        }
+
+        this.exportingPdf = true;
+        this.cdr.detectChanges();
+
+        // let the "Preparing PDF" overlay paint first
+        await new Promise<void>(r => setTimeout(r, 50));
+
+        try {
+            const sheets: any[] = getWorkbookRoot(this.saved.workbookJson)?.sheets;
+            const index = this.findDashboardIndex(sheets);
+
+            if (index < 0) {
+                throw new Error('Dashboard sheet not found.');
+            }
+
+            const pdf = new jsPDF({ orientation: 'landscape', unit: 'mm', format: 'a4' });
+
+            if (this.collectCharts(sheets[index]).length > 0) {
+                await this.addChartsToPdf(pdf);
+            } else {
+                this.addDataTableToPdf(pdf, sheets[index]);
+            }
+
+            pdf.save(this.pdfFileName);
+        } catch (error) {
+            console.error('Dashboard PDF export failed:', error);
+            this.notify.error('Failed to export Dashboard PDF.');
+        } finally {
+            this.exportingPdf = false;
+            this.cdr.detectChanges();
+        }
+    }
+
+    // ---------- charts ----------
+
+    private svgToPng(svg: SVGSVGElement, width: number, height: number, scale = 2): Promise<string> {
+        return new Promise((resolve, reject) => {
+            const copy = svg.cloneNode(true) as SVGSVGElement;
+            copy.setAttribute('xmlns', 'http://www.w3.org/2000/svg');
+            copy.setAttribute('width', String(width));
+            copy.setAttribute('height', String(height));
+
+            const url = URL.createObjectURL(
+                new Blob([new XMLSerializer().serializeToString(copy)], { type: 'image/svg+xml;charset=utf-8' })
+            );
+
+            const img = new Image();
+
+            img.onload = () => {
+                const canvas = document.createElement('canvas');
+                canvas.width = width * scale;
+                canvas.height = height * scale;
+
+                const ctx = canvas.getContext('2d')!;
+                ctx.fillStyle = '#ffffff';
+                ctx.fillRect(0, 0, canvas.width, canvas.height);
+                ctx.drawImage(img, 0, 0, canvas.width, canvas.height);
+
+                URL.revokeObjectURL(url);
+                resolve(canvas.toDataURL('image/png'));
+            };
+
+            img.onerror = () => {
+                URL.revokeObjectURL(url);
+                reject(new Error('Chart image failed.'));
+            };
+
+            img.src = url;
+        });
+    }
+
+    private async addChartsToPdf(pdf: jsPDF): Promise<void> {
+        const host = this.dashboardExportArea?.nativeElement;
+
+        if (!host) {
+            throw new Error('Dashboard not ready.');
+        }
+
+        const items = (Array.from(host.querySelectorAll('.e-ss-overlay')) as HTMLElement[])
+            .map((o): ChartExportItem | null => {
+                const svg = o.querySelector('svg[id$="_svg"]') as SVGSVGElement | null;
+
+                if (!svg) {
+                    return null;
+                }
+
+                const box = svg.getBoundingClientRect();
 
                 return {
-                    value: key
-                        ? record[key] ?? ''
-                        : ''
+                    svg,
+                    w: Math.round(box.width),
+                    h: Math.round(box.height),
+                    // original desktop position (saved by the mobile layout code), else the current one
+                    left: Number(o.dataset.origLeft ?? (parseFloat(o.style.left) || 0)),
+                    top: Number(o.dataset.origTop ?? (parseFloat(o.style.top) || 0))
                 };
             })
+            .filter((x): x is ChartExportItem => !!x && x.w > 0 && x.h > 0)
+            .sort((a, b) => (a.top - b.top) || (a.left - b.left));
+
+        if (!items.length) {
+            throw new Error('Charts are not rendered yet.');
+        }
+
+        const margin = 8;
+        const pageW = pdf.internal.pageSize.getWidth() - margin * 2;
+        const pageH = pdf.internal.pageSize.getHeight() - margin * 2;
+
+        // px -> mm: fit the dashboard width to the page, but do not blow up small layouts
+        const layoutW = Math.max(...items.map(i => i.left + i.w));
+        const k = Math.min(pageW / layoutW, 0.35);
+
+        let currentPage = 0;
+
+        for (const item of items) {
+            const x = margin + item.left * k;
+            const w = item.w * k;
+            const h = item.h * k;
+
+            let page = Math.floor((item.top * k) / pageH);
+            let y = (item.top * k) % pageH;
+
+            // do not cut a chart between two pages
+            if (y + h > pageH) {
+                page++;
+                y = 0;
+            }
+
+            while (currentPage < page) {
+                pdf.addPage();
+                currentPage++;
+            }
+
+            const png = await this.svgToPng(item.svg, item.w, item.h);
+            pdf.addImage(png, 'PNG', x, margin + y, w, h);
+        }
+    }
+
+    // ---------- data table (no charts) ----------
+
+    private formatCellValue(cell: any): string {
+        const value = cell?.value;
+
+        if (value === undefined || value === null) {
+            return '';
+        }
+
+        if (typeof value === 'string' && /^\d{4}-\d{2}-\d{2}T/.test(value)) {
+            const m = moment(value);
+            return m.isValid() ? m.format('L') : value;
+        }
+
+        if (typeof value === 'number') {
+            return String(Math.round(value * 100) / 100);
+        }
+
+        return String(value);
+    }
+
+    /** Builds a dense grid from the sparse saved rows/cells (skips hidden and empty rows/columns). */
+    private buildSheetGrid(sheet: any): string[][] {
+        const rows: string[][] = [];
+        let r = 0;
+
+        for (const row of sheet?.rows ?? []) {
+            if (row?.index !== undefined) {
+                r = row.index;
+            }
+
+            if (!row?.hidden) {
+                const line: string[] = [];
+                let c = 0;
+
+                for (const cell of row?.cells ?? []) {
+                    if (cell?.index !== undefined) {
+                        c = cell.index;
+                    }
+
+                    if (!sheet?.columns?.[c]?.hidden) {
+                        line[c] = this.formatCellValue(cell);
+                    }
+
+                    c++;
+                }
+
+                rows[r] = line;
+            }
+
+            r++;
+        }
+
+        const filled: string[][] = [];
+
+        for (let i = 0; i < rows.length; i++) {
+            if (rows[i]?.some(v => v !== undefined && v !== '')) {
+                filled.push(rows[i]);
+            }
+        }
+
+        // keep only columns that have at least one value
+        const usedCols = new Set<number>();
+        filled.forEach(line => line.forEach((v, c) => {
+            if (v !== undefined && v !== '') {
+                usedCols.add(c);
+            }
+        }));
+
+        const cols = Array.from(usedCols).sort((a, b) => a - b);
+
+        return filled.map(line => cols.map(c => line[c] ?? ''));
+    }
+
+    private addDataTableToPdf(pdf: jsPDF, sheet: any): void {
+        const grid = this.buildSheetGrid(sheet);
+
+        if (!grid.length || !grid[0].length) {
+            throw new Error('The Dashboard tab has no data to export.');
+        }
+
+        const margin = 10;
+        const pageW = pdf.internal.pageSize.getWidth() - margin * 2;
+        const pageH = pdf.internal.pageSize.getHeight() - margin * 2;
+        const fontSize = 8;
+        const rowH = 6;
+        const pad = 2;
+        const maxColW = 70;
+        const titleH = 10;
+
+        pdf.setFontSize(fontSize);
+
+        // column widths from the widest text (header is bold, so measure it bold)
+        const colCount = grid[0].length;
+        const widths: number[] = [];
+
+        for (let c = 0; c < colCount; c++) {
+            let w = 12;
+
+            grid.forEach((line, r) => {
+                pdf.setFont('helvetica', r === 0 ? 'bold' : 'normal');
+                w = Math.max(w, pdf.getTextWidth(line[c] ?? '') + pad * 2);
+            });
+
+            widths.push(Math.min(w, maxColW));
+        }
+
+        // split columns into page-wide groups
+        const groups: number[][] = [];
+        let group: number[] = [];
+        let used = 0;
+
+        widths.forEach((w, c) => {
+            if (group.length && used + w > pageW) {
+                groups.push(group);
+                group = [];
+                used = 0;
+            }
+            group.push(c);
+            used += w;
         });
-    }
 
-    // Preserve cells beyond the data columns,
-    // including existing chart helper ranges.
-    const maxRows = Math.max(
-        oldRows.length,
-        newRows.length
-    );
-
-    const mergedRows: any[] = [];
-
-    for (let r = 0; r < maxRows; r++) {
-
-        const oldCells =
-            oldRows[r]?.cells ?? [];
-
-        const newCells =
-            newRows[r]?.cells ?? [];
-
-        const cells = [...oldCells];
-
-        for (let c = 0; c < oldDataColumnCount; c++) {
-            cells[c] = newCells[c] ?? {};
+        if (group.length) {
+            groups.push(group);
         }
 
-        mergedRows.push({
-            ...(oldRows[r] ?? {}),
-            cells
+        const header = grid[0];
+        const body = grid.slice(1);
+        const rowsPerPage = Math.max(1, Math.floor((pageH - titleH - rowH) / rowH));
+
+        const fit = (text: string, width: number): string => {
+            const maxW = width - pad * 2;
+
+            if (pdf.getTextWidth(text) <= maxW) {
+                return text;
+            }
+
+            let t = text;
+
+            while (t.length > 1 && pdf.getTextWidth(t + '...') > maxW) {
+                t = t.slice(0, -1);
+            }
+
+            return t + '...';
+        };
+
+        let firstPage = true;
+
+        groups.forEach(cols => {
+            for (let start = 0; start < Math.max(body.length, 1); start += rowsPerPage) {
+                if (!firstPage) {
+                    pdf.addPage();
+                }
+                firstPage = false;
+
+                let y = margin;
+
+                pdf.setFont('helvetica', 'bold');
+                pdf.setFontSize(12);
+                pdf.text(String(this.dashboard?.title || 'Dashboard'), margin, y + 4);
+                pdf.setFontSize(fontSize);
+                y += titleH;
+
+                const drawRow = (line: string[], isHeader: boolean) => {
+                    let x = margin;
+
+                    cols.forEach(c => {
+                        const w = widths[c];
+
+                        if (isHeader) {
+                            pdf.setFillColor(243, 234, 246);
+                            pdf.rect(x, y, w, rowH, 'FD');
+                        } else {
+                            pdf.rect(x, y, w, rowH, 'S');
+                        }
+
+                        pdf.setFont('helvetica', isHeader ? 'bold' : 'normal');
+                        pdf.text(fit(line[c] ?? '', w), x + pad, y + rowH - 2);
+                        x += w;
+                    });
+
+                    y += rowH;
+                };
+
+                pdf.setDrawColor(200, 200, 200);
+                drawRow(header, true);
+                body.slice(start, start + rowsPerPage).forEach(line => drawRow(line, false));
+            }
         });
-    }
-
-    sheet.rows = mergedRows;
-}
-
-async refreshDashboard(): Promise<void> {
-
-    if (
-        this.refreshing ||
-        this.loading ||
-        !this.dashboardId
-    ) {
-        return;
-    }
-
-    this.refreshing = true;
-
-    try {
-
-        // 1. Reload saved dashboard.
-        const result: any = await firstValueFrom(
-            this.appDashboardService.getDashboardForView(
-                this.dashboardId
-            )
-        );
-
-        const dashboard =
-            result?.dashboard ?? result;
-
-        const saved =
-            typeof dashboard?.spreadsheet === 'string'
-                ? JSON.parse(dashboard.spreadsheet)
-                : dashboard?.spreadsheet;
-
-        if (!saved?.workbookJson) {
-            throw new Error('Dashboard workbook not found.');
-        }
-
-        // 2. Restore saved metadata.
-        this.savedSheetSources =
-            structuredClone(saved.sheetDataSources ?? []);
-
-        this.savedAnalyses =
-            structuredClone(saved.sheetAnalyses ?? []);
-
-        this.savedWidgets =
-            structuredClone(saved.dashboardWidgets ?? []);
-
-        // 3. Restore workbook.
-        const workbook = this.getWorkbook(
-            saved.workbookJson
-        );
-
-        if (!Array.isArray(workbook?.sheets)) {
-            throw new Error('Invalid workbook.');
-        }
-
-        // Work on a copy, never mutate the saved object.
-        const sheets = structuredClone(workbook.sheets);
-
-        // 4. Fetch updated source records.
-        for (const sheetSource of this.savedSheetSources) {
-
-            const sheetName =
-                sheetSource?.sheetName;
-
-            const source =
-                sheetSource?.source;
-
-            if (!sheetName || !source) {
-                continue;
-            }
-
-            const sheet = sheets.find(
-                (item: any) =>
-                    item.name === sheetName
-            );
-
-            if (!sheet) {
-                console.warn(
-                    '[Dashboard Refresh] Missing source sheet:',
-                    sheetName
-                );
-                continue;
-            }
-
-            const { fields, records } =
-                await this.fetchSourceRecords(source);
-
-            this.replaceSourceSheetData(
-                sheet,
-                fields,
-                records
-            );
-
-            console.log(
-                `[Dashboard Refresh] ${sheetName}: ${records.length} records`
-            );
-        }
-
-        // 5. Rebuild derived chart data.
-        //
-        // This step must run before displaying the
-        // refreshed workbook.
-        //
-        // Recalculate:
-        // - Direct chart aggregation helper ranges
-        // - Pivot chart result matrices
-        // - Dashboard widget source ranges
-        //
-        // See section 6 below.
-
-        // 6. Find dashboard sheet.
-        const dashboardIndex =
-            this.findDashboardSheetIndex(sheets);
-
-        if (dashboardIndex < 0) {
-            throw new Error('Dashboard sheet not found.');
-        }
-
-        // 7. Keep only Dashboard visible.
-        const displaySheets = sheets.map(
-            (sheet: any, index: number) => ({
-                ...sheet,
-                state:
-                    index === dashboardIndex
-                        ? 'Visible'
-                        : 'Hidden'
-            })
-        );
-
-        // 8. Recreate viewer with refreshed data.
-        this.dashboardWorkbookReady = false;
-        this.cdr.detectChanges();
-
-        this.dashboard = dashboard;
-        this.dashboardSheets = displaySheets;
-        this.dashboardActiveSheetIndex =
-            dashboardIndex;
-
-        this.dashboardLoadError = '';
-        this.dashboardWorkbookReady = true;
-
-        this.cdr.detectChanges();
-
-        await new Promise<void>(
-            resolve => setTimeout(resolve, 300)
-        );
-
-        this.dashboardSpreadsheet?.refresh();
-
-        this.notify.success(
-            'Dashboard data refreshed successfully.'
-        );
-
-    } catch (error) {
-
-        console.error(
-            '[Dashboard] Data refresh failed:',
-            error
-        );
-
-        this.notify.error(
-            'Unable to refresh dashboard data.'
-        );
-
-    } finally {
-
-        this.refreshing = false;
-        this.cdr.detectChanges();
-    }
-}
-    private getWorkbook(workbookJson: any): any {
-        return (workbookJson?.jsonObject?.Workbook ?? workbookJson?.Workbook ?? null);
-    }
-
-    private buildActionsMenu(): void {
-
-        this.actionsMenuItems = [
-
-            {
-                label:
-                    'Refresh',
-
-                icon:
-                    'pi pi-refresh',
-
-                command:
-                    () =>
-                        this.refreshDashboard()
-            }
-
-        ];
-
-    }
-
-
-    exportDashboardPdf(){
-
-    }
-    ngOnDestroy(): void {
-        this.dashboardSheets = [];
-
     }
 }

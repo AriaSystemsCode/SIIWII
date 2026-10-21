@@ -1,164 +1,156 @@
 <p-toast></p-toast>
 
-<div class="dashboard-detail-page container-fluid px-0">
+<div class="dashboard-detail-page  px-0">
 
-    <!-- ============================================= -->
-    <!-- DASHBOARD HEADER -->
-    <!-- ============================================= -->
+    <!-- ================= HEADER ================= -->
+    <div class="dash-topbar">
+        <div class="dashboard-topbar-content">
 
-    <div class="dash-topbar shadow-sm">
-
-        <div class="d-flex align-items-center justify-content-between">
-
-            <div class="d-flex align-items-center gap-3 min-w-0">
-
-                <!-- <div class="dash-icon">
-                    <i class="pi pi-chart-bar"></i>
-                </div> -->
-
-                <div class="min-w-0">
-
-             
-
-                    <div class="dash-meta text-muted mt-1">
-
-                        <span class="mr-3">
-                           Last Updated:
-                            <b>
-                                {{
-                                 dashboard?.lastViewDate | momentFormat:'L' }}
-                            </b>
-                        </span>
-
-
-
-                    </div>
-
+            <div class="dashboard-header-info">
+                <span class="dash-icon"><i class="pi pi-chart-bar"></i></span>
+                <div class="dash-meta">
+                    <i class="pi pi-clock"></i>
+                    <span>
+                        {{ 'LastUpdated' | localize }}:
+                        <b>{{ dashboard?.lastViewDate | momentFormat:'L' }}</b>
+                    </span>
                 </div>
-
             </div>
-       <h2 class="dash-title text-truncate m-0">
 
-                        {{ dashboard?.title }}
+            <h2 class="dash-title text-truncate" [title]="dashboard?.title">
+                {{ dashboard?.title }}
+            </h2>
 
-                    </h2>
-
-            <!-- Actions -->
-            <!-- <div class="d-flex align-items-center gap-2">
-
-                <button pButton type="button" icon="pi pi-refresh" class="refreshBtn" pTooltip="Refresh dashboard"
-                    [loading]="refreshing" [disabled]="
-                        loading ||
-                        !dashboardWorkbookReady
-                    " (click)="refreshDashboard()">
+            <div class="dashboard-actions">
+                <button
+                    pButton
+                    type="button"
+                    icon="pi pi-refresh"
+                    [label]="'Refresh' | localize"
+                    class="p-button-outlined dashboard-refresh-btn"
+                    [pTooltip]="'RefreshDashboard' | localize"
+                    tooltipPosition="bottom"
+                    [loading]="refreshing"
+                    [disabled]="loading || refreshing || exportingPdf || !dashboardWorkbookReady"
+                    (click)="refreshDashboard()">
                 </button>
 
-
-                <p-menu #menu [popup]="true" [model]="actionsMenuItems">
-                </p-menu>
-
-
-                <button pButton type="button" icon="pi pi-ellipsis-h" class="p-button-rounded p-button-text"
-                    (click)="menu.toggle($event)" aria-label="More actions">
+                <button
+                    pButton
+                    type="button"
+                    icon="pi pi-file-pdf"
+                    [label]="'ExportToPDF' | localize"
+                    class="dashboard-export-btn"
+                    [loading]="exportingPdf"
+                    [disabled]="loading || refreshing || exportingPdf || !dashboardWorkbookReady"
+                    (click)="exportDashboardPdf()">
                 </button>
-
-            </div> -->
-
-
-               <div class="dashboard-actions d-flex align-items-center gap-2">
-
-   <button
-    pButton
-    type="button"
-    icon="pi pi-refresh"
-    class="p-button-outlined p-button-secondary"
-    pTooltip="Refresh Dashboard"
-    [loading]="refreshing"
-    [disabled]="loading || refreshing || exportingPdf"
-    (click)="refreshDashboard()">
-</button>
-
-    <button
-        pButton
-        type="button"
-        icon="pi pi-file-pdf"
-        [label]="'Export to PDF'"
-        class="p-button-danger"
-       
-        [loading]="exportingPdf"
-        [disabled]="loading || refreshing || !dashboardWorkbookReady"
-        (click)="exportDashboardPdf()">
-    </button>
-
-</div>
+            </div>
 
         </div>
-
     </div>
 
+    <!-- ================= VIEW ================= -->
+    <div class="dashboard-page-body">
+        <div class="dashboard-view-container">
 
-    <!-- ============================================= -->
-    <!-- DASHBOARD VIEW -->
-    <!-- ============================================= -->
+            <!-- Loading -->
+            <div *ngIf="loading" class="dashboard-state">
+                <div class="state-card">
+                    <i class="pi pi-spin pi-spinner"></i>
+                    <h4>{{ 'LoadingDashboard' | localize }}</h4>
+                    <p>{{ 'PleaseWaitFewSeconds' | localize }}</p>
+                </div>
+            </div>
 
-    <div class="dashboard-view-container">
+            <!-- Error -->
+            <div *ngIf="!loading && dashboardLoadError" class="dashboard-state dashboard-error">
+                <div class="state-card">
+                    <i class="pi pi-exclamation-triangle"></i>
+                    <h4>{{ 'DashboardLoadFailed' | localize }}</h4>
+                    <p>{{ dashboardLoadError }}</p>
+                </div>
+            </div>
 
+            <!-- Dashboard sheet (other sheets are hidden, charts still read them) -->
+            <div
+                *ngIf="!loading && !dashboardLoadError && dashboardWorkbookReady"
+                #dashboardExportArea
+                 class="dashboard-sheet-viewer"
+    [class.has-charts]="dashboardHasCharts">
 
-        <!-- ========================================= -->
-        <!-- LOADING -->
-        <!-- ========================================= -->
+                <ejs-spreadsheet
+                    #dashboardSpreadsheet
+                    width="100%"
+                    height="100%"
+                    [sheets]="dashboardSheets"
+                    [activeSheetIndex]="dashboardActiveSheetIndex"
+                    [allowChart]="true"
+                    [allowEditing]="false"
+                    [allowInsert]="false"
+                    [allowDelete]="false"
+                    [allowSorting]="false"
+                    [allowFiltering]="false"
+                    [allowOpen]="false"
+                    [allowSave]="false"
+                    [enableContextMenu]="false"
+                    [enableKeyboardShortcut]="false"
+                    [showRibbon]="false"
+                    [showFormulaBar]="false"
+                    [showSheetTabs]="false"
+                    (click)="onDashboardChartClick($event)"
+                    (created)="onDashboardCreated()">
+                </ejs-spreadsheet>
+            </div>
 
-        <div *ngIf="loading" class="dashboard-state">
-
-            <i class="pi pi-spin pi-spinner"></i>
-
-            <span>
-                Loading dashboard...
-            </span>
+            <!-- Busy overlay (outside the export area, so it never appears in the PDF) -->
+            <div *ngIf="refreshing || exportingPdf" class="dashboard-busy-overlay">
+                <div class="busy-pill">
+                    <i class="pi pi-spin pi-spinner"></i>
+                    <span>{{ (exportingPdf ? 'PreparingPdf' : 'RefreshingDashboard') | localize }}</span>
+                </div>
+            </div>
 
         </div>
-
-
-        <!-- ========================================= -->
-        <!-- ERROR -->
-        <!-- ========================================= -->
-
-        <div *ngIf="
-                !loading &&
-                dashboardLoadError
-            " class="dashboard-state dashboard-error">
-
-            <i class="pi pi-exclamation-triangle"></i>
-
-            <span>
-                {{ dashboardLoadError }}
-            </span>
-
-        </div>
-
-
-        <!-- ========================================= -->
-        <!-- DASHBOARD SPREADSHEET VIEWER -->
-        <!-- ========================================= -->
-
-        <div *ngIf="
-                !loading &&
-                !dashboardLoadError &&
-                dashboardWorkbookReady
-            " class="dashboard-sheet-viewer">
-
-            <ejs-spreadsheet #dashboardSpreadsheet width="100%" height="100%" [sheets]="dashboardSheets"
-                [activeSheetIndex]="
-                    dashboardActiveSheetIndex
-                " [allowChart]="true" [allowEditing]="false" [allowInsert]="false" [allowDelete]="false"
-                [allowSorting]="false" [allowFiltering]="false" [allowOpen]="false" [allowSave]="false"
-                [enableContextMenu]="false" [enableKeyboardShortcut]="false" [showRibbon]="false"
-                [showFormulaBar]="false" [showSheetTabs]="false" (created)="onDashboardCreated()">
-
-            </ejs-spreadsheet>
-
-        </div>
-
     </div>
-
 </div>
+
+<!-- ================= DRILLDOWN (shared) ================= -->
+<app-drilldown-dialog
+    [(visible)]="drilldownVisible"
+    [title]="drilldownTitle"
+    [records]="drilldownRecords">
+</app-drilldown-dialog>
+
+<!-- ================= TEMPORARY PDF EXPORT SPREADSHEET ================= -->
+<!-- <div
+    *ngIf="pdfRenderVisible"
+    #pdfExportArea
+    class="dashboard-pdf-export"
+    [style.width.px]="pdfExportWidth"
+    [style.height.px]="pdfExportHeight">
+
+    <ejs-spreadsheet
+        #pdfSpreadsheet
+        [width]="pdfExportWidth + 'px'"
+        [height]="pdfExportHeight + 'px'"
+        [sheets]="pdfExportSheets"
+        [activeSheetIndex]="pdfExportSheetIndex"
+        [scrollSettings]="pdfScrollSettings"
+        [allowChart]="true"
+        [allowEditing]="false"
+        [allowInsert]="false"
+        [allowDelete]="false"
+        [allowSorting]="false"
+        [allowFiltering]="false"
+        [allowOpen]="false"
+        [allowSave]="false"
+        [enableContextMenu]="false"
+        [enableKeyboardShortcut]="false"
+        [showRibbon]="false"
+        [showFormulaBar]="false"
+        [showSheetTabs]="false"
+        (created)="onPdfSpreadsheetCreated()">
+    </ejs-spreadsheet>
+
+</div> -->
