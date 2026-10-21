@@ -46,7 +46,7 @@ BEGIN TRY
         (Ordinal, Code, Name, DataType, DefaultValue, Usage)
     VALUES
         (1, N'AllowNull',    N'Allow Null',    N'boolean',  N'false', N'FieldManager.AdvancedInformation'),
-        (2, N'DateFormat',   N'Date Format',   N'string',   NULL,     N'FieldManager.AdvancedInformation'),
+        (2, N'DateFormat',   N'Date Format',   N'dropDownList', NULL, N'FieldManager.AdvancedInformation'),
         (3, N'DefaultValue', N'Default Value', N'Datetime', NULL,     N'FieldManager.AdvancedInformation'),
         (4, N'Required',     N'Required',      N'boolean',  N'false', N'FieldManager.AdvancedInformation'),
         (5, N'Visible',      N'Visible',       N'boolean',  N'true',  N'FieldManager.ExtraAttributes');

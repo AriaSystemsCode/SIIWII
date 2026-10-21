@@ -245,7 +245,7 @@ namespace onetouch.AppFields
                     if (selectedType == null) throw new UserFriendlyException("Select a valid object type.");
                     var objectIds = await GetEffectiveObjectIds(selectedType.ObjectId);
                     var baseObjectIds = objectIds.Skip(1).ToList();
-                    var rows = await assignments.Where(x =>
+                    var rows = await assignments.Include(x => x.SettingValues).Where(x =>
                         (x.SycObjectId == selectedType.ObjectId &&
                             (x.SycEntityObjectTypeId == null || x.SycEntityObjectTypeId == selectedType.Id)) ||
                         (baseObjectIds.Contains(x.SycObjectId) && x.SycEntityObjectTypeId == null))
@@ -258,7 +258,7 @@ namespace onetouch.AppFields
                 else if (input.SelectedObjectId.HasValue)
                 {
                     var objectIds = await GetEffectiveObjectIds(input.SelectedObjectId.Value);
-                    var rows = await assignments.Where(x => objectIds.Contains(x.SycObjectId) &&
+                    var rows = await assignments.Include(x => x.SettingValues).Where(x => objectIds.Contains(x.SycObjectId) &&
                         x.SycEntityObjectTypeId == null).AsNoTracking().ToListAsync();
                     var filtered = FilterFields(SelectAppliedDefinitions(rows.Where(x =>
                         !suppressedHostKeys.Contains(x.FieldDefinitionKey)), tenantId, objectIds).AsQueryable(), input);
@@ -273,7 +273,7 @@ namespace onetouch.AppFields
                         var query = FilterFields(VisibleFields()
                             .Where(x => !x.IsDeleted || usedKeys.Contains(x.FieldDefinitionKey)), input);
                         count = await query.CountAsync();
-                        page = await SortFields(query, input.Sorting).Skip(input.SkipCount)
+                        page = await SortFields(query.Include(x => x.SettingValues), input.Sorting).Skip(input.SkipCount)
                             .Take(input.MaxResultCount).AsNoTracking().ToListAsync();
                     }
                 }
@@ -345,6 +345,7 @@ namespace onetouch.AppFields
                     CreatorUserName = x.CreatorUserId.HasValue && creatorNames.TryGetValue(x.CreatorUserId.Value, out var creatorName)
                         ? creatorName : null,
                     CreationTime = x.CreationTime,
+                    SettingValues = x.SettingValues.Select(ToSettingDto).ToList(),
                     Tables = pageAssignments.Where(a => a.FieldDefinitionKey == x.FieldDefinitionKey)
                         .SelectMany(a => a.SycEntityObjectTypeId.HasValue
                             ? assignmentTypeNames.TryGetValue(a.SycEntityObjectTypeId.Value, out var assignedTypeName)
@@ -690,12 +691,22 @@ namespace onetouch.AppFields
                 }
 
                 await RequirePermission(AppPermissions.Pages_Administration_FieldManager_Edit);
-                var field = await VisibleFields().Include(x => x.SettingValues).FirstOrDefaultAsync(x => x.Id == input.Id.Value);
-                if (field == null) throw new UserFriendlyException("Field was not found.");
                 if (string.IsNullOrWhiteSpace(input.ExpectedCurrentRevisionNo))
                     throw new UserFriendlyException("The current revision is required. Refresh the field before editing.");
-                if (field.CurrentRevisionNo != input.ExpectedCurrentRevisionNo)
-                    throw new UserFriendlyException("The field changed. Refresh it before saving.");
+                await AcquireRevisionLock(input.Id.Value);
+                var field = await VisibleFields().Include(x => x.SettingValues).FirstOrDefaultAsync(x => x.Id == input.Id.Value);
+                if (field == null && AbpSession.TenantId.HasValue)
+                {
+                    var existingCopy = await _fields.GetAll().AsNoTracking().FirstOrDefaultAsync(x =>
+                        x.TenantId == AbpSession.TenantId && x.SourceFieldId == input.Id.Value && !x.IsDeleted);
+                    if (existingCopy != null)
+                        return new AppFieldDto { Error = RevisionConflict("00",
+                            NextRevision(existingCopy.CurrentRevisionNo), existingCopy.Id) };
+                }
+                if (field == null) throw new UserFriendlyException("Field was not found.");
+                var revisionError = await EnsureRevisionAvailable(field, input.ExpectedCurrentRevisionNo);
+                if (revisionError != null)
+                    return new AppFieldDto { Error = revisionError };
                 if (AbpSession.TenantId.HasValue && field.TenantId == null)
                 {
                     var copy = await CreateField(input, field.Id);
@@ -717,7 +728,14 @@ namespace onetouch.AppFields
                 }
                 catch (DbUpdateConcurrencyException)
                 {
-                    throw new UserFriendlyException("The field changed while you were editing. Refresh it before saving.");
+                    CurrentUnitOfWork.GetDbContext<onetouchDbContext>().ChangeTracker.Clear();
+                    var latestRevision = await _fields.GetAll().AsNoTracking()
+                        .Where(x => x.Id == input.Id.Value).Select(x => x.CurrentRevisionNo)
+                        .FirstOrDefaultAsync();
+                    return new AppFieldDto { Error = RevisionConflict(
+                        NextRevision(input.ExpectedCurrentRevisionNo),
+                        NextRevision(latestRevision ?? input.ExpectedCurrentRevisionNo),
+                        input.Id.Value, revisionAlreadyExists: false) };
                 }
                 await RecordHistory(field, "Edit");
                 return await ToDtoForResponse(field);
@@ -1143,6 +1161,50 @@ namespace onetouch.AppFields
         {
             if (!int.TryParse(current, out var number)) throw new UserFriendlyException("Invalid field revision.");
             return (number + 1).ToString("D2");
+        }
+
+        private async Task<FieldRevisionErrorDto> EnsureRevisionAvailable(AppField field, string expectedCurrentRevisionNo)
+        {
+            var newRevisionNo = NextRevision(expectedCurrentRevisionNo);
+            var savedRevisions = await _history.GetAll().Where(x => x.AppFieldId == field.Id)
+                .Select(x => x.RevisionNo).ToListAsync();
+            var revisionExists = savedRevisions.Contains(newRevisionNo);
+            if (field.CurrentRevisionNo == expectedCurrentRevisionNo && !revisionExists)
+                return null;
+
+            if (!int.TryParse(field.CurrentRevisionNo, NumberStyles.None, CultureInfo.InvariantCulture,
+                out var highestRevision))
+                throw new UserFriendlyException("Invalid field revision.");
+            foreach (var revision in savedRevisions)
+                if (int.TryParse(revision, NumberStyles.None, CultureInfo.InvariantCulture, out var number))
+                    highestRevision = Math.Max(highestRevision, number);
+            var expectedNewRevisionNo = NextRevision(highestRevision.ToString("D2", CultureInfo.InvariantCulture));
+            return RevisionConflict(newRevisionNo, expectedNewRevisionNo, field.Id, revisionExists);
+        }
+
+        private static FieldRevisionErrorDto RevisionConflict(string conflictingRevisionNo,
+            string expectedNewRevisionNo, long currentFieldId, bool revisionAlreadyExists = true)
+        {
+            var message = revisionAlreadyExists
+                ? "Revision " + conflictingRevisionNo + " has already been saved. Refresh the field before saving."
+                : "The field revision changed. Refresh the field before saving.";
+            return new FieldRevisionErrorDto
+            {
+                Code = 40901,
+                Message = message,
+                ConflictingRevisionNo = conflictingRevisionNo,
+                ExpectedNewRevisionNo = expectedNewRevisionNo,
+                CurrentFieldId = currentFieldId,
+                RevisionAlreadyExists = revisionAlreadyExists
+            };
+        }
+
+        private async Task AcquireRevisionLock(long fieldId)
+        {
+            var context = CurrentUnitOfWork.GetDbContext<onetouchDbContext>();
+            var lockName = "APPFields:Revision:" + fieldId.ToString(CultureInfo.InvariantCulture);
+            await context.Database.ExecuteSqlInterpolatedAsync(
+                $"DECLARE @result int; EXEC @result = sp_getapplock @Resource = {lockName}, @LockMode = 'Exclusive', @LockOwner = 'Transaction'; IF @result < 0 THROW 51001, 'Unable to lock the field revision.', 1;");
         }
 
         private async Task RequirePermission(string permission)
