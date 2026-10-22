@@ -38,6 +38,9 @@ import { MenuItem } from "primeng/api";
 import { DatePipe } from "@angular/common";
 import { TransactionInformationComponent } from "@app/main/transactions/app-TransactionTabsInfo/Components/transaction-information-component/transaction-information.component";
 import Swal from "sweetalert2";
+import { Subject } from 'rxjs';
+import { takeUntil } from 'rxjs/operators';
+import { AccountRefreshService } from "@shared/utils/account-refresh.service";
 
 
 @Component({
@@ -127,6 +130,7 @@ export class TopBarComponent extends ThemesLayoutBaseComponent implements OnInit
         private _AppTransactionServiceProxy: AppTransactionServiceProxy,
         private _AppEntitiesServiceProxy: AppEntitiesServiceProxy   ,
         private _accountsServiceProxy: AccountsServiceProxy,
+        private accountRefreshService: AccountRefreshService,
     ) {
         super(injector);
         this.showMainSpinner();
@@ -188,6 +192,33 @@ export class TopBarComponent extends ThemesLayoutBaseComponent implements OnInit
     }
 
     ngOnInit() {
+     this.accountRefreshService.accountUpdated$
+    .pipe(takeUntil(this.destroy$))
+    .subscribe(data => {
+
+        // Only update for Personal Accounts
+        if (
+            !data ||
+            data.firstName === undefined ||
+            data.lastName === undefined
+        ) {
+            return;
+        }
+
+        const firstName = data.firstName.trim();
+        const lastName = data.lastName.trim();
+
+        // Topbar displays first name only
+        this.name = firstName;
+
+        // Keep full name for other uses
+        this.fullName = `${firstName} ${lastName}`.trim();
+
+        if (this.appSession?.user) {
+            this.appSession.user.name = firstName;
+            this.appSession.user.surname = lastName;
+        }
+    });
         this.isAuthenticated = !!this.appSession?.user;
        this.loadDefaultPage()
         this.currentLang = abp.utils.getCookieValue('Abp.Localization.CultureName')
@@ -242,7 +273,48 @@ export class TopBarComponent extends ThemesLayoutBaseComponent implements OnInit
        
     }
 
+refreshPersonalAccountName(): void {
 
+    if (!this.isAuthenticated) {
+        return;
+    }
+
+    const isPersonal =
+        this.appSession?.tenant?.edition?.displayName ===
+        'Personal Edition';
+
+    if (!isPersonal) {
+        return;
+    }
+
+    this._accountsServiceProxy
+        .getAccountSummary()
+        .pipe(takeUntil(this.destroy$))
+        .subscribe({
+            next: result => {
+
+                if (!result) {
+                    return;
+                }
+
+                const fullName = (result.name || '').trim();
+
+                if (!fullName) {
+                    return;
+                }
+
+                this.name = fullName;
+                this.fullName = fullName;
+            },
+
+            error: error => {
+                console.error(
+                    'Failed to refresh personal account name',
+                    error
+                );
+            }
+        });
+}
 
     registerToEvents() {
         abp.event.on("profilePictureChanged", () => {
@@ -267,15 +339,43 @@ export class TopBarComponent extends ThemesLayoutBaseComponent implements OnInit
     }
 
     fullName: string = "";
-    setCurrentLoginInformations(): void {
-        this.shownLoginName = this.appSession?.getShownLoginName();
-        this.tenancyName = this.appSession?.tenancyName;
-        this.userName = this.appSession?.user?.userName;
-        this.name = this.appSession?.user?.name;
-        this.fullName =
-            this.appSession?.user?.name + ' ' + this.appSession?.user?.surname;
+    // setCurrentLoginInformations(): void {
+    //     this.shownLoginName = this.appSession?.getShownLoginName();
+    //     this.tenancyName = this.appSession?.tenancyName;
+    //     this.userName = this.appSession?.user?.userName;
+    //     this.name = this.appSession?.user?.name;
+    //     this.fullName =
+    //         this.appSession?.user?.name + ' ' + this.appSession?.user?.surname;
        
-    }
+    // }
+    setCurrentLoginInformations(): void {
+
+    this.shownLoginName =
+        this.appSession?.getShownLoginName();
+
+    this.tenancyName =
+        this.appSession?.tenancyName;
+
+    this.userName =
+        this.appSession?.user?.userName || '';
+
+    const firstName =
+        this.appSession?.user?.name || '';
+
+    const lastName =
+        this.appSession?.user?.surname || '';
+
+    this.fullName =
+        `${firstName} ${lastName}`.trim();
+
+    const isPersonal =
+        this.appSession?.tenant?.edition?.displayName ===
+        'Personal Edition';
+
+    this.name = isPersonal
+        ? this.fullName
+        : firstName;
+}
     closeModal(value: boolean) {
         this.display = false;
     }
@@ -588,12 +688,20 @@ export class TopBarComponent extends ThemesLayoutBaseComponent implements OnInit
       onImgErr(evt: Event) {
         (evt.target as HTMLImageElement).src = '/assets/placeholders/_logo-placeholder.png';
       }
-    ngOnDestroy(): void {
-        if (this.profilePicSub) {
-          this.profilePicSub.unsubscribe();
-        }
-      }
-      
+    // ngOnDestroy(): void {
+    //     if (this.profilePicSub) {
+    //       this.profilePicSub.unsubscribe();
+    //     }
+    //   }
+ngOnDestroy(): void {
+
+    this.destroy$.next(true);
+    this.destroy$.complete();
+
+    if (this.profilePicSub) {
+        this.profilePicSub.unsubscribe();
+    }
+}
 }
 
 
