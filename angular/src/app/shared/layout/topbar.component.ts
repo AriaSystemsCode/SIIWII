@@ -192,31 +192,26 @@ export class TopBarComponent extends ThemesLayoutBaseComponent implements OnInit
     }
 
     ngOnInit() {
-     this.accountRefreshService.accountUpdated$
+       this.accountRefreshService.accountUpdated$
     .pipe(takeUntil(this.destroy$))
     .subscribe(data => {
 
-        // Only update for Personal Accounts
-        if (
-            !data ||
-            data.firstName === undefined ||
-            data.lastName === undefined
-        ) {
+        if (!data?.name) {
             return;
         }
 
-        const firstName = data.firstName.trim();
-        const lastName = data.lastName.trim();
-
-        // Topbar displays first name only
-        this.name = firstName;
-
-        // Keep full name for other uses
-        this.fullName = `${firstName} ${lastName}`.trim();
+        this.name = data.name;
+        this.fullName = data.name;
 
         if (this.appSession?.user) {
-            this.appSession.user.name = firstName;
-            this.appSession.user.surname = lastName;
+
+            if (data.firstName !== undefined) {
+                this.appSession.user.name = data.firstName;
+            }
+
+            if (data.lastName !== undefined) {
+                this.appSession.user.surname = data.lastName;
+            }
         }
     });
         this.isAuthenticated = !!this.appSession?.user;
