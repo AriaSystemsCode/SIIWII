@@ -88,7 +88,7 @@
             </div>
 
             <!-- Dropdown list with static values -->
-            <div class="flex-grow-1" *ngIf="extraAttr.dataType === 'dropDownList'">
+            <!-- <div class="flex-grow-1" *ngIf="extraAttr.dataType === 'dropDownList'">
               <div class="d-flex align-items-baseline justify-content-start">
                 <p-dropdown [options]="getDropdownOptions(extraAttr)"
                                 [(ngModel)]="extraAttr.selectedValues"
@@ -111,8 +111,41 @@
                   </ng-template>
                 </p-dropdown>
               </div>
+            </div> -->
+
+
+            <!-- Dynamic / static dropdown -->
+<div class="flex-grow-1 w-100"
+     *ngIf="extraAttr.dataType === 'dropDownList'">
+
+    <p-dropdown
+        [options]="getDropdownOptions(extraAttr)"
+        [(ngModel)]="extraAttr.selectedValues"
+        [name]="'extraAttr_' + extraAttr.attributeId"
+        optionLabel="label"
+        optionValue="value"
+        [filter]="true"
+        filterBy="label"
+        [showClear]="true"
+        [styleClass]="'w-100 searchableDropdown'"
+        [placeholder]="('Select' | localize) + ' ' + (extraAttr.name | localize)"
+        (onClick)="onDropdownClick(extraAttr)"
+        (onChange)="onDropdownChange(extraAttr)">
+
+        <ng-template let-item pTemplate="item">
+            <div *ngIf="item.isLoadMore; else normalItem"
+                 class="load-more-item"
+                 (click)="onLoadMoreClick($event, extraAttr)">
+                {{ 'LoadMore' | localize }}...
             </div>
 
+            <ng-template #normalItem>
+                {{ item.label }}
+            </ng-template>
+        </ng-template>
+
+    </p-dropdown>
+</div>
             <!-- Text input -->
             <div class="ml-2 flex-grow-1 position-relative" *ngIf="extraAttr.dataType === 'string'&& !extraAttr.isLookup && isVisible(extraAttr)">
               <input type="text" name="{{extraAttr.name}}"

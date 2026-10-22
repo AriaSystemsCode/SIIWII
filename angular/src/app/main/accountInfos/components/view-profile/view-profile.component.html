@@ -140,7 +140,7 @@
                                     <h5 class="account-name">{{accountData?.name}}
 
                                     </h5>
-                                    <p style="font-size: 12px;">{{contactData?.jobTitle}}</p>
+                                    <!-- <p style="font-size: 12px;">{{contactData?.jobTitle}}</p> -->
                                     <div *ngIf="!personalAccount">
                                         <textarea class="thin-scroll w-100 mt-2 txtSty" readonly="">{{accountData?.description}}
                                         </textarea>
@@ -472,9 +472,9 @@
                                     </p-multiSelect>
                                 </div>
                             </div>
-                            <hr class="header">
+                            <!-- <hr class="header"> -->
 
-                            <div class="col-md-12  align-items-baseline pt-2 pb-2 pl-3">
+                            <!-- <div class="col-md-12  align-items-baseline pt-2 pb-2 pl-3">
                                 <h6 class=" font-weight-bold mr-3 " [ngClass]="Editting ? 'addWidth':''"> <img
                                         src="../../assets/img/input_icons/outline-work.png" class=""> {{ (
                                     "JobTitle" | localize ) + " :" }}</h6>
@@ -491,7 +491,7 @@
                                 <validation-messages *ngIf="NoteditInfo && Editting"
                                     [formCtrl]="jobTitleInput"></validation-messages>
 
-                            </div>
+                            </div> -->
                             <hr class="header">
                             <div class="col-md-12  align-items-baseline pt-2 pb-2  pl-3 d-flex">
                                 <h6 class="font-weight-bold mx-3  " [ngClass]="Editting ? 'addWidth':''"><img

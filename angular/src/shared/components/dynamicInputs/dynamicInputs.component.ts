@@ -278,88 +278,188 @@ reset(extraAttr: any): void {
 
 
 
- fillSelectedValuesFromDto() {
-  if (!this.extraAttributeObject?.value?.extraAttributes || !this.dynamicInputsForViewDto?.extraDataAttributes) {
-    return;
-  }
+//  fillSelectedValuesFromDto() {
+//   if (!this.extraAttributeObject?.value?.extraAttributes || !this.dynamicInputsForViewDto?.extraDataAttributes) {
+//     return;
+//   }
 
-  const dtoData = this.dynamicInputsForViewDto.extraDataAttributes;
+//   const dtoData = this.dynamicInputsForViewDto.extraDataAttributes;
 
-  const allAttributes = [
-    ...(this.extraAttributeObject.value.extraAttributes || []),
-    ...(this.extraAttributeObject.value.filteredExtraAttributes || [])
-  ];
+//   const allAttributes = [
+//     ...(this.extraAttributeObject.value.extraAttributes || []),
+//     ...(this.extraAttributeObject.value.filteredExtraAttributes || [])
+//   ];
 
-  for (const attr of allAttributes) {
-    const matchedDto = dtoData.find(
-      d => d.extraAttributeId === attr.attributeId
-    );
+//   for (const attr of allAttributes) {
+//     const matchedDto = dtoData.find(
+//       d => d.extraAttributeId === attr.attributeId
+//     );
 
-    if (matchedDto && matchedDto.selectedValues?.length) {
-      let dtoValue =  matchedDto.selectedValues[matchedDto.selectedValues.length - 1].value;
-      if ((attr.dataType?.toLowerCase() === 'boolean' || attr.dataType?.toLowerCase() === 'bit') && !attr.validEntries?.trim()) {
-        dtoValue =  this.normalizeBooleanValue(dtoValue);
-      }
-      if (attr.isLookup) {
-        const matchedOption =  attr.paginationSetting?.list?.find(
-            opt => opt.label === dtoValue || opt.value === dtoValue
-          );
+//     if (matchedDto && matchedDto.selectedValues?.length) {
+//       let dtoValue =  matchedDto.selectedValues[matchedDto.selectedValues.length - 1].value;
+//       if ((attr.dataType?.toLowerCase() === 'boolean' || attr.dataType?.toLowerCase() === 'bit') && !attr.validEntries?.trim()) {
+//         dtoValue =  this.normalizeBooleanValue(dtoValue);
+//       }
+//       if (attr.isLookup) {
+//         const matchedOption =  attr.paginationSetting?.list?.find(
+//             opt => opt.label === dtoValue || opt.value === dtoValue
+//           );
 
-        if (matchedOption) {
-          attr.selectedValues = matchedOption.value;
+//         if (matchedOption) {
+//           attr.selectedValues = matchedOption.value;
+
+//         } else {
+
+//           const manualOption = {
+//             value: dtoValue,
+//             label: dtoValue,
+//             code: null,
+//             isHostRecord: false,
+//             stockAvailability: null,
+//             image: null,
+//             hexaCode: null
+//           };
+
+//           if (attr.paginationSetting?.list) {
+//             attr.paginationSetting.list.push(manualOption);
+//           }
+
+//           attr.selectedValues =  manualOption.value;
+//         }
+
+//       } else if (attr.dataType === 'Datetime' && typeof dtoValue === 'string') {
+//         attr.selectedValues =  new Date(dtoValue);
+//       } else {
+//         attr.selectedValues = dtoValue;
+//       }
+
+//       this.originalValuesMap.set(
+//         attr.attributeId,
+//         attr.selectedValues
+//       );
+//     }
+
+
+//     else {
+
+//       if (
+//         (attr.dataType?.toLowerCase() === 'boolean' ||  attr.dataType?.toLowerCase() === 'bit') && !attr.validEntries?.trim()
+//       ) {
+
+//         attr.selectedValues =   this.normalizeBooleanValue(attr.defaultValue);
+
+//       } else {
+//         attr.selectedValues = attr.defaultValue;
+//       }
+
+//       this.originalValuesMap.set(
+//         attr.attributeId,
+//         attr.selectedValues
+//       );
+//     }
+//   }
+// }
+fillSelectedValuesFromDto(): void {
+
+    const attributeObject = this.extraAttributeObject?.value;
+    const dtoData = this.dynamicInputsForViewDto?.extraDataAttributes;
+
+    if (!attributeObject || !Array.isArray(dtoData)) {
+        return;
+    }
+
+    const allAttributes = [
+        ...(attributeObject.extraAttributes || []),
+        ...(attributeObject.filteredExtraAttributes || [])
+    ];
+
+    const processed = new Set<number>();
+
+    for (const attr of allAttributes) {
+
+        const attributeId = Number(attr.attributeId);
+
+        if (processed.has(attributeId)) {
+            continue;
+        }
+
+        processed.add(attributeId);
+
+        const matchedDto = dtoData.find(
+            d => Number(d.extraAttributeId) === attributeId
+        );
+
+        const savedValues = matchedDto?.selectedValues || [];
+
+        let value = savedValues.length
+            ? savedValues[savedValues.length - 1].value
+            : attr.defaultValue;
+
+        const dataType = String(attr.dataType || '').toLowerCase();
+
+        if (
+            (dataType === 'boolean' || dataType === 'bit') &&
+            !attr.validEntries?.trim()
+        ) {
+            value = this.normalizeBooleanValue(value);
+        }
+
+        if (attr.isLookup) {
+
+            const matchedOption = attr.paginationSetting?.list?.find(
+                option =>
+                    String(option.value) === String(value) ||
+                    String(option.label) === String(value)
+            );
+
+            attr.selectedValues = matchedOption
+                ? matchedOption.value
+                : value;
+
+        } else if (dataType === 'datetime') {
+
+            const date = value ? new Date(value) : null;
+
+            attr.selectedValues =
+                date && !isNaN(date.getTime())
+                    ? date
+                    : null;
+
+        } else if (
+            dataType === 'dropdownlist' ||
+            dataType === 'searchabledropdown'
+        ) {
+
+            attr.selectedValues =
+                value !== null &&
+                value !== undefined &&
+                value !== ''
+                    ? String(value)
+                    : null;
 
         } else {
 
-          const manualOption = {
-            value: dtoValue,
-            label: dtoValue,
-            code: null,
-            isHostRecord: false,
-            stockAvailability: null,
-            image: null,
-            hexaCode: null
-          };
-
-          if (attr.paginationSetting?.list) {
-            attr.paginationSetting.list.push(manualOption);
-          }
-
-          attr.selectedValues =  manualOption.value;
+            attr.selectedValues = value;
         }
 
-      } else if (attr.dataType === 'Datetime' && typeof dtoValue === 'string') {
-        attr.selectedValues =  new Date(dtoValue);
-      } else {
-        attr.selectedValues = dtoValue;
-      }
+        this.originalValuesMap.set(
+            attributeId,
+            attr.selectedValues
+        );
 
-      this.originalValuesMap.set(
-        attr.attributeId,
-        attr.selectedValues
-      );
+        // Load dynamic options immediately for an existing selection.
+        if (
+            attr.dataSource &&
+            (dataType === 'dropdownlist' ||
+             dataType === 'searchabledropdown') &&
+            attr.selectedValues !== null &&
+            attr.selectedValues !== undefined &&
+            attr.selectedValues !== ''
+        ) {
+            this.onDropdownClick(attr);
+        }
     }
-
-
-    else {
-
-      if (
-        (attr.dataType?.toLowerCase() === 'boolean' ||  attr.dataType?.toLowerCase() === 'bit') && !attr.validEntries?.trim()
-      ) {
-
-        attr.selectedValues =   this.normalizeBooleanValue(attr.defaultValue);
-
-      } else {
-        attr.selectedValues = attr.defaultValue;
-      }
-
-      this.originalValuesMap.set(
-        attr.attributeId,
-        attr.selectedValues
-      );
-    }
-  }
 }
-
 
   clearExtraAttr(attr: any) {
     if (attr.acceptMultipleValues) {
@@ -512,41 +612,111 @@ reset(extraAttr: any): void {
   getSafeString = (str: string) => str.replace(/\s+/g, '_');
   extraAttrOptions = new Map<string, { items: any[], totalCount: number, isLoading: boolean }>();
 
-  getDropdownOptions(extraAttr: any) {
+  // getDropdownOptions(extraAttr: any) {
+  //   if (extraAttr?.validEntries && !extraAttr?.dataSource) {
+  //   return extraAttr.validEntries.split('|').map(v => ({
+  //     label: v.trim(),
+  //     value: v.trim()
+  //   }));
+
+  // }
+  
+  // return this.extraAttrOptions.get(extraAttr.id)?.items || [];
+  // }
+  
+  // onDropdownClick(extraAttr: any) {
+  //   if (extraAttr?.validEntries && !extraAttr?.dataSource) 
+  //   return;
+
+  // const data = this.extraAttrOptions.get(extraAttr.id);
+
+  // if (!data || data.items.length === 0) 
+  //   this.loadNextItems(extraAttr);
+
+  // }
+
+  // onLoadMoreClick(event: Event, extraAttr: any) {
+  //   event.stopPropagation();
+  //   this.loadNextItems(extraAttr);
+  // }
+  // loadNextItems(extraAttr: any) {
+  //   let data = this.extraAttrOptions.get(extraAttr.id);
+  //   if (!data) {
+  //     data = { items: [], totalCount: 0, isLoading: false };
+  //     this.extraAttrOptions.set(extraAttr.id, data);
+  //   }
+
+  //   if (data.isLoading) return;
+
+  //   const skipCount = data.items.length;
+  //   const maxResultCount = 10;
+
+  //   data.isLoading = true;
+
+  //   this.callDynamicAPI(extraAttr, skipCount, maxResultCount);
+  // }
+
+
+  getDropdownOptions(extraAttr: any): any[] {
+
     if (extraAttr?.validEntries && !extraAttr?.dataSource) {
-    return extraAttr.validEntries.split('|').map(v => ({
-      label: v.trim(),
-      value: v.trim()
-    }));
-
-  }
-  
-  return this.extraAttrOptions.get(extraAttr.id)?.items || [];
-  }
-  
-  onDropdownClick(extraAttr: any) {
-    if (extraAttr?.validEntries && !extraAttr?.dataSource) 
-    return;
-
-  const data = this.extraAttrOptions.get(extraAttr.id);
-
-  if (!data || data.items.length === 0) 
-    this.loadNextItems(extraAttr);
-
-  }
-
-  onLoadMoreClick(event: Event, extraAttr: any) {
-    event.stopPropagation();
-    this.loadNextItems(extraAttr);
-  }
-  loadNextItems(extraAttr: any) {
-    let data = this.extraAttrOptions.get(extraAttr.id);
-    if (!data) {
-      data = { items: [], totalCount: 0, isLoading: false };
-      this.extraAttrOptions.set(extraAttr.id, data);
+        return extraAttr.validEntries.split('|').map(value => ({
+            label: value.trim(),
+            value: value.trim()
+        }));
     }
 
-    if (data.isLoading) return;
+    return this.extraAttrOptions.get(
+        this.getDropdownKey(extraAttr)
+    )?.items || [];
+}
+
+onDropdownClick(extraAttr: any): void {
+
+    if (extraAttr?.validEntries && !extraAttr?.dataSource) {
+        return;
+    }
+
+    const key = this.getDropdownKey(extraAttr);
+    const data = this.extraAttrOptions.get(key);
+
+    if (!data || data.items.length === 0) {
+        this.loadNextItems(extraAttr);
+    }
+}
+
+onLoadMoreClick(event: Event, extraAttr: any): void {
+    event.stopPropagation();
+    this.loadNextItems(extraAttr);
+}
+
+loadNextItems(extraAttr: any): void {
+
+    const key = this.getDropdownKey(extraAttr);
+
+    let data = this.extraAttrOptions.get(key);
+
+    if (!data) {
+        data = {
+            items: [],
+            totalCount: 0,
+            isLoading: false
+        };
+
+        this.extraAttrOptions.set(key, data);
+    }
+
+    if (data.isLoading) {
+        return;
+    }
+
+    if (
+        data.items.length > 0 &&
+        data.totalCount > 0 &&
+        data.items.length >= data.totalCount
+    ) {
+        return;
+    }
 
     const skipCount = data.items.length;
     const maxResultCount = 10;
@@ -554,70 +724,194 @@ reset(extraAttr: any): void {
     data.isLoading = true;
 
     this.callDynamicAPI(extraAttr, skipCount, maxResultCount);
-  }
+}
 
- callDynamicAPI(extraAttr: any, skipCount: number = 0, maxResultCount: number = 10) {
-  if (extraAttr?.validEntries && extraAttr.validEntries.includes('|')) {
-    const items = extraAttr.validEntries.split('|').map(val => ({
-      label: val.trim(),
-      value: val.trim()
-    }));
+private restoreDropdownSelection(
+    extraAttr: any,
+    options: any[]
+): void {
 
-    this.extraAttrOptions.set(extraAttr.id, {
-      items: items,
-      totalCount: items.length,
-      isLoading: false
-    });
-    return;
-  }
+    const savedValue = extraAttr.selectedValues;
 
-  if (extraAttr?.dataSource) {
-    const serviceName = extraAttr.dataSource.service + "ServiceProxy";
+    if (
+        savedValue === null ||
+        savedValue === undefined ||
+        savedValue === ''
+    ) {
+        return;
+    }
+
+    const matchedOption = options.find(option =>
+        String(option.value) === String(savedValue)
+    );
+
+    if (matchedOption) {
+        extraAttr.selectedValues = matchedOption.value;
+    }
+}
+//  callDynamicAPI(extraAttr: any, skipCount: number = 0, maxResultCount: number = 10) {
+//   if (extraAttr?.validEntries && extraAttr.validEntries.includes('|')) {
+//     const items = extraAttr.validEntries.split('|').map(val => ({
+//       label: val.trim(),
+//       value: val.trim()
+//     }));
+
+//     this.extraAttrOptions.set(extraAttr.id, {
+//       items: items,
+//       totalCount: items.length,
+//       isLoading: false
+//     });
+//     return;
+//   }
+
+//   if (extraAttr?.dataSource) {
+//     const serviceName = extraAttr.dataSource.service + "ServiceProxy";
+//     const apiMethod = extraAttr.dataSource.api;
+//     const resultField = extraAttr.dataSource.parameter;
+
+//   this.dynamicApi.dispatch(serviceName, apiMethod, {
+//     skipCount,
+//     maxResultCount
+// }).subscribe({
+//     next: (result: any) => {
+//         if (!result || !Array.isArray(result.items)) {
+//             console.error('Invalid dynamic API response:', {
+//                 serviceName,
+//                 apiMethod,
+//                 result
+//             });
+
+//             const data = this.extraAttrOptions.get(extraAttr.id);
+//             if (data) {
+//                 data.isLoading = false;
+//             }
+
+//             return;
+//         }
+
+//         const dropdownItems = result.items.map(item => ({
+//             label: this.getByPath(item, resultField.trim()),
+//             value: item.account?.id
+//         }));
+
+//         const existing =
+//             this.extraAttrOptions.get(extraAttr.id)?.items || [];
+
+//         this.extraAttrOptions.set(extraAttr.id, {
+//             items: skipCount > 0
+//                 ? [...existing, ...dropdownItems]
+//                 : dropdownItems,
+//             totalCount: result.totalCount ?? dropdownItems.length,
+//             isLoading: false
+//         });
+//     },
+  
+// });
+//   }
+// }
+
+callDynamicAPI(
+    extraAttr: any,
+    skipCount: number = 0,
+    maxResultCount: number = 10
+): void {
+
+    const key = this.getDropdownKey(extraAttr);
+
+    if (extraAttr?.validEntries && !extraAttr?.dataSource) {
+
+        const items = extraAttr.validEntries
+            .split('|')
+            .map(value => ({
+                label: value.trim(),
+                value: value.trim()
+            }));
+
+        this.extraAttrOptions.set(key, {
+            items,
+            totalCount: items.length,
+            isLoading: false
+        });
+
+        this.restoreDropdownSelection(extraAttr, items);
+        return;
+    }
+
+    if (!extraAttr?.dataSource) {
+        return;
+    }
+
+    const serviceName =
+        extraAttr.dataSource.service + 'ServiceProxy';
+
     const apiMethod = extraAttr.dataSource.api;
     const resultField = extraAttr.dataSource.parameter;
 
-  this.dynamicApi.dispatch(serviceName, apiMethod, {
-    skipCount,
-    maxResultCount
-}).subscribe({
-    next: (result: any) => {
-        if (!result || !Array.isArray(result.items)) {
-            console.error('Invalid dynamic API response:', {
-                serviceName,
-                apiMethod,
-                result
-            });
+    this.dynamicApi.dispatch(
+        serviceName,
+        apiMethod,
+        {
+            skipCount,
+            maxResultCount
+        }
+    ).subscribe({
 
-            const data = this.extraAttrOptions.get(extraAttr.id);
-            if (data) {
-                data.isLoading = false;
+        next: (result: any) => {
+
+            const currentData = this.extraAttrOptions.get(key);
+
+            if (!result || !Array.isArray(result.items)) {
+                console.error('Invalid dynamic API response:', result);
+
+                if (currentData) {
+                    currentData.isLoading = false;
+                }
+
+                return;
             }
 
-            return;
-        }
+            const dropdownItems = result.items.map(item => {
 
-        const dropdownItems = result.items.map(item => ({
-            label: this.getByPath(item, resultField.trim()),
-            value: item.account?.id
-        }));
+                const rawValue = item.account?.id ?? item.id;
 
-        const existing =
-            this.extraAttrOptions.get(extraAttr.id)?.items || [];
+                return {
+                    label: this.getByPath(
+                        item,
+                        resultField.trim()
+                    ),
+                    value: rawValue == null
+                        ? null
+                        : String(rawValue)
+                };
+            });
 
-        this.extraAttrOptions.set(extraAttr.id, {
-            items: skipCount > 0
+            const existing = currentData?.items || [];
+
+            const allItems = skipCount > 0
                 ? [...existing, ...dropdownItems]
-                : dropdownItems,
-            totalCount: result.totalCount ?? dropdownItems.length,
-            isLoading: false
-        });
-    },
-  
-});
-  }
+                : dropdownItems;
+
+            this.extraAttrOptions.set(key, {
+                items: allItems,
+                totalCount: result.totalCount ?? allItems.length,
+                isLoading: false
+            });
+
+            this.restoreDropdownSelection(extraAttr, allItems);
+        },
+
+        error: error => {
+
+            console.error('Dynamic dropdown API error:', error);
+
+            const currentData = this.extraAttrOptions.get(key);
+
+            if (currentData) {
+                currentData.isLoading = false;
+            }
+        }
+    });
 }
-
-
   getByPath(obj: any, path: string) {
     return path.split('.').reduce((o, p) => o?.[p], obj);
   }
@@ -684,5 +978,7 @@ private normalizeBooleanValue(value: any): string {
   return value;
 }
 
-
+private getDropdownKey(extraAttr: any): string {
+    return String(extraAttr.attributeId ?? extraAttr.id);
+}
 }

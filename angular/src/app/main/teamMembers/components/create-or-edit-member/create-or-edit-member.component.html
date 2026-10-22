@@ -1,338 +1,208 @@
-
-<div [@routerTransition] class="wrapper" >
+<div [@routerTransition] class="wrapper">
     <div class="kt-content kt-grid__item kt-grid__item--fluid kt-grid kt-grid--hor pb-0">
+
         <div class="kt-subheader kt-grid__item" *ngIf="active">
             <div [class]="containerClass">
                 <div class="kt-subheader__main">
                     <h6 class="kt-subheader__title">
-                        <span>{{ isManualOrExternalContact ? l("ManualContact") : l("TeamMember")  }}</span>
+                        <span>{{ isManualOrExternalContact ? l("ManualContact") : l("TeamMember") }}</span>
                     </h6>
                     <span class="kt-subheader__separator kt-subheader__separator--v"></span>
-                    <h6 class="mb-0 mr-2">{{ memberDto?.name }} </h6>
+                    <h6 class="mb-0 mr-2">{{ memberDto?.name }}</h6>
                     <span class="hint">{{ "ProfileInformation" | localize }}</span>
                 </div>
                 <div class="kt-subheader__toolbar">
-                    <div class="kt-subheader__wrapper" >
-                        <button  type="submit" class="btn btn-save btn-1bc5bd w-auto ml-4" (click)="SaveMember()"
-                            [disabled]="!memberForm.form.valid && !memberDto?.parentId">
-                            <span>{{l("SaveChanges")}}</span>
+                    <div class="kt-subheader__wrapper">
+                        <button type="submit" class="btn btn-save btn-1bc5bd w-auto ml-4" (click)="SaveMember()"
+                            [disabled]="!memberForm.form.valid">
+                            <span>{{ l("SaveChanges") }}</span>
                         </button>
                     </div>
                 </div>
             </div>
         </div>
-        
+
         <div [class]="containerClass + ' kt-grid__item kt-grid__item--fluid'">
             <div class="kt-portlet kt-portlet--mobile">
                 <div class="kt-portlet__body pt-5">
                     <form #memberForm="ngForm">
-                        <div *ngIf="active" >
-                            <!--Profile Picture-->
-                            <div class="form-group row ">
-                                <label for="colFormLabelSm" class="col-sm-2 col-form-label col-form-label-sm label-form">
-                                    <span class="text-danger">*</span>
-                                    {{l("MyPhoto")}}
+                        <div *ngIf="active">
+
+                            <!-- Profile picture -->
+                            <div class="form-group row">
+                                <label class="col-sm-2 col-form-label col-form-label-sm label-form">
+                                    <span class="text-danger">*</span> {{ l("MyPhoto") }}
                                 </label>
                                 <app-image-upload
                                     [sycAttachmentCategory]="sycAttachmentCategoryLogo"
                                     [image]="ProfileImg"
                                     [staticHeight]="170"
                                     [showGuidelines]="true"
-                                    (imageBrowseDone)="imageBrowseDone($event,sycAttachmentCategoryLogo)"
-                                    (removeImage)="removeImage($event,sycAttachmentCategoryLogo,-1)"
-                                >
+                                    (imageBrowseDone)="imageBrowseDone($event, sycAttachmentCategoryLogo)"
+                                    (removeImage)="removeImage(sycAttachmentCategoryLogo)">
                                 </app-image-upload>
                             </div>
-                            <!--  cover photo-->
-                            <div class="form-group row ">
-                                <label class="col-sm-2 col-form-label col-form-label-sm label-form">{{l("CoverPhoto")}} </label>
+
+                            <!-- Cover photo -->
+                            <div class="form-group row">
+                                <label class="col-sm-2 col-form-label col-form-label-sm label-form">{{ l("CoverPhoto") }}</label>
                                 <app-image-upload
                                     [sycAttachmentCategory]="sycAttachmentCategoryBanner"
                                     [image]="coverPhoto"
                                     [staticHeight]="120"
                                     [showGuidelines]="true"
-                                    (imageBrowseDone)="imageBrowseDone($event,sycAttachmentCategoryBanner)"
-                                    (removeImage)="removeImage($event,sycAttachmentCategoryBanner,-2)"
-                                >
+                                    (imageBrowseDone)="imageBrowseDone($event, sycAttachmentCategoryBanner)"
+                                    (removeImage)="removeImage(sycAttachmentCategoryBanner)">
                                 </app-image-upload>
                             </div>
-                            <!--First Name -->
-                      
-                            
-                            <div class=" row">
-                                <label for="Name" class="col-sm-2 col-form-label col-form-label-sm label-form">
-                                    <span class="text-danger">*</span>
-                                    {{l("First Name")}}
+
+                            <!-- First name -->
+                            <div class="row">
+                                <label for="FirstName" class="col-sm-2 col-form-label col-form-label-sm label-form">
+                                    <span class="text-danger">*</span> {{ l("First Name") }}
                                 </label>
                                 <div class="col-md-8">
-                                    <input type="text" id="FirstName" class="form-control" name="FirstName" #FirstNameInput="ngModel" [ngModel]="getStringValue(701)"   (ngModelChange)="setStringValue(701, $event)" required [placeholder]="'PleaseEnterFirstName' | localize "/>
+                                    <input type="text" id="FirstName" class="form-control" name="FirstName"
+                                        #FirstNameInput="ngModel" [ngModel]="getStringValue(701)"
+                                        (ngModelChange)="setStringValue(701, $event)" required
+                                        [placeholder]="'PleaseEnterFirstName' | localize" />
                                     <validation-messages [formCtrl]="FirstNameInput"></validation-messages>
-
                                 </div>
                             </div>
                             <hr class="header">
-                            <!--Sur Name -->
-                            <div class=" row">
-                                <label for="FirstName" class="col-sm-2 col-form-label col-form-label-sm label-form">
-                                    <span class="text-danger">*</span>
-                                    {{l("Sir Name")}}
+
+                            <!-- Sur name -->
+                            <div class="row">
+                                <label for="LastName" class="col-sm-2 col-form-label col-form-label-sm label-form">
+                                    <span class="text-danger">*</span> {{ l("Sir Name") }}
                                 </label>
                                 <div class="col-md-8">
-                                    <input   type="text"
-                                    id="LastName"
-                                    class="form-control"
-                                    name="LastName"
-                                    #LastNameInput="ngModel"
-                                    [ngModel]="getStringValue(702)"
-                                    (ngModelChange)="setStringValue(702, $event)"
-                                    required
-                                    [placeholder]="'PleaseEnterFirstName' | localize"/>
+                                    <input type="text" id="LastName" class="form-control" name="LastName"
+                                        #LastNameInput="ngModel" [ngModel]="getStringValue(702)"
+                                        (ngModelChange)="setStringValue(702, $event)" required
+                                        [placeholder]="'PleaseEnterLastName' | localize" />
                                     <validation-messages [formCtrl]="LastNameInput"></validation-messages>
                                 </div>
                             </div>
                             <hr class="header">
 
-                            <!-- code -->
-                            <div class=" row">
-                                <label for="Code" class="col-sm-2 col-form-label col-form-label-sm label-form">
-                                    <span class="text-danger">*</span>
-                                    {{l("Code")}}
+                            <!-- Code -->
+                            <div class="row">
+                                <label for="code" class="col-sm-2 col-form-label col-form-label-sm label-form">
+                                    <span class="text-danger">*</span> {{ l("Code") }}
                                 </label>
                                 <div class="col-md-8">
-                                    <input type="text" id="code" class="form-control"  name="code" #CodeInput="ngModel" [(ngModel)]="memberDto.code" required [placeholder]="'PleaseEnterCode' | localize" [disabled]="memberDto?.id"/>
+                                    <input type="text" id="code" class="form-control" name="code" #CodeInput="ngModel"
+                                        [(ngModel)]="memberDto.code" required
+                                        [placeholder]="'PleaseEnterCode' | localize" [disabled]="memberDto?.id" />
                                     <validation-messages [formCtrl]="CodeInput"></validation-messages>
                                 </div>
                             </div>
-                        <hr class="header">
+                            <hr class="header">
 
-                            <!--Email Address-->
-
-                            <div class=" row">
+                            <!-- Email -->
+                            <div class="row">
                                 <label for="Email" class="col-sm-2 col-form-label col-form-label-sm label-form">
-                                    <span class="text-danger">*</span>
-                                    {{l("Email")}}
+                                    <span class="text-danger">*</span> {{ l("Email") }}
                                 </label>
                                 <div class="col-md-6">
-                                    <input type="email" id="Email" class="form-control" name="Email"  #emailAddressInput="ngModel" [(ngModel)]="memberDto.eMailAddress" required [placeholder]="'PleaseEnterEmail' | localize"/>
+                                    <input type="email" id="Email" class="form-control" name="Email"
+                                        #emailAddressInput="ngModel" [(ngModel)]="memberDto.eMailAddress" required
+                                        [placeholder]="'PleaseEnterEmail' | localize" />
                                     <validation-messages [formCtrl]="emailAddressInput"></validation-messages>
                                 </div>
                                 <div class="col-md-4" *ngIf="!isManualOrExternalContact">
                                     <span class="mr-3 isPublic">{{ "IsPublic" | localize }}</span>
-                                    <p-inputSwitch
-                                    [ngModel]="getBooleanValue(709)"
-                                    (onChange)="setBooleanValue(709, $event.checked)"
-                                    name="EmailAddressIsPublic">
-                                  </p-inputSwitch>
-                                  
-                                  
-                                  
-                                  
-                                  
-                                  
+                                    <p-inputSwitch [ngModel]="getBooleanValue(709)"
+                                        (onChange)="setBooleanValue(709, $event.checked)"
+                                        name="EmailAddressIsPublic"></p-inputSwitch>
                                 </div>
                             </div>
-                            <hr class="header" >
+                            <hr class="header">
 
-                            <!--Language -->
-
-                   
-                      
-                            <div class=" row">
+                            <!-- Language -->
+                            <div class="row">
                                 <label for="language" class="col-sm-2 col-form-label col-form-label-sm label-form">
-                                    {{l("Language")}}
+                                    {{ l("Language") }}
                                 </label>
                                 <div class="col-md-6">
-                                    <p-dropdown id="language" [options]="allLanguages" styleClass="form-control aria-select" name="Language" [(ngModel)]="memberDto.languageId" ></p-dropdown>
+                                    <p-dropdown id="language" [options]="allLanguages" styleClass="form-control aria-select"
+                                        name="Language" [(ngModel)]="memberDto.languageId"></p-dropdown>
                                 </div>
                                 <div class="col-md-4" *ngIf="!isManualOrExternalContact">
                                     <span class="mr-3 isPublic">{{ "IsPublic" | localize }}</span>
-                                    <p-inputSwitch
-                                    [ngModel]="getBooleanValue(708)"
-                                    (onChange)="setBooleanValue(708, $event.checked)"
-                                    name="languageIsPublic">
-                                  </p-inputSwitch>
-                                  
-                                </div>
-                            </div>
-
-                            <hr class="header">
-                            <!--Branch -->
-
-
-
-                            
-                            <div class=" row" *ngIf="memberDto.accountId">
-                                <label for="Branch" class="col-sm-2 col-form-label col-form-label-sm label-form">
-                                    <span class="text-danger">*</span>
-                                    {{l("Branch")}}
-                                </label>
-                                <div class="col-md-6">
-                                    <div class="input-group">
-                                        <input type="text"
-                                        id="Branch"
-                                        class="form-control"
-                                        [ngModel]="selectedBranchName"
-                                        [ngModelOptions]="{ standalone: true }"
-                                        readonly
-                                        [placeholder]="'PleaseSelectBranch' | localize" />
-                                    </div>
-                                </div>
-                                <div class="col-md-4">
-                                    <a class="text-change text-underline" (click)="selectBranch()">
-                                        {{ ( selectedBranchId ? 'Change' : 'Choose' ) | localize }}
-                                    </a>
+                                    <p-inputSwitch [ngModel]="getBooleanValue(708)"
+                                        (onChange)="setBooleanValue(708, $event.checked)"
+                                        name="languageIsPublic"></p-inputSwitch>
                                 </div>
                             </div>
                             <hr class="header">
-                            <!--Join Date -->
-                            <div class=" row">
-                                <label for="JoinDate" class="col-sm-2 col-form-label col-form-label-sm label-form">{{l("JoinDate")}}</label>
-                                <div class="col-md-6">
-                                  
-                                    <p-calendar
-                                    name="JoinDate"
-                                    [(ngModel)]="joinDateModel"
-                                    (ngModelChange)="onChangejoinDateFromPicker($event)"
-                                    [disabled]="memberDto?.id > 0"
-                                    [readonlyInput]="memberDto?.id > 0"
-                                    [showIcon]="true">
-                                  </p-calendar>
-                                  
-                                </div>
-                                
-                                <div class="col-md-4 d-flex align-items-center" *ngIf="!isManualOrExternalContact">
-                                    <span class="mr-3 isPublic">
-                                        {{ "IsPublic" | localize }}
-                                    </span>
-                                    <p-inputSwitch
-                                    [ngModel]="getBooleanValue(713)"
-                                    (onChange)="setBooleanValue(713, $event.checked)"
-                                    name="joinDateIsPublic">
-                                  </p-inputSwitch>
-                           
-                                  
-                                </div>
-                            </div>
-                            <hr class="header">
-                            <!--User Name -->
-                            <!-- <div class="form-group row" *ngIf="!isManualOrExternalContact">
-                                <label for="UserName" class="col-sm-2 col-form-label col-form-label-sm label-form">
-                                    <span class="text-danger">*</span>
-                                    {{l("UserName")}}
-                                </label>
-                                <div class="col-md-6">
-                                    <input type="text" id="name" name="name" class="form-control" minlength="2" maxlength="100"
-                                    required #UserNameNameInput="ngModel" [ngModel]="memberDto.name" [placeholder]="'PleaseEnterUserName' | localize " readonly/>
-                                    <validation-messages [formCtrl]="UserNameNameInput"></validation-messages>
-                                </div>
-                            </div> -->
-                            <!--Job Title -->
-                            <div class=" row">
-                                <label for="JobTitle" class="col-sm-2 col-form-label col-form-label-sm label-form">
-                                    <span class="text-danger">*</span>
-                                    {{l("JobTitle")}}
-                                </label>
-                                <div class="col-md-6">
-                                    <input   type="text"
-                                    id="JobTitle"
-                                    name="JobTitle"
-                                    class="form-control"
-                                    #JobTitleInput="ngModel"
-                                    [ngModel]="getStringValue(706)"
-                                    (ngModelChange)="setStringValue(706, $event)"
-                                    minlength="2"
-                                    maxlength="100"
-                                    required
-                                    [placeholder]="'PleaseEnterJobTitle' | localize"/>
-                                    <validation-messages [formCtrl]="JobTitleInput"></validation-messages>
-                                </div>
-                            </div>
-                            <hr class="header">
-                            <!--Phone -->
-                            <div class="form-group row" *ngFor="let item of phonelist ; let i = index" >
-                                <label for="phone" class="col-sm-2 col-form-label col-form-label-sm label-form">{{l("Phone")}}</label>
-                                <div class="col-sm-2" *ngIf="phonesLoaded">
-                                    <p-dropdown id="phone" name="phone{{i+1}}TypeId" [options]="allPhoneTypes" [(ngModel)]="memberDto['phone'+(i+1)+'TypeId']"  (onChange)="onPhoneTypeChange($event,i)" ></p-dropdown>
+
+                            <!-- Phones -->
+                            <div class="form-group row" *ngFor="let item of phonelist; let i = index">
+                                <label class="col-sm-2 col-form-label col-form-label-sm label-form">{{ l("Phone") }}</label>
+                                <div class="col-sm-3" *ngIf="phonesLoaded">
+                                    <p-dropdown id="phone" name="phone{{i+1}}TypeId" [options]="allPhoneTypes"
+                                        [(ngModel)]="memberDto['phone'+(i+1)+'TypeId']"
+                                        (onChange)="onPhoneTypeChange($event, i)"></p-dropdown>
                                 </div>
                                 <div class="col-sm-3">
                                     <input type="text" ng2TelInput [ng2TelInputOptions]="{initialCountry: 'us'}"
                                         name="phone{{i+1}}Number"
-                                        (hasError)="hasErrorphoneNumber($event ,i)"
-                                        (ng2TelOutput)="getNumberphoneNumber($event ,i)"
-                                        (countryChange)="onCountryChangephoneNumber($event,i)"
-                                        (intlTelInputObject)="telInputObjectphoneNumber($event ,i)"
+                                        (countryChange)="onCountryChangephoneNumber($event, i)"
+                                        (intlTelInputObject)="telInputObjectphoneNumber($event, i)"
                                         class="form-control form-control-sm aria-input-text phone-input"
-                                        (input)="onPhoneNumberChange($event.target.value ,i)"
-                                        [(ngModel)]="memberDto['phone'+(i+1)+'Number']"
-                                    />
+                                        [(ngModel)]="memberDto['phone'+(i+1)+'Number']" />
                                 </div>
                                 <div class="col-sm-2">
-                                        <input type="text" id="PhoneEx" class="form-control" name="phone{{i+1}}Ex"
-                                        minlength="1" maxlength="10" [placeholder]="'Ext.' | localize" [(ngModel)]="memberDto['phone'+(i+1)+'Ex']" />
+                                    <input type="text" class="form-control" name="phone{{i+1}}Ex" minlength="1"
+                                        maxlength="10" [placeholder]="'Ext.' | localize"
+                                        [(ngModel)]="memberDto['phone'+(i+1)+'Ex']" />
                                 </div>
                                 <div class="col-sm-2 d-flex align-items-center" *ngIf="!isManualOrExternalContact">
                                     <span class="mr-2 isPublic">{{ "IsPublic" | localize }}</span>
-                                    <p-inputSwitch
-                                    [ngModel]="getBooleanValue(i ==0 ? 710 : i==1 ? 711 : 712)"
-                                    (onChange)="setBooleanValue(i ==0 ? 710 : i==1 ? 711 : 712, $event.checked)"
-                                    name="Phone{{i}}IsPublic">
-                                  </p-inputSwitch>
-                                  
-                           
-                                  
-                                  
+                                    <p-inputSwitch [ngModel]="getBooleanValue(710 + i)"
+                                        (onChange)="setBooleanValue(710 + i, $event.checked)"
+                                        name="Phone{{i}}IsPublic"></p-inputSwitch>
                                 </div>
                                 <div class="col-sm-1">
-                                    <i type="button" *ngIf="phonelist.length < 3 && i == 0" style="size: 10px;" class="fas fa-plus-circle "  (click)="AddPhoneToList()"> </i>
-                                    <i type="button" *ngIf="i > 0" style="size: 10px;" class="fas fa-minus-circle " (click)="removePhoneFromList(i)"> </i>
+                                    <i type="button" *ngIf="phonelist.length < 3 && i == 0" class="fas fa-plus-circle"
+                                        (click)="AddPhoneToList()"></i>
+                                    <i type="button" *ngIf="i > 0" class="fas fa-minus-circle"
+                                        (click)="removePhoneFromList(i)"></i>
                                 </div>
-                              
                             </div>
                             <hr class="header">
+
                             <!-- About -->
                             <div class="form-group row">
-                                <label for="colFormLabelSm" class="col-sm-2 col-form-label col-form-label-sm label-form">{{l("About")}} </label>
+                                <label for="About" class="col-sm-2 col-form-label col-form-label-sm label-form">{{ l("About") }}</label>
                                 <div class="col-md-8">
-                                    <textarea class="form-control z-depth-1 aria-textarea-text" id="About" rows="4" name="About"
-                                        [placeholder]="'PleaseEnterAboutMember' | localize" #AboutInput="ngModel" [(ngModel)]="memberDto.notes" >
-                                    </textarea>
+                                    <textarea class="form-control z-depth-1 aria-textarea-text" id="About" rows="4"
+                                        name="About" [placeholder]="'PleaseEnterAboutMember' | localize"
+                                        [(ngModel)]="memberDto.notes"></textarea>
                                 </div>
                             </div>
                         </div>
-                        
                     </form>
-
                 </div>
-
-
-            
-
-
             </div>
-            <!-- <p-accordion [multiple]="true" [(activeIndex)]="activeAccordionIndexes" class="mt-3">
-                <p-accordionTab
-                  *ngFor="let usage of usageList; let i = index"
-                  [header]="usage "
-                  [attr.id]="'usage_' + usage">
-                  
-                  <app-dynamicInputs
-                  [extraAttributeObject]="{ value: { filteredExtraAttributes: groupedByUsage[usage], extraAttributes: allAttributes } }"
-                    [entityObjectTypeId]="21"
-                    [entityType]="'Accounts'"
-                    [appTransactionsForViewDto]="memberDto"
-                    (extraDataCleared)="onExtraAttributeCleared($event)" (extraDataChanged)="onExtraAttributesChanged($event)"
-                  >
-                  </app-dynamicInputs>
-              
-                </p-accordionTab>
-              </p-accordion> -->
-        </div>
 
+            <!-- Relationship Settings: Job title / Join date / Branch -->
+            <div class="relation-settings-section mt-4" *ngIf="active">
+             
+                <h5 class="font-weight-bold mb-3">{{ 'RelationshipSettings' | localize }}</h5>
+
+                <app-dynamicInputs *ngIf="relationAttributeObject && relationEntityObjectTypeId"
+                    [extraAttributeObject]="relationAttributeObject"
+                    [entityObjectTypeId]="relationEntityObjectTypeId"
+                    [entityType]="'MARKETPLACECONTACTRELATIONSHIP'"
+                    [dynamicInputsForViewDto]="relationInputsDto"
+                    [fromSetting]="true"
+                    (extraDataChanged)="onRelationSettingsChanged($event)"
+                    (extraDataCleared)="onRelationSettingCleared($event)">
+                </app-dynamicInputs>
+            </div>
+        </div>
     </div>
 </div>
-
-<selectBranchModal
-    #selectBranchModal
-    (branchSelected)="branchSelected($event)"
-    (branchSelectionCanceled)="branchSelectionCanceled()"
-></selectBranchModal>
