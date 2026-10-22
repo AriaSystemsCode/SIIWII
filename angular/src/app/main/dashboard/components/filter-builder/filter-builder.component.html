@@ -165,40 +165,72 @@
 
             <ng-container *ngIf="!isNullOperator(rule)">
 
-                <!-- lookup / valid entries / dynamic api -->
+                <!-- lookup / valid entries / static options / dynamic api -->
                 <ng-container *ngIf="isOptionField(rule); else normalValueInput">
 
                     <div class="lookup-dropdown-wrapper">
 
-                        <p-dropdown
-                            [inputId]="getRuleId(rule) + '-lookup'"
-                            [name]="getRuleId(rule) + '-lookup'"
-                            [options]="getValueOptionsWithSelection(rule)"
-                            [(ngModel)]="rule.value"
-                            [ngModelOptions]="{ standalone: true }"
-                            optionLabel="label"
-                            optionValue="value"
-                            [filter]="true"
-                            filterBy="label"
-                            [showClear]="true"
-                            placeholder="Select value"
-                            appendTo="body"
-                            styleClass="w-100"
-                            (onShow)="onLookupOpen(rule)">
-                        </p-dropdown>
+    <p-dropdown
+        [inputId]="getRuleId(rule) + '-lookup'"
+        [name]="getRuleId(rule) + '-lookup'"
+        [options]="getValueOptionsWithSelection(rule)"
+        [(ngModel)]="rule.value"
+        [ngModelOptions]="{ standalone: true }"
+        optionLabel="label"
+        optionValue="value"
+        [filter]="true"
+        filterBy="label"
+        [showClear]="true"
+        placeholder="Select value"
+        appendTo="body"
+        styleClass="w-100 lookup-value-dropdown"
+        (onShow)="onLookupOpen(rule)">
 
-                        <i *ngIf="isLookupLoading(rule)" class="pi pi-spin pi-spinner lookup-loading-icon"></i>
+        <!-- Load More inside dropdown, below options -->
+        <ng-template pTemplate="footer">
 
-                    </div>
+            <div
+                *ngIf="hasMoreLookupOptions(rule)"
+                class="lookup-dropdown-footer">
 
-                    <button
-                        *ngIf="hasMoreLookupOptions(rule)"
-                        type="button"
-                        class="btn btn-link btn-sm mt-1"
-                        [disabled]="isLookupLoading(rule)"
-                        (click)="loadMoreLookupOptions(rule)">
-                        {{ 'Load More' | localize }}
-                    </button>
+                <button
+                    type="button"
+                    class="lookup-load-more-btn"
+                    [disabled]="isLookupLoading(rule)"
+                    (click)="$event.stopPropagation(); loadMoreLookupOptions(rule)">
+
+                    <i
+                        *ngIf="isLookupLoading(rule)"
+                        class="pi pi-spin pi-spinner">
+                    </i>
+
+                    <i
+                        *ngIf="!isLookupLoading(rule)"
+                        class="pi pi-angle-down">
+                    </i>
+
+                    <span>
+                        {{ 'Load More' | localize }}...
+                    </span>
+
+                </button>
+
+            </div>
+
+            <div
+                *ngIf="isLookupLoading(rule)"
+                class="lookup-dropdown-loading">
+
+                <i class="pi pi-spin pi-spinner"></i>
+                <span>Loading...</span>
+
+            </div>
+
+        </ng-template>
+
+    </p-dropdown>
+
+</div>
 
                 </ng-container>
 

@@ -17,6 +17,7 @@ import {
     FilterConditionRule,
     FilterMatchMode
 } from '../../models/dashboard.model';
+import { ExtraAttributeDataService } from '@app/main/app-items/app-item-shared/services/extra-attribute-data.service';
 
 type SelectOption = { label: string; value: any };
 
@@ -30,7 +31,10 @@ interface LookupState {
 @Component({
     selector: 'app-filter-builder',
     templateUrl: './filter-builder.component.html',
-    styleUrls: ['./filter-builder.component.scss']
+    styleUrls: ['./filter-builder.component.scss'],
+    // ExtraAttributeDataService has no providedIn, so it is provided here.
+    // Remove this line if your module already provides it.
+    providers: [ExtraAttributeDataService]
 })
 export class FilterBuilderComponent implements OnChanges {
 
@@ -46,6 +50,9 @@ export class FilterBuilderComponent implements OnChanges {
 
     /** The filter being edited. Nested groups live inside `children`. */
     rootGroup: FilterConditionGroup = { type: 'group', matchMode: 'all', children: [] };
+
+    private dropdownOptionsCache = new Map<string, SelectOption[]>();
+private dropdownOptionsCacheKeys = new Map<string, string>();
 
     // ---- Dropdown options ----
     readonly matchOptions: SelectOption[] = [
@@ -112,10 +119,16 @@ export class FilterBuilderComponent implements OnChanges {
     private readonly lookupPageSize = 10;
     private lookups = new Map<string, LookupState>();
 
+    /** How many static options (valid entries / fixed lists) are currently visible per field. */
+    private staticVisible = new Map<string, number>();
+
     // ---- Unique ids for the inputs ----
     private lastRuleId = 0;
 
-    constructor(private dynamicApi: DynamicApiDispatcherService) { }
+    constructor(
+        private dynamicApi: DynamicApiDispatcherService,
+        private extraAttributeData: ExtraAttributeDataService
+    ) { }
 
     // =====================================================
     // INITIALIZATION
@@ -280,7 +293,20 @@ export class FilterBuilderComponent implements OnChanges {
         rule.datePeriod = undefined;
         rule.dateRange = [];
 
-        if (this.getField(rule.field)?.dataSource) {
+        const field = this.getField(rule.field);
+
+        // TEMPORARY DEBUG: remove once the field mapper passes isLookup / entityObjectTypeCode / validEntries.
+        console.log('[Filter Builder] field selected:', rule.field, field, 'usesApi:', !!field && this.usesApiLookup(field));
+
+        if (!field) {
+            return;
+        }
+
+        // start static lists from the first page again
+        this.staticVisible.delete(field.name);
+
+        // load the API options right away for lookup fields
+        if (this.usesApiLookup(field)) {
             this.onLookupOpen(rule);
         }
     }
@@ -541,8 +567,39 @@ export class FilterBuilderComponent implements OnChanges {
     }
 
     // =====================================================
-    // DROPDOWN VALUES (valid entries, static options, API lookups)
+    // DROPDOWN VALUES
+    //
+    // A field gets its dropdown values from ONE of these, checked in this order:
+    //   1. validEntries                     -> "MSRP|A|B|C|D" split into options
+    //   2. dataSource.service + .api        -> dynamic API
+    //   3. isLookup + entityObjectTypeCode  -> getExtraAttributeLookupDataWithPaging(code, ...)
+    //   4. options / paginationSetting.list -> fixed options
     // =====================================================
+
+    private hasValidEntries(field: FilterBuilderField): boolean {
+        return !!field.validEntries?.toString().trim();
+    }
+
+    /** Does the field point to a real service + api? (an empty dataSource object does not count) */
+    private hasDynamicSource(field: FilterBuilderField): boolean {
+        return !!field.dataSource?.service && !!field.dataSource?.api;
+    }
+
+    /** The entity type code, e.g. "SHIPVIA" (empty string when missing). */
+    private getLookupCode(field: FilterBuilderField): string {
+        return (field.entityObjectTypeCode ?? '').toString().trim();
+    }
+
+    /** Must the values be loaded from an API? (a dynamic source, or isLookup with an entity type code) */
+    private usesApiLookup(field: FilterBuilderField | undefined): boolean {
+        if (!field) {
+            return false;
+        }
+
+        const isEntityLookup = !!field.isLookup && this.getLookupCode(field) !== '';
+
+        return this.hasDynamicSource(field) || isEntityLookup;
+    }
 
     /** True when the value is picked from a list instead of typed. */
     isOptionField(rule: FilterBuilderRule): boolean {
@@ -552,12 +609,56 @@ export class FilterBuilderComponent implements OnChanges {
             return false;
         }
 
-        const hasValidEntries = !!field.validEntries?.trim();
-        const hasDynamicApi = !!field.dataSource?.service && !!field.dataSource?.api;
-        const hasStaticOptions = !!field.options?.length || !!field.paginationSetting?.list?.length;
+        const hasFixedOptions = !!field.options?.length || !!field.paginationSetting?.list?.length;
 
-        return field.isLookup === true || hasValidEntries || hasDynamicApi || hasStaticOptions;
+        return field.isLookup === true
+            || this.hasValidEntries(field)
+            || this.hasDynamicSource(field)
+            || hasFixedOptions;
     }
+
+    // ---- static options (valid entries / fixed lists) ----
+
+    /** "MSRP|A|B|C|D" -> ['MSRP', 'A', 'B', 'C', 'D'] */
+    private splitPipe(text: string): string[] {
+        return text.split('|').map(part => part.trim()).filter(Boolean);
+    }
+
+    /** Builds the full static option list. Pipe-delimited text is always split into separate options. */
+    private getStaticOptions(field: FilterBuilderField): SelectOption[] {
+        // 1) valid entries
+        if (this.hasValidEntries(field)) {
+            return this.splitPipe(field.validEntries!.toString())
+                .map(text => ({ label: text, value: text }));
+        }
+
+        // 2) fixed options
+        const fixed: any[] = field.paginationSetting?.list?.length
+            ? field.paginationSetting.list
+            : (field.options ?? []);
+
+        const result: SelectOption[] = [];
+
+        for (const item of fixed) {
+            const value = item?.value ?? item?.label ?? item;
+            const label = item?.label ?? item?.value ?? item;
+
+            if (value === null || value === undefined || value === '') {
+                continue;
+            }
+
+            // the value itself may be "MSRP|A|B|C|D"
+            if (typeof value === 'string' && value.includes('|')) {
+                this.splitPipe(value).forEach(text => result.push({ label: text, value: text }));
+            } else {
+                result.push({ label: String(label).trim(), value });
+            }
+        }
+
+        return result;
+    }
+
+    // ---- options shown in the dropdown ----
 
     private getValueOptions(rule: FilterBuilderRule): SelectOption[] {
         const field = this.getField(rule.field);
@@ -566,64 +667,103 @@ export class FilterBuilderComponent implements OnChanges {
             return [];
         }
 
-        // "a|b|c" without an API is a fixed list.
-        if (field.validEntries?.trim() && !field.dataSource) {
-            return field.validEntries
-                .split('|')
-                .map(value => value.trim())
-                .filter(Boolean)
-                .map(value => ({ label: value, value }));
+        if (this.usesApiLookup(field)) {
+            return this.lookups.get(field.name)?.items ?? [];
         }
 
-        const loaded = this.lookups.get(field.name);
-
-        if (loaded) {
-            return loaded.items;
-        }
-
-        const options = field.paginationSetting?.list?.length
-            ? field.paginationSetting.list
-            : field.options ?? [];
-
-        return options.map((option: any) => ({
-            label: String(option.label ?? option.value ?? ''),
-            value: option.value
-        }));
+        // everything else: static options
+        return this.getStaticOptions(field);
     }
 
-    /** Same options, plus the current value when it has not been loaded yet (so it is still shown). */
-    getValueOptionsWithSelection(rule: FilterBuilderRule): SelectOption[] {
-        const options = this.getValueOptions(rule);
+  getValueOptionsWithSelection(rule: FilterBuilderRule): SelectOption[] {
 
-        if (rule.value === null || rule.value === undefined || rule.value === '') {
-            return options;
-        }
+    const field = this.getField(rule.field);
 
-        const isInOptions = options.some(option => String(option.value) === String(rule.value));
-
-        return isInOptions
-            ? options
-            : [{ label: String(rule.value), value: rule.value }, ...options];
+    if (!field) {
+        return [];
     }
+
+    let options = this.getValueOptions(rule);
+
+    if (!this.usesApiLookup(field)) {
+        const visibleCount =
+            this.staticVisible.get(field.name) ?? this.lookupPageSize;
+
+        options = options.slice(0, visibleCount);
+    }
+
+    const selectedValue = rule.value;
+
+    const hasSelectedValue =
+        selectedValue !== null &&
+        selectedValue !== undefined &&
+        selectedValue !== '';
+
+    if (
+        hasSelectedValue &&
+        !options.some(
+            option => String(option.value) === String(selectedValue)
+        )
+    ) {
+        options = [
+            {
+                label: String(selectedValue),
+                value: selectedValue
+            },
+            ...options
+        ];
+    }
+
+    // Cache options so PrimeNG receives a stable array reference.
+    const cacheKey = JSON.stringify({
+        field: field.name,
+        options: options.map(option => [
+            option.label,
+            option.value
+        ])
+    });
+
+    const ruleId = this.getRuleId(rule);
+
+    if (this.dropdownOptionsCacheKeys.get(ruleId) === cacheKey) {
+        return this.dropdownOptionsCache.get(ruleId)!;
+    }
+
+    this.dropdownOptionsCacheKeys.set(ruleId, cacheKey);
+    this.dropdownOptionsCache.set(ruleId, options);
+
+    return options;
+}
+
+    // ---- loading state and "Load More" ----
 
     isLookupLoading(rule: FilterBuilderRule): boolean {
         return !!this.lookups.get(rule.field)?.isLoading;
     }
 
     hasMoreLookupOptions(rule: FilterBuilderRule): boolean {
-        if (!this.getField(rule.field)?.dataSource) {
+        const field = this.getField(rule.field);
+
+        if (!field) {
             return false;
         }
 
-        const state = this.lookups.get(rule.field);
+        // API field: more records on the server?
+        if (this.usesApiLookup(field)) {
+            const state = this.lookups.get(field.name);
+            return !!state && state.isLoaded && !state.isLoading && state.items.length < state.totalCount;
+        }
 
-        return !!state && !state.isLoading && state.items.length < state.totalCount;
+        // static field: more options hidden?
+        const visibleCount = this.staticVisible.get(field.name) ?? this.lookupPageSize;
+        return this.getStaticOptions(field).length > visibleCount;
     }
 
+    /** Called when the dropdown opens: loads the first page for API fields (only once). */
     onLookupOpen(rule: FilterBuilderRule): void {
         const field = this.getField(rule.field);
 
-        if (!field?.dataSource) {
+        if (!field || !this.usesApiLookup(field)) {
             return;
         }
 
@@ -637,29 +777,30 @@ export class FilterBuilderComponent implements OnChanges {
     loadMoreLookupOptions(rule: FilterBuilderRule): void {
         const field = this.getField(rule.field);
 
-        if (field?.dataSource) {
-            this.loadLookupOptions(field, true);
+        if (!field) {
+            return;
         }
+
+        // API field: ask the server for the next page
+        if (this.usesApiLookup(field)) {
+            this.loadLookupOptions(field, true);
+            return;
+        }
+
+        // static field: show 10 more
+        const visibleCount = this.staticVisible.get(field.name) ?? this.lookupPageSize;
+        this.staticVisible.set(field.name, visibleCount + this.lookupPageSize);
     }
 
+    // ---- API loading ----
+
     private loadLookupOptions(field: FilterBuilderField, append: boolean): void {
-        const source = field.dataSource;
-
-        if (!source?.service || !source?.api) {
-            return;
-        }
-
         const previous = this.lookups.get(field.name);
+        if (previous?.isLoading) return;
+        if (append && previous?.isLoaded && previous.items.length >= previous.totalCount) return;
 
-        if (previous?.isLoading) {
-            return;
-        }
-
-        if (append && previous?.isLoaded && previous.items.length >= previous.totalCount) {
-            return;
-        }
-
-        const existingItems = append ? previous?.items ?? [] : [];
+        const existingItems = append ? (previous?.items ?? []) : [];
+        const skipCount = existingItems.length;
 
         this.lookups.set(field.name, {
             items: existingItems,
@@ -668,21 +809,63 @@ export class FilterBuilderComponent implements OnChanges {
             isLoaded: previous?.isLoaded ?? false
         });
 
+        // ---- Lookup by entityObjectTypeCode (e.g. SHIPVIA) ----
+        const code = this.getLookupCode(field);
+
+        if (field.isLookup && code) {
+
+            this.extraAttributeData
+                .getExtraAttributeLookupDataWithPaging(code, skipCount, this.lookupPageSize)
+                .pipe(finalize(() => this.setLookupLoading(field.name, false)))
+                .subscribe({
+                    next: (result: any) => {
+                        const records: any[] = result?.items ?? result?.result?.items ?? [];
+
+                        const newItems: SelectOption[] = records
+                            .map(item => ({
+                                label: String(item.label ?? item.name ?? item.description ?? item.code ?? item.value ?? item.id ?? ''),
+                                value: item.value ?? item.id
+                            }))
+                            .filter(item => item.value !== null && item.value !== undefined);
+
+                        // keep one item per value
+                        const unique = new Map<string, SelectOption>();
+                        [...existingItems, ...newItems].forEach(item => unique.set(String(item.value), item));
+
+                        this.lookups.set(field.name, {
+                            items: [...unique.values()],
+                            totalCount: Number(
+                                result?.totalCount ?? result?.result?.totalCount ?? (skipCount + newItems.length)
+                            ),
+                            isLoading: false,
+                            isLoaded: true
+                        });
+                    },
+                    error: error => console.error('[Filter Builder] Entity lookup failed:', code, error)
+                });
+
+            return;
+        }
+
+        // ---- Lookup by dynamic API (dataSource.service / dataSource.api) ----
+        if (!this.hasDynamicSource(field)) {
+            this.lookups.delete(field.name);
+            return;
+        }
+
+        const source = field.dataSource!;
         const serviceName = source.service.endsWith('ServiceProxy')
             ? source.service
             : `${source.service}ServiceProxy`;
 
-        this.dynamicApi
-            .dispatch(serviceName, source.api, {
-                skipCount: existingItems.length,
-                maxResultCount: this.lookupPageSize
-            })
-            .pipe(finalize(() => this.setLookupLoading(field.name, false)))
-            .subscribe({
-                next: (result: any) => this.onLookupLoaded(field, existingItems, result),
-                error: (error: any) =>
-                    console.error('[Filter Builder] Lookup loading failed:', field.name, error)
-            });
+        this.dynamicApi.dispatch(serviceName, source.api, {
+            skipCount,
+            maxResultCount: this.lookupPageSize
+        }).pipe(finalize(() => this.setLookupLoading(field.name, false)))
+          .subscribe({
+              next: (result: any) => this.onLookupLoaded(field, existingItems, result),
+              error: (error: any) => console.error('[Filter Builder] Lookup failed:', field.name, error)
+          });
     }
 
     private onLookupLoaded(field: FilterBuilderField, existingItems: SelectOption[], result: any): void {

@@ -1269,3 +1269,51 @@ $danger-bg: #fff0f0;
         flex: 0 1 auto;
     }
 }
+
+
+.lookup-dropdown-footer {
+    padding: 6px 8px;
+    border-top: 1px solid #e5e7eb;
+    background: #ffffff;
+}
+
+.lookup-load-more-btn {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+
+    width: 100%;
+    padding: 9px 12px;
+
+    border: none;
+    border-radius: 6px;
+    background: #f3f6fb;
+
+    color:#481056;
+    font-size: 13px;
+    font-weight: 600;
+
+    cursor: pointer;
+    transition: background 0.2s ease;
+
+    &:hover:not(:disabled) {
+        background: #e8f0ff;
+    }
+
+    &:disabled {
+        opacity: 0.6;
+        cursor: not-allowed;
+    }
+}
+
+.lookup-dropdown-loading {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+
+    padding: 10px;
+    color: #64748b;
+    font-size: 12px;
+}

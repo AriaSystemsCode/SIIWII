@@ -137,16 +137,6 @@ export interface SpreadsheetDataBatch {
 
 
 
-export interface FilterBuilderField {
-    name: string;
-    label: string;
-    dataType: string;
-    options?: Array<{
-        label: string;
-        value: any;
-    }>;
-}
-
 export interface FilterBuilderCondition {
     field: string;
     operator: string;
@@ -182,6 +172,9 @@ paginationSetting?: {
         value: any;
     }>;
 };
+
+entityObjectTypeCode?: string | null;
+
 
 }
 

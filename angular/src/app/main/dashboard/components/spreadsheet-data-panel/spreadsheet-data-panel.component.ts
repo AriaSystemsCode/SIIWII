@@ -245,48 +245,82 @@ export class SpreadsheetDataPanelComponent extends AppComponentBase implements O
         }
     }
 
-    private toFilterField(field: ExtraAttribute): FilterBuilderField {
-        return {
-            name: field.name,
-            label: field.description || field.name,
-            dataType: field.dataType || 'String--Textbox',
-            options: this.mapValidEntries(field.validEntries),
-            acceptMultipleValues: field.acceptMultipleValues === true
-        };
+  private toFilterField(field: ExtraAttribute): FilterBuilderField {
+    return {
+        name: field.name,
+        label: field.description || field.name,
+        dataType: field.dataType || 'String--Textbox',
+
+        isLookup: field.isLookup === true,
+        entityObjectTypeCode: field.entityObjectTypeCode ?? null,
+
+        validEntries: field.validEntries ?? null,
+        options: this.mapValidEntries(field.validEntries),
+
+        dataSource: field.dataSource ?? null,
+        acceptMultipleValues: field.acceptMultipleValues === true
+    };
+}
+
+   private mapValidEntries(
+    entries: any
+): Array<{ label: string; value: any }> {
+
+    if (!entries) {
+        return [];
     }
 
-    private mapValidEntries(entries: any): Array<{ label: string; value: any }> {
-        if (!entries) {
-            return [];
-        }
+    let values = entries;
 
-        let values = entries;
+    if (typeof values === 'string') {
+        const text = values.trim();
 
-        if (typeof values === 'string') {
+        if (text.startsWith('[')) {
             try {
-                values = JSON.parse(values);
+                values = JSON.parse(text);
             } catch {
-                values = values.split(',').map((value: string) => value.trim());
+                values = text.split('|');
             }
+        } else {
+            values = text.split('|');
         }
+    }
 
-        if (!Array.isArray(values)) {
-            return [];
-        }
+    if (!Array.isArray(values)) {
+        return [];
+    }
 
-        return values.map((item: any) => {
+    return values
+        .map((item: any) => {
             if (typeof item !== 'object' || item === null) {
-                return { label: String(item), value: item };
+                const value = String(item).trim();
+
+                return {
+                    label: value,
+                    value
+                };
             }
 
             return {
                 label: String(
-                    item.label ?? item.description ?? item.name ?? item.text ?? item.value ?? item.code ?? item.id
+                    item.label ??
+                    item.description ??
+                    item.name ??
+                    item.text ??
+                    item.value ??
+                    item.code ??
+                    item.id ??
+                    ''
                 ),
-                value: item.value ?? item.code ?? item.id ?? item.name
+                value:
+                    item.value ??
+                    item.code ??
+                    item.id ??
+                    item.name
             };
-        });
-    }
+        })
+        .filter(item => item.label !== '');
+}
 
     isColumnSelected(column: ExtraAttribute): boolean {
         return this.selectedColumns.some(selected => selected.attributeId === column.attributeId);
