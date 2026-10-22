@@ -718,12 +718,32 @@ namespace onetouch.AppDashboards
                 {
                     foreach (var field in fieldsList.Items)
                     {
+
                         ExtraAttribute fieldData = new ExtraAttribute();
                         fieldData.DataType = field.FieldTypeName;
                         fieldData.Name = field.FieldName;
                         fieldData.Code = field.FieldCode; 
                         fieldData.AttributeId= field.Id;
                         fieldData.Description = field.Description;
+                        if (field.SettingValues != null && field.SettingValues.Count > 0)
+                        {
+                            var lookup = field.SettingValues.Where(z => z.SettingFieldName.ToUpper() == "ISLOOKUP").FirstOrDefault();
+                            if (lookup != null)
+                            {
+                                if (lookup.Value.ToUpper() == "TRUE")
+                                {
+                                    fieldData.IsLookup = true;
+                                    var lookupEntity = field.SettingValues.Where(z => z.SettingFieldName.ToUpper() == "ENTITYOBJECTTYPECODE").FirstOrDefault();
+                                    if (lookupEntity!=null)
+                                    {
+                                        fieldData.EntityObjectTypeCode = lookupEntity.Value;
+                                    }
+                                }
+                            }
+                            var validEntries = field.SettingValues.Where(z => z.SettingFieldName.ToUpper() == "VALIDENTRIES").FirstOrDefault();
+                            if(validEntries!=null)
+                                fieldData.ValidEntries = validEntries.Value;
+                        }
                         returnList.Add(fieldData);
                     }
 
