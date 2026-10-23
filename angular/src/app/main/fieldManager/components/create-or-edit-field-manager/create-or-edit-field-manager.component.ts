@@ -295,7 +295,7 @@ export class CreateOrEditFieldManagerComponent extends AppComponentBase implemen
                 .subscribe({ next: sequence => {
                     if (request !== this.codePreviewRequest) return;
                     const typeCode = this.selectedFieldType?.code || '';
-                    this.item.fieldCode = `${typeCode.substring(0, 2)}${level.substring(0, 1)}${name.substring(0, 4)}${sequence}`;
+                    this.item.fieldCode = `${typeCode.substring(0, 2).toUpperCase()}${level.substring(0, 1).toUpperCase()}${name.substring(0, 4).toUpperCase()}${sequence}`;
                 } });
         }, 250);
     }
