@@ -199,7 +199,7 @@ export class CreateOrEditFieldManagerComponent extends AppComponentBase implemen
                         allowEscapeKey: false
                     }).then(result => {
                         if (!result.isConfirmed || !saveError.expectedNewRevisionNo) return;
-                        input.expectedCurrentRevisionNo = saveError.expectedNewRevisionNo;
+                        input.expectedCurrentRevisionNo = saveError.conflictingRevisionNo;
                         this.saveField(input);
                     });
                     return;
