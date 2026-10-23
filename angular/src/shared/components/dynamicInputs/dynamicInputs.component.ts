@@ -78,7 +78,7 @@ export class dynamicInputs extends AppComponentBase implements OnInit, OnChanges
         continue;
       }
 
-    const isChips = attr.dataType?.toLowerCase() === 'chips';
+    const isChips = !!attr.dataType?.toLowerCase().includes('chips');
     let formattedValue = isChips
       ? this.normalizeChipValues(attr.selectedValues)
       : attr.selectedValues == null ||
@@ -156,6 +156,17 @@ onChipsChange(values: any, extraAttr: any): void {
   this.onAnyInputChange();
 }
 
+addChipFromInput(host: HTMLElement, extraAttr: any): void {
+  const input = host.querySelector('input') as HTMLInputElement;
+  const value = input?.value?.trim();
+  if (!value) return;
+  const current = this.normalizeChipValues(extraAttr.selectedValues);
+  if (current.indexOf(value) === -1) {
+    this.onChipsChange([...current, value], extraAttr);
+  }
+  input.value = '';
+}
+
 private normalizeChipValues(values: any): string[] {
   const entries = Array.isArray(values) ? values : values == null || values === '' ? [] : [values];
   return entries
@@ -164,7 +175,7 @@ private normalizeChipValues(values: any): string[] {
 }
 
 onDropdownChange(extraAttr: any) {
-
+debugger;
   this.onAnyInputChange(); // update normal data
 
   const updatedDataMap = new Map<number, any>();
@@ -526,14 +537,20 @@ reset(extraAttr: any): void {
   getSafeString = (str: string) => str.replace(/\s+/g, '_');
   extraAttrOptions = new Map<string, { items: any[], totalCount: number, isLoading: boolean }>();
 
+  private validEntriesCache = new Map<string, any[]>();
+
   getDropdownOptions(extraAttr: any) {
     if (extraAttr?.validEntries && !extraAttr?.dataSource) {
-    return extraAttr.validEntries.split('|').map((v: string) => ({
-      label: v.trim(),
-      value: v.trim()
-    }));
-
-  }
+      // Stable array reference; a new one per change detection resets the dropdown
+      const cached = this.validEntriesCache.get(extraAttr.validEntries);
+      if (cached) return cached;
+      const options: any[] = extraAttr.validEntries.split('|').map((v: string) => ({
+        label: v.trim(),
+        value: v.trim()
+      }));
+      this.validEntriesCache.set(extraAttr.validEntries, options);
+      return options;
+    }
   
   return this.extraAttrOptions.get(extraAttr.id)?.items || [];
   }

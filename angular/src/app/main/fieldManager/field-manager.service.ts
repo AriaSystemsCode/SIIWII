@@ -2,17 +2,17 @@ import { Injectable } from '@angular/core';
 import { Observable, of } from 'rxjs';
 import { map, switchMap } from 'rxjs/operators';
 import {
+    AppEntityExtraDataDto,
     AppFieldDto,
     AppFieldHistoryDto,
     AppFieldListDto,
     AppFieldManagerServiceProxy,
     FieldCreateOrEditMetadataDto,
-    ExtraAttribute,
     FieldLookupDto,
     FieldManagerPermissionDto,
     CreateOrEditFieldInput,
-    FieldSettingValueDto,
     EntityDtoOfInt64,
+    FieldSettingValueDto,
     LinkExistingFieldsInput,
     LinkExistingFieldsResultDto,
     ObjectTypeTreeNodeDto,
@@ -45,54 +45,34 @@ export class FieldManagerService {
             : Object.assign(new targetType(), data);
     }
 
-    mapExtraAttributeValuesToSettings(
-        values: any[],
-        definitions: ExtraAttribute[],
-        attributes: any[]
-    ): FieldSettingValueDto[] {
-        return (values || []).reduce((mapped: FieldSettingValueDto[], entry: any) => {
-            const definition = definitions.find(item => item.attributeId === entry.attributeId);
-            const attribute = (attributes || []).find(item => item.attributeId === entry.attributeId);
-            const dataType = (definition?.dataType || '').toLowerCase();
-            const isMultiple = entry.acceptMultipleValues === true || dataType === 'chips';
-            const selectedValues = isMultiple
-                ? (Array.isArray(entry.value) ? entry.value : [])
-                : [entry.value];
+    // One extra-data row per selected value; lookup rows carry attributeValueId instead of text.
+    toSettingValues(rows: AppEntityExtraDataDto[] | undefined): FieldSettingValueDto[] {
+        return (rows || []).map(row => {
+            const settingValue = new FieldSettingValueDto();
+            settingValue.settingFieldId = row.attributeId;
+            settingValue.settingFieldCode = row.attributeCode;
+            settingValue.value = row.attributeValue ??
+                (row.attributeValueId != null ? String(row.attributeValueId) : undefined);
+            if (row.attributeValueId != null) {
+                settingValue.appFieldsOptionId = row.attributeValueId;
+                settingValue.optionCode = row.attributeValueFkCode;
+                settingValue.optionName = row.attributeValueFkName;
+            }
+            return settingValue;
+        });
+    }
 
-            selectedValues.forEach((selectedValue: any) => {
-                if (selectedValue === undefined || selectedValue === null || selectedValue === '') return;
-
-                const isOptionObject = typeof selectedValue === 'object' && selectedValue !== null &&
-                    Object.prototype.hasOwnProperty.call(selectedValue, 'value');
-                const selectedId = isOptionObject ? selectedValue.value : selectedValue;
-                const selectedCode = isOptionObject ? selectedValue.code : undefined;
-                const option = entry.isLookup
-                    ? attribute?.paginationSetting?.list?.find((item: any) =>
-                        String(item.value) === String(selectedId) || item.code === selectedCode
-                    )
-                    : undefined;
-                const setting = new FieldSettingValueDto();
-                setting.settingFieldId = entry.attributeId;
-                setting.settingFieldCode = definition?.code;
-                setting.settingFieldName = definition?.name;
-                const mappedValue = option?.label != null
-                    ? String(option.label)
-                    : dataType.includes('date') || dataType.includes('time')
-                        ? (selectedId instanceof Date ? selectedId.toISOString() : String(selectedId))
-                        : String(selectedId);
-                setting.value = mappedValue;
-
-                if (option) {
-                    setting.appFieldsOptionId = option.value;
-                    setting.optionCode = option.code;
-                    setting.optionName = option.label;
-                }
-
-                mapped.push(setting);
-            });
-
-            return mapped;
-        }, []);
+    toExtraData(settingValues: FieldSettingValueDto[] | undefined): AppEntityExtraDataDto[] {
+        return (settingValues || []).map(settingValue => {
+            const row = new AppEntityExtraDataDto();
+            row.attributeId = settingValue.settingFieldId;
+            row.attributeCode = settingValue.settingFieldCode;
+            row.attributeValue = settingValue.value;
+            row.attributeValueId = settingValue.appFieldsOptionId;
+            row.attributeValueFkCode = settingValue.optionCode;
+            row.attributeValueFkName = settingValue.optionName;
+            return row;
+        });
     }
 
     getEntityTree(): Observable<ObjectTypeTreeNodeDto[]> {

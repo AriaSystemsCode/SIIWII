@@ -70,17 +70,17 @@
                         </div>
                     </section>
 
-                    - 
-                                     //i51_BE-FE-Handle Extra Data in the View and Create/Edit/view modals 
+                    
                     <section class="field-card advanced-card">
                         <div class="card-section-heading"><div><h3>Advanced Information</h3></div></div>
                         <div class="detail-grid advanced-grid">
-                            <div class="detail-item"><span>Allow Null</span><strong>{{ item.allowNull ? 'Yes' : 'No' }}</strong></div>
-                            <div class="detail-item"><span>Length</span><strong>{{ item.length || '—' }}</strong></div>
-                            <div class="detail-item"><span>Allow Multi Select</span><strong>{{ item.allowMultiSelect ? 'Yes' : 'No' }}</strong></div>
-                            <div class="detail-item"><span>Decimals</span><strong>{{ item.decimals }}</strong></div>
-                            <div class="detail-item"><span>Default Value</span><strong>{{ item.defaultValue || '—' }}</strong></div>
-                            <div class="detail-item"><span>Date Format</span><strong>{{ item.dateFormat || '—' }}</strong></div>
+                            <div class="detail-item" *ngFor="let setting of item.settingValues">
+                                <span>{{ setting.settingFieldName | localize }}</span>
+                                <strong>{{ setting.value || '—' }}</strong>
+                            </div>
+                            <div class="detail-item" *ngIf="!item.settingValues?.length">
+                                <strong>—</strong>
+                            </div>
                         </div>
                     </section>
                 </ng-container>

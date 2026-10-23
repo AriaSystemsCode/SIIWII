@@ -397,6 +397,10 @@ export class BrowseFieldManagerComponent extends AppComponentBase implements OnI
         this.loadItems();
     }
 
+    onViewClosed(): void {
+        this.loadItems();
+    }
+
     @HostListener('document:click')
     closeActions(): void {
         this.activeActionId = null;

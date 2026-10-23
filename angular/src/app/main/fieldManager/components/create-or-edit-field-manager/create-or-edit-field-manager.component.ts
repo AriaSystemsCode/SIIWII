@@ -6,7 +6,7 @@ import { FieldManagerService } from '../../field-manager.service';
 import { ExtraAttributeDataService } from '@app/main/app-items/app-item-shared/services/extra-attribute-data.service';
 import Swal from 'sweetalert2';
 import * as moment from 'moment';
-import { AppFieldDto, CreateOrEditFieldInput, ExtraAttribute, ExtraAttributesSource, FieldCreateOrEditMetadataDto, FieldLookupDto, SycEntityObjectTypesServiceProxy } from '@shared/service-proxies/service-proxies';
+import { AppEntityExtraDataDto, AppFieldDto, CreateOrEditFieldInput, ExtraAttribute, ExtraAttributesSource, FieldCreateOrEditMetadataDto, FieldLookupDto, FieldSettingValueDto, SycEntityObjectTypesServiceProxy } from '@shared/service-proxies/service-proxies';
 
 @Component({
     selector: 'app-create-or-edit-field-manager',
@@ -36,6 +36,7 @@ export class CreateOrEditFieldManagerComponent extends AppComponentBase implemen
     private codePreviewRequest = 0;
     private previewTimer: ReturnType<typeof setTimeout> | null = null;
     private initialFormState = '';
+    private closeWithoutConfirmation = false;
     private extraAttributes: { [key: string]: any } = {};
     private expectedCurrentRevisionNo?: string;
     private isRevisionEdit = false;
@@ -69,6 +70,7 @@ export class CreateOrEditFieldManagerComponent extends AppComponentBase implemen
 
     show(id?: number, fromExisting = false, _tableName?: string, entityId?: number | null,
         objectTypeId?: number | null, entityParentId?: number | null): void {
+        this.closeWithoutConfirmation = false;
         this.activeTab = 'field-info';
         this.expectedCurrentRevisionNo = undefined;
         this.isRevisionEdit = false;
@@ -99,7 +101,8 @@ export class CreateOrEditFieldManagerComponent extends AppComponentBase implemen
         this.modal.show();
     }
 
-    showRevision(field: AppFieldDto, expectedCurrentRevisionNo?: string): void {
+    showRevision(field: AppFieldDto, expectedCurrentRevisionNo?: string, showModal = true): void {
+        this.closeWithoutConfirmation = !showModal;
         this.activeTab = 'field-info';
         this.isEdit = true;
         this.isRevisionEdit = true;
@@ -120,7 +123,7 @@ export class CreateOrEditFieldManagerComponent extends AppComponentBase implemen
         if (this.item.fieldTypeId) this.loadFieldTypeSettings(this.item.fieldTypeId);
         this.active = true;
         this.initialFormState = this.getFormState();
-        this.modal.show();
+        if (showModal) this.modal.show();
     }
 
     selectTab(tab: 'field-info', event: Event): void {
@@ -129,11 +132,7 @@ export class CreateOrEditFieldManagerComponent extends AppComponentBase implemen
     }
 
     save(): void {
-        debugger
-         //i51_BE-FE- Extra Data  saving ???
-         //i51 Whem chips !!
-        //i51-BE-Define the expected behavior when two users attempt to create a new revision at the same time. If one user saves a revision number that has already been used by another user, the system should notify the second user and ask whether they want to continue with a different revision number or cancel the operation.
-        this.dropdownOptions = this.dropdownOptions
+         this.dropdownOptions = this.dropdownOptions
             .filter(option => option.option.trim().length > 0 || option.value.trim().length > 0)
             .map(option => ({
                 option: option.option.trim(),
@@ -181,8 +180,35 @@ export class CreateOrEditFieldManagerComponent extends AppComponentBase implemen
         });
 
         input.fieldCode = this.item.fieldCode;
+        this.saveField(input);
+    }
+
+    private saveField(input: CreateOrEditFieldInput): void {
         this.fieldManagerService.createField(input).subscribe({
             next: savedField => {
+                const saveError = savedField.error;
+                if (saveError?.revisionAlreadyExists) {
+                    Swal.fire({
+                        title: '',
+                        text: `Revision ${saveError.conflictingRevisionNo} has already been saved. Do you want to create revision ${saveError.expectedNewRevisionNo}?`,
+                        icon: 'warning',
+                        showCancelButton: true,
+                        confirmButtonText: 'Create revision',
+                        cancelButtonText: 'Cancel',
+                        allowOutsideClick: false,
+                        allowEscapeKey: false
+                    }).then(result => {
+                        if (!result.isConfirmed || !saveError.expectedNewRevisionNo) return;
+                        input.expectedCurrentRevisionNo = saveError.expectedNewRevisionNo;
+                        this.saveField(input);
+                    });
+                    return;
+                }
+                if (saveError) {
+                    this.notify.error(saveError.message || 'Could not save the field.');
+                    return;
+                }
+
                 const revision = this.isEdit ? savedField.currentRevisionNo : undefined;
                 this.notify.success(revision
                     ? `Revision #${revision} saved successfully.`
@@ -201,7 +227,8 @@ export class CreateOrEditFieldManagerComponent extends AppComponentBase implemen
     }
 
     close(): void {
-        if (this.getFormState() === this.initialFormState) {
+        if (this.closeWithoutConfirmation || this.getFormState() === this.initialFormState) {
+            this.closeWithoutConfirmation = false;
             this.active = false;
             this.modal.hide();
             this.closed.emit();
@@ -312,12 +339,50 @@ export class CreateOrEditFieldManagerComponent extends AppComponentBase implemen
         const existingValues = (this.item.settingValues || []).filter(value =>
             !incomingAttributeIds.has(value.settingFieldId)
         );
-        const updatedValues = this.fieldManagerService.mapExtraAttributeValuesToSettings(
-            incomingValues,
-            this.fieldTypeSettings,
-            this.dynamicSettingsObject.value.filteredExtraAttributes
-        );
 
+        const updatedRows = incomingValues.reduce((result: AppEntityExtraDataDto[], value: any) => {
+            const definition = this.fieldTypeSettings.find(setting => setting.attributeId === value.attributeId);
+            const isChips = (definition?.dataType || '').toLowerCase() === 'chips';
+            const selectedValues: any[] = value.acceptMultipleValues || isChips
+                ? (Array.isArray(value.value) ? value.value : [])
+                : [value.value];
+            const attribute = this.dynamicSettingsObject.value.filteredExtraAttributes
+                .find((item: any) => item.attributeId === value.attributeId);
+
+            const rows = selectedValues
+                .filter(selectedValue => selectedValue !== undefined && selectedValue !== null && selectedValue !== '')
+                .map(selectedValue => {
+                const row = new AppEntityExtraDataDto();
+                row.attributeId = value.attributeId;
+                row.attributeCode = definition?.code;
+                const selectedOption = value.isLookup
+                    ? attribute?.paginationSetting?.list?.find((option: any) =>
+                        String(option.value) === String(typeof selectedValue === 'object' ? selectedValue.value : selectedValue) ||
+                        option.code === (typeof selectedValue === 'object' ? selectedValue.code : selectedValue)
+                    )
+                    : undefined;
+                if (selectedOption) {
+                    row.attributeValueId = selectedOption.value;
+                    row.attributeValueFkCode = selectedOption.code;
+                    row.attributeValueFkName = selectedOption.label;
+                    return row;
+                }
+                const normalizedValue = typeof selectedValue === 'object' ? selectedValue.value : selectedValue;
+                const typeCode = (definition?.dataType || '').toLowerCase();
+                row.attributeValue = normalizedValue == null ? undefined :
+                    typeCode.includes('date') || typeCode.includes('time')
+                        ? (moment as any)(normalizedValue).toISOString()
+                        : String(normalizedValue);
+                return row;
+            });
+            return result.concat(rows);
+        }, []);
+
+        const updatedValues = this.fieldManagerService.toSettingValues(updatedRows);
+        updatedValues.forEach(settingValue => {
+            settingValue.settingFieldName = this.fieldTypeSettings
+                .find(setting => setting.attributeId === settingValue.settingFieldId)?.name;
+        });
         this.item.settingValues = [...existingValues, ...updatedValues];
     }
 

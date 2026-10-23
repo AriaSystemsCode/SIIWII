@@ -79,9 +79,75 @@
 }
 
 ::ng-deep .dynamic-chips .p-chips-multiple-container {
-  min-height: 44px;
+  min-height: 46px;
   align-items: center;
-  gap: 4px;
+  gap: 6px;
+  padding: 6px 10px;
+  border: 1px solid #e1dde3;
+  border-radius: 8px;
+  background: #fff;
+  transition: border-color .15s ease, box-shadow .15s ease;
+}
+
+.add-chip-btn {
+  height: 46px;
+  padding: 0 16px;
+  border: 1px solid #4A0D4A;
+  border-radius: 8px;
+  background: #4A0D4A;
+  color: #fff;
+  font-weight: 500;
+  transition: background .15s ease, color .15s ease;
+
+  &:disabled {
+    cursor: not-allowed;
+    opacity: .5;
+  }
+}
+
+::ng-deep .dynamic-chips .p-chips-token {
+  display: inline-flex;
+  align-items: center;
+  margin: 0;
+  padding: 4px 10px;
+  border-radius: 16px;
+  background: #f3ecf3;
+  border: 1px solid #e3d3e3;
+  color: #4A0D4A;
+  font-size: 0.875rem;
+  font-weight: 500;
+
+  .p-chips-token-icon {
+    margin-left: 8px;
+    font-size: 0.75rem;
+    cursor: pointer;
+    opacity: .6;
+
+    &:hover {
+      opacity: 1;
+    }
+  }
+}
+
+::ng-deep .dynamic-chips .p-chips-input-token {
+  flex: 1;
+  min-width: 120px;
+  padding: 0;
+
+  input {
+    width: 100%;
+    border: 0;
+    outline: 0;
+    box-shadow: none;
+    background: transparent;
+    font-size: 0.95rem;
+  }
+}
+
+::ng-deep .dynamic-chips .p-chips-multiple-container:not(.p-disabled).p-focus,
+::ng-deep .dynamic-chips .p-chips-multiple-container:not(.p-disabled):hover {
+  border-color: #4A0D4A;
+  box-shadow: 0 0 0 3px rgba(74, 13, 74, 0.08);
 }
 
 .clear-action-icon {

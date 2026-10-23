@@ -19,8 +19,8 @@
                     <label class="existing-field-option" *ngFor="let field of availableFields">
                         <input type="checkbox" [checked]="isSelected(field.id)" (change)="toggleField(field.id)" />
                         <span class="existing-field-details">
-                            <strong>{{ field.fieldCode }}  </strong>
-                            <small>{{ field.fieldName }} </small>
+                            <strong>{{ field.fieldName }}  </strong>
+                            <small>{{ field.fieldCode }} </small>
                         </span>
                     </label>
                     <div class="existing-fields-empty" *ngIf="!availableFields.length">

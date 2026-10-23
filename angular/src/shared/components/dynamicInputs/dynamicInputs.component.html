@@ -59,7 +59,7 @@
             </div>
 
             <!-- Searchable dropdown -->
-            <div class="flex-grow-1" *ngIf="extraAttr.dataType === 'SearchableDropdown'">
+            <div class="flex-grow-1" *ngIf="extraAttr.dataType?.includes('SearchableDropdown')">
               <div class="d-flex align-items-baseline justify-content-start">
                 <p-dropdown [options]="getDropdownOptions(extraAttr)"
                                 [(ngModel)]="extraAttr.selectedValues"
@@ -95,7 +95,7 @@
             </div>
 
             <!-- Dropdown list with static values -->
-            <div class="flex-grow-1" *ngIf="extraAttr.dataType === 'dropDownList'">
+            <div class="flex-grow-1" *ngIf="extraAttr.dataType?.includes('dropDownList')">
               <div class="d-flex align-items-baseline justify-content-start">
                 <p-dropdown [options]="getDropdownOptions(extraAttr)"
                                 [(ngModel)]="extraAttr.selectedValues"
@@ -106,6 +106,7 @@
                             optionLabel="label"
                             optionValue="value"
                             panelStyleClass="dynamic-options-panel"
+                            name="extraAttr_{{extraAttr.name}}"
                             (onClick)="onDropdownClick(extraAttr)"
                             styleClass="w-100 searchableDropdown dynamic-options-dropdown"
                             (onChange)="onDropdownChange(extraAttr)">
@@ -141,21 +142,27 @@
             </div>
 
             <!-- Chips input -->
-            <div class="dynamic-chips-control flex-grow-1" *ngIf="extraAttr.dataType?.toLowerCase() === 'chips'">
+            <div class="dynamic-chips-control flex-grow-1 d-flex align-items-center" #chipsHost (input)="0" *ngIf="extraAttr.dataType?.includes('chips')">
               <p-chips [ngModel]="extraAttr.selectedValues"
                        (ngModelChange)="onChipsChange($event, extraAttr)"
                        [addOnBlur]="true"
-                       [allowDuplicate]="false"
+                       [allowDuplicate]="true"
                        [separator]="','"
                        [inputStyleClass]="'dynamic-chips-input'"
                        styleClass="w-100 dynamic-chips"
+                       class="flex-grow-1"
                        name="extraAttr_{{extraAttr.name}}"
                        [placeholder]="extraAttr.name | localize">
               </p-chips>
+              <button type="button" class="btn btn-sm add-chip-btn ml-2 text-nowrap"
+                      [disabled]="!chipsHost.querySelector('input')?.value?.trim()"
+                      (click)="addChipFromInput(chipsHost, extraAttr)">
+                {{ 'AddOption' | localize }}
+              </button>
             </div>
 
             <!-- Boolean / Radio input -->
-            <div class="flex-grow-1" *ngIf="extraAttr.dataType === 'boolean' || extraAttr.dataType === 'Boolean' || extraAttr.dataType === 'bit'">
+            <div class="flex-grow-1" *ngIf="extraAttr.dataType?.includes('boolean') || extraAttr.dataType?.includes('Boolean') || extraAttr.dataType?.includes('bit')">
               <div class="radio-inline mt-2">
                 <ng-container *ngIf="extraAttr.validEntries?.trim(); else yesNoBlock">
                   <label class="radio radio-accent radio-primary mr-4"
@@ -188,7 +195,7 @@
 
             <!-- Color picker -->
             <div class="flex-grow-1 position-relative d-flex align-items-center gap-2"
-                 *ngIf="extraAttr.dataType === 'color'">
+                 *ngIf="extraAttr.dataType?.includes('color')">
               <input type="color" class="form-control form-control-color col-1"
                          [(ngModel)]="extraAttr.selectedValues" (ngModelChange)="onAnyInputChange()" />
               <span>{{ extraAttr.selectedValues | localize }}</span>
@@ -197,7 +204,7 @@
             </div>
 
             <!-- File upload -->
-            <div class="upload-card" *ngIf="extraAttr.dataType === 'file'">
+            <div class="upload-card" *ngIf="extraAttr.dataType?.includes('file')">
               <div class="upload-box" *ngIf="!extraAttr.selectedValues" (click)="fileInput.click()">
                 <div class="upload-content">
                   <i class="pi pi-upload upload-icon"></i>
@@ -224,7 +231,7 @@
             </div>
 
             <!-- Pills / Themes -->
-            <div class="theme-tabset" *ngIf="extraAttr.dataType === 'pills'">
+            <div class="theme-tabset" *ngIf="extraAttr.dataType?.includes('pills')">
               <ul class="nav nav-pills mb-3" id="pills-tab" role="tablist">
                 <li class="nav-item m-3" *ngFor="let theme of extraAttr.themes; let i = index" role="presentation">
                   <button class="nav-link" [class.active]="selectedTheme === theme" (click)="selectTheme(theme)" type="button">
@@ -244,7 +251,7 @@
             </div>
 
             <!-- Datetime picker -->
-            <div class="position-relative {{fromSetting?'calWidth':''}}" *ngIf="extraAttr.dataType === 'Datetime'">
+            <div class="position-relative {{fromSetting?'calWidth':''}}" *ngIf="extraAttr.dataType?.includes('Datetime')">
               <p-calendar #calendarRef     [(ngModel)]="extraAttr.selectedValues" [showIcon]="false"
                           [showOtherMonths]="true" [selectOtherMonths]="true"
                           placeholder="{{extraAttr.name| localize}}" (ngModelChange)="onAnyInputChange()" appendTo="body"
@@ -256,7 +263,7 @@
 
             <!-- Numeric input -->
        <div class="flex-grow-1 position-relative"
-     *ngIf="extraAttr.dataType === 'Numeric'">
+     *ngIf="extraAttr.dataType?.includes('Numeric')">
 
     <input
         type="number"
@@ -279,7 +286,7 @@
 
             <!-- text eitor -->
             <div class="flex-grow-1 w-100"
-                *ngIf="extraAttr.dataType === 'html'">
+                *ngIf="extraAttr.dataType?.includes('html')">
               <p-editor
                 [(ngModel)]="extraAttr.selectedValues"
                 styleClass="dynamic-input-editor"

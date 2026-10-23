@@ -4,7 +4,7 @@ import { ModalDirective } from 'ngx-bootstrap/modal';
 import { forkJoin } from 'rxjs';
 import { finalize } from 'rxjs/operators';
 import { AppComponentBase } from '@shared/common/app-component-base';
-import { AppFieldDto, AppFieldHistoryDto, FieldLookupDto } from '@shared/service-proxies/service-proxies';
+import { AppFieldDto, AppFieldHistoryDto, CreateOrEditFieldInput, FieldLookupDto } from '@shared/service-proxies/service-proxies';
 import { FieldManagerService } from '../../field-manager.service';
 import { CreateOrEditFieldManagerComponent } from '../create-or-edit-field-manager/create-or-edit-field-manager.component';
 import Swal from 'sweetalert2';
@@ -110,9 +110,9 @@ export class ViewFieldManagerComponent extends AppComponentBase implements OnIni
 
   // ...existing code...
     restoreRevision(): void {
-        if (!this.item) return;
+        if (!this.item || !this.currentItem) return;
 
-        const itemToRestore = this.copyItem(this.item);
+        const revision = this.item;
         Swal.fire({
             title: '',
             text: 'A new revision will be created and will become current revision.',
@@ -123,18 +123,18 @@ export class ViewFieldManagerComponent extends AppComponentBase implements OnIni
             allowOutsideClick: false,
             allowEscapeKey: false
         }).then(result => {
-            if (result.isConfirmed) {
-                this.requestRevision(itemToRestore);
-            }
+            if (!result.isConfirmed) return;
+            this.requestRevision(revision, true);
+            this.revisionEditor.save();
         });
     }
 
-    private requestRevision(field: AppFieldDto): void {
+    private requestRevision(field: AppFieldDto, hideEditor = false): void {
         if (!this.currentItem) return;
         this.isRevisionSaved = false;
         this.savedRevisionFieldId = null;
-        this.modal.hide();
-        this.revisionEditor.showRevision(this.copyItem(field), this.currentItem.currentRevisionNo);
+        if (!hideEditor) this.modal.hide();
+        this.revisionEditor.showRevision(this.copyItem(field), this.currentItem.currentRevisionNo, !hideEditor);
     }
 
     onRevisionEditorSaved(field: AppFieldDto): void {
