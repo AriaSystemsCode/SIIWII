@@ -91,7 +91,7 @@
                                     <div class="font-weight-normal pageTxt" *ngIf="active">
                                         {{ (paginator.getPage()) * primengTableHelper.defaultRecordsCountPerPage  }}-{{ (paginator.getPage() ) * primengTableHelper.defaultRecordsCountPerPage + items.length  }}
                                         {{ "over"| localize}}
-                                        {{ primengTableHelper.totalRecordsCount }} {{"ResultsOf"}} "{{mainFilterCtrl?.value?.label | localize}}"
+                                        {{ primengTableHelper.totalRecordsCount }} {{"ResultsOf" | localize}} {{mainFilterCtrl?.value?.label | localize}}
                                     </div>
                                     <div>
                                         <div class="btn-group dropdown list-toolbar-dropdown" dropdown >

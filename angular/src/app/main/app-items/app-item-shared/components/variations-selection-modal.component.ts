@@ -33,6 +33,9 @@ export class VariationsSelectionModalComponent extends AppComponentBase  {
     listId: number;
     displayedRecords : VariationSelectionDto[];
     searchQuery:string
+
+     currentLang:string
+    isArabic:boolean = true
     constructor(
         injector: Injector,
         public _extraAttrDataService : ExtraAttributeDataService,
@@ -40,6 +43,11 @@ export class VariationsSelectionModalComponent extends AppComponentBase  {
         super(injector);
     }
 
+
+        ngOnInit(){
+                this.currentLang = abp.utils.getCookieValue('Abp.Localization.CultureName')
+        this.currentLang == 'ar' || this.currentLang == 'ar-EG'  ? this.isArabic = true : this.isArabic = false
+    }
     ngAfterViewInit(){
         this.modal.config.backdrop = 'static'
         this.modal.config.ignoreBackdropClick = true
