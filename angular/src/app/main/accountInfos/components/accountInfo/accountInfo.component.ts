@@ -25,6 +25,7 @@ import { ViewMemberProfileComponentInputsI } from '@app/main/teamMembers/models/
 import { MembersListComponent } from '@app/main/members-list/components/members-list/members-list.component';
 import { ImageUploadComponentOutput } from '@app/shared/common/image-upload/image-upload.component';
 import { Paginator } from 'primeng/paginator';
+import { AccountRefreshService } from '@shared/utils/account-refresh.service';
 
 @Component({
     selector: 'app-account-info',
@@ -170,6 +171,9 @@ export class AccountInfoComponent extends AppComponentBase implements OnInit {
         private _marketplaceAccountsServiceProxy: MarketplaceAccountsServiceProxy,
         private AppTransactionServiceProxy: AppTransactionServiceProxy,
            private _sycEntityObjectTypesServiceProxy: SycEntityObjectTypesServiceProxy,
+           
+private accountRefreshService: AccountRefreshService
+
 
 
 
@@ -1174,7 +1178,26 @@ getAccountTypes(): void {
   
     savePerData(event) {
 
+        // this.accountInfoTemp = event;
         this.accountInfoTemp = event;
+
+if (this.accountInfoTemp?.accountTypeId === 21) {
+
+    const firstName = (event?.firstName ?? '').trim();
+    const lastName = (event?.lastName ?? '').trim();
+
+    this.personalContactTemp = {
+        ...this.personalContactTemp,
+        firstName,
+        lastName,
+        jobTitle: event?.jobTitle ??
+            this.personalContactTemp?.jobTitle
+    };
+
+    // Keep the account name synchronized with personal fields.
+    this.accountInfoTemp.name =
+        `${firstName} ${lastName}`.trim();
+}
 
         if (!this.accountInfoTemp.entityExtraData) {
             this.accountInfoTemp.entityExtraData = [];
@@ -1510,73 +1533,298 @@ getAccountTypes(): void {
             this.previousSelectedRoles = [...(this.selectedRoles || [])];
         });
     }
-    saveMyAccount() {
-        this.accountInfoTemp.entityExtraData ??= [];
 
-        // if (!this.accountInfoTemp.id) {
-        //     const mustHave = [701, 702, 703, 706, 707, 708, 709, 710, 711, 712, 713, 714, 715];
-        //     mustHave.forEach(id => this.ensureAttribute(id));
+// saveMyAccount(): void {
 
-        //     this.setStringValue(701, this.accountInfoTemp.entityExtraData[0].attributeValue);
-        //     this.setStringValue(702, this.accountInfoTemp.entityExtraData[1].attributeValue);
-        //     this.setStringValue(707, '');
-        //     this.setStringValue(706, '');
-        //     this.setBooleanValue(713, true);
-        //     this.setBooleanValue(708, true);
-        //     this.setBooleanValue(710, true);
-        //     this.setStringValue(715, '');
-        //     this.setBooleanValue(711, true);
-        //     this.setBooleanValue(712, true);
-        //     this.setBooleanValue(709, true);
-        //     this.setStringValue(703, '');
-        //     this.setBooleanValue(714, true);
-        // }
+//     this.accountInfoTemp.entityExtraData ??= [];
 
-         if (
-        this.accountInfoTemp?.accountTypeId !== 21
-    ) {
+//     if (this.accountInfoTemp?.accountTypeId !== 21) {
+//         this.updateMarketplaceRolesExtraData();
+//     }
+
+//     this.accountInfoTemp.accountLevel = 0;
+//     this.saving = true;
+
+//     this._AccountsServiceProxy
+//         .createOrEditMyAccount(this.accountInfoTemp)
+//         .pipe(
+//             finalize(() => {
+//                 this.saving = false;
+//             })
+//         )
+//         .subscribe({
+//             next: async result => {
+
+//                 if (!result) {
+//                     return;
+//                 }
+
+//                 await this.tenantRoleService.loadRoles();
+
+//                 this.accountId = result?.accountInfo?.id;
+
+//                 if (this.appSession?.user) {
+//                     this.appSession.user.accountId =
+//                         this.accountId;
+//                 }
+
+//                 this.touched = false;
+
+//                 this.notify.success(
+//                     this.l('SavedSuccessfully')
+//                 );
+
+//                 if (this.appSession?.tenant) {
+//                     this.appSession.tenant.currencyInfoDto =
+//                         this.allCurrencies.find(
+//                             e => e.value ==
+//                                 this.accountInfoTemp.currencyId
+//                         );
+
+//                     this.tenantDefaultCurrency =
+//                         this.appSession.tenant.currencyInfoDto;
+//                 }
+
+//                 this.displaySaveAccount = true;
+//                 this.canPublish = true;
+
+//                 if (this.getForEditResult) {
+//                     this.getForEditResult
+//                         .lastChangesIsPublished = false;
+//                 }
+
+//                 // Existing logo update behavior
+//                 this.updateLogoService.updateLogo();
+
+//                 // Reload the saved account information
+//             // Reload the saved account information
+// await this.getMyAccountDataForView();
+
+// const isPersonal =
+//     this.accountInfoTemp?.accountTypeId === 21;
+
+// if (isPersonal) {
+
+//     const firstName =
+//         (this.personalContactTemp?.firstName ?? '').trim();
+
+//     const lastName =
+//         (this.personalContactTemp?.lastName ?? '').trim();
+
+//     const fullName =
+//         `${firstName} ${lastName}`.trim();
+
+//     if (this.accountDataForView) {
+//         this.accountDataForView.name = fullName;
+//     }
+
+//     if (this.appSession?.user) {
+//         this.appSession.user.name = firstName;
+//         this.appSession.user.surname = lastName;
+//     }
+
+//     this.accountRefreshService.notifyAccountUpdated({
+//         name: fullName,
+//         firstName,
+//         lastName
+//     });
+
+// } else {
+
+//     this.accountRefreshService.notifyAccountUpdated({
+//         name: this.accountDataForView?.name || ''
+//     });
+// }
+
+//                 // Notify the default layout and other subscribers
+//                 this.accountRefreshService
+//                     .notifyAccountUpdated();
+
+//                 this._router.navigate(
+//                     ['/app/main/account'],
+//                     {
+//                         queryParams: {
+//                             tab: 'ProfileView'
+//                         }
+//                     }
+//                 );
+
+//                 this.changeTab(
+//                     this.accountInfoPageTabsEnum.ProfileView
+//                 );
+//             },
+
+//             error: error => {
+//                 this.touched = true;
+
+//                 console.error(
+//                     'Failed to save account',
+//                     error
+//                 );
+//             }
+//         });
+// }
+
+
+
+saveMyAccount(): void {
+
+    this.accountInfoTemp.entityExtraData ??= [];
+
+    if (this.accountInfoTemp?.accountTypeId !== 21) {
         this.updateMarketplaceRolesExtraData();
     }
 
-        this.accountInfoTemp.accountLevel = 0;
-        this.saving = true;
+    this.accountInfoTemp.accountLevel = 0;
+    this.saving = true;
 
-        this._AccountsServiceProxy.createOrEditMyAccount(this.accountInfoTemp)
-            .pipe(finalize(() => {
+    // Keep edited names before reloading account data
+    const isPersonal =
+        this.accountInfoTemp?.accountTypeId === 21;
+
+    const firstName = isPersonal
+        ? (this.personalContactTemp?.firstName ?? '').trim()
+        : '';
+
+    const lastName = isPersonal
+        ? (this.personalContactTemp?.lastName ?? '').trim()
+        : '';
+
+    const fullName =
+        `${firstName} ${lastName}`.trim();
+
+    this._AccountsServiceProxy
+        .createOrEditMyAccount(this.accountInfoTemp)
+        .pipe(
+            finalize(() => {
                 this.saving = false;
-            }))
-            .subscribe(async result => {
-                if (!result) return;
+            })
+        )
+        .subscribe({
+
+            next: async result => {
+
+                if (!result) {
+                    return;
+                }
+
                 await this.tenantRoleService.loadRoles();
-                this.accountId = result?.accountInfo?.id;
+
+                this.accountId =
+                    result?.accountInfo?.id;
 
                 if (this.appSession?.user) {
-                    this.appSession.user.accountId = this.accountId;
+                    this.appSession.user.accountId =
+                        this.accountId;
                 }
 
                 this.touched = false;
-                this.notify.success(this.l('SavedSuccessfully'));
 
-                this.appSession.tenant.currencyInfoDto =
-                    this.allCurrencies.find(e => e.value == this.accountInfoTemp.currencyId);
-                this.tenantDefaultCurrency = this.appSession.tenant.currencyInfoDto;
+                this.notify.success(
+                    this.l('SavedSuccessfully')
+                );
+
+                if (this.appSession?.tenant) {
+
+                    this.appSession.tenant.currencyInfoDto =
+                        this.allCurrencies?.find(
+                            e =>
+                                e.value ===
+                                this.accountInfoTemp.currencyId
+                        );
+
+                    this.tenantDefaultCurrency =
+                        this.appSession.tenant.currencyInfoDto;
+                }
+
                 this.displaySaveAccount = true;
                 this.canPublish = true;
-                this.getForEditResult.lastChangesIsPublished = false;
 
+                if (this.getForEditResult) {
+                    this.getForEditResult
+                        .lastChangesIsPublished = false;
+                }
+
+                // Keep existing logo refresh
                 this.updateLogoService.updateLogo();
 
-                await this.getMyAccountDataForView(); // one refresh only
+                // Reload saved account information
+                try {
+                    await this.getMyAccountDataForView();
+                } catch (error) {
+                    console.error(
+                        'Account saved, but refresh failed',
+                        error
+                    );
+                }
 
-                this._router.navigate(['/app/main/account'], {
-                    queryParams: { tab: 'ProfileView' }
-                });
+                // =========================================
+                // REFRESH PERSONAL ACCOUNT NAME
+                // =========================================
+                if (isPersonal) {
 
-                this.changeTab(this.accountInfoPageTabsEnum.ProfileView);
-            }, _ => {
+                    if (this.accountDataForView && fullName) {
+                        this.accountDataForView.name =
+                            fullName;
+                    }
+
+                    if (this.appSession?.user) {
+                        this.appSession.user.name =
+                            firstName;
+
+                        this.appSession.user.surname =
+                            lastName;
+                    }
+
+                    // Notify layout and topbar
+                    this.accountRefreshService
+                        .notifyAccountUpdated({
+                            name: fullName,
+                            firstName,
+                            lastName
+                        });
+
+                } else {
+
+                    // Refresh business/group account
+                    this.accountRefreshService
+                        .notifyAccountUpdated({
+                            name:
+                                this.accountDataForView?.name ||
+                                this.accountInfoTemp?.name ||
+                                ''
+                        });
+                }
+
+                // =========================================
+                // NAVIGATE TO PROFILE VIEW
+                // =========================================
+                this._router.navigate(
+                    ['/app/main/account'],
+                    {
+                        queryParams: {
+                            tab: 'ProfileView'
+                        }
+                    }
+                );
+
+                this.changeTab(
+                    this.accountInfoPageTabsEnum.ProfileView
+                );
+            },
+
+            error: error => {
+
                 this.touched = true;
-            });
-    }
+
+                console.error(
+                    'Failed to save account',
+                    error
+                );
+            }
+        });
+}
+
 
 
     async saveExternalOrManualAccount(): Promise<void> {
@@ -2627,49 +2875,90 @@ getAccountTypes(): void {
         };
     }
 
+    // private preparePersonalDataBeforeSave(): void {
+
+    //     if (
+    //         this.accountInfoTemp?.accountTypeId !== 21
+    //     ) {
+    //         return;
+    //     }
+
+    //     this.accountInfoTemp.entityExtraData ??= [];
+
+    //     this.ensureAttribute(701);
+    //     this.ensureAttribute(702);
+    //     this.ensureAttribute(706);
+    //     this.ensureAttribute(709);
+    //     this.ensureAttribute(710);
+
+    //     this.setStringValue(
+    //         701,
+    //         this.personalContactTemp.firstName
+    //     );
+
+    //     this.setStringValue(
+    //         702,
+    //         this.personalContactTemp.lastName
+    //     );
+
+    //     this.setStringValue(
+    //         706,
+    //         this.personalContactTemp.jobTitle
+    //     );
+
+    //     this.setBooleanValue(
+    //         709,
+    //         !!this.personalContactTemp
+    //             .emailAddressIsPublic
+    //     );
+
+    //     this.setBooleanValue(
+    //         710,
+    //         !!this.personalContactTemp
+    //             .phone1IsPublic
+    //     );
+    // }
     private preparePersonalDataBeforeSave(): void {
 
-        if (
-            this.accountInfoTemp?.accountTypeId !== 21
-        ) {
-            return;
-        }
-
-        this.accountInfoTemp.entityExtraData ??= [];
-
-        this.ensureAttribute(701);
-        this.ensureAttribute(702);
-        this.ensureAttribute(706);
-        this.ensureAttribute(709);
-        this.ensureAttribute(710);
-
-        this.setStringValue(
-            701,
-            this.personalContactTemp.firstName
-        );
-
-        this.setStringValue(
-            702,
-            this.personalContactTemp.lastName
-        );
-
-        this.setStringValue(
-            706,
-            this.personalContactTemp.jobTitle
-        );
-
-        this.setBooleanValue(
-            709,
-            !!this.personalContactTemp
-                .emailAddressIsPublic
-        );
-
-        this.setBooleanValue(
-            710,
-            !!this.personalContactTemp
-                .phone1IsPublic
-        );
+    if (this.accountInfoTemp?.accountTypeId !== 21) {
+        return;
     }
+
+    this.accountInfoTemp.entityExtraData ??= [];
+
+    const firstName =
+        (this.personalContactTemp?.firstName ?? '').trim();
+
+    const lastName =
+        (this.personalContactTemp?.lastName ?? '').trim();
+
+    this.accountInfoTemp.name =
+        `${firstName} ${lastName}`.trim();
+
+    this.ensureAttribute(701);
+    this.ensureAttribute(702);
+    this.ensureAttribute(706);
+    this.ensureAttribute(709);
+    this.ensureAttribute(710);
+
+    this.setStringValue(701, firstName);
+    this.setStringValue(702, lastName);
+
+    this.setStringValue(
+        706,
+        this.personalContactTemp?.jobTitle ?? ''
+    );
+
+    this.setBooleanValue(
+        709,
+        !!this.personalContactTemp?.emailAddressIsPublic
+    );
+
+    this.setBooleanValue(
+        710,
+        !!this.personalContactTemp?.phone1IsPublic
+    );
+}
 
     private getPersonalBooleanExtraDataValue(
         attributeId: number

@@ -3839,6 +3839,34 @@ namespace onetouch.Accounts
                     }
                 }
             }
+            //Update personal account user first and sur name[Start]
+            if (input.EntityExtraData != null && input.EntityExtraData.Count > 0)
+            {
+                var userObj = input.EntityExtraData.Where(z => z.AttributeId == 715).FirstOrDefault();
+                if (userObj != null && !string.IsNullOrEmpty(userObj.AttributeValue) && int.Parse(userObj.AttributeValue) > 0)
+                {
+                    string firstName = "";
+                    string lastName = "";
+                    var userFirstNameObj = input.EntityExtraData.Where(z => z.AttributeId == 701).FirstOrDefault();
+                    if (userFirstNameObj != null)
+                        firstName = userFirstNameObj.AttributeValue;
+                    var userLastNameObj = input.EntityExtraData.Where(z => z.AttributeId == 702).FirstOrDefault();
+                    if (userLastNameObj != null)
+                        lastName = userLastNameObj.AttributeValue;
+                    var user = await UserManager.FindByIdAsync(userObj.AttributeValue);
+                    if (user != null)
+                    {
+                        user.Surname = lastName;
+                        user.Name = firstName;
+                        try
+                        {
+                            await UserManager.UpdateAsync(user);
+                        }
+                        catch { }
+                    }
+                }
+            }
+            //[End]
             //T-SII-20220922.0002,1 MMT 11/10/2022 Update user's profile image from contact image[End]
             return returnValue;
         }
