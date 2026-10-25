@@ -615,6 +615,11 @@ namespace onetouch.AppFields
                     revisionField.CreatorUserName = revisionField.CreatorUserId.HasValue &&
                         userNames.TryGetValue(revisionField.CreatorUserId.Value, out var creatorName)
                         ? creatorName : null;
+                    // Seeded fields may acquire their first history row on the first edit.
+                    // Revision 00 was created with the field, not when that row was archived.
+                    var isInitialRevision = x.RevisionNo == "00";
+                    var revisionCreatedAt = isInitialRevision ? x.CreationTime : x.ChangedAt;
+                    var revisionCreatorId = isInitialRevision ? x.CreatorUserId : x.ChangedBy;
                     return new AppFieldHistoryDto
                     {
                         Id = x.Id,
@@ -623,9 +628,9 @@ namespace onetouch.AppFields
                         RevisionNo = x.RevisionNo,
                         ChangeType = x.ChangeType,
                         Field = revisionField,
-                        ChangedAt = x.ChangedAt,
-                        ChangedBy = x.ChangedBy,
-                        ChangedByName = x.ChangedBy.HasValue && userNames.TryGetValue(x.ChangedBy.Value, out var changedByName)
+                        ChangedAt = revisionCreatedAt,
+                        ChangedBy = revisionCreatorId,
+                        ChangedByName = revisionCreatorId.HasValue && userNames.TryGetValue(revisionCreatorId.Value, out var changedByName)
                             ? changedByName : null,
                         RestoredFromRevisionNo = x.RestoredFromRevisionNo
                     };
@@ -911,7 +916,12 @@ namespace onetouch.AppFields
             // Older releases recorded every new revision immediately. Keep those rows immutable.
             if (!await _history.GetAll().AnyAsync(x => x.AppFieldId == field.Id &&
                 x.RevisionNo == field.CurrentRevisionNo))
-                await RecordHistory(field, "Edit");
+            {
+                var isInitialRevision = field.CurrentRevisionNo == "00";
+                await RecordHistory(field, isInitialRevision ? "Create" : "Edit",
+                    changedAt: isInitialRevision ? field.CreationTime : field.LastModificationTime ?? DateTime.UtcNow,
+                    changedBy: isInitialRevision ? field.CreatorUserId : field.LastModifierUserId);
+            }
         }
 
         private async Task ValidateFieldInput(CreateOrEditFieldInput input)
@@ -1013,7 +1023,8 @@ namespace onetouch.AppFields
                 field.SettingValues.Add(CopyCurrentSettingValue(value, field.TenantId));
         }
 
-        private async Task RecordHistory(AppField field, string changeType, string restoredFromRevisionNo = null)
+        private async Task RecordHistory(AppField field, string changeType, string restoredFromRevisionNo = null,
+            DateTime? changedAt = null, long? changedBy = null)
         {
             await _history.InsertAsync(new AppFieldHistory
             {
@@ -1069,8 +1080,8 @@ namespace onetouch.AppFields
                 IsDeleted = field.IsDeleted,
                 DeleterUserId = field.DeleterUserId,
                 DeletionTime = field.DeletionTime,
-                ChangedAt = DateTime.UtcNow,
-                ChangedBy = AbpSession.UserId
+                ChangedAt = changedAt ?? DateTime.UtcNow,
+                ChangedBy = changedAt.HasValue ? changedBy : AbpSession.UserId
             });
             // Persist each revision before returning a successful save response. The
             // surrounding unit of work still commits the field and history atomically.
