@@ -31,6 +31,7 @@
     <EmbeddedResource Include="Net\Emailing\EmailTemplates\InviteNewUser_EN.json" />
     <EmbeddedResource Include="Net\Emailing\EmailTemplates\InvitePartner_EN.json" />
 	<EmbeddedResource Include="Net\Emailing\EmailTemplates\InvitePartnerByType_EN.json" />
+	  <EmbeddedResource Include="Net\Emailing\EmailTemplates\InvitePartnerByType_AR-EG.json" />
   </ItemGroup>
   <ItemGroup>
     <PackageReference Include="Abp" Version="8.0.0" />

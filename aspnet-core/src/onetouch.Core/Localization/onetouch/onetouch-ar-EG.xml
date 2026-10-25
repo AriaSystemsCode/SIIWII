@@ -1798,6 +1798,9 @@
 		<text name="Banner">بانر</text>
 		<text name="Portrait">عمودي</text>
 		<text name="Landscape">أفقي</text>
+		<text name="RegistrationEmailSentTo">تم إرسال بريد إلكتروني للتسجيل إلى</text>
+		<text name="PleaseClickRegisterLinkToCreateAccount">يرجى الضغط على رابط التسجيل الموجود في البريد الإلكتروني لإنشاء حساب {0} الجديد.</text>
+
 		<text name="AddProduct(s)">إضافة منتج/منتجات</text>
 <text name="Draft">مسودة</text>
 <text name="COLOR">اللون</text>
