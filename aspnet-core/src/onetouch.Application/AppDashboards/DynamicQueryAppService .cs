@@ -33,10 +33,10 @@ namespace onetouch.AppDashboards
         {
             // 1. Validate table
             if (input == null ||
-                string.IsNullOrWhiteSpace(input.TableName) )
-                //||
-                //!AllowedTables.TryGetValue(
-                  //  input.TableName, out var allowedColumns))
+                string.IsNullOrWhiteSpace(input.TableName))
+            //||
+            //!AllowedTables.TryGetValue(
+            //  input.TableName, out var allowedColumns))
             {
                 throw new UserFriendlyException(
                     "Invalid or unauthorized table.");
@@ -52,8 +52,8 @@ namespace onetouch.AppDashboards
 
             if (input.Fields.Any(
                 f => string.IsNullOrWhiteSpace(f)))
-                //||
-                  //   !allowedColumns.Contains(f)))
+            //||
+            //   !allowedColumns.Contains(f)))
             {
                 throw new UserFriendlyException(
                     "One or more fields are not allowed.");
@@ -215,37 +215,37 @@ namespace onetouch.AppDashboards
 
             //}
             long oind = 0;
-            var returnCond = GenerateConditionList(input.Conditions,"AND", ref oind);
-            foreach (var conditionRet in returnCond) 
+            var returnCond = GenerateConditionList(input.Conditions, "AND", ref oind);
+            foreach (var conditionRet in returnCond)
             {
-                if (conditionRet == null || conditionRet.ExpressionList==null || conditionRet.ExpressionList.Count==0)
+                if (conditionRet == null || conditionRet.ExpressionList == null || conditionRet.ExpressionList.Count == 0)
                     continue;
-                
-                var whereExp = ""; 
+
+                var whereExp = "";
                 if (conditionRet.ExpressionList.Count > 1)
                 {
-                     whereExp = " ( " + string.Join
-                     ((conditionRet.ApplyAnyOfThisCondition ? " OR " : " AND "),
-                     conditionRet.ExpressionList) + " ) ";
+                    whereExp = " ( " + string.Join
+                    ((conditionRet.ApplyAnyOfThisCondition ? " OR " : " AND "),
+                    conditionRet.ExpressionList) + " ) ";
                 }
                 else
                 {
                     // (conditionRet.ApplyAnyOfThisCondition ?
                     //" false " : " true ") +
-                   // (conditionRet.ApplyAnyOfThisCondition ?
-                     //   " OR " : " AND ") +
-                   whereExp =  conditionRet.ExpressionList[0];
+                    // (conditionRet.ApplyAnyOfThisCondition ?
+                    //   " OR " : " AND ") +
+                    whereExp = conditionRet.ExpressionList[0];
                 }
                 where.Add(whereExp);
                 parameters.AddRange(conditionRet.ParameterList);
             }
             // Always AND user filters with the tenant condition.
-            var whereSql = ""; 
+            var whereSql = "";
             if (input.ApplyAnyOfConditions == true)
             {
-                whereSql = " WHERE (" + string.Join(" OR ", where.Where(z=>z!= "[TenantId] = @tenantId").ToList())+")"
-                    + (where.Where(z => z == "[TenantId] = @tenantId").FirstOrDefault()!=null ?
-                    " AND [TenantId] = @tenantId"  :"") ;
+                whereSql = " WHERE (" + string.Join(" OR ", where.Where(z => z != "[TenantId] = @tenantId").ToList()) + ")"
+                    + (where.Where(z => z == "[TenantId] = @tenantId").FirstOrDefault() != null ?
+                    " AND [TenantId] = @tenantId" : "");
             }
             else
             {
@@ -254,17 +254,17 @@ namespace onetouch.AppDashboards
             var lastUpdateDate = input.LastUpdateDate;
             if (input.LastUpdateDate != null)
             {
-                
-                whereSql += string.Format(" AND "+
+
+                whereSql += string.Format(" AND " +
                     " ([CreationTime] >= '{0}' OR " +
-                " [LastModificationTime] >= '{0}') ",lastUpdateDate);
+                " [LastModificationTime] >= '{0}') ", lastUpdateDate);
             }
             // 5. Count matching records
             if (!tableName.ToUpper().Contains("Inner Join".ToUpper()))
                 tableName += " a";
-            
-             var countSql =
-                $"SELECT COUNT_BIG(*) FROM {tableName} {whereSql}";
+
+            var countSql =
+               $"SELECT COUNT_BIG(*) FROM {tableName} {whereSql}";
 
             var totalCount = await ExecuteCountAsync(
                 countSql, parameters);
@@ -279,15 +279,13 @@ namespace onetouch.AppDashboards
                     new[] { ' ' },
                     StringSplitOptions.RemoveEmptyEntries);
 
-                if (parts.Length > 2 )//||
-                   // !allowedColumns.Contains(parts[0]))
+                if (parts.Length > 2)//||
+                                     // !allowedColumns.Contains(parts[0]))
                 {
                     throw new UserFriendlyException(
                         "Invalid sorting field.");
                 }
-
-                sortField = parts[0];
-
+                                
                 if (parts.Length == 2)
                 {
                     if (parts[1].Equals(
@@ -303,7 +301,8 @@ namespace onetouch.AppDashboards
                     }
                 }
             }
-
+            sortField = "[" + sortField + "]" +
+                    (sortField.ToUpper().TrimEnd() == "ID" ? "" : ",[Id]");
             // 7. Apply paging
             var skip = Math.Max(0, input.SkipCount);
             var take = input.MaxResultCount <= 0
@@ -319,7 +318,7 @@ namespace onetouch.AppDashboards
 
             var sql =
                 $"SELECT {selectSql} FROM {tableName}" +
-                $"{whereSql} ORDER BY [{sortField}] {direction}" +
+                $"{whereSql} ORDER BY {sortField} {direction}" +
                 " OFFSET @skip ROWS FETCH NEXT @take ROWS ONLY";
 
             var queryParameters = new List<DbParameter>(parameters)
