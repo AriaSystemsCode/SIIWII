@@ -172,7 +172,7 @@ NOT CARDS VIEW MODE
     <div>
       <div class="col-md-12 px-0">
         <div class="d-flex justify-content-between">
-          <h3 class="card-name my-1 m-0"
+          <h3 class="card-name my-1 m-0" (click)="clickCardHandler()"
             [pTooltip]="account?.account?.name?.length > 25 ? account?.account?.name : null" tooltipPosition="bottom"
             [tooltipEvent]="isSmallScreen ? 'focus' : 'hover'" [autoHide]="true" [showDelay]="100" [hideDelay]="100"
             [tabindex]="isSmallScreen ? 0 : null">
