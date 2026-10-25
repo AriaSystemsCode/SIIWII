@@ -18,7 +18,6 @@ import {
     ExtraAttribute
 } from '@shared/service-proxies/service-proxies';
 import {
-    FilterBuilderCondition,
     FilterBuilderField,
     FilterConditionGroup,
     FilterConditionNode,
@@ -27,8 +26,21 @@ import {
     SpreadsheetDataBatch,
     SpreadsheetSheetDataSource
 } from '../../models/dashboard.model';
+import { BatchEvent, NestedListName } from '../../models/spreadsheet.model';
 
-type NestedListName = 'orWithList' | 'andWithList';
+const NESTED_LISTS: { name: NestedListName; matchMode: FilterMatchMode }[] = [
+    { name: 'andWithList', matchMode: 'all' },
+    { name: 'orWithList', matchMode: 'any' }
+];
+
+const OPERATOR_LABELS: Record<string, string> = {
+    eq: '=', neq: '≠', gt: '>', gte: '>=', lt: '<', lte: '<=',
+    contains: 'contains', notcontains: 'does not contain',
+    startswith: 'starts with', endswith: 'ends with',
+    in: 'is in', notin: 'is not in'
+};
+
+const BATCH_SIZE = 10;
 
 @Component({
     selector: 'app-spreadsheet-data-panel',
@@ -38,7 +50,6 @@ type NestedListName = 'orWithList' | 'andWithList';
 })
 export class SpreadsheetDataPanelComponent extends AppComponentBase implements OnChanges {
 
-    // ---- Inputs / outputs ----
     @Input() visible = false;
     @Input() editSource: SpreadsheetSheetDataSource | null = null;
     @Input() targetSheetName = '';
@@ -49,53 +60,14 @@ export class SpreadsheetDataPanelComponent extends AppComponentBase implements O
     @Output() loadingFailed = new EventEmitter<any>();
     @Output() dataSourceCleared = new EventEmitter<string>();
 
-    // ---- Settings ----
-    private readonly batchSize = 10;
-
-    private readonly tableIcons: Record<string, string> = {
-        AppContacts: 'fa fa-address-book',
-        APPFields: 'fa fa-list-alt',
-        AppFieldsHistory: 'fa fa-history',
-        AppTableFields: 'fa fa-table',
-        AppItems: 'fa fa-box',
-        AppItemsLists: 'fa fa-list',
-        AppMessages: 'fa fa-envelope',
-        Articles: 'fa fa-file-alt',
-        'News Digest': 'fa fa-newspaper',
-        SingleImage: 'fa fa-image',
-        SingleVideo: 'fa fa-video',
-        Text: 'fa fa-font',
-        AppTransactionDetails: 'fa fa-list-ul',
-        AppTransactionHeaders: 'fa fa-exchange-alt'
-    };
-
-    private readonly operatorLabels: Record<string, string> = {
-        eq: '=',
-        neq: '≠',
-        gt: '>',
-        gte: '>=',
-        lt: '<',
-        lte: '<=',
-        contains: 'contains',
-        notcontains: 'does not contain',
-        startswith: 'starts with',
-        endswith: 'ends with',
-        in: 'is in',
-        notin: 'is not in'
-    };
-
-    // ---- Wizard state ----
-    step: 1 | 2 = 1;
+    // ---- Panel state ----
     isEditMode = false;
     isAdding = false;
     isLoadingTables = false;
     isLoadingColumns = false;
 
-    // ---- Step 1: table ----
+    // ---- Table, columns, filters, destination ----
     tables: string[] = [];
-    pendingTable: string | null = null;   // highlighted in step 1, not confirmed yet
-
-    // ---- Step 2: columns, filters, destination ----
     selectedTable = '';
     tableColumns: ExtraAttribute[] = [];
     selectedColumns: ExtraAttribute[] = [];
@@ -113,10 +85,6 @@ export class SpreadsheetDataPanelComponent extends AppComponentBase implements O
         super(injector);
     }
 
-    // =====================================================
-    // OPEN / RESET
-    // =====================================================
-
     ngOnChanges(changes: SimpleChanges): void {
         if (!changes['visible'] || !this.visible) {
             return;
@@ -127,23 +95,19 @@ export class SpreadsheetDataPanelComponent extends AppComponentBase implements O
             return;
         }
 
-        this.isEditMode = false;
-        this.loadTables();
         this.reset();
+        this.loadTables();
     }
 
     reset(): void {
-        this.step = 1;
         this.isEditMode = false;
         this.insertAsNewSheet = true;
         this.isLoadingColumns = false;
-        this.pendingTable = null;
         this.selectedTable = '';
         this.showFilterDialog = false;
         this.clearTableSelection();
     }
 
-    /** Clears everything that depends on the selected table. */
     private clearTableSelection(): void {
         this.tableColumns = [];
         this.selectedColumns = [];
@@ -159,10 +123,6 @@ export class SpreadsheetDataPanelComponent extends AppComponentBase implements O
         this.reset();
         this.close.emit();
     }
-
-    // =====================================================
-    // STEP 1: TABLES
-    // =====================================================
 
     private loadTables(): void {
         this.isLoadingTables = true;
@@ -181,54 +141,24 @@ export class SpreadsheetDataPanelComponent extends AppComponentBase implements O
         });
     }
 
-    getTableIcon(tableName: string): string {
-        return this.tableIcons[tableName] || 'fa fa-database';
-    }
-
-    chooseTable(table: string): void {
-        this.pendingTable = table;
-    }
-
-    goToColumnsStep(): void {
-        if (this.pendingTable) {
-            void this.openTable(this.pendingTable);
-        }
-    }
-
-    backToTables(): void {
-        if (this.isAdding || this.isEditMode) {
+    async onTableSelectionChange(table: string | null): Promise<void> {
+        if (this.isEditMode || this.isAdding || this.isLoadingColumns) {
             return;
         }
 
-        this.step = 1;
-        this.selectedTable = '';
+        this.selectedTable = table || '';
         this.clearTableSelection();
-    }
 
-    // =====================================================
-    // STEP 2: COLUMNS
-    // =====================================================
-
-    private async openTable(table: string): Promise<void> {
-        if (!table || this.isLoadingColumns) {
-            return;
+        if (table && !(await this.loadTableFields(table))) {
+            this.selectedTable = '';
         }
-
-        this.selectedTable = table;
-        this.clearTableSelection();
-        this.step = 2;
-
-        await this.loadTableFields(table);
     }
 
-    /** Loads the table columns and the matching filter fields. Returns false when it fails. */
     private async loadTableFields(table: string): Promise<boolean> {
         this.isLoadingColumns = true;
 
         try {
-            const fields: ExtraAttribute[] = await firstValueFrom(
-                this.appDashboardService.getTableFieldsList(table)
-            );
+            const fields = await firstValueFrom(this.appDashboardService.getTableFieldsList(table));
 
             this.tableColumns = fields ?? [];
             this.filterBuilderFields = this.tableColumns.map(field => this.toFilterField(field));
@@ -245,82 +175,52 @@ export class SpreadsheetDataPanelComponent extends AppComponentBase implements O
         }
     }
 
-  private toFilterField(field: ExtraAttribute): FilterBuilderField {
-    return {
-        name: field.name,
-        label: field.description || field.name,
-        dataType: field.dataType || 'String--Textbox',
-
-        isLookup: field.isLookup === true,
-        entityObjectTypeCode: field.entityObjectTypeCode ?? null,
-
-        validEntries: field.validEntries ?? null,
-        options: this.mapValidEntries(field.validEntries),
-
-        dataSource: field.dataSource ?? null,
-        acceptMultipleValues: field.acceptMultipleValues === true
-    };
-}
-
-   private mapValidEntries(
-    entries: any
-): Array<{ label: string; value: any }> {
-
-    if (!entries) {
-        return [];
+    private toFilterField(field: ExtraAttribute): FilterBuilderField {
+        return {
+            name: field.name,
+            label: field.description || field.name,
+            dataType: field.dataType || 'String--Textbox',
+            acceptMultipleValues: field.acceptMultipleValues === true,
+            isLookup: field.isLookup === true,
+            entityObjectTypeCode: field.entityObjectTypeCode ?? null,
+            validEntries: field.validEntries ?? null,
+            dataSource: field.dataSource ?? null,
+            options: this.toOptions(field.validEntries)
+        };
     }
 
-    let values = entries;
+    /** validEntries can be "A|B|C", a JSON array, or an array of objects. */
+    private toOptions(entries: any): Array<{ label: string; value: any }> {
+        let items = entries;
 
-    if (typeof values === 'string') {
-        const text = values.trim();
+        if (typeof items === 'string') {
+            const text = items.trim();
 
-        if (text.startsWith('[')) {
             try {
-                values = JSON.parse(text);
+                items = text.startsWith('[') ? JSON.parse(text) : text.split('|');
             } catch {
-                values = text.split('|');
+                items = text.split('|');
             }
-        } else {
-            values = text.split('|');
         }
-    }
 
-    if (!Array.isArray(values)) {
-        return [];
-    }
+        if (!Array.isArray(items)) {
+            return [];
+        }
 
-    return values
-        .map((item: any) => {
-            if (typeof item !== 'object' || item === null) {
-                const value = String(item).trim();
+        return items
+            .map(item => {
+                if (item === null || typeof item !== 'object') {
+                    const text = String(item).trim();
+                    return { label: text, value: text };
+                }
 
                 return {
-                    label: value,
-                    value
+                    label: String(item.label ?? item.description ?? item.name ?? item.text ?? item.value ?? item.code ?? item.id ?? ''),
+                    value: item.value ?? item.code ?? item.id ?? item.name
                 };
-            }
-
-            return {
-                label: String(
-                    item.label ??
-                    item.description ??
-                    item.name ??
-                    item.text ??
-                    item.value ??
-                    item.code ??
-                    item.id ??
-                    ''
-                ),
-                value:
-                    item.value ??
-                    item.code ??
-                    item.id ??
-                    item.name
-            };
-        })
-        .filter(item => item.label !== '');
-}
+            })
+            .filter(option => option.label !== '');
+    }
 
     isColumnSelected(column: ExtraAttribute): boolean {
         return this.selectedColumns.some(selected => selected.attributeId === column.attributeId);
@@ -329,16 +229,9 @@ export class SpreadsheetDataPanelComponent extends AppComponentBase implements O
     toggleColumn(column: ExtraAttribute, event: Event): void {
         const isChecked = (event.target as HTMLInputElement).checked;
 
-        if (!isChecked) {
-            this.selectedColumns = this.selectedColumns.filter(
-                selected => selected.attributeId !== column.attributeId
-            );
-            return;
-        }
-
-        if (!this.isColumnSelected(column)) {
-            this.selectedColumns = [...this.selectedColumns, column];
-        }
+        this.selectedColumns = isChecked
+            ? (this.isColumnSelected(column) ? this.selectedColumns : [...this.selectedColumns, column])
+            : this.selectedColumns.filter(selected => selected.attributeId !== column.attributeId);
     }
 
     selectAllColumns(): void {
@@ -349,11 +242,6 @@ export class SpreadsheetDataPanelComponent extends AppComponentBase implements O
         this.selectedColumns = [];
     }
 
-    // =====================================================
-    // STEP 2: FILTERS
-    // =====================================================
-
-    /** The filter tree to show in the summary, or null when nothing is applied. */
     get filterPreview(): FilterConditionGroup | null {
         return this.filterTree?.children?.length ? this.filterTree : null;
     }
@@ -378,21 +266,20 @@ export class SpreadsheetDataPanelComponent extends AppComponentBase implements O
     }
 
     private copyTree(tree: FilterConditionGroup): FilterConditionGroup {
-        return JSON.parse(JSON.stringify(tree)) as FilterConditionGroup;
+        return JSON.parse(JSON.stringify(tree));
     }
 
-    // ---- labels for the summary ----
+    // ---- labels for the read-only filter summary ----
 
     getConditionFieldLabel(fieldName: string): string {
-        const field = this.filterBuilderFields.find(item => item.name === fieldName);
-        return field?.label || fieldName;
+        return this.filterBuilderFields.find(field => field.name === fieldName)?.label || fieldName;
     }
 
     getConditionOperatorLabel(operator: string): string {
-        return this.operatorLabels[operator] || operator;
+        return OPERATOR_LABELS[operator] || operator;
     }
 
-    getConditionValueLabel(condition: FilterBuilderCondition): string {
+    getConditionValueLabel(condition: FilterConditionRule): string {
         const value = condition.value;
 
         if (value === null || value === undefined || value === '') {
@@ -406,49 +293,32 @@ export class SpreadsheetDataPanelComponent extends AppComponentBase implements O
             return option.label;
         }
 
-        if (typeof value === 'boolean') {
-            return value ? 'Yes' : 'No';
-        }
-
-        return String(value);
+        return typeof value === 'boolean' ? (value ? 'Yes' : 'No') : String(value);
     }
-
-    // =====================================================
-    // EDIT MODE
-    // =====================================================
 
     private async loadEditSource(): Promise<void> {
         const source = this.editSource?.source;
 
-        if (!source) {
-            return;
-        }
-
         this.isEditMode = true;
         this.insertAsNewSheet = false;
         this.showFilterDialog = false;
-        this.selectedTable = source.sourceKey || source.type;
+        this.selectedTable = source?.sourceKey || source?.type || '';
+        this.tables = this.selectedTable ? [this.selectedTable] : [];
         this.clearTableSelection();
 
-        const isLoaded = await this.loadTableFields(this.selectedTable);
-
-        if (!isLoaded) {
+        if (!source || !this.selectedTable || !(await this.loadTableFields(this.selectedTable))) {
+            this.cdr.detectChanges();
             return;
         }
 
-        const savedColumnNames: string[] = source.columns ?? [];
-
-        this.selectedColumns = this.tableColumns.filter(column => savedColumnNames.includes(column.name));
+        const savedColumns: string[] = source.columns ?? [];
+        this.selectedColumns = this.tableColumns.filter(column => savedColumns.includes(column.name));
         this.filterTree = this.restoreSavedFilterTree(source.filters, source.mode === 'any' ? 'any' : 'all');
-        this.step = 2;
 
         this.cdr.detectChanges();
     }
 
-    /**
-     * Returns the saved nested tree. Older data only has flat conditions
-     * (with andWithList[n].* / orWithList[n].* keys), so those are converted to a tree.
-     */
+    /** Returns the saved tree. Older data only has flat conditions, which are converted to a tree. */
     private restoreSavedFilterTree(filters: any, fallbackMode: FilterMatchMode): FilterConditionGroup | null {
         if (filters?.filterTree?.type === 'group') {
             return this.copyTree(filters.filterTree);
@@ -474,45 +344,33 @@ export class SpreadsheetDataPanelComponent extends AppComponentBase implements O
                 value: condition.value
             });
 
-            this.restoreNestedGroup(root, condition, 'andWithList', 'all');
-            this.restoreNestedGroup(root, condition, 'orWithList', 'any');
+            this.restoreNestedGroups(root, condition);
         }
 
         return root;
     }
 
-    private restoreNestedGroup(
-        root: FilterConditionGroup,
-        condition: any,
-        listName: NestedListName,
-        matchMode: FilterMatchMode
-    ): void {
-        const fieldKey = new RegExp(`^${listName}\\[(\\d+)\\]\\.field$`);
+    /** Turns "andWithList[n].*" / "orWithList[n].*" keys of one condition into nested groups. */
+    private restoreNestedGroups(root: FilterConditionGroup, condition: any): void {
+        for (const { name, matchMode } of NESTED_LISTS) {
+            const fieldKey = new RegExp(`^${name}\\[(\\d+)\\]\\.field$`);
 
-        const indexes = Object.keys(condition)
-            .map(key => key.match(fieldKey))
-            .filter((match): match is RegExpMatchArray => !!match)
-            .map(match => Number(match[1]))
-            .sort((a, b) => a - b);
+            const children: FilterConditionNode[] = Object.keys(condition)
+                .map(key => key.match(fieldKey))
+                .filter((match): match is RegExpMatchArray => !!match)
+                .map(match => Number(match[1]))
+                .sort((a, b) => a - b)
+                .filter(index => !!condition[`${name}[${index}].field`])
+                .map(index => ({
+                    type: 'rule' as const,
+                    field: condition[`${name}[${index}].field`],
+                    operator: condition[`${name}[${index}].operator`] || 'eq',
+                    value: condition[`${name}[${index}].value`]
+                }));
 
-        const children: FilterConditionNode[] = [];
-
-        for (const index of indexes) {
-            const prefix = `${listName}[${index}]`;
-            const field = condition[`${prefix}.field`];
-
-            if (field) {
-                children.push({
-                    type: 'rule',
-                    field,
-                    operator: condition[`${prefix}.operator`] || 'eq',
-                    value: condition[`${prefix}.value`]
-                });
+            if (children.length) {
+                root.children.push({ type: 'group', matchMode, children });
             }
-        }
-
-        if (children.length) {
-            root.children.push({ type: 'group', matchMode, children });
         }
     }
 
@@ -527,9 +385,8 @@ export class SpreadsheetDataPanelComponent extends AppComponentBase implements O
             key: 'clearDataSourceConfirm',
             header: 'Clear Data Source',
             message:
-                `Are you sure you want to clear all data and remove ` +
-                `the linked data source from "${sheetName}"? ` +
-                `Click Save on the spreadsheet to persist this change.`,
+                `Are you sure you want to clear all data and remove the linked data source from "${sheetName}"? ` +
+                'Click Save on the spreadsheet to persist this change.',
             icon: 'pi pi-exclamation-triangle',
             acceptLabel: 'Yes',
             rejectLabel: 'Cancel',
@@ -539,14 +396,11 @@ export class SpreadsheetDataPanelComponent extends AppComponentBase implements O
         });
     }
 
-    // =====================================================
-    // FILTER TREE -> API CONDITIONS
-    // =====================================================
-
     private buildApiConditions(): DynamicCondition[] {
         return this.filterTree ? this.nodesToConditions(this.filterTree.children) : [];
     }
 
+    /** Rules become conditions. A nested group is attached to the previous condition as and/or children. */
     private nodesToConditions(nodes: FilterConditionNode[]): DynamicCondition[] {
         const conditions: DynamicCondition[] = [];
 
@@ -564,10 +418,8 @@ export class SpreadsheetDataPanelComponent extends AppComponentBase implements O
 
             const listName: NestedListName = node.matchMode === 'any' ? 'orWithList' : 'andWithList';
 
-            // A group belongs to the condition before it.
-            // If there is none, the first rule of the group becomes that condition.
+            // a group with no condition before it uses its first rule as the parent
             let parent = conditions[conditions.length - 1];
-
             if (!parent) {
                 parent = this.ruleToCondition(rules.shift()!);
                 conditions.push(parent);
@@ -580,17 +432,7 @@ export class SpreadsheetDataPanelComponent extends AppComponentBase implements O
     }
 
     private flattenRules(group: FilterConditionGroup): FilterConditionRule[] {
-        const rules: FilterConditionRule[] = [];
-
-        for (const node of group.children) {
-            if (node.type === 'rule') {
-                rules.push(node);
-            } else {
-                rules.push(...this.flattenRules(node));
-            }
-        }
-
-        return rules;
+        return group.children.flatMap(node => node.type === 'rule' ? [node] : this.flattenRules(node));
     }
 
     private ruleToCondition(rule: { field: string; operator: string; value: any }): DynamicCondition {
@@ -601,10 +443,7 @@ export class SpreadsheetDataPanelComponent extends AppComponentBase implements O
         return condition;
     }
 
-    /**
-     * The generated proxy sends arrays as "[object Object]", so nested conditions
-     * are added as flat keys (orWithList[0].field ...) that ASP.NET model binding understands.
-     */
+    /** Nested conditions are added as flat keys: orWithList[0].field, orWithList[0].operator ... */
     private addNestedCondition(parent: DynamicCondition, listName: NestedListName, child: DynamicCondition): void {
         const fieldKey = new RegExp(`^${listName}\\[(\\d+)\\]\\.field$`);
         const nextIndex = Object.keys(parent).filter(key => fieldKey.test(key)).length;
@@ -619,17 +458,18 @@ export class SpreadsheetDataPanelComponent extends AppComponentBase implements O
     }
 
     /** Dates become "yyyy-MM-dd", everything else becomes a string. */
+
     private formatConditionValue(value: any): string {
         if (!(value instanceof Date)) {
             return String(value);
         }
 
-        const year = value.getFullYear();
-        const month = String(value.getMonth() + 1).padStart(2, '0');
-        const day = String(value.getDate()).padStart(2, '0');
+        const month = ('0' + (value.getMonth() + 1)).slice(-2);
+        const day = ('0' + value.getDate()).slice(-2);
 
-        return `${year}-${month}-${day}`;
+        return `${value.getFullYear()}-${month}-${day}`;
     }
+
 
     // =====================================================
     // LOAD DATA INTO THE SPREADSHEET
@@ -648,17 +488,21 @@ export class SpreadsheetDataPanelComponent extends AppComponentBase implements O
     }
 
     async addSheet(): Promise<void> {
-        const destinationSheetName = this.isEditMode ? this.editSource?.sheetName : this.targetSheetName;
-        const replacesExistingSheet = this.isEditMode || !this.insertAsNewSheet;
+        if (!this.selectedTable || !this.selectedColumns.length || this.isAdding) {
+            return;
+        }
 
-        if (replacesExistingSheet && !destinationSheetName) {
+        const sheetName = this.isEditMode ? this.editSource?.sheetName : this.targetSheetName;
+        const replacesSheet = this.isEditMode || !this.insertAsNewSheet;
+
+        if (replacesSheet && !sheetName) {
             this.notify.warn('Please select a destination worksheet.');
             return;
         }
 
         if (!this.isEditMode && !this.insertAsNewSheet && this.targetSheetHasData) {
             const isConfirmed = window.confirm(
-                `The worksheet "${destinationSheetName}" already contains data.\n\n` +
+                `The worksheet "${sheetName}" already contains data.\n\n` +
                 'Inserting this list will replace its existing contents and linked data source, if any.\n\n' +
                 'Do you want to continue?'
             );
@@ -668,17 +512,11 @@ export class SpreadsheetDataPanelComponent extends AppComponentBase implements O
             }
         }
 
-        if (!this.selectedTable || !this.selectedColumns.length || this.isAdding) {
-            return;
-        }
-
-        const selectedFields = this.selectedColumns
-            .map(column => column.name)
-            .filter((name): name is string => !!name);
+        const selectedFields = this.selectedColumns.map(column => column.name).filter(name => !!name);
 
         // The Id column is always loaded.
         const requestedFields = selectedFields.some(name => name.toLowerCase() === 'id')
-            ? [...selectedFields]
+            ? selectedFields
             : [...selectedFields, 'Id'];
 
         const conditions = this.buildApiConditions();
@@ -702,7 +540,7 @@ export class SpreadsheetDataPanelComponent extends AppComponentBase implements O
                         matchMode === 'any',
                         undefined,
                         skip,
-                        this.batchSize
+                        BATCH_SIZE
                     )
                 );
 
@@ -714,10 +552,11 @@ export class SpreadsheetDataPanelComponent extends AppComponentBase implements O
                 }
 
                 loaded += records.length;
+                skip += records.length;
 
-                const isLastBatch = records.length < this.batchSize || (total > 0 && loaded >= total);
+                const isLastBatch = records.length < BATCH_SIZE || (total > 0 && loaded >= total);
 
-                this.batchLoaded.emit({
+                const batch: BatchEvent = {
                     table: this.selectedTable,
                     fields: [...selectedFields],
                     selectedColumns: [...this.selectedColumns],
@@ -725,23 +564,18 @@ export class SpreadsheetDataPanelComponent extends AppComponentBase implements O
                     matchMode,
                     filterTree: this.filterTree,
                     insertAsNewSheet: !this.isEditMode && this.insertAsNewSheet,
-                    targetSheetName: destinationSheetName,
+                    targetSheetName: sheetName,
                     rows: this.buildRows(records),
                     loaded,
                     total,
                     isFirstBatch,
                     isLastBatch
-                } as SpreadsheetDataBatch & {
-                    matchMode: FilterMatchMode;
-                    filterTree: FilterConditionGroup | null;
-                    insertAsNewSheet: boolean;
-                    targetSheetName?: string;
-                });
+                } as BatchEvent;
+
+                this.batchLoaded.emit(batch);
 
                 await this.waitForPaint();
-
                 isFirstBatch = false;
-                skip += records.length;
 
                 if (isLastBatch) {
                     break;
@@ -771,9 +605,7 @@ export class SpreadsheetDataPanelComponent extends AppComponentBase implements O
         return records.map(record => {
             const row: any = { Id: this.readValue(record, 'Id') };
 
-            columnNames.forEach(name => {
-                row[name] = this.readValue(record, name);
-            });
+            columnNames.forEach(name => row[name] = this.readValue(record, name));
 
             return row;
         });
@@ -819,8 +651,6 @@ export class SpreadsheetDataPanelComponent extends AppComponentBase implements O
 
     /** Lets the browser paint between two batches so the spreadsheet stays responsive. */
     private waitForPaint(): Promise<void> {
-        return new Promise(resolve => {
-            requestAnimationFrame(() => requestAnimationFrame(() => resolve()));
-        });
+        return new Promise(resolve => requestAnimationFrame(() => requestAnimationFrame(() => resolve())));
     }
 }

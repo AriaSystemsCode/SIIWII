@@ -195,28 +195,14 @@ export class DashboardShareComponent
         );
     }
 
-    onSearchUserSelected(
-        selectedUser:
-            SharingUserInfo
-    ): void {
-
+    onSearchUserSelected(selectedUser:SharingUserInfo): void {
         if (!selectedUser) {
             return;
         }
-
-
-        const user =
-            this.tenantUsers.find(
-                item =>
-                    item.userId ===
-                    selectedUser.userId
-            );
-
-
+        const user =  this.tenantUsers.find(item => item.userId === selectedUser.userId);
         if (!user) {
             return;
         }
-
         user.canView = true;
         user.canEdit = false;
         this.refreshSharedUsers();
@@ -322,112 +308,46 @@ export class DashboardShareComponent
         this.mode = 'specific';
     }
 
-    // get sharedUsersCount():
-    //     number {
 
-    //     return this.sharedUsers.filter(
-    //         user =>
-    //             !user.isOwner &&
-    //             (
-    //                 user.canView ||
-    //                 user.canEdit
-    //             )
-    //     ).length;
-    // }
+    get shareStatusText(): string {
+        const nonOwners =
+            this.originalTenantUsers.filter(
+                user => !user.isOwner
+            );
 
-    // get shareStatusText(): string {
-    //     if (this.mode === 'private') {
-    //         return 'Shared with no one';
-    //     }
-    //     if (this.mode === 'all') {
-    //         return 'Shared with everyone';
-    //     }
-    //     if (this.mode === 'confirm') {
-    //         return this.getStatusFromUsers();
-    //     }
-    //     const count = this.sharedUsersCount;
-    //     return count === 1 ? 'Shared with 1 user' : `Shared with ${count} users`;
-    // }
-
-
-
-    private getStatusFromUsers():
-        string {
-
-        const tenantCount =
-            this.tenantUsers.filter(
+        const sharedNonOwners =
+            nonOwners.filter(
                 user =>
-                    !user.isOwner
-            ).length;
+                    user.canView ||
+                    user.canEdit
+            );
 
-
-        const sharedCount =
-            this.sharedUsersCount;
-
-
-        if (
-            sharedCount === 0
-        ) {
-
+        if (sharedNonOwners.length === 0) {
             return 'Shared with no one';
         }
 
-
         if (
-            tenantCount > 0 &&
-            tenantCount ===
-            sharedCount
+            nonOwners.length > 0 &&
+            sharedNonOwners.length === nonOwners.length
         ) {
-
             return 'Shared with everyone';
         }
 
-
-        return sharedCount === 1
+        return sharedNonOwners.length === 1
             ? 'Shared with 1 user'
-            : `Shared with ${sharedCount} users`;
+            : `Shared with ${sharedNonOwners.length} users`;
     }
 
-
-    get shareStatusText(): string {
-    const nonOwners =
-        this.originalTenantUsers.filter(
-            user => !user.isOwner
-        );
-
-    const sharedNonOwners =
-        nonOwners.filter(
+    get sharedUsersCount(): number {
+        return this.originalTenantUsers.filter(
             user =>
-                user.canView ||
-                user.canEdit
-        );
-
-    if (sharedNonOwners.length === 0) {
-        return 'Shared with no one';
+                !user.isOwner &&
+                (
+                    user.canView ||
+                    user.canEdit
+                )
+        ).length;
     }
-
-    if (
-        nonOwners.length > 0 &&
-        sharedNonOwners.length === nonOwners.length
-    ) {
-        return 'Shared with everyone';
-    }
-
-    return sharedNonOwners.length === 1
-        ? 'Shared with 1 user'
-        : `Shared with ${sharedNonOwners.length} users`;
-}
-
-get sharedUsersCount(): number {
-    return this.originalTenantUsers.filter(
-        user =>
-            !user.isOwner &&
-            (
-                user.canView ||
-                user.canEdit
-            )
-    ).length;
-}
 
     done(): void {
         if (!this.dashboardId || this.isSaving) {
@@ -466,55 +386,22 @@ get sharedUsersCount(): number {
             });
     }
 
-    // private buildShareDashboardBody(): ShareDashboardInfo {
-    //     const body = new ShareDashboardInfo();
-
-    //     body.dashboardId = Number(this.dashboardId);
-    //     body.sharingLevel = this.getSharingLevel();
-    //     body.canEdit =
-    //         this.mode === 'all' &&
-    //         this.allUsersAccess === 'Edit';
-
-    //     if (this.mode === 'all') {
-    //         body.usersList = this.buildAllUsersList();
-    //     } else if (this.mode === 'specific') {
-    //         body.usersList = this.buildSpecificUsersList();
-    //     } else {
-    //         body.usersList = [];
-    //     }
-
-    //     return body;
-    // }
-
     private buildShareDashboardBody(): ShareDashboardInfo {
-    const body = new ShareDashboardInfo();
+        const body = new ShareDashboardInfo();
 
-    body.dashboardId = Number(this.dashboardId);
-    body.sharingLevel = this.getSharingLevel();
-    body.canEdit =
-        this.mode === 'all' &&
-        this.allUsersAccess === 'Edit';
+        body.dashboardId = Number(this.dashboardId);
+        body.sharingLevel = this.getSharingLevel();
+        body.canEdit =
+            this.mode === 'all' &&
+            this.allUsersAccess === 'Edit';
 
-    if (this.mode === 'specific') {
-        body.usersList = this.buildSpecificUsersList();
-    } else {
-        body.usersList = [];
-    }
+        if (this.mode === 'specific') {
+            body.usersList = this.buildSpecificUsersList();
+        } else {
+            body.usersList = [];
+        }
 
-    return body;
-}
-    private buildAllUsersList(): ShareWithUser[] {
-        return this.tenantUsers
-            .filter(user => !user.isOwner)
-            .map(user => {
-                const item = new ShareWithUser();
-
-                item.userId = user.userId;
-                item.canEdit =
-                    this.allUsersAccess === 'Edit';
-
-                return item;
-            });
+        return body;
     }
 
     private getSharingLevel(): number {
@@ -560,34 +447,14 @@ get sharedUsersCount(): number {
         this.visibleChange.emit(false);
     }
 
-    getUserInitials(
-        name: string
-    ): string {
-
+    getUserInitials(name: string): string {
         if (!name) {
             return '';
         }
-
-
-        const parts =
-            name
-                .trim()
-                .split(/\s+/);
-
-
-        if (
-            parts.length === 1
-        ) {
-
-            return parts[0]
-                .substring(
-                    0,
-                    2
-                )
-                .toUpperCase();
+        const parts = name.trim().split(/\s+/);
+        if (parts.length === 1) {
+            return parts[0].substring(0, 2).toUpperCase();
         }
-
-
         return (
             parts[0].charAt(0) +
             parts[

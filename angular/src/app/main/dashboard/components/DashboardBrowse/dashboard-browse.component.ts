@@ -37,6 +37,16 @@ export class DashboardBrowseComponent
 
     creatingNewDashboard = false;
     newDashboardName = '';
+    readonly minDashboardNameLength = 9;
+    readonly maxDashboardNameLength = 50;
+    newDashboardNameTouched = false;
+    renameDashboardNameTouched = false;
+
+    isDashboardNameValid(name: string): boolean {
+        const length = (name || '').trim().length;
+        return length >= this.minDashboardNameLength && length <= this.maxDashboardNameLength;
+    }
+
     dashboardFilterOptions = [
         {
             label: 'AllDashboards',
@@ -116,47 +126,114 @@ export class DashboardBrowseComponent
         this.cancelRename();
         this.creatingNewDashboard = true;
         this.newDashboardName = '';
+        this.newDashboardNameTouched = false;
     }
 
     cancelCreate(): void {
         this.creatingNewDashboard = false;
         this.newDashboardName = '';
+        this.newDashboardNameTouched = false;
     }
 
-    saveNewDashboard(): void {
-        const name = this.newDashboardName?.trim();
-        const newDashboard: any = {
-            title: name,
-        }
-        this.showMainSpinner()
-        this.appDashboardsAppService
-            .createOrEdit(newDashboard).pipe(
-                finalize(() => {
-                    this.hideMainSpinner()
-                    this.reloadFromFirstPage();
 
-                })
-            )
-            .subscribe(result => {
-                this.cancelCreate();
+   saveNewDashboard(): void {
 
-            });
+    const name = this.newDashboardName?.trim() || '';
 
+    if (!this.isDashboardNameValid(name)) {
+        this.newDashboardNameTouched = true;
+        this.notify.warn(this.l('DashboardNameLengthValidation'));
+        return;
     }
+
+    const newDashboard: any = {
+        title: name
+    };
+
+    this.showMainSpinner();
+
+    this.appDashboardsAppService
+        .createOrEdit(newDashboard)
+        .pipe(
+            finalize(() => {
+                this.hideMainSpinner();
+            })
+        )
+        .subscribe(() => {
+
+            this.cancelCreate();
+
+            // Move to last page after successful creation
+            this.goToLastDashboardPage();
+
+        });
+}
+goToLastDashboardPage(): void {
+
+    const pageSize =
+        this.maxResultCount > 0
+            ? this.maxResultCount
+            : this.primengTableHelper.defaultRecordsCountPerPage || 10;
+
+    this.appDashboardsAppService
+        .getAll(
+            this.filterText || null,
+            this.selectedDashboardFilter.value,
+            this.sorting || null,
+            0,
+            1
+        )
+        .subscribe(result => {
+
+            const totalRecords = result?.totalCount || 0;
+
+            const lastPageIndex = Math.max(
+                0,
+                Math.ceil(totalRecords / pageSize) - 1
+            );
+
+            const lastPageFirst = lastPageIndex * pageSize;
+
+            this.skipCount = lastPageFirst;
+            this.maxResultCount = pageSize;
+
+            if (this.paginator) {
+
+                // Updates paginator UI and triggers onPageChange()
+                this.paginator.changePage(lastPageIndex);
+
+            } else {
+
+                this.getDashboards();
+
+            }
+
+        });
+}
 
     startRename(row: any): void {
         this.cancelCreate();
         this.editingDashboardId = row.id;
         this.editingDashboardName = row.title || '';
+        this.renameDashboardNameTouched = false;
     }
 
     cancelRename(): void {
         this.editingDashboardId = null;
         this.editingDashboardName = '';
+        this.renameDashboardNameTouched = false;
     }
 
     saveRename(row: any): void {
-        const name = this.editingDashboardName?.trim();
+
+        const name = this.editingDashboardName?.trim() || '';
+
+        if (!this.isDashboardNameValid(name)) {
+            this.renameDashboardNameTouched = true;
+            this.notify.warn(this.l('DashboardNameLengthValidation'));
+            return;
+        }
+
         if (name === row.title) {
             this.cancelRename();
             this.notify.warn(this.l('Already Same Name.'));
@@ -165,19 +242,23 @@ export class DashboardBrowseComponent
 
         const editDashboard: any = {
             id: row.id,
-            title: name,
-        }
-        this.appDashboardsAppService.createOrEdit(editDashboard)
+            title: name
+        };
+
+        this.appDashboardsAppService
+            .createOrEdit(editDashboard)
             .subscribe(() => {
+
                 row.title = name;
+
                 this.cancelRename();
-                this.notify.success(this.l('Dashboard Renamed Successfuly')
+
+                this.notify.success(
+                    this.l('Dashboard Renamed Successfuly')
                 );
 
             });
-
     }
-
 
     openShareDashboard(row: any): void {
         this.selectedDashboard = row;

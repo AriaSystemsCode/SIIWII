@@ -22,26 +22,15 @@
             </h2>
 
             <div class="dashboard-actions">
-                <button
-                    pButton
-                    type="button"
-                    icon="pi pi-refresh"
-                    [label]="'Refresh' | localize"
-                    class="p-button-outlined dashboard-refresh-btn"
-                    [pTooltip]="'RefreshDashboard' | localize"
-                    tooltipPosition="bottom"
-                    [loading]="refreshing"
+                <button pButton type="button" icon="pi pi-refresh" [label]="'Refresh' | localize"
+                    class="p-button-outlined dashboard-refresh-btn" [pTooltip]="'RefreshDashboard' | localize"
+                    tooltipPosition="bottom" [loading]="refreshing"
                     [disabled]="loading || refreshing || exportingPdf || !dashboardWorkbookReady"
                     (click)="refreshDashboard()">
                 </button>
 
-                <button
-                    pButton
-                    type="button"
-                    icon="pi pi-file-pdf"
-                    [label]="'ExportToPDF' | localize"
-                    class="dashboard-export-btn"
-                    [loading]="exportingPdf"
+                <button pButton type="button" icon="pi pi-file-pdf" [label]="'ExportToPDF' | localize"
+                    class="dashboard-export-btn" [loading]="exportingPdf"
                     [disabled]="loading || refreshing || exportingPdf || !dashboardWorkbookReady"
                     (click)="exportDashboardPdf()">
                 </button>
@@ -55,51 +44,33 @@
         <div class="dashboard-view-container">
 
             <!-- Loading -->
-            <div *ngIf="loading" class="dashboard-state">
+            <!-- <div *ngIf="loading" class="dashboard-state">
                 <div class="state-card">
                     <i class="pi pi-spin pi-spinner"></i>
                     <h4>{{ 'LoadingDashboard' | localize }}</h4>
                     <p>{{ 'PleaseWaitFewSeconds' | localize }}</p>
                 </div>
-            </div>
+            </div> -->
 
             <!-- Error -->
             <div *ngIf="!loading && dashboardLoadError" class="dashboard-state dashboard-error">
-                <div class="state-card">
+                <!-- <div class="state-card">
                     <i class="pi pi-exclamation-triangle"></i>
                     <h4>{{ 'DashboardLoadFailed' | localize }}</h4>
                     <p>{{ dashboardLoadError }}</p>
-                </div>
+                </div> -->
             </div>
 
             <!-- Dashboard sheet (other sheets are hidden, charts still read them) -->
-            <div
-                *ngIf="!loading && !dashboardLoadError && dashboardWorkbookReady"
-                #dashboardExportArea
-                 class="dashboard-sheet-viewer"
-    [class.has-charts]="dashboardHasCharts">
+            <div *ngIf="!loading && !dashboardLoadError && dashboardWorkbookReady" #dashboardExportArea
+                class="dashboard-sheet-viewer" [class.has-charts]="dashboardHasCharts">
 
-                <ejs-spreadsheet
-                    #dashboardSpreadsheet
-                    width="100%"
-                    height="100%"
-                    [sheets]="dashboardSheets"
-                    [activeSheetIndex]="dashboardActiveSheetIndex"
-                    [allowChart]="true"
-                    [allowEditing]="false"
-                    [allowInsert]="false"
-                    [allowDelete]="false"
-                    [allowSorting]="false"
-                    [allowFiltering]="false"
-                    [allowOpen]="false"
-                    [allowSave]="false"
-                    [enableContextMenu]="false"
-                    [enableKeyboardShortcut]="false"
-                    [showRibbon]="false"
-                    [showFormulaBar]="false"
-                    [showSheetTabs]="false"
-                    (click)="onDashboardChartClick($event)"
-                    (created)="onDashboardCreated()">
+                <ejs-spreadsheet #dashboardSpreadsheet width="100%" height="100%" [sheets]="dashboardSheets"
+                    [activeSheetIndex]="dashboardActiveSheetIndex" [allowChart]="true" [allowEditing]="false"
+                    [allowInsert]="false" [allowDelete]="false" [allowSorting]="false" [allowFiltering]="false"
+                    [allowOpen]="false" [allowSave]="false" [enableContextMenu]="false" [enableKeyboardShortcut]="false"
+                    [showRibbon]="false" [showFormulaBar]="false" [showSheetTabs]="false"
+                    (click)="onDashboardChartClick($event)" (created)="onDashboardCreated()">
                 </ejs-spreadsheet>
             </div>
 
@@ -116,41 +87,5 @@
 </div>
 
 <!-- ================= DRILLDOWN (shared) ================= -->
-<app-drilldown-dialog
-    [(visible)]="drilldownVisible"
-    [title]="drilldownTitle"
-    [records]="drilldownRecords">
+<app-drilldown-dialog [(visible)]="drilldownVisible" [title]="drilldownTitle" [records]="drilldownRecords">
 </app-drilldown-dialog>
-
-<!-- ================= TEMPORARY PDF EXPORT SPREADSHEET ================= -->
-<!-- <div
-    *ngIf="pdfRenderVisible"
-    #pdfExportArea
-    class="dashboard-pdf-export"
-    [style.width.px]="pdfExportWidth"
-    [style.height.px]="pdfExportHeight">
-
-    <ejs-spreadsheet
-        #pdfSpreadsheet
-        [width]="pdfExportWidth + 'px'"
-        [height]="pdfExportHeight + 'px'"
-        [sheets]="pdfExportSheets"
-        [activeSheetIndex]="pdfExportSheetIndex"
-        [scrollSettings]="pdfScrollSettings"
-        [allowChart]="true"
-        [allowEditing]="false"
-        [allowInsert]="false"
-        [allowDelete]="false"
-        [allowSorting]="false"
-        [allowFiltering]="false"
-        [allowOpen]="false"
-        [allowSave]="false"
-        [enableContextMenu]="false"
-        [enableKeyboardShortcut]="false"
-        [showRibbon]="false"
-        [showFormulaBar]="false"
-        [showSheetTabs]="false"
-        (created)="onPdfSpreadsheetCreated()">
-    </ejs-spreadsheet>
-
-</div> -->

@@ -102,6 +102,8 @@ export class CreateOrEditSpreadsheetComponent extends AppComponentBase implement
     private newDataSheetName: string | null = null;
     private newDataSheetLoadedRows = 0;
     private newDataSheetFields: string[] = [];
+    private dataBatchQueue: Promise<void> = Promise.resolve();
+    private dataBatchFailed = false;
 
     // ---- Pivot ----
     showPivot = false;
@@ -880,17 +882,22 @@ export class CreateOrEditSpreadsheetComponent extends AppComponentBase implement
     // ADD / EDIT DATA PANEL
     // =====================================================
 
-    openDataPanel(): void {
-        this.editingSheetName = null;
-        this.dataPanelTargetSheetName = this.activeSheetName;
-        this.dataPanelTargetHasData = this.sheetHasExistingData(this.dataPanelTargetSheetName);
 
+    openDataPanel(): void {
+        const activeSheet = this.activeSheet;
+        if (!activeSheet) {
+            this.notify.warn('No active worksheet found.');
+            return;
+        }
+        this.editingSheetName = null;
+        this.dataPanelTargetSheetName = activeSheet.name;
+        this.dataPanelTargetHasData = this.sheetHasExistingData(this.dataPanelTargetSheetName);
         this.closeChartPanel();
         this.showDataPanel = true;
-
         this.cdr.detectChanges();
         this.resizeLater();
     }
+
 
     editActiveSheetFilters(): void {
         const sheetSource = this.activeSheetSource;
@@ -932,14 +939,42 @@ export class CreateOrEditSpreadsheetComponent extends AppComponentBase implement
      * Loads API records into the Spreadsheet in batches.
      * Id is kept in sheetRecordIds only - it is NOT written into the worksheet.
      */
-    async onDataBatchLoaded(batch: SpreadsheetDataBatch): Promise<void> {
+
+    onDataBatchLoaded(batch: SpreadsheetDataBatch): void {
+        // Angular EventEmitter does not await async event handlers.
+        // Serialize all batches so the first one finishes creating the sheet.
+        this.dataBatchQueue = this.dataBatchQueue.then(async () => {
+            if (batch.isFirstBatch) {
+                this.dataBatchFailed = false;
+            }
+            if (this.dataBatchFailed) {
+                return;
+            }
+            await this.processDataBatch(batch);
+        }).catch(error => {
+            if (!this.dataBatchFailed) {
+                this.dataBatchFailed = true;
+                console.error('[Spreadsheet] Batch loading failed:', error);
+                this.onDataLoadingFailed(error);
+            }
+        });
+    }
+
+    private async processDataBatch(batch: SpreadsheetDataBatch): Promise<void> {
+
         if (!this.spreadsheet) {
-            return;
+            throw new Error("Spreadsheet is not initialized.");
         }
 
         try {
-            // ---- 1. First batch: choose / prepare the destination sheet ----
+
+            // ============================================
+            // 1. FIRST BATCH: PREPARE DESTINATION SHEET
+            // ============================================
+
             if (batch.isFirstBatch) {
+
+                this.newDataSheetName = null;
                 this.newDataSheetFields = [];
                 this.newDataSheetLoadedRows = 0;
 
@@ -949,80 +984,164 @@ export class CreateOrEditSpreadsheetComponent extends AppComponentBase implement
                 };
 
                 if (destination.insertAsNewSheet === true) {
-                    await this.createDataSheet(batch);
-                } else {
-                    const targetSheetName = destination.targetSheetName;
 
-                    if (!targetSheetName || !this.findSheet(targetSheetName)) {
-                        throw new Error(`Destination worksheet "${targetSheetName}" was not found.`);
+                    // Create a new worksheet
+                    await this.createDataSheet(batch);
+
+                } else {
+
+                    // Insert into current sheet or edit existing sheet
+                    const targetSheetName = (
+                        destination.targetSheetName ||
+                        this.dataPanelTargetSheetName ||
+                        this.editingSheetName ||
+                        ''
+                    ).trim();
+
+                    if (!targetSheetName) {
+                        throw new Error(
+                            'No destination worksheet was selected.'
+                        );
                     }
 
+                    const targetSheet = this.findSheet(targetSheetName);
+
+                    if (!targetSheet) {
+                        throw new Error(
+                            `Destination worksheet "${targetSheetName}" was not found.`
+                        );
+                    }
+
+                    // Set the destination explicitly
+                    this.newDataSheetName = targetSheetName;
+
+                    // Clear previous cell contents
                     await this.clearSheetForEdit(targetSheetName);
                 }
 
-                if (this.newDataSheetName) {
-                    this.sheetRecordIds[this.newDataSheetName] = [];
+                // Ensure the destination is available
+                if (!this.newDataSheetName) {
+                    throw new Error(
+                        'Unable to initialize destination worksheet.'
+                    );
                 }
+
+                // Reset record IDs for the new data
+                this.sheetRecordIds[this.newDataSheetName] = [];
             }
+
+            // ============================================
+            // 2. GET DESTINATION SHEET
+            // ============================================
 
             const sheetName = this.newDataSheetName;
 
             if (!sheetName) {
-                throw new Error('No destination worksheet is available.');
+                throw new Error(
+                    'No destination worksheet is available.'
+                );
+            }
+
+            const sheet = this.findSheet(sheetName);
+
+            if (!sheet) {
+                throw new Error(
+                    `Worksheet "${sheetName}" was not found.`
+                );
             }
 
             await this.activateSheet(sheetName);
 
             const rows: any[] = batch.rows ?? [];
 
-            // ---- 2. Headers (without Id) ----
-            if (!this.newDataSheetFields.length && rows.length > 0) {
-                this.newDataSheetFields = Object.keys(rows[0]).filter(f => f.trim().toLowerCase() !== 'id');
+            // ============================================
+            // 3. CREATE HEADERS (WITHOUT ID)
+            // ============================================
 
-                this.newDataSheetFields.forEach((field, index) => this.setCell(`${toColumnName(index + 1)}1`, field));
+            if (!this.newDataSheetFields.length && rows.length > 0) {
+
+                this.newDataSheetFields = Object.keys(rows[0])
+                    .filter(field =>
+                        field.trim().toLowerCase() !== 'id'
+                    );
+
+                this.newDataSheetFields.forEach((field, index) => {
+
+                    const columnName = toColumnName(index + 1);
+
+                    this.setCell(
+                        `${columnName}1`,
+                        field
+                    );
+
+                });
             }
 
-            // ---- 3. Rows: save the Id, write the visible fields ----
-            const startRow = this.newDataSheetLoadedRows + 2;
-            const recordIds = this.sheetRecordIds[sheetName] ?? [];
+            // ============================================
+            // 4. PREPARE ROWS AND RECORD IDS
+            // ============================================
 
+            // Upsert by backend Id: duplicates update the same row instead of failing.
+            const recordIds = [...(this.sheetRecordIds[sheetName] ?? [])];
+            const rowById = new Map<string, number>();
+            recordIds.forEach((id, index) => {
+                rowById.set(String(id).trim(), index + 2); // Excel row 1 is headers
+            });
+
+            // Deduplicate the incoming batch; last occurrence wins.
+            const uniqueRecords = new Map<string, any>();
             rows.forEach((record, index) => {
                 const id = getValueIgnoreCase(record, 'Id');
-
                 if (id === undefined || id === null || String(id).trim() === '') {
-                    throw new Error(`Backend record at Excel row ${startRow + index} has no Id.`);
+                    throw new Error(`Backend record at batch index ${index} has no Id.`);
                 }
+                uniqueRecords.set(String(id).trim(), record);
+            });
 
-                if (recordIds.some(existing => String(existing) === String(id))) {
-                    throw new Error(`Duplicate backend Id "${id}" in "${sheetName}".`);
+            uniqueRecords.forEach((record, idKey) => {
+                let excelRow = rowById.get(idKey);
+                if (excelRow === undefined) {
+                    recordIds.push(getValueIgnoreCase(record, 'Id'));
+                    excelRow = recordIds.length + 1;
+                    rowById.set(idKey, excelRow);
                 }
-
-                recordIds.push(id);
 
                 this.newDataSheetFields.forEach((field, col) => {
-                    this.setCell(
-                        `${toColumnName(col + 1)}${startRow + index}`,
-                        getValueIgnoreCase(record, field) ?? ''
-                    );
+                    const columnName = toColumnName(col + 1);
+                    const value = getValueIgnoreCase(record, field) ?? '';
+                    this.setCell(`${columnName}${excelRow}`, value);
                 });
             });
 
             this.sheetRecordIds[sheetName] = recordIds;
-            this.newDataSheetLoadedRows += rows.length;
-            this.setProgress(batch.loaded, batch.total);
+            this.newDataSheetLoadedRows = recordIds.length;
+
+            this.setProgress(
+                batch.loaded,
+                batch.total
+            );
 
             await this.settle();
 
+            // ============================================
+            // 7. FINISH OR CONTINUE LOADING
+            // ============================================
+
             if (batch.isLastBatch) {
+
                 await this.finishDataLoading(batch);
+
             } else {
+
                 await this.paint();
             }
+
         } catch (error) {
-            console.error('[Spreadsheet] Batch loading failed:', error);
-            this.onDataLoadingFailed(error);
+            throw error;
         }
     }
+
+
 
     /** Edit mode: reuse the existing sheet and wipe its old data. */
     private async clearSheetForEdit(sheetName: string): Promise<void> {
@@ -1580,8 +1699,8 @@ export class CreateOrEditSpreadsheetComponent extends AppComponentBase implement
 
             // const matrix = this.getPivotResultMatrix();
             const matrix = this.refreshService.removeGrandTotalFromChart(
-    this.getPivotResultMatrix()
-);
+                this.getPivotResultMatrix()
+            );
             const maxColumns = matrix.reduce((max, row) => Math.max(max, row?.length ?? 0), 0);
 
             if (matrix.length < 2 || maxColumns < 2) {
@@ -1631,8 +1750,8 @@ export class CreateOrEditSpreadsheetComponent extends AppComponentBase implement
 
             // const matrix = this.getPivotResultMatrix();
             const matrix = this.refreshService.removeGrandTotalFromChart(
-    this.getPivotResultMatrix()
-);
+                this.getPivotResultMatrix()
+            );
 
             if (!matrix.length || !matrix[0]?.length) {
                 return;
@@ -2550,138 +2669,138 @@ export class CreateOrEditSpreadsheetComponent extends AppComponentBase implement
 
         return cleaned;
     }
-async refreshSpreadsheet(): Promise<void> {
-    if (this.isRefreshing || !this.spreadsheet || !this.dashboardId) {
-        return;
-    }
-
-    this.isRefreshing = true;
-    this.showLoading('Refreshing Spreadsheet...');
-
-    const activeSheetBefore = this.activeSheetName;
-    const pivotBefore = this.showPivot ? text(this.pivotSheet) : '';
-
-    try {
-        this.closeChartPanel();
-        this.closeDataPanel();
-
-        if (this.showPivot) {
-            await this.closePivot();
+    async refreshSpreadsheet(): Promise<void> {
+        if (this.isRefreshing || !this.spreadsheet || !this.dashboardId) {
+            return;
         }
 
-        const current = await this.buildSavedState();
+        this.isRefreshing = true;
+        this.showLoading('Refreshing Spreadsheet...');
 
-        const refreshed = await this.refreshService.refresh(current, {
-            tenantId: this.appSession.tenantId,
-            highlight: true,
-            onProgress: (message, done, total) => {
-                this.loadingMessage = message;
-                this.setProgress(done, total);
+        const activeSheetBefore = this.activeSheetName;
+        const pivotBefore = this.showPivot ? text(this.pivotSheet) : '';
+
+        try {
+            this.closeChartPanel();
+            this.closeDataPanel();
+
+            if (this.showPivot) {
+                await this.closePivot();
             }
-        });
 
-        // Save only after all source sheets and charts are refreshed.
-        this.loadingMessage = 'Saving refreshed Spreadsheet...';
+            const current = await this.buildSavedState();
 
-        refreshed.updatedDate =
-            moment().format('YYYY-MM-DDTHH:mm:ss.SSS') + '0000';
+            const refreshed = await this.refreshService.refresh(current, {
+                tenantId: this.appSession.tenantId,
+                highlight: true,
+                onProgress: (message, done, total) => {
+                    this.loadingMessage = message;
+                    this.setProgress(done, total);
+                }
+            });
 
-        await firstValueFrom(
-            this.dashboardService.saveSpreadSheetJson(this.dashboardId, {
-                ...refreshed,
-                recordCount: this.countRecords(refreshed.workbookJson)
-            } as any)
-        );
+            // Save only after all source sheets and charts are refreshed.
+            this.loadingMessage = 'Saving refreshed Spreadsheet...';
 
-        // Reopen the exact workbook that was saved.
-        this.ignoreSpreadsheetChanges = true;
-        await this.openWorkbook(refreshed);
+            refreshed.updatedDate =
+                moment().format('YYYY-MM-DDTHH:mm:ss.SSS') + '0000';
 
-        if (
-            activeSheetBefore &&
-            this.findSheet(activeSheetBefore) &&
-            this.activeSheetName !== activeSheetBefore
-        ) {
-            await this.activateSheet(activeSheetBefore);
+            await firstValueFrom(
+                this.dashboardService.saveSpreadSheetJson(this.dashboardId, {
+                    ...refreshed,
+                    recordCount: this.countRecords(refreshed.workbookJson)
+                } as any)
+            );
+
+            // Reopen the exact workbook that was saved.
+            this.ignoreSpreadsheetChanges = true;
+            await this.openWorkbook(refreshed);
+
+            if (
+                activeSheetBefore &&
+                this.findSheet(activeSheetBefore) &&
+                this.activeSheetName !== activeSheetBefore
+            ) {
+                await this.activateSheet(activeSheetBefore);
+            }
+
+            const pivotAnalysis = pivotBefore
+                ? this.findAnalysis(pivotBefore)
+                : null;
+
+            if (pivotAnalysis) {
+                await this.openPivot(pivotAnalysis);
+            }
+
+            this.isDirty = false;
+            this.notify.success(
+                'Spreadsheet refreshed and saved successfully.'
+            );
+
+        } catch (error) {
+            console.error('[Spreadsheet] Refresh or save failed:', error);
+            this.notify.error(
+                'Unable to complete Spreadsheet refresh and save.'
+            );
+        } finally {
+            this.ignoreSpreadsheetChanges = false;
+            this.isRefreshing = false;
+            this.hideLoading();
+            this.cdr.detectChanges();
+            this.resizeLater(100);
+        }
+    }
+
+    async onDataSourceCleared(sheetName: string): Promise<void> {
+
+        if (!this.spreadsheet || !sheetName) {
+            return;
         }
 
-        const pivotAnalysis = pivotBefore
-            ? this.findAnalysis(pivotBefore)
-            : null;
+        const sheet = this.findSheet(sheetName);
 
-        if (pivotAnalysis) {
-            await this.openPivot(pivotAnalysis);
+        if (!sheet) {
+            this.notify.warn('Worksheet not found.');
+            return;
         }
 
-        this.isDirty = false;
-        this.notify.success(
-            'Spreadsheet refreshed and saved successfully.'
+        const hasSource = this.sheetSources.some(
+            source => source.sheetName === sheetName
         );
 
-    } catch (error) {
-        console.error('[Spreadsheet] Refresh or save failed:', error);
-        this.notify.error(
-            'Unable to complete Spreadsheet refresh and save.'
-        );
-    } finally {
-        this.ignoreSpreadsheetChanges = false;
-        this.isRefreshing = false;
-        this.hideLoading();
-        this.cdr.detectChanges();
-        this.resizeLater(100);
+        if (!hasSource) {
+            this.notify.warn('No linked data source found.');
+            return;
+        }
+
+        try {
+
+            await this.clearSheetForEdit(sheetName);
+            this.sheetSources = this.sheetSources.filter(
+                source => source.sheetName !== sheetName
+            );
+            delete this.sheetRecordIds[sheetName];
+            this.newDataSheetName = null;
+            this.newDataSheetFields = [];
+            this.newDataSheetLoadedRows = 0;
+            this.closeDataPanel();
+            this.updateListRibbonButton();
+            this.markDirty();
+            this.notify.success(
+                'Data source removed and worksheet cleared. Click Save to persist.'
+            );
+
+        } catch (error) {
+
+            console.error(
+                '[Spreadsheet] Failed to clear data source:',
+                error
+            );
+
+            this.notify.error(
+                'Unable to clear worksheet data.'
+            );
+        }
     }
-}
-
-async onDataSourceCleared(sheetName: string): Promise<void> {
-
-    if (!this.spreadsheet || !sheetName) {
-        return;
-    }
-
-    const sheet = this.findSheet(sheetName);
-
-    if (!sheet) {
-        this.notify.warn('Worksheet not found.');
-        return;
-    }
-
-    const hasSource = this.sheetSources.some(
-        source => source.sheetName === sheetName
-    );
-
-    if (!hasSource) {
-        this.notify.warn('No linked data source found.');
-        return;
-    }
-
-    try {
-
-        await this.clearSheetForEdit(sheetName);
-        this.sheetSources = this.sheetSources.filter(
-            source => source.sheetName !== sheetName
-        );
-        delete this.sheetRecordIds[sheetName];
-        this.newDataSheetName = null;
-        this.newDataSheetFields = [];
-        this.newDataSheetLoadedRows = 0;
-        this.closeDataPanel();
-        this.updateListRibbonButton();
-        this.markDirty();
-        this.notify.success(
-            'Data source removed and worksheet cleared. Click Save to persist.'
-        );
-
-    } catch (error) {
-
-        console.error(
-            '[Spreadsheet] Failed to clear data source:',
-            error
-        );
-
-        this.notify.error(
-            'Unable to clear worksheet data.'
-        );
-    }
-}
 
 }

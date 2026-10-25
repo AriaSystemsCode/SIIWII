@@ -219,3 +219,16 @@ export interface FilterConditionRule {
 export type FilterConditionNode =
     | FilterConditionGroup
     | FilterConditionRule;
+
+
+
+    
+   export type SelectOption = { label: string; value: any };
+    
+   export interface LookupState {
+        items: SelectOption[];
+        totalCount: number;
+        isLoading: boolean;
+        isLoaded: boolean;
+    }
+    

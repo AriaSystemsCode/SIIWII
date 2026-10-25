@@ -44,7 +44,6 @@ export class DashboardDetailComponent extends AppComponentBase implements OnInit
     dashboardId = 1;
     dashboard: any;
 
-    /** The saved spreadsheet (kept up to date by Refresh). */
     private saved: SpreadsheetPayload | null = null;
 
     // ---- State ----
@@ -54,7 +53,6 @@ export class DashboardDetailComponent extends AppComponentBase implements OnInit
     dashboardWorkbookReady = false;
     dashboardLoadError = '';
 
-    /** True when the Dashboard tab contains at least one chart (drives the borderless style). */
     dashboardHasCharts = false;
 
     // ---- Visible spreadsheet ----
@@ -83,14 +81,10 @@ export class DashboardDetailComponent extends AppComponentBase implements OnInit
         super(injector);
     }
 
-    // =====================================================
-    // LOAD
-    // =====================================================
-
     ngOnInit(): void {
         const routeId = Number(this.route.snapshot.paramMap.get('id'));
 
-        if (Number.isFinite(routeId) && routeId > 0) {
+        if (routeId > 0) {
             this.dashboardId = routeId;
         }
 
@@ -105,6 +99,7 @@ export class DashboardDetailComponent extends AppComponentBase implements OnInit
 
     loadDashboard(): void {
         this.loading = true;
+        this.showMainSpinner()
         this.dashboardWorkbookReady = false;
         this.dashboardLoadError = '';
         this.dashboardSheets = [];
@@ -122,6 +117,7 @@ export class DashboardDetailComponent extends AppComponentBase implements OnInit
                     this.dashboardSheets = [];
                 } finally {
                     this.loading = false;
+                    this.hideMainSpinner()
                     this.cdr.detectChanges();
                 }
             },
@@ -129,6 +125,7 @@ export class DashboardDetailComponent extends AppComponentBase implements OnInit
                 console.error('[Dashboard] Dashboard API failed:', error);
                 this.dashboardLoadError = 'Unable to load the dashboard.';
                 this.loading = false;
+                this.hideMainSpinner()
                 this.cdr.detectChanges();
             }
         });
@@ -150,7 +147,7 @@ export class DashboardDetailComponent extends AppComponentBase implements OnInit
         };
     }
 
-    /** Shows ONLY the Dashboard tab. The other sheets stay hidden because the charts read from them. */
+    /** Shows ONLY the Dashboard tab. */
     private showWorkbook(saved: SpreadsheetPayload): void {
         const sheets: any[] = getWorkbookRoot(saved.workbookJson)?.sheets;
 
@@ -339,10 +336,7 @@ export class DashboardDetailComponent extends AppComponentBase implements OnInit
                 )
             );
 
-            // Update local state only after successful API save.
             this.saved = refreshed;
-
-            // Re-create viewer using the newly saved workbook.
             this.dashboardWorkbookReady = false;
             this.cdr.detectChanges();
 
@@ -375,88 +369,6 @@ export class DashboardDetailComponent extends AppComponentBase implements OnInit
     // DRILLDOWN
     // =====================================================
 
-    private registerChartDrilldownEvents(): void {
-        const container =
-            this.dashboardExportArea?.nativeElement as HTMLElement;
-
-        if (!container) {
-            return;
-        }
-
-        const chartElements = container.querySelectorAll(
-            '.e-chart, .e-accumulationchart'
-        );
-
-        chartElements.forEach((element: Element) => {
-            const instances =
-                (element as any).ej2_instances ?? [];
-
-            const chart = instances.find((instance: any) =>
-                instance instanceof Chart ||
-                instance instanceof AccumulationChart
-            );
-
-            if (!chart) {
-                return;
-            }
-
-            // Avoid registering repeatedly on the same chart instance.
-            if ((chart as any).__drilldownRegistered) {
-                return;
-            }
-
-            (chart as any).__drilldownRegistered = true;
-
-            const previousHandler = chart.pointClick;
-
-            chart.pointClick = (args: any) => {
-                if (typeof previousHandler === 'function') {
-                    previousHandler.call(chart, args);
-                }
-
-                this.handleChartPointClick(args, element as HTMLElement);
-            };
-        });
-    }
-
-    private handleChartPointClick(
-        args: any,
-        chartElement: HTMLElement
-    ): void {
-        const category = args.point?.x;
-        const value = args.point?.y;
-
-        if (category === undefined || category === null) {
-            return;
-        }
-
-        console.log('[Dashboard Point Click]', {
-            category,
-            value,
-            pointIndex: args.pointIndex
-        });
-
-        const result = this.drilldown.fromPoint(
-            chartElement,
-            category,
-            {
-                container: this.dashboardExportArea?.nativeElement,
-                sheets: (this.dashboardSpreadsheet?.sheets as any[]) ?? [],
-                analyses: this.saved?.sheetAnalyses ?? [],
-                sheetName: this.dashboardSheetName
-            }
-        );
-
-        if (!result) {
-            return;
-        }
-
-        this.drilldownTitle = result.title;
-        this.drilldownRecords = result.records;
-        this.drilldownVisible = true;
-
-        this.cdr.detectChanges();
-    }
 
     onDashboardChartClick(event: MouseEvent): void {
         const result = this.drilldown.fromClick(event, {

@@ -1,3 +1,4 @@
+import { FilterConditionGroup, FilterMatchMode, SpreadsheetDataBatch } from "./dashboard.model";
 
 
 export const DASHBOARD_SHEET = 'Dashboard';
@@ -73,3 +74,13 @@ export interface ParsedRange {
 }
 
 
+
+
+export type NestedListName = 'andWithList' | 'orWithList';
+
+export type BatchEvent = SpreadsheetDataBatch & {
+    matchMode: FilterMatchMode;
+    filterTree: FilterConditionGroup | null;
+    insertAsNewSheet: boolean;
+    targetSheetName?: string;
+};

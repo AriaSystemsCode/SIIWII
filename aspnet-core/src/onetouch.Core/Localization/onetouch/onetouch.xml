@@ -3106,5 +3106,9 @@ Please select one of the available linesheet templates
 		<text name="EditOrCreateNewDashboard">Edit Dashboard or Create New Dashboard</text>
 		<text name="DeleteDashboard">Delete Dashboard</text>
 		<text name="AddfromExistingField(s)"> Add from Existing Field(s) </text>
+		<text name="DashboardNameLengthValidation">Dashboard name must be between 5 and 9 characters.</text>
+
+
+		
   </texts>  
 </localizationDictionary>

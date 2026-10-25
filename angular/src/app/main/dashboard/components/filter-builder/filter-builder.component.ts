@@ -15,32 +15,22 @@ import {
     FilterConditionGroup,
     FilterConditionNode,
     FilterConditionRule,
-    FilterMatchMode
+    FilterMatchMode,
+    LookupState,
+    SelectOption
 } from '../../models/dashboard.model';
 import { ExtraAttributeDataService } from '@app/main/app-items/app-item-shared/services/extra-attribute-data.service';
-
-type SelectOption = { label: string; value: any };
-
-interface LookupState {
-    items: SelectOption[];
-    totalCount: number;
-    isLoading: boolean;
-    isLoaded: boolean;
-}
 
 @Component({
     selector: 'app-filter-builder',
     templateUrl: './filter-builder.component.html',
     styleUrls: ['./filter-builder.component.scss'],
-    // ExtraAttributeDataService has no providedIn, so it is provided here.
-    // Remove this line if your module already provides it.
     providers: [ExtraAttributeDataService]
 })
 export class FilterBuilderComponent implements OnChanges {
 
-    // ---- Inputs / outputs ----
     @Input() fields: FilterBuilderField[] = [];
-    @Input() conditions: FilterBuilderCondition[] = [];   // flat conditions, used when there is no tree
+    @Input() conditions: FilterBuilderCondition[] = [];  
     @Input() matchMode: FilterMatchMode = 'all';
     @Input() filterTree: FilterConditionGroup | null = null;
 
@@ -48,13 +38,11 @@ export class FilterBuilderComponent implements OnChanges {
     @Output() matchModeChange = new EventEmitter<FilterMatchMode>();
     @Output() cancel = new EventEmitter<void>();
 
-    /** The filter being edited. Nested groups live inside `children`. */
     rootGroup: FilterConditionGroup = { type: 'group', matchMode: 'all', children: [] };
 
     private dropdownOptionsCache = new Map<string, SelectOption[]>();
-private dropdownOptionsCacheKeys = new Map<string, string>();
+    private dropdownOptionsCacheKeys = new Map<string, string>();
 
-    // ---- Dropdown options ----
     readonly matchOptions: SelectOption[] = [
         { label: 'all', value: 'all' },
         { label: 'any', value: 'any' }
@@ -115,24 +103,17 @@ private dropdownOptionsCacheKeys = new Map<string, string>();
         { label: 'Date range', value: 'dateRange' }
     ];
 
-    // ---- Lookup fields (dropdown values loaded from an API) ----
+    // ---- Lookup fields 
     private readonly lookupPageSize = 10;
     private lookups = new Map<string, LookupState>();
 
-    /** How many static options (valid entries / fixed lists) are currently visible per field. */
     private staticVisible = new Map<string, number>();
-
-    // ---- Unique ids for the inputs ----
     private lastRuleId = 0;
 
     constructor(
         private dynamicApi: DynamicApiDispatcherService,
         private extraAttributeData: ExtraAttributeDataService
     ) { }
-
-    // =====================================================
-    // INITIALIZATION
-    // =====================================================
 
     ngOnChanges(): void {
         this.rootGroup = this.filterTree
@@ -181,10 +162,6 @@ private dropdownOptionsCacheKeys = new Map<string, string>();
         return isNaN(date.getTime()) ? null : date;
     }
 
-    // =====================================================
-    // ADD / REMOVE CONDITIONS AND GROUPS
-    // =====================================================
-
     private createRule(): FilterConditionRule {
         return { type: 'rule', field: '', operator: 'eq', value: null };
     }
@@ -197,12 +174,10 @@ private dropdownOptionsCacheKeys = new Map<string, string>();
         group.children.splice(index + 1, 0, this.createRule());
     }
 
-    /** Only one nested group is allowed, directly under the root group. */
     get hasNestedGroup(): boolean {
         return this.rootGroup.children.some(node => node.type === 'group');
     }
 
-    /** Adds a nested group that contains one empty condition. */
     addNestedGroupAfter(group: FilterConditionGroup, index: number): void {
         if (group !== this.rootGroup || this.hasNestedGroup) {
             return;
@@ -251,15 +226,10 @@ private dropdownOptionsCacheKeys = new Map<string, string>();
         return item._uiId;
     }
 
-    // =====================================================
-    // FIELD / OPERATOR / VALUE TYPE
-    // =====================================================
-
     private getField(fieldName: string): FilterBuilderField | undefined {
         return this.fields.find(field => field.name === fieldName);
     }
 
-    /** Groups the many data type names into: date, number, boolean, list or string. */
     private getFieldType(fieldName: string): 'date' | 'number' | 'boolean' | 'list' | 'string' {
         const type = (this.getField(fieldName)?.dataType || '').trim().toLowerCase();
         const startsWith = (...prefixes: string[]) => prefixes.some(prefix => type.startsWith(prefix));
@@ -294,10 +264,6 @@ private dropdownOptionsCacheKeys = new Map<string, string>();
         rule.dateRange = [];
 
         const field = this.getField(rule.field);
-
-        // TEMPORARY DEBUG: remove once the field mapper passes isLookup / entityObjectTypeCode / validEntries.
-        console.log('[Filter Builder] field selected:', rule.field, field, 'usesApi:', !!field && this.usesApiLookup(field));
-
         if (!field) {
             return;
         }
@@ -344,7 +310,6 @@ private dropdownOptionsCacheKeys = new Map<string, string>();
     // DATE PERIODS
     // =====================================================
 
-    /** "Is in" / "Is not in" on a date field use a period instead of one date. */
     isDatePeriodOperator(rule: FilterBuilderRule): boolean {
         return this.getValueType(rule) === 'date' && ['in', 'notin'].includes(rule.operator);
     }
@@ -471,9 +436,6 @@ private dropdownOptionsCacheKeys = new Map<string, string>();
         return this.isGroupValid(this.rootGroup);
     }
 
-    // =====================================================
-    // APPLY / CLOSE
-    // =====================================================
 
     applyFilters(): void {
         if (!this.canApply) {
@@ -490,7 +452,6 @@ private dropdownOptionsCacheKeys = new Map<string, string>();
         this.cancel.emit();
     }
 
-    /** Converts the edited group into the clean tree that is saved and sent to the API. */
     private buildFilterTree(group: FilterConditionGroup): FilterConditionGroup {
         const children: FilterConditionNode[] = [];
 
@@ -580,17 +541,14 @@ private dropdownOptionsCacheKeys = new Map<string, string>();
         return !!field.validEntries?.toString().trim();
     }
 
-    /** Does the field point to a real service + api? (an empty dataSource object does not count) */
     private hasDynamicSource(field: FilterBuilderField): boolean {
         return !!field.dataSource?.service && !!field.dataSource?.api;
     }
 
-    /** The entity type code, e.g. "SHIPVIA" (empty string when missing). */
     private getLookupCode(field: FilterBuilderField): string {
         return (field.entityObjectTypeCode ?? '').toString().trim();
     }
 
-    /** Must the values be loaded from an API? (a dynamic source, or isLookup with an entity type code) */
     private usesApiLookup(field: FilterBuilderField | undefined): boolean {
         if (!field) {
             return false;
@@ -675,65 +633,65 @@ private dropdownOptionsCacheKeys = new Map<string, string>();
         return this.getStaticOptions(field);
     }
 
-  getValueOptionsWithSelection(rule: FilterBuilderRule): SelectOption[] {
+    getValueOptionsWithSelection(rule: FilterBuilderRule): SelectOption[] {
 
-    const field = this.getField(rule.field);
+        const field = this.getField(rule.field);
 
-    if (!field) {
-        return [];
+        if (!field) {
+            return [];
+        }
+
+        let options = this.getValueOptions(rule);
+
+        if (!this.usesApiLookup(field)) {
+            const visibleCount =
+                this.staticVisible.get(field.name) ?? this.lookupPageSize;
+
+            options = options.slice(0, visibleCount);
+        }
+
+        const selectedValue = rule.value;
+
+        const hasSelectedValue =
+            selectedValue !== null &&
+            selectedValue !== undefined &&
+            selectedValue !== '';
+
+        if (
+            hasSelectedValue &&
+            !options.some(
+                option => String(option.value) === String(selectedValue)
+            )
+        ) {
+            options = [
+                {
+                    label: String(selectedValue),
+                    value: selectedValue
+                },
+                ...options
+            ];
+        }
+
+        // Cache options so PrimeNG receives a stable array reference.
+        const cacheKey = JSON.stringify({
+            field: field.name,
+            options: options.map(option => [
+                option.label,
+                option.value
+            ])
+        });
+
+        const ruleId = this.getRuleId(rule);
+
+        if (this.dropdownOptionsCacheKeys.get(ruleId) === cacheKey) {
+            return this.dropdownOptionsCache.get(ruleId)!;
+        }
+
+        this.dropdownOptionsCacheKeys.set(ruleId, cacheKey);
+        this.dropdownOptionsCache.set(ruleId, options);
+
+        return options;
     }
-
-    let options = this.getValueOptions(rule);
-
-    if (!this.usesApiLookup(field)) {
-        const visibleCount =
-            this.staticVisible.get(field.name) ?? this.lookupPageSize;
-
-        options = options.slice(0, visibleCount);
-    }
-
-    const selectedValue = rule.value;
-
-    const hasSelectedValue =
-        selectedValue !== null &&
-        selectedValue !== undefined &&
-        selectedValue !== '';
-
-    if (
-        hasSelectedValue &&
-        !options.some(
-            option => String(option.value) === String(selectedValue)
-        )
-    ) {
-        options = [
-            {
-                label: String(selectedValue),
-                value: selectedValue
-            },
-            ...options
-        ];
-    }
-
-    // Cache options so PrimeNG receives a stable array reference.
-    const cacheKey = JSON.stringify({
-        field: field.name,
-        options: options.map(option => [
-            option.label,
-            option.value
-        ])
-    });
-
-    const ruleId = this.getRuleId(rule);
-
-    if (this.dropdownOptionsCacheKeys.get(ruleId) === cacheKey) {
-        return this.dropdownOptionsCache.get(ruleId)!;
-    }
-
-    this.dropdownOptionsCacheKeys.set(ruleId, cacheKey);
-    this.dropdownOptionsCache.set(ruleId, options);
-
-    return options;
-}
 
     // ---- loading state and "Load More" ----
 
@@ -748,7 +706,6 @@ private dropdownOptionsCacheKeys = new Map<string, string>();
             return false;
         }
 
-        // API field: more records on the server?
         if (this.usesApiLookup(field)) {
             const state = this.lookups.get(field.name);
             return !!state && state.isLoaded && !state.isLoading && state.items.length < state.totalCount;
@@ -780,8 +737,6 @@ private dropdownOptionsCacheKeys = new Map<string, string>();
         if (!field) {
             return;
         }
-
-        // API field: ask the server for the next page
         if (this.usesApiLookup(field)) {
             this.loadLookupOptions(field, true);
             return;
@@ -791,8 +746,6 @@ private dropdownOptionsCacheKeys = new Map<string, string>();
         const visibleCount = this.staticVisible.get(field.name) ?? this.lookupPageSize;
         this.staticVisible.set(field.name, visibleCount + this.lookupPageSize);
     }
-
-    // ---- API loading ----
 
     private loadLookupOptions(field: FilterBuilderField, append: boolean): void {
         const previous = this.lookups.get(field.name);
@@ -862,10 +815,10 @@ private dropdownOptionsCacheKeys = new Map<string, string>();
             skipCount,
             maxResultCount: this.lookupPageSize
         }).pipe(finalize(() => this.setLookupLoading(field.name, false)))
-          .subscribe({
-              next: (result: any) => this.onLookupLoaded(field, existingItems, result),
-              error: (error: any) => console.error('[Filter Builder] Lookup failed:', field.name, error)
-          });
+            .subscribe({
+                next: (result: any) => this.onLookupLoaded(field, existingItems, result),
+                error: (error: any) => console.error('[Filter Builder] Lookup failed:', field.name, error)
+            });
     }
 
     private onLookupLoaded(field: FilterBuilderField, existingItems: SelectOption[], result: any): void {
@@ -873,7 +826,7 @@ private dropdownOptionsCacheKeys = new Map<string, string>();
         const records: any[] = result?.items ?? result?.result?.items ?? [];
 
         const labelPath = source.parameter || 'name';
-        const valuePath = source.valueField || 'account.id';   // same default as dynamicInputs
+        const valuePath = source.valueField || 'account.id'; 
 
         const newItems: SelectOption[] = records
             .map(record => {
