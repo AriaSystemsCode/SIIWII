@@ -51,6 +51,7 @@ using Abp.Extensions;
 using DocumentFormat.OpenXml.Drawing.Diagrams;
 using ClosedXML.Excel;
 using System.Transactions;
+using Abp.Domain.Entities;
 
 namespace onetouch.AppMarketplaceAccounts
 {
@@ -2250,7 +2251,24 @@ namespace onetouch.AppMarketplaceAccounts
                 var foundEntity = await _appEntityRepository.GetAll().AsNoTracking()
                                    .FirstOrDefaultAsync(x => x.TenantId == AbpSession.TenantId
                                    && x.Id == input.EntityId);
-
+                if (input.SSIN == null)
+                {
+                    var branch  = await _appContactRepository.GetAll().Include(z=>z.EntityFk)                    
+                    .FirstOrDefaultAsync(x => x.TenantId == AbpSession.TenantId
+                    && x.Id == branchId);
+                    if (branch != null)
+                    {
+                        branch.EntityFk.EntityObjectTypeCode = await _helper.SystemTables.GetEntityObjectTypeBranchCode();
+                        var contactObjectId = await _helper.SystemTables.GetObjectContactId();
+                        branch.SSIN = await
+                            _helper.SystemTables.GenerateSSIN(contactObjectId, ObjectMapper.Map<AppEntityDto>(branch.EntityFk));
+                        branch.EntityFk.SSIN = branch.SSIN;
+                        foundEntity.SSIN = branch.SSIN;
+                        input.SSIN = branch.SSIN;
+                        await _appContactRepository.UpdateAsync(branch);
+                        await UnitOfWorkManager.Current.SaveChangesAsync();
+                    }
+                }
 
                 AppMarketplaceContact appMarketplaceContact = new AppMarketplaceContact();
                 ObjectMapper.Map(input, appMarketplaceContact);
