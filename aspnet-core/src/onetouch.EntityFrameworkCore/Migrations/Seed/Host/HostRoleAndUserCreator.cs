@@ -74,7 +74,8 @@ namespace onetouch.Migrations.Seed.Host
                 "20261018_SeedSingleValueFieldSettings.sql",
                 "20261019_SeedStringChipsSettings.sql",
                 "20261021_PromoteDropdownOptionsToChips.sql",
-                "20261021_SeedHeaderFieldSettings.sql"
+                "20261021_SeedHeaderFieldSettings.sql",
+                "20261025_FixOptionsListChipsDataType.sql"
             };
 
             var previousTimeout = _context.Database.GetCommandTimeout();

@@ -88,7 +88,7 @@ BEGIN TRY
          DefaultValue, AllowNull, Required)
     VALUES
         (1, N'hasOptions', N'BOOLEAN', @booleanTypeId, N'boolean', N'false', 0, 1),
-        (2, N'OptionsList', N'SC', @chipsTypeId, N'string', NULL, 1, 0);
+        (2, N'OptionsList', N'SC', @chipsTypeId, N'chips', NULL, 1, 0);
 
     IF EXISTS (SELECT 1 FROM #ChipsSettings s JOIN dbo.AppFields f
         ON f.SycObjectId = @fieldObjectId AND f.EntitySycObjectId = @chipsTypeId
@@ -164,7 +164,7 @@ BEGIN TRY
          FieldLevelCode, FieldStatusCode, TrackingNo, CurrentRevisionNo,
          IsStandard, IsExtraField, IsHidden, AllowNull, [Length], Decimals,
          DefaultValue, DateFormat, TimeFormat, AllowMultiSelect, Required, Visible,
-         Editable, Usage, CreationTime, CreatorUserId, LastModificationTime,
+         Editable, Usage, SourceDataType, CreationTime, CreatorUserId, LastModificationTime,
          LastModifierUserId, IsDeleted, DeleterUserId, DeletionTime)
     SELECT NULL, NULL, @fieldObjectId, @chipsTypeId,
            LEFT(m.TypeCode, 2) + N'S' + LEFT(UPPER(m.FieldName) + N'____', 4)
@@ -172,7 +172,7 @@ BEGIN TRY
            m.FieldName, N'Field Manager String--Chips AdvancedInformation setting',
            m.FieldTypeId, NULL, NULL, NULL, N'System', N'Active', NULL, N'00',
            1, 0, 0, m.AllowNull, NULL, NULL, m.DefaultValue,
-           NULL, NULL, 0, m.Required, 1, 1, N'FieldManager.AdvancedInformation',
+           NULL, NULL, 0, m.Required, 1, 1, N'FieldManager.AdvancedInformation', m.XmlDataType,
            SYSUTCDATETIME(), NULL, NULL, NULL, 0, NULL, NULL
     FROM #MissingChipsSettings m;
 

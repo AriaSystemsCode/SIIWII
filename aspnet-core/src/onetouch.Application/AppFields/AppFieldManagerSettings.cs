@@ -80,6 +80,7 @@ namespace onetouch.AppFields
             "DP" => "Datetime",
             "IN" or "IC" => "Numeric",
             "LD" or "SD" => "dropDownList",
+            "SC" => "chips",
             _ => "string"
         };
 
