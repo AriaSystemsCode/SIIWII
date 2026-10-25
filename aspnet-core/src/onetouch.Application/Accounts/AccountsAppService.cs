@@ -1441,6 +1441,7 @@ namespace onetouch.Accounts
         //Mariam[Start]
         public async Task<IReadOnlyList<TreeNode<BranchForViewDto>>> GetAllBranches(long parentId)
         {
+            
             var presonEntityObjectTypeId = await _helper.SystemTables.GetEntityObjectTypePersonId();
 
             TreeNode<BranchForViewDto> ret = new TreeNode<BranchForViewDto>();
@@ -1448,7 +1449,7 @@ namespace onetouch.Accounts
             var filteredBranches = _appContactRepository.GetAll()
                       .Include(e => e.ParentFk)
                       .Include(e => e.ParentFkList)
-                      .Where(x => x.IsProfileData)
+                      //.Where(x => x.IsProfileData)
                       .Where(x => x.EntityFk.EntityObjectTypeId != presonEntityObjectTypeId)
                       .Where(e => e.ParentId != null && e.ParentId == parentId);
 
@@ -8753,9 +8754,63 @@ namespace onetouch.Accounts
                 return await UpdateBranch(input);
             }
         }
-
-        public async Task<IReadOnlyList<TreeNode<BranchForViewDto>>> GetBranchChilds(int parentId)
+        public async Task<PagedResultDto<GetAccountForViewDto>> GetAccountBranches(int? parentId)
         {
+            List<GetAccountForViewDto> returnList = new List<GetAccountForViewDto>();
+            if (parentId == null)
+            {
+                var currentTenantAccount = _appContactRepository.GetAll().AsNoTracking().Include(e => e.EntityFk).ThenInclude(z => z.EntityExtraData)
+                         .FirstOrDefault(e => e.TenantId == AbpSession.TenantId && e.IsProfileData && e.ParentId == null);
+                if (currentTenantAccount != null)
+                    parentId = int.Parse(currentTenantAccount.Id.ToString());
+            }
+            if (parentId != null)
+            {
+                var branches = await  GetBranchChilds(parentId);
+                if (branches != null)
+                {
+
+                    returnList.AddRange(GetBranchNamesFromList(branches));
+
+                }
+            }
+            var result = new PagedResultDto<GetAccountForViewDto>(
+    returnList.Count,
+    returnList
+);
+            return result;
+        }
+        private List<GetAccountForViewDto> GetBranchNamesFromList(IReadOnlyList<TreeNode<BranchForViewDto>> branches)
+        {
+            List<GetAccountForViewDto> retr = new List<GetAccountForViewDto>();
+            //if (branch.Children!=null)
+            {
+                foreach (var item in branches)
+                {
+                    retr.Add(new GetAccountForViewDto
+                    {
+                        Account = new AccountDto
+                        {
+                            Id = item.Data.Branch.Id,
+                            Name = item.Data.Branch.Name
+                        },
+                        EntityExtraData= new List<AppEntityExtraDataDto>(),
+                        AppEntityName ="",
+                        
+
+                    });
+                    if (item.Children != null)
+                    {
+                        var returnListch = GetBranchNamesFromList(item.Children);
+                        retr.AddRange(returnListch);
+                    }
+                }
+            }
+            return retr;
+        }
+        public async Task<IReadOnlyList<TreeNode<BranchForViewDto>>> GetBranchChilds(int? parentId)
+        {
+            
             var presonEntityObjectTypeId = await _helper.SystemTables.GetEntityObjectTypePersonId();
             var filteredBranches = _appContactRepository.GetAll()
                         .Include(e => e.ParentFk)

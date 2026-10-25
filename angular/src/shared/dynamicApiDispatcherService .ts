@@ -1,5 +1,8 @@
 import { Injectable } from "@angular/core";
 import { AccountsServiceProxy, AppItemsServiceProxy, MarketplaceAccountsServiceProxy } from "./service-proxies/service-proxies";
+import { HttpClient } from '@angular/common/http';
+import { AppConsts } from '@shared/AppConsts';
+import { map } from 'rxjs/operators';
 
 @Injectable({ providedIn: 'root' })
 export class DynamicApiDispatcherService {
@@ -8,10 +11,25 @@ export class DynamicApiDispatcherService {
     private accountsServiceProxy: AccountsServiceProxy,
     private appItemsServiceProxy: AppItemsServiceProxy,
     private marketplaceAccountsServiceProxy: MarketplaceAccountsServiceProxy,
+      private http: HttpClient
 ) {}
 
  
 dispatch(serviceName: string, methodName: string, values: any = {}) {
+ if (
+    serviceName === 'AccountsServiceProxy' &&
+    methodName === 'getAccountBranches'
+) {
+    return this.http.get<any>(
+        `${AppConsts.remoteServiceBaseUrl}/api/services/app/Accounts/GetAccountBranches`
+    ).pipe(
+        map(response =>
+            response?.__abp === true
+                ? response.result
+                : response
+        )
+    );
+}
 
   let selectedService = (this as any)[serviceName];
 

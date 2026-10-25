@@ -1306,7 +1306,7 @@
                                 #createOrEditMember></app-create-or-edit-member>
                         </div>
                         <div class="tab7" [ngClass]="{'d-none' : currentTab != accountInfoPageTabsEnum.ViewMember}">
-                            <app-view-member-profile #viewMemberProfile [fromManualAcc]="fromManualAcc"
+                            <app-view-member-profile #viewMemberProfile [fromManualAcc]="isManualAccount"
                                 (edit)="createOrEditMemberHandler($event)"
                                 (delete)="onDeleteMemberHandler($event)"></app-view-member-profile>
                         </div>
