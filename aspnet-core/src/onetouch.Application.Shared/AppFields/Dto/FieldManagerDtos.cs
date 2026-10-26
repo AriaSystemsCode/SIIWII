@@ -206,6 +206,7 @@ namespace onetouch.AppFields.Dto
     {
         public bool CanEditCoreInfo { get; set; }
         public bool CanEditAttributes { get; set; }
+        public bool CanCreateRevision { get; set; }
         public bool CanDelete { get; set; }
         public bool CanHide { get; set; }
         public bool IsTenantCustomCopyRequired { get; set; }

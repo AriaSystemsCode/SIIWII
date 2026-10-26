@@ -589,6 +589,7 @@ namespace onetouch.AppFields
                     {
                         CanEditCoreInfo = canEdit,
                         CanEditAttributes = canEdit,
+                        CanCreateRevision = CanCreateRevision(field),
                         CanDelete = !field.IsDeleted && own && PermissionChecker.IsGranted(AppPermissions.Pages_Administration_FieldManager_Delete),
                         CanHide = !field.IsDeleted && AbpSession.TenantId.HasValue && field.TenantId == null,
                         IsTenantCustomCopyRequired = AbpSession.TenantId.HasValue && field.TenantId == null
@@ -652,6 +653,8 @@ namespace onetouch.AppFields
                 var field = await VisibleFields().Include(x => x.SettingValues)
                     .SingleOrDefaultAsync(x => x.Id == input.AppFieldId && !x.IsDeleted && !x.IsHidden);
                 if (field == null) throw new UserFriendlyException("Field was not found.");
+                if (!CanCreateRevision(field))
+                    throw new UserFriendlyException("You cannot create a revision for this field.");
                 if (field.TenantId != AbpSession.TenantId)
                     throw new UserFriendlyException("A tenant cannot restore a host field.");
                 if (field.CurrentRevisionNo != input.ExpectedCurrentRevisionNo)
@@ -709,6 +712,8 @@ namespace onetouch.AppFields
                             NextRevision(existingCopy.CurrentRevisionNo), existingCopy.Id) };
                 }
                 if (field == null) throw new UserFriendlyException("Field was not found.");
+                if (!CanCreateRevision(field))
+                    throw new UserFriendlyException("You cannot create a revision for this field.");
                 var revisionError = await EnsureRevisionAvailable(field, input.ExpectedCurrentRevisionNo);
                 if (revisionError != null)
                     return new AppFieldDto { Error = revisionError };
@@ -1107,6 +1112,23 @@ namespace onetouch.AppFields
                 (!AbpSession.TenantId.HasValue && level == "Tenant"))
                 throw new UserFriendlyException("Select a valid field level.");
             return level;
+        }
+
+        private bool CanCreateRevision(AppField field)
+        {
+            if (field.IsDeleted || field.IsHidden ||
+                !PermissionChecker.IsGranted(AppPermissions.Pages_Administration_FieldManager_Edit))
+                return false;
+
+            switch (field.FieldLevelCode)
+            {
+                case "Application":
+                    return !AbpSession.TenantId.HasValue && !field.TenantId.HasValue;
+                case "Tenant":
+                    return AbpSession.TenantId.HasValue && field.TenantId == AbpSession.TenantId;
+                default:
+                    return false;
+            }
         }
 
         private async Task<string> NextFieldCode(AppField field, bool acquireLock = true)

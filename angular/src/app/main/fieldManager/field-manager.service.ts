@@ -8,6 +8,7 @@ import {
     AppFieldListDto,
     AppFieldManagerServiceProxy,
     FieldCreateOrEditMetadataDto,
+    GetFieldForEditOutput,
     FieldLookupDto,
     FieldManagerPermissionDto,
     CreateOrEditFieldInput,
@@ -175,11 +176,15 @@ export class FieldManagerService {
     }
 
     getFieldForEdit(id: number): Observable<AppFieldDto> {
+        return this.getFieldForEditWithPermissions(id).pipe(map(response => response.field));
+    }
+
+    getFieldForEditWithPermissions(id: number): Observable<GetFieldForEditOutput> {
         return this.appFieldManagerProxy.getFieldForEdit(id).pipe(map(response => {
             if (!response.field) throw new Error('Field details were not returned.');
-            return response.field;
+            return response;
         }));
-    }    
+    }
 
     getFieldHistory(appFieldId: number): Observable<AppFieldHistoryDto[]> {
         return this.appFieldManagerProxy.getFieldHistory(appFieldId);

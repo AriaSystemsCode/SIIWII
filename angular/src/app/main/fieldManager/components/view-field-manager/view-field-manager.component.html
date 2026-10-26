@@ -28,7 +28,7 @@
                             class="btn  history-action" (click)="goToHistory()">
                             <i class="fa fa-history"></i> Revision Log
                         </button>
-                           <button *ngIf="viewState === 'details' && !isViewingHistoryRevision" type="button"
+                           <button *ngIf="viewState === 'details' && !isViewingHistoryRevision && canCreateRevision" type="button"
                             class="btn  revision-primary" (click)="createNewRevision()">
                             <i class="fa fa-plus"></i>{{ 'CreateNewRevision' | localize }}
                         </button>

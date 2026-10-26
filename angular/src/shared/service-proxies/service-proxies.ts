@@ -82502,6 +82502,7 @@ export interface ILinkExistingFieldsResultDto {
 export class FieldEditPermissionDto implements IFieldEditPermissionDto {
     canEditCoreInfo!: boolean;
     canEditAttributes!: boolean;
+    canCreateRevision!: boolean;
     canDelete!: boolean;
     canHide!: boolean;
     isTenantCustomCopyRequired!: boolean;
@@ -82525,6 +82526,7 @@ export class FieldEditPermissionDto implements IFieldEditPermissionDto {
             }
             this.canEditCoreInfo = _data["canEditCoreInfo"];
             this.canEditAttributes = _data["canEditAttributes"];
+            this.canCreateRevision = _data["canCreateRevision"];
             this.canDelete = _data["canDelete"];
             this.canHide = _data["canHide"];
             this.isTenantCustomCopyRequired = _data["isTenantCustomCopyRequired"];
@@ -82546,6 +82548,7 @@ export class FieldEditPermissionDto implements IFieldEditPermissionDto {
         }
         data["canEditCoreInfo"] = this.canEditCoreInfo;
         data["canEditAttributes"] = this.canEditAttributes;
+        data["canCreateRevision"] = this.canCreateRevision;
         data["canDelete"] = this.canDelete;
         data["canHide"] = this.canHide;
         data["isTenantCustomCopyRequired"] = this.isTenantCustomCopyRequired;
@@ -82556,6 +82559,7 @@ export class FieldEditPermissionDto implements IFieldEditPermissionDto {
 export interface IFieldEditPermissionDto {
     canEditCoreInfo: boolean;
     canEditAttributes: boolean;
+    canCreateRevision: boolean;
     canDelete: boolean;
     canHide: boolean;
     isTenantCustomCopyRequired: boolean;

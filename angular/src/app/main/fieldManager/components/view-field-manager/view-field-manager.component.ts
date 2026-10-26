@@ -26,6 +26,7 @@ export class ViewFieldManagerComponent extends AppComponentBase implements OnIni
     active = false;
     isViewingHistoryRevision = false;
     canRestoreRevision = false;
+    canCreateRevision = false;
     private currentItem: AppFieldDto | null = null;
     private detailsRequest = 0;
     private historyRequest = 0;
@@ -96,7 +97,7 @@ export class ViewFieldManagerComponent extends AppComponentBase implements OnIni
         this.isViewingHistoryRevision = true;
         const revisionNo = this.normalizeRevisionNo(revision.revisionNo || revision.field.currentRevisionNo);
         const currentRevisionNo = this.normalizeRevisionNo(this.currentItem?.currentRevisionNo);
-        this.canRestoreRevision = !!revisionNo && !!currentRevisionNo && revisionNo !== currentRevisionNo;
+        this.canRestoreRevision = this.canCreateRevision && !!revisionNo && !!currentRevisionNo && revisionNo !== currentRevisionNo;
     }
 
     backToHistory(): void {
@@ -104,13 +105,13 @@ export class ViewFieldManagerComponent extends AppComponentBase implements OnIni
     }
 
     createNewRevision(): void {
-        if (!this.item) return;
+        if (!this.item || !this.canCreateRevision) return;
         this.requestRevision(this.item);
     }
 
   // ...existing code...
     restoreRevision(): void {
-        if (!this.item || !this.currentItem) return;
+        if (!this.item || !this.currentItem || !this.canRestoreRevision) return;
 
         const revision = this.item;
         Swal.fire({
@@ -156,17 +157,18 @@ export class ViewFieldManagerComponent extends AppComponentBase implements OnIni
         const request = ++this.detailsRequest;
         this.showMainSpinner();
         forkJoin({
-            field: this.fieldManagerService.getFieldForEdit(id),
+            field: this.fieldManagerService.getFieldForEditWithPermissions(id),
             metadata: this.fieldManagerService.getFieldMetadata()
         }).pipe(finalize(() => {
             if (request === this.detailsRequest) this.hideMainSpinner();
         })).subscribe({
             next: result => {
                 if (request !== this.detailsRequest) return;
-                this.item = result.field;
-                this.currentItem = this.copyItem(result.field);
+                this.item = result.field.field;
+                this.canCreateRevision = result.field.permissions?.canCreateRevision === true;
+                this.currentItem = this.copyItem(result.field.field);
                 this.revisions = [];
-                this.selectedRevision = result.field;
+                this.selectedRevision = result.field.field;
                 this.fieldTypes = result.metadata.fieldTypes || [];
                 this.viewState = 'details';
                 this.isViewingHistoryRevision = false;
@@ -202,6 +204,8 @@ export class ViewFieldManagerComponent extends AppComponentBase implements OnIni
         ++this.historyRequest;
         this.hideMainSpinner();
         this.active = false;
+        this.canCreateRevision = false;
+        this.canRestoreRevision = false;
         this.item = null;
         this.modal.hide();
     }
