@@ -1,5 +1,5 @@
 
-<div class="mainDiv mx-lg-5 mb-5">
+<div class="mainDiv mx-lg-5 mb-5" [ngClass]="isArabic ? 'mt-ar-dash':''">
   <div class="my-dashboards-page container-fluid">
 
     <!-- Page Header -->
@@ -248,7 +248,7 @@
               </td>
 
               <!-- Actions -->
-              <td class="text-center">
+              <td class="text-center-im">
 
                 <div
                   *ngIf="row?.isTheOwner"
@@ -265,49 +265,50 @@
                     <i class="fas fa-ellipsis-v"></i>
                   </button>
 
-                  <ul
-                    *dropdownMenu
-                    class="dropdown-menu dropdown-menu-right">
+              <ul
+    *dropdownMenu
+    class="dropdown-menu"
+    [ngClass]="isArabic ? 'dropdown-menu-left dropdown-rtl' : 'dropdown-menu-right dropdown-ltr'">
 
-                    <!-- Rename -->
-                    <li>
-                      <button
-                        type="button"
-                        class="dropdown-item"
-                        (click)="startRename(row)">
+    <!-- Rename -->
+    <li>
+        <button
+            type="button"
+            class="dropdown-item"
+            (click)="startRename(row)">
 
-                        <i class="fas fa-pen mr-2"></i>
-                        {{ 'Rename' | localize }}
-                      </button>
-                    </li>
+            <i class="fas fa-pen"></i>
+            <span>{{ 'Rename' | localize }}</span>
+        </button>
+    </li>
 
-                    <!-- Sharing -->
-                    <li>
-                      <button
-                        type="button"
-                        class="dropdown-item"
-                        (click)="openShareDashboard(row)">
+    <!-- Sharing -->
+    <li>
+        <button
+            type="button"
+            class="dropdown-item"
+            (click)="openShareDashboard(row)">
 
-                        <i class="fas fa-share-alt mr-2"></i>
-                        {{ 'Sharing' | localize }}
-                      </button>
-                    </li>
+            <i class="fas fa-share-alt"></i>
+            <span>{{ 'Sharing' | localize }}</span>
+        </button>
+    </li>
 
-                    <li class="dropdown-divider"></li>
+    <li class="dropdown-divider"></li>
 
-                    <!-- Delete -->
-                    <li>
-                      <button
-                        type="button"
-                        class="dropdown-item text-danger"
-                        (click)="deleteDashboard(row)">
+    <!-- Delete -->
+    <li>
+        <button
+            type="button"
+            class="dropdown-item text-danger"
+            (click)="deleteDashboard(row)">
 
-                        <i class="fas fa-trash-alt mr-2"></i>
-                        {{ 'Delete' | localize }}
-                      </button>
-                    </li>
+            <i class="fas fa-trash-alt"></i>
+            <span>{{ 'Delete' | localize }}</span>
+        </button>
+    </li>
 
-                  </ul>
+</ul>
 
                 </div>
 

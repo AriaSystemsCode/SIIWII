@@ -1,7 +1,9 @@
+
 <div class="filter-builder">
 
     <div class="filter-content">
-        <ng-container *ngTemplateOutlet="groupTemplate; context: { $implicit: rootGroup, isRoot: true }">
+        <ng-container
+            *ngTemplateOutlet="groupTemplate; context: { $implicit: rootGroup, isRoot: true }">
         </ng-container>
     </div>
 
@@ -11,12 +13,17 @@
 
     <ng-template #groupTemplate let-group let-isRoot="isRoot">
 
-        <div class="filter-group" [class.filter-group-root]="isRoot" [class.filter-group-nested]="!isRoot">
+        <div
+            class="filter-group"
+            [class.filter-group-root]="isRoot"
+            [class.filter-group-nested]="!isRoot">
 
-            <!-- all / any -->
+            <!-- ALL / ANY -->
             <div class="filter-match-row">
 
-                <span *ngIf="isRoot">{{ 'Match' | localize }}</span>
+                <span *ngIf="isRoot">
+                    {{ 'Match' | localize }}
+                </span>
 
                 <p-dropdown
                     [inputId]="isRoot ? 'filter-root-match' : 'filter-nested-match'"
@@ -30,84 +37,125 @@
                     styleClass="match-dropdown">
                 </p-dropdown>
 
-                <span>{{ (isRoot ? 'of the following conditions' : 'of') | localize }}:</span>
+                <span>
+                    {{ (isRoot ? 'OfFollowingConditions' : 'Of') | localize }}:
+                </span>
 
             </div>
 
-            <!-- column titles -->
-            <div class="filter-rule-header" *ngIf="group.children.length">
+            <!-- COLUMN TITLES -->
+            <div
+                class="filter-rule-header"
+                *ngIf="group.children.length">
+
                 <span>{{ 'Field' | localize }}</span>
                 <span>{{ 'Operator' | localize }}</span>
                 <span>{{ 'Value' | localize }}</span>
                 <span></span>
+
             </div>
 
-            <ng-container *ngFor="let node of group.children; let i = index">
+            <ng-container
+                *ngFor="let node of group.children; let i = index">
 
-                <!-- condition -->
-                <div *ngIf="isRule(node)" class="filter-rule-row">
+                <!-- ========================================= -->
+                <!-- CONDITION -->
+                <!-- ========================================= -->
 
-                    <ng-container *ngTemplateOutlet="ruleTemplate; context: { $implicit: asRule(node) }">
+                <div
+                    *ngIf="isRule(node)"
+                    class="filter-rule-row">
+
+                    <ng-container
+                        *ngTemplateOutlet="ruleTemplate; context: { $implicit: asRule(node) }">
                     </ng-container>
 
                     <div class="filter-actions">
 
-                        <!-- add a condition (nested groups only) -->
+                        <!-- ADD CONDITION: nested groups only -->
                         <button
                             *ngIf="!isRoot"
                             type="button"
                             class="filter-icon-btn add-btn"
-                            title="Add Condition"
+                            [title]="'AddCondition' | localize"
                             (click)="addRuleAfter(group, i)">
+
                             <i class="fa fa-plus"></i>
+
                         </button>
 
-                        <!-- create the nested group (root only, one allowed) -->
+                        <!-- ADD NESTED GROUP: root only -->
                         <button
                             *ngIf="isRoot && !hasNestedGroup"
                             type="button"
                             class="filter-icon-btn group-btn"
-                            title="Add nested group"
+                            [title]="'AddNestedGroup' | localize"
                             (click)="addNestedGroupAfter(group, i)">
+
                             <i class="fa fa-sitemap"></i>
+
                         </button>
 
+                        <!-- DELETE CONDITION -->
                         <button
                             type="button"
                             class="filter-icon-btn delete-btn"
-                            title="Delete Condition"
+                            [title]="'DeleteCondition' | localize"
                             (click)="removeNode(group, i)">
+
                             <i class="fa fa-trash"></i>
+
                         </button>
 
                     </div>
 
                 </div>
 
-                <!-- nested group -->
-                <div *ngIf="isGroup(node)" class="nested-group-container">
+                <!-- ========================================= -->
+                <!-- NESTED GROUP -->
+                <!-- ========================================= -->
+
+                <div
+                    *ngIf="isGroup(node)"
+                    class="nested-group-container">
 
                     <button
                         type="button"
                         class="filter-icon-btn delete-btn group-delete-btn"
-                        title="Delete group"
+                        [title]="'DeleteGroup' | localize"
                         (click)="removeNode(group, i)">
+
                         <i class="fa fa-trash"></i>
+
                     </button>
 
-                    <ng-container *ngTemplateOutlet="groupTemplate; context: { $implicit: asGroup(node), isRoot: false }">
+                    <ng-container
+                        *ngTemplateOutlet="groupTemplate; context: { $implicit: asGroup(node), isRoot: false }">
                     </ng-container>
 
                 </div>
 
             </ng-container>
 
-            <!-- new condition (root only) -->
-            <div class="filter-group-actions" *ngIf="isRoot">
-                <button type="button" class="new-rule-btn" (click)="addRule(group)">
+            <!-- ========================================= -->
+            <!-- NEW CONDITION: root only -->
+            <!-- ========================================= -->
+
+            <div
+                class="filter-group-actions"
+                *ngIf="isRoot">
+
+                <button
+                    type="button"
+                    class="new-rule-btn"
+                    (click)="addRule(group)">
+
                     <i class="fa fa-plus mr-2"></i>
-                    {{ 'New Condition' | localize }}
+
+                    {{ 'NewCondition' | localize }}
+
                 </button>
+
             </div>
 
         </div>
@@ -115,13 +163,18 @@
     </ng-template>
 
     <!-- ========================================= -->
-    <!-- CONDITION: field / operator / value -->
+    <!-- CONDITION: FIELD / OPERATOR / VALUE -->
     <!-- ========================================= -->
 
     <ng-template #ruleTemplate let-rule>
 
-        <!-- field -->
-        <div class="filter-field" [attr.data-label]="'Field' | localize">
+        <!-- ========================================= -->
+        <!-- FIELD -->
+        <!-- ========================================= -->
+
+        <div
+            class="filter-field"
+            [attr.data-label]="'Field' | localize">
 
             <p-dropdown
                 [inputId]="getRuleId(rule) + '-field'"
@@ -134,7 +187,7 @@
                 [filter]="true"
                 filterBy="label,name"
                 [showClear]="true"
-                placeholder="Select field"
+                [placeholder]="'SelectField' | localize"
                 appendTo="body"
                 styleClass="w-100"
                 (onChange)="onFieldChange(rule)">
@@ -142,8 +195,13 @@
 
         </div>
 
-        <!-- operator -->
-        <div class="filter-operator" [attr.data-label]="'Operator' | localize">
+        <!-- ========================================= -->
+        <!-- OPERATOR -->
+        <!-- ========================================= -->
+
+        <div
+            class="filter-operator"
+            [attr.data-label]="'Operator' | localize">
 
             <p-dropdown
                 [inputId]="getRuleId(rule) + '-operator'"
@@ -160,85 +218,102 @@
 
         </div>
 
-        <!-- value -->
-        <div class="filter-value" [attr.data-label]="'Value' | localize">
+        <!-- ========================================= -->
+        <!-- VALUE -->
+        <!-- ========================================= -->
+
+        <div
+            class="filter-value"
+            [attr.data-label]="'Value' | localize">
 
             <ng-container *ngIf="!isNullOperator(rule)">
 
-                <!-- lookup / valid entries / static options / dynamic api -->
-                <ng-container *ngIf="isOptionField(rule); else normalValueInput">
+                <!-- ========================================= -->
+                <!-- LOOKUP / STATIC OPTIONS / DYNAMIC API -->
+                <!-- ========================================= -->
+
+                <ng-container
+                    *ngIf="isOptionField(rule); else normalValueInput">
 
                     <div class="lookup-dropdown-wrapper">
 
-    <p-dropdown
-        [inputId]="getRuleId(rule) + '-lookup'"
-        [name]="getRuleId(rule) + '-lookup'"
-        [options]="getValueOptionsWithSelection(rule)"
-        [(ngModel)]="rule.value"
-        [ngModelOptions]="{ standalone: true }"
-        optionLabel="label"
-        optionValue="value"
-        [filter]="true"
-        filterBy="label"
-        [showClear]="true"
-        placeholder="Select value"
-        appendTo="body"
-        styleClass="w-100 lookup-value-dropdown"
-        (onShow)="onLookupOpen(rule)">
+                        <p-dropdown
+                            [inputId]="getRuleId(rule) + '-lookup'"
+                            [name]="getRuleId(rule) + '-lookup'"
+                            [options]="getValueOptionsWithSelection(rule)"
+                            [(ngModel)]="rule.value"
+                            [ngModelOptions]="{ standalone: true }"
+                            optionLabel="label"
+                            optionValue="value"
+                            [filter]="true"
+                            filterBy="label"
+                            [showClear]="true"
+                            [placeholder]="'SelectValue' | localize"
+                            appendTo="body"
+                            styleClass="w-100 lookup-value-dropdown"
+                            (onShow)="onLookupOpen(rule)">
 
-        <!-- Load More inside dropdown, below options -->
-        <ng-template pTemplate="footer">
+                            <!-- LOAD MORE -->
+                            <ng-template pTemplate="footer">
 
-            <div
-                *ngIf="hasMoreLookupOptions(rule)"
-                class="lookup-dropdown-footer">
+                                <div
+                                    *ngIf="hasMoreLookupOptions(rule)"
+                                    class="lookup-dropdown-footer">
 
-                <button
-                    type="button"
-                    class="lookup-load-more-btn"
-                    [disabled]="isLookupLoading(rule)"
-                    (click)="$event.stopPropagation(); loadMoreLookupOptions(rule)">
+                                    <button
+                                        type="button"
+                                        class="lookup-load-more-btn"
+                                        [disabled]="isLookupLoading(rule)"
+                                        (click)="$event.stopPropagation(); loadMoreLookupOptions(rule)">
 
-                    <i
-                        *ngIf="isLookupLoading(rule)"
-                        class="pi pi-spin pi-spinner">
-                    </i>
+                                        <i
+                                            *ngIf="isLookupLoading(rule)"
+                                            class="pi pi-spin pi-spinner">
+                                        </i>
 
-                    <i
-                        *ngIf="!isLookupLoading(rule)"
-                        class="pi pi-angle-down">
-                    </i>
+                                        <i
+                                            *ngIf="!isLookupLoading(rule)"
+                                            class="pi pi-angle-down">
+                                        </i>
 
-                    <span>
-                        {{ 'Load More' | localize }}...
-                    </span>
+                                        <span>
+                                            {{ 'LoadMore' | localize }}
+                                        </span>
 
-                </button>
+                                    </button>
 
-            </div>
+                                </div>
 
-            <div
-                *ngIf="isLookupLoading(rule)"
-                class="lookup-dropdown-loading">
+                                <!-- LOADING -->
+                                <div
+                                    *ngIf="isLookupLoading(rule)"
+                                    class="lookup-dropdown-loading">
 
-                <i class="pi pi-spin pi-spinner"></i>
-                <span>Loading...</span>
+                                    <i class="pi pi-spin pi-spinner"></i>
 
-            </div>
+                                    <span>
+                                        {{ 'Loading' | localize }}
+                                    </span>
 
-        </ng-template>
+                                </div>
 
-    </p-dropdown>
+                            </ng-template>
 
-</div>
+                        </p-dropdown>
+
+                    </div>
 
                 </ng-container>
 
-                <!-- plain inputs by value type -->
+                <!-- ========================================= -->
+                <!-- NORMAL VALUE INPUT -->
+                <!-- ========================================= -->
+
                 <ng-template #normalValueInput>
 
                     <ng-container [ngSwitch]="getValueType(rule)">
 
+                        <!-- NUMBER -->
                         <input
                             *ngSwitchCase="'number'"
                             type="number"
@@ -247,8 +322,9 @@
                             [ngModelOptions]="{ standalone: true }"
                             [id]="getRuleId(rule) + '-number'"
                             [name]="getRuleId(rule) + '-number'"
-                            placeholder="Enter number" />
+                            [placeholder]="'EnterNumber' | localize" />
 
+                        <!-- BOOLEAN -->
                         <p-dropdown
                             *ngSwitchCase="'boolean'"
                             [inputId]="getRuleId(rule) + '-boolean'"
@@ -259,15 +335,20 @@
                             optionLabel="label"
                             optionValue="value"
                             [showClear]="true"
-                            placeholder="Select value"
+                            [placeholder]="'SelectValue' | localize"
                             appendTo="body"
                             styleClass="w-100">
                         </p-dropdown>
 
+                        <!-- ========================================= -->
+                        <!-- DATE -->
+                        <!-- ========================================= -->
+
                         <ng-container *ngSwitchCase="'date'">
 
-                            <!-- "is in" / "is not in": a period or a custom range -->
-                            <ng-container *ngIf="isDatePeriodOperator(rule); else singleDate">
+                            <!-- DATE PERIOD -->
+                            <ng-container
+                                *ngIf="isDatePeriodOperator(rule); else singleDate">
 
                                 <p-dropdown
                                     [inputId]="getRuleId(rule) + '-period'"
@@ -277,12 +358,13 @@
                                     [ngModelOptions]="{ standalone: true }"
                                     optionLabel="label"
                                     optionValue="value"
-                                    placeholder="Select period"
+                                    [placeholder]="'SelectPeriod' | localize"
                                     appendTo="body"
                                     styleClass="w-100"
                                     (onChange)="onDatePeriodChange(rule)">
                                 </p-dropdown>
 
+                                <!-- CUSTOM DATE RANGE -->
                                 <p-calendar
                                     *ngIf="rule.datePeriod === 'dateRange'"
                                     [inputId]="getRuleId(rule) + '-range'"
@@ -299,6 +381,7 @@
 
                             </ng-container>
 
+                            <!-- SINGLE DATE -->
                             <ng-template #singleDate>
 
                                 <p-calendar
@@ -317,6 +400,7 @@
 
                         </ng-container>
 
+                        <!-- LIST -->
                         <input
                             *ngSwitchCase="'list'"
                             type="text"
@@ -325,8 +409,9 @@
                             [ngModelOptions]="{ standalone: true }"
                             [id]="getRuleId(rule) + '-list'"
                             [name]="getRuleId(rule) + '-list'"
-                            placeholder="Enter value" />
+                            [placeholder]="'EnterValue' | localize" />
 
+                        <!-- TEXT -->
                         <input
                             *ngSwitchDefault
                             type="text"
@@ -335,7 +420,7 @@
                             [ngModelOptions]="{ standalone: true }"
                             [id]="getRuleId(rule) + '-text'"
                             [name]="getRuleId(rule) + '-text'"
-                            placeholder="Enter value" />
+                            [placeholder]="'EnterValue' | localize" />
 
                     </ng-container>
 
@@ -353,16 +438,32 @@
 
     <div class="filter-footer">
 
-        <button type="button" class="btn btn-light" (click)="close()">
+        <button
+            type="button"
+            class="btn btn-light"
+            (click)="close()">
+
             {{ 'Discard' | localize }}
+
         </button>
 
-        <button type="button" class="btn btn-outline-secondary" (click)="clearFilters()">
+        <button
+            type="button"
+            class="btn btn-outline-secondary"
+            (click)="clearFilters()">
+
             {{ 'ClearAll' | localize }}
+
         </button>
 
-        <button type="button" class="btn btn-primary" [disabled]="!canApply" (click)="applyFilters()">
+        <button
+            type="button"
+            class="btn btn-primary"
+            [disabled]="!canApply"
+            (click)="applyFilters()">
+
             {{ 'Confirm' | localize }}
+
         </button>
 
     </div>

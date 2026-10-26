@@ -1493,7 +1493,6 @@
 <text name="Hide details">إخفاء التفاصيل</text>
 <text name="Created">تم الإنشاء</text>
 <text name="TypeYourNotesHere">اكتب ملاحظاتك هنا</text>
-<text name="Any">الكل</text>
 <text name="select color">اختر اللون</text>
 <text name="select size">اختر المقاس</text>
 <text name="NoAddressesFound">لم يتم العثور على عناوين</text>
@@ -1798,5 +1797,184 @@
 		<text name="Banner">بانر</text>
 		<text name="Portrait">عمودي</text>
 		<text name="Landscape">أفقي</text>
+
+
+
+
+    
+
+
+
+
+
+
+
+<text name="DeleteDashboard">حذف لوحة المعلومات</text>
+<text name="Spreadsheet">جدول البيانات</text>
+<text name="SourceSheet">ورقة المصدر</text>
+<text name="Chart">الرسم البياني</text>
+<text name="ConfigureChartData">إعداد بيانات الرسم البياني</text>
+<text name="DataRange">نطاق البيانات</text>
+<text name="CategoryAxis">محور الفئات</text>
+<text name="CategoryAxisRangeHint">حدد نطاق الخلايا الذي يحتوي على أسماء الفئات.</text>
+<text name="Aggregation">التجميع</text>
+<text name="AggregationHint">اختر طريقة حساب قيم الرسم البياني.</text>
+<text name="DataSeries">سلاسل البيانات</text>
+<text name="NoDataSeries">لم تتم إضافة أي سلاسل بيانات.</text>
+<text name="Applying">جارٍ التطبيق...</text>
+<text name="ApplyChartData">تطبيق بيانات الرسم البياني</text>
+<text name="FieldsAndPivotConfiguration">الحقول وإعدادات الجدول المحوري</text>
+<text name="CopyPivotChartToDashboard">نسخ الرسم البياني المحوري إلى لوحة المعلومات</text>
+<text name="PivotTable">جدول محوري</text>
+<text name="CreatePivotTable">إنشاء جدول محوري للورقة الحالية</text>
+<text name="NewDataSource">مصدر بيانات جديد</text>
+<text name="ListProperties">خصائص القائمة</text>
+<text name="ManageDataSource">إدارة مصدر البيانات</text>
+<text name="NoAggregation">بدون تجميع</text>
+<text name="Sum">المجموع</text>
+<text name="Average">المتوسط</text>
+<text name="Minimum">الحد الأدنى</text>
+<text name="Maximum">الحد الأقصى</text>
+<text name="PivotChart">رسم بياني محوري</text>
+<text name="RecordsLoaded">تم تحميل السجلات</text>
+<text name="ChartDataUpdated">تم تحديث بيانات الرسم البياني.</text>
+<text name="UnableToUpdateChartData">تعذر تحديث بيانات الرسم البياني.</text>
+<text name="UnableToLoadSpreadsheetData">تعذر تحميل بيانات جدول البيانات.</text>
+<text name="NoMatchingSourceRecords">لم يتم العثور على سجلات مصدر مطابقة.</text>
+<text name="FailedToCreatePivotTable">فشل إنشاء الجدول المحوري.</text>
+<text name="UnableToCopyPivotChart">تعذر نسخ الرسم البياني المحوري إلى لوحة المعلومات.</text>
+<text name="PivotChartAdded">تمت إضافة الرسم البياني المحوري إلى لوحة المعلومات. اضغط على حفظ للاحتفاظ بالتغييرات.</text>
+<text name="PivotChartUpdated">تم تحديث الرسم البياني المحوري في لوحة المعلومات. اضغط على حفظ للاحتفاظ بالتغييرات.</text>
+
+<text name="LastRefreshed">آخر تحديث</text>
+<text name="by">بواسطة</text>
+<text name="RefreshDashboard">تحديث لوحة المعلومات</text>
+<text name="ExportToPDF">تصدير إلى PDF</text>
+<text name="LoadingDashboard">جارٍ تحميل لوحة المعلومات</text>
+<text name="PleaseWaitFewSeconds">يرجى الانتظار بضع ثوانٍ...</text>
+<text name="DashboardLoadFailed">فشل تحميل لوحة المعلومات</text>
+<text name="PreparingPdf">جارٍ تجهيز ملف PDF...</text>
+<text name="RefreshingDashboard">جارٍ تحديث لوحة المعلومات...</text>
+<text name="DashboardRefreshedSuccessfully">تم تحديث لوحة المعلومات وحفظها بنجاح.</text>
+<text name="DashboardRefreshFailed">تعذر إكمال تحديث لوحة المعلومات وحفظها.</text>
+<text name="DashboardPdfExportFailed">فشل تصدير لوحة المعلومات إلى PDF.</text>
+<text name="UnableToLoadDashboard">تعذر تحميل لوحة المعلومات.</text>
+<text name="DashboardNotReady">لوحة المعلومات غير جاهزة.</text>
+<text name="DashboardSheetNotFound">لم يتم العثور على ورقة لوحة المعلومات.</text>
+<text name="NoDashboardDataToExport">لا توجد بيانات في لوحة المعلومات لتصديرها.</text>
+<text name="ChartsNotRendered">لم يتم عرض الرسوم البيانية بعد.</text>
+<text name="ChartImageFailed">فشل إنشاء صورة الرسم البياني.</text>
+
+<text name="AllUsers">جميع المستخدمين</text>
+<text name="SpecificUsers">مستخدمون محددون</text>
+<text name="EveryoneCanAccessDashboard">يمكن لجميع المستخدمين الذين لديهم صلاحية الوصول الاطلاع على لوحة المعلومات.</text>
+<text name="SearchUsersByName">البحث عن مستخدم بالاسم</text>
+<text name="SharedWith">تمت المشاركة مع</text>
+<text name="MakePrivate">جعلها خاصة</text>
+<text name="Done">تم</text>
+<text name="MakeDashboardPrivateQuestion">هل تريد جعل لوحة المعلومات خاصة؟</text>
+<text name="EveryoneWillLoseAccess">سيفقد جميع المستخدمين الذين تمت مشاركة لوحة المعلومات معهم صلاحية الوصول إليها.</text>
+<text name="CanShareAgainLater">يمكنك مشاركتها مرة أخرى لاحقًا.</text>
+<text name="GoBack">رجوع</text>
+<text name="RemoveAccess">إزالة صلاحية الوصول</text>
+<text name="DashboardIsPrivate">لوحة المعلومات هذه خاصة</text>
+<text name="OnlyYouCanSeeDashboard">أنت الوحيد الذي يمكنه رؤيتها حاليًا.</text>
+<text name="ShareDashboard">مشاركة لوحة المعلومات</text>
+<text name="SharedWithNoOne">لم تتم المشاركة مع أي شخص</text>
+<text name="SharedWithEveryone">تمت المشاركة مع الجميع</text>
+<text name="SharedWithOneUser">تمت المشاركة مع مستخدم واحد</text>
+<text name="SharedWithUsers">تمت المشاركة مع {0} مستخدمين</text>
+
+<text name="AllDashboards">جميع لوحات المعلومات</text>
+<text name="MyDashboards">لوحات المعلومات الخاصة بي</text>
+<text name="DashboardTitle">عنوان لوحة المعلومات</text>
+<text name="DashboardName">اسم لوحة المعلومات</text>
+<text name="DashboardNameLengthValidation">يجب أن يتراوح اسم لوحة المعلومات بين 9 و50 حرفًا.</text>
+<text name="EditSpreadsheet">تعديل جدول البيانات</text>
+<text name="LastViewed">آخر عرض</text>
+<text name="LastUpdated">آخر تحديث</text>
+<text name="Sharing">المشاركة</text>
+<text name="Rename">إعادة تسمية</text>
+<text name="NoDashboardsFound">لم يتم العثور على لوحات معلومات.</text>
+<text name="DashboardAlreadySameName">لوحة المعلومات تحمل هذا الاسم بالفعل.</text>
+<text name="DashboardRenamedSuccessfully">تمت إعادة تسمية لوحة المعلومات بنجاح.</text>
+<text name="DeleteDashboardConfirmation">هل أنت متأكد من رغبتك في حذف لوحة المعلومات هذه؟</text>
+
+<text name="DrilldownPageReport">عرض {first} إلى {last} من إجمالي {totalRecords} سجل</text>
+<text name="NoMatchingRecords">لا توجد سجلات مطابقة</text>
+<text name="NoDrilldownSourceRecords">لم يتم العثور على سجلات مصدر للقسم المحدد من الرسم البياني.</text>
+
+<text name="Match">مطابقة</text>
+<text name="OfFollowingConditions">من الشروط التالية</text>
+<text name="Any">أي</text>
+<text name="Field">الحقل</text>
+<text name="Operator">المعامل</text>
+<text name="AddCondition">إضافة شرط</text>
+<text name="AddNestedGroup">إضافة مجموعة شروط فرعية</text>
+<text name="DeleteCondition">حذف الشرط</text>
+<text name="DeleteGroup">حذف المجموعة</text>
+<text name="NewCondition">شرط جديد</text>
+<text name="SelectField">اختر الحقل</text>
+<text name="SelectValue">اختر القيمة</text>
+<text name="SelectPeriod">اختر الفترة</text>
+<text name="EnterNumber">أدخل رقمًا</text>
+<text name="EnterValue">أدخل القيمة</text>
+<text name="Discard">تجاهل</text>
+<text name="Confirm">تأكيد</text>
+<text name="Equal">يساوي</text>
+<text name="NotEqual">لا يساوي</text>
+<text name="LessThan">أقل من</text>
+<text name="LessThanOrEqual">أقل من أو يساوي</text>
+<text name="GreaterThan">أكبر من</text>
+<text name="GreaterThanOrEqual">أكبر من أو يساوي</text>
+<text name="DoesNotContain">لا يحتوي على</text>
+<text name="StartsWith">يبدأ بـ</text>
+<text name="EndsWith">ينتهي بـ</text>
+<text name="IsIn">ضمن الفترة</text>
+<text name="IsNotIn">خارج الفترة</text>
+<text name="Before">قبل</text>
+<text name="BeforeOrEqual">قبل أو يساوي</text>
+<text name="After">بعد</text>
+<text name="AfterOrEqual">بعد أو يساوي</text>
+<text name="IsSet">له قيمة</text>
+<text name="IsNotSet">ليس له قيمة</text>
+<text name="MonthToDate">من بداية الشهر حتى اليوم</text>
+<text name="YearToDate">من بداية السنة حتى اليوم</text>
+<text name="Last365Days">آخر 365 يومًا</text>
+
+<text name="EditData">تعديل البيانات</text>
+<text name="NewData">بيانات جديدة</text>
+<text name="ClearData">مسح البيانات</text>
+<text name="Table">الجدول</text>
+<text name="TableCannotBeChanged">لا يمكن تغيير الجدول عند تعديل مصدر بيانات موجود.</text>
+<text name="SelectTable">اختر الجدول</text>
+<text name="ChooseColumnsAndOptionalFilters">اختر الأعمدة وعوامل التصفية الاختيارية لبياناتك.</text>
+<text name="Columns">الأعمدة</text>
+<text name="NoColumnsFound">لم يتم العثور على أعمدة.</text>
+<text name="EditFilters">تعديل الفلاتر</text>
+<text name="AddFilters">إضافة الفلاتر</text>
+<text name="AllOf">جميع</text>
+<text name="AnyOf">أي من</text>
+<text name="These">هذه الشروط</text>
+<text name="NoFiltersApplied">لم يتم تطبيق أي فلاتر.</text>
+<text name="InsertAsNewSheet">إدراج كورقة جديدة</text>
+<text name="CreateNewWorksheetForData">إنشاء ورقة عمل جديدة لهذه البيانات</text>
+<text name="InsertIntoCurrentWorksheetDescription">سيتم إدراج البيانات في ورقة العمل الحالية</text>
+<text name="Sheet">ورقة العمل</text>
+<text name="ExistingWorksheetDataWillBeReplaced">سيتم استبدال البيانات الموجودة في ورقة العمل.</text>
+<text name="Adding">جارٍ الإضافة...</text>
+<text name="AddAsNewSheet">إضافة كورقة جديدة</text>
+<text name="InsertIntoCurrentSheet">إدراج في ورقة العمل الحالية</text>
+<text name="ClearDataSource">مسح مصدر البيانات</text>
+<text name="ClearDataSourceConfirmation">هل أنت متأكد من رغبتك في مسح جميع البيانات وإزالة مصدر البيانات المرتبط من "{0}"؟ اضغط على حفظ في جدول البيانات للاحتفاظ بهذا التغيير.</text>
+<text name="ReplaceWorksheetConfirmation">تحتوي ورقة العمل "{0}" على بيانات بالفعل. سيؤدي إدراج هذه القائمة إلى استبدال محتوياتها الحالية ومصدر البيانات المرتبط بها، إن وجد. هل تريد المتابعة؟</text>
+<text name="SelectDestinationWorksheet">يرجى اختيار ورقة العمل المستهدفة.</text>
+
+
+
+
+
+
+
   </texts>
 </localizationDictionary>

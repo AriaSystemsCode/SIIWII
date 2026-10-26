@@ -275,9 +275,24 @@ export class SpreadsheetDataPanelComponent extends AppComponentBase implements O
         return this.filterBuilderFields.find(field => field.name === fieldName)?.label || fieldName;
     }
 
-    getConditionOperatorLabel(operator: string): string {
-        return OPERATOR_LABELS[operator] || operator;
-    }
+   getConditionOperatorLabel(operator: string): string {
+    const labels: Record<string, string> = {
+        eq: '=',
+        neq: '≠',
+        gt: '>',
+        gte: '>=',
+        lt: '<',
+        lte: '<=',
+        contains: this.l('Contains'),
+        notcontains: this.l('DoesNotContain'),
+        startswith: this.l('StartsWith'),
+        endswith: this.l('EndsWith'),
+        in: this.l('IsIn'),
+        notin: this.l('IsNotIn')
+    };
+
+    return labels[operator] || operator;
+}
 
     getConditionValueLabel(condition: FilterConditionRule): string {
         const value = condition.value;
@@ -293,7 +308,7 @@ export class SpreadsheetDataPanelComponent extends AppComponentBase implements O
             return option.label;
         }
 
-        return typeof value === 'boolean' ? (value ? 'Yes' : 'No') : String(value);
+     return typeof value === 'boolean' ? this.l(value ? 'Yes' : 'No') : String(value);
     }
 
     private async loadEditSource(): Promise<void> {
@@ -374,27 +389,27 @@ export class SpreadsheetDataPanelComponent extends AppComponentBase implements O
         }
     }
 
-    clearDataSource(): void {
-        const sheetName = this.editSource?.sheetName;
 
-        if (this.isAdding || !this.isEditMode || !sheetName) {
-            return;
-        }
+clearDataSource(): void {
+    const sheetName = this.editSource?.sheetName;
 
-        this.confirmationService.confirm({
-            key: 'clearDataSourceConfirm',
-            header: 'Clear Data Source',
-            message:
-                `Are you sure you want to clear all data and remove the linked data source from "${sheetName}"? ` +
-                'Click Save on the spreadsheet to persist this change.',
-            icon: 'pi pi-exclamation-triangle',
-            acceptLabel: 'Yes',
-            rejectLabel: 'Cancel',
-            acceptButtonStyleClass: 'p-button-text p-button-secondary',
-            rejectButtonStyleClass: 'p-button-text p-button-transparent',
-            accept: () => this.dataSourceCleared.emit(sheetName)
-        });
+    if (this.isAdding || !this.isEditMode || !sheetName) {
+        return;
     }
+
+    this.confirmationService.confirm({
+        key: 'clearDataSourceConfirm',
+        header: this.l('ClearDataSource'),
+        message: this.l('ClearDataSourceConfirmation', sheetName),
+        icon: 'pi pi-exclamation-triangle',
+        acceptLabel: this.l('Yes'),
+        rejectLabel: this.l('Cancel'),
+        acceptButtonStyleClass: 'p-button-text p-button-secondary',
+        rejectButtonStyleClass: 'p-button-text p-button-transparent',
+        accept: () => this.dataSourceCleared.emit(sheetName)
+    });
+}
+
 
     private buildApiConditions(): DynamicCondition[] {
         return this.filterTree ? this.nodesToConditions(this.filterTree.children) : [];
@@ -496,16 +511,14 @@ export class SpreadsheetDataPanelComponent extends AppComponentBase implements O
         const replacesSheet = this.isEditMode || !this.insertAsNewSheet;
 
         if (replacesSheet && !sheetName) {
-            this.notify.warn('Please select a destination worksheet.');
+         this.notify.warn(this.l('SelectDestinationWorksheet'));
             return;
         }
 
         if (!this.isEditMode && !this.insertAsNewSheet && this.targetSheetHasData) {
-            const isConfirmed = window.confirm(
-                `The worksheet "${sheetName}" already contains data.\n\n` +
-                'Inserting this list will replace its existing contents and linked data source, if any.\n\n' +
-                'Do you want to continue?'
-            );
+          const isConfirmed = window.confirm(
+    this.l('ReplaceWorksheetConfirmation', sheetName)
+);
 
             if (!isConfirmed) {
                 return;
@@ -583,7 +596,7 @@ export class SpreadsheetDataPanelComponent extends AppComponentBase implements O
             }
 
             if (loaded === 0) {
-                this.notify.info('No records found.');
+              this.notify.info(this.l('NoRecordsFound'));
             }
 
         } catch (error) {

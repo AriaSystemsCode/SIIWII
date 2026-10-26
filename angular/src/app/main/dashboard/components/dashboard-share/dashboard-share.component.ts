@@ -56,19 +56,19 @@ export class DashboardShareComponent
     isSaving = false;
 
 
-    readonly permissionOptions: {
-        label: string;
-        value: ShareAccess;
-    }[] = [
-            {
-                label: 'View',
-                value: 'View'
-            },
-            {
-                label: 'Edit',
-                value: 'Edit'
-            }
-        ];
+  readonly permissionOptions: {
+    label: string;
+    value: ShareAccess;
+}[] = [
+    {
+        label: this.l('View'),
+        value: 'View'
+    },
+    {
+        label: this.l('Edit'),
+        value: 'Edit'
+    }
+];
 
 
     constructor(
@@ -309,34 +309,35 @@ export class DashboardShareComponent
     }
 
 
-    get shareStatusText(): string {
-        const nonOwners =
-            this.originalTenantUsers.filter(
-                user => !user.isOwner
-            );
+  get shareStatusText(): string {
+    const nonOwners = this.originalTenantUsers.filter(
+        user => !user.isOwner
+    );
 
-        const sharedNonOwners =
-            nonOwners.filter(
-                user =>
-                    user.canView ||
-                    user.canEdit
-            );
+    const sharedNonOwners = nonOwners.filter(
+        user => user.canView || user.canEdit
+    );
 
-        if (sharedNonOwners.length === 0) {
-            return 'Shared with no one';
-        }
-
-        if (
-            nonOwners.length > 0 &&
-            sharedNonOwners.length === nonOwners.length
-        ) {
-            return 'Shared with everyone';
-        }
-
-        return sharedNonOwners.length === 1
-            ? 'Shared with 1 user'
-            : `Shared with ${sharedNonOwners.length} users`;
+    if (sharedNonOwners.length === 0) {
+        return this.l('SharedWithNoOne');
     }
+
+    if (
+        nonOwners.length > 0 &&
+        sharedNonOwners.length === nonOwners.length
+    ) {
+        return this.l('SharedWithEveryone');
+    }
+
+    if (sharedNonOwners.length === 1) {
+        return this.l('SharedWithOneUser');
+    }
+
+    return this.l(
+        'SharedWithUsers',
+        sharedNonOwners.length
+    );
+}
 
     get sharedUsersCount(): number {
         return this.originalTenantUsers.filter(

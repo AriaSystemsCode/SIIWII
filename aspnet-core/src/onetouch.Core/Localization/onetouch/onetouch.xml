@@ -3109,6 +3109,169 @@ Please select one of the available linesheet templates
 		<text name="DashboardNameLengthValidation">Dashboard name must be between 5 and 9 characters.</text>
 
 
+<text name="Spreadsheet">Spreadsheet</text>
+<text name="SourceSheet">Source Sheet</text>
+<text name="Chart">Chart</text>
+<text name="ConfigureChartData">Configure Chart Data</text>
+<text name="DataRange">Data Range</text>
+<text name="CategoryAxis">Category Axis</text>
+<text name="CategoryAxisRangeHint">Select the range containing category labels.</text>
+<text name="Aggregation">Aggregation</text>
+<text name="AggregationHint">Choose how chart values are calculated.</text>
+<text name="DataSeries">Data Series</text>
+<text name="NoDataSeries">No data series added.</text>
+<text name="Applying">Applying...</text>
+<text name="ApplyChartData">Apply Chart Data</text>
+<text name="FieldsAndPivotConfiguration">Fields and Pivot Configuration</text>
+<text name="CopyPivotChartToDashboard">Copy Pivot Chart to Dashboard</text>
+<text name="PivotTable">Pivot Table</text>
+<text name="CreatePivotTable">Create Pivot Table for the active sheet</text>
+<text name="NewDataSource">New Data Source</text>
+<text name="ListProperties">List Properties</text>
+<text name="ManageDataSource">Manage Data Source</text>
+<text name="NoAggregation">No Aggregation</text>
+<text name="Sum">Sum</text>
+<text name="Average">Average</text>
+<text name="Minimum">Minimum</text>
+<text name="Maximum">Maximum</text>
+<text name="PivotChart">Pivot Chart</text>
+<text name="RecordsLoaded">Records Loaded</text>
+<text name="ChartDataUpdated">Chart data updated.</text>
+<text name="UnableToUpdateChartData">Unable to update chart data.</text>
+<text name="UnableToLoadSpreadsheetData">Unable to load Spreadsheet data.</text>
+<text name="NoMatchingSourceRecords">No matching source records could be resolved.</text>
+<text name="FailedToCreatePivotTable">Failed to create Pivot Table.</text>
+<text name="UnableToCopyPivotChart">Unable to copy Pivot chart to Dashboard.</text>
+<text name="PivotChartAdded">Pivot chart added to Dashboard. Click Save to persist changes.</text>
+<text name="PivotChartUpdated">Pivot chart updated on Dashboard. Click Save to persist changes.</text>
+
+<text name="LastRefreshed">Last Refreshed</text>
+<text name="by">by</text>
+<text name="RefreshDashboard">Refresh Dashboard</text>
+<text name="ExportToPDF">Export to PDF</text>
+<text name="LoadingDashboard">Loading Dashboard</text>
+<text name="PleaseWaitFewSeconds">Please wait a few seconds...</text>
+<text name="DashboardLoadFailed">Failed to Load Dashboard</text>
+<text name="PreparingPdf">Preparing PDF...</text>
+<text name="RefreshingDashboard">Refreshing Dashboard...</text>
+<text name="DashboardRefreshedSuccessfully">Dashboard refreshed and saved successfully.</text>
+<text name="DashboardRefreshFailed">Unable to complete Dashboard refresh and save.</text>
+<text name="DashboardPdfExportFailed">Failed to export Dashboard PDF.</text>
+<text name="UnableToLoadDashboard">Unable to load the dashboard.</text>
+<text name="DashboardNotReady">Dashboard is not ready.</text>
+<text name="DashboardSheetNotFound">Dashboard sheet not found.</text>
+<text name="NoDashboardDataToExport">The Dashboard tab has no data to export.</text>
+<text name="ChartsNotRendered">Charts are not rendered yet.</text>
+<text name="ChartImageFailed">Failed to generate chart image.</text>
+
+
+<text name="AllUsers">All Users</text>
+<text name="SpecificUsers">Specific Users</text>
+<text name="EveryoneCanAccessDashboard">Everyone who has access can access this dashboard.</text>
+<text name="SearchUsersByName">Search users by name</text>
+<text name="SharedWith">Shared with</text>
+<text name="MakePrivate">Make Private</text>
+<text name="MakeDashboardPrivateQuestion">Make this dashboard private?</text>
+<text name="EveryoneWillLoseAccess">Everyone currently shared with will lose access.</text>
+<text name="CanShareAgainLater">You can share it again later.</text>
+<text name="GoBack">Go back</text>
+<text name="RemoveAccess">Remove access</text>
+<text name="DashboardIsPrivate">This dashboard is private</text>
+<text name="OnlyYouCanSeeDashboard">Only you can see it right now.</text>
+<text name="ShareDashboard">Share dashboard</text>
+<text name="SharedWithNoOne">Shared with no one</text>
+<text name="SharedWithEveryone">Shared with everyone</text>
+<text name="SharedWithOneUser">Shared with 1 user</text>
+<text name="SharedWithUsers">Shared with {0} users</text>
+
+<text name="AllDashboards">All Dashboards</text>
+<text name="MyDashboards">My Dashboards</text>
+<text name="DashboardTitle">Dashboard Title</text>
+<text name="DashboardName">Dashboard Name</text>
+<text name="EditSpreadsheet">Edit Spreadsheet</text>
+<text name="LastViewed">Last Viewed</text>
+<text name="LastUpdated">Last Updated</text>
+<text name="Sharing">Sharing</text>
+<text name="Rename">Rename</text>
+<text name="NoDashboardsFound">No dashboards found.</text>
+<text name="User">User</text>
+<text name="DashboardAlreadySameName">The dashboard already has this name.</text>
+<text name="DashboardRenamedSuccessfully">Dashboard renamed successfully.</text>
+<text name="DeleteDashboardConfirmation">Are you sure you want to delete this dashboard?</text>
+
+<text name="DrilldownPageReport">Showing {first} to {last} of {totalRecords} records</text>
+<text name="NoMatchingRecords">No Matching Records</text>
+<text name="NoDrilldownSourceRecords">No source records were found for the selected chart section.</text>
+
+<text name="Match">Match</text>
+<text name="OfFollowingConditions">of the following conditions</text>
+<text name="Of">of</text>
+<text name="Operator">Operator</text>
+<text name="AddCondition">Add Condition</text>
+<text name="AddNestedGroup">Add nested group</text>
+<text name="DeleteCondition">Delete Condition</text>
+<text name="DeleteGroup">Delete group</text>
+<text name="NewCondition">New Condition</text>
+<text name="SelectField">Select field</text>
+<text name="SelectValue">Select value</text>
+<text name="SelectPeriod">Select period</text>
+<text name="EnterNumber">Enter number</text>
+<text name="EnterValue">Enter value</text>
+<text name="Discard">Discard</text>
+<text name="Equal">Equal</text>
+<text name="NotEqual">Not equal</text>
+<text name="LessThan">Less than</text>
+<text name="LessThanOrEqual">Less than or equal</text>
+<text name="GreaterThan">Greater than</text>
+<text name="GreaterThanOrEqual">Greater than or equal</text>
+<text name="DoesNotContain">Does not contain</text>
+<text name="StartsWith">Starts with</text>
+<text name="EndsWith">Ends with</text>
+<text name="IsIn">Is in</text>
+<text name="IsNotIn">Is not in</text>
+<text name="Before">Before</text>
+<text name="BeforeOrEqual">Before or equal</text>
+<text name="After">After</text>
+<text name="AfterOrEqual">After or equal</text>
+<text name="IsSet">Is Set</text>
+<text name="IsNotSet">Is Not Set</text>
+<text name="MonthToDate">Month to date</text>
+<text name="YearToDate">Year to date</text>
+<text name="Last365Days">Last 365 days</text>
+
+<text name="EditData">Edit Data</text>
+<text name="NewData">New Data</text>
+<text name="ClearData">Clear Data</text>
+<text name="Table">Table</text>
+<text name="TableCannotBeChanged">The table cannot be changed when editing an existing data source.</text>
+<text name="SelectTable">Select table</text>
+<text name="ChooseColumnsAndOptionalFilters">Choose the columns and optional filters for your data.</text>
+<text name="Columns">Columns</text>
+<text name="NoColumnsFound">No columns found.</text>
+<text name="EditFilters">Edit Filters</text>
+<text name="AddFilters">Add Filters</text>
+<text name="AllOf">all of</text>
+<text name="AnyOf">any of</text>
+<text name="These">these</text>
+<text name="NoFiltersApplied">No filters applied.</text>
+<text name="InsertAsNewSheet">Insert as New Sheet</text>
+<text name="CreateNewWorksheetForData">Create a new worksheet for this data</text>
+<text name="InsertIntoCurrentWorksheetDescription">Data will be inserted into the current worksheet</text>
+<text name="Sheet">Sheet</text>
+<text name="ExistingWorksheetDataWillBeReplaced">Existing worksheet data will be replaced.</text>
+<text name="Adding">Adding...</text>
+<text name="AddAsNewSheet">Add as New Sheet</text>
+<text name="InsertIntoCurrentSheet">Insert into Current Sheet</text>
+<text name="ClearDataSource">Clear Data Source</text>
+<text name="ClearDataSourceConfirmation">Are you sure you want to clear all data and remove the linked data source from "{0}"? Click Save on the spreadsheet to persist this change.</text>
+<text name="ReplaceWorksheetConfirmation">The worksheet "{0}" already contains data. Inserting this list will replace its existing contents and linked data source, if any. Do you want to continue?</text>
+<text name="SelectDestinationWorksheet">Please select a destination worksheet.</text>
+
+
+
+
+
+
 		
   </texts>  
 </localizationDictionary>

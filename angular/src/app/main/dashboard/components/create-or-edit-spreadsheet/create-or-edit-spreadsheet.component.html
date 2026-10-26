@@ -1,4 +1,4 @@
-<div class="create-or-edit-spreadsheet-page">
+<div class="create-or-edit-spreadsheet-page" [style.margin-top]="isArLang ? '70px' : '-45px'">
 
     <!-- ================= HEADER ================= -->
     <div class="d-flex align-items-center justify-content-between px-3 pt-3 pb-2">
@@ -38,9 +38,11 @@
     <div class="d-flex spreadsheet-workspace">
 
         <!-- SPREADSHEET -->
-        <div class="spreadsheet-editor flex-grow-1 position-relative" (click)="onSheetClick($event)">
-            <ejs-spreadsheet #spreadsheet width="100%" height="100%" [sheets]="sheets" [scrollSettings]="scrollSettings"
-                [showAggregate]="showAggregate" [showSheetTabs]="true" (created)="onCreated()"
+        <div class="spreadsheet-editor flex-grow-1 position-relative" (click)="onSheetClick($event)" >
+            <ejs-spreadsheet     *ngIf="syncfusionLocaleReady" #spreadsheet width="100%" height="100%" [sheets]="sheets" [scrollSettings]="scrollSettings"
+                [showAggregate]="showAggregate" [showSheetTabs]="true" (created)="onCreated()"     [allowSave]="true"
+    [saveUrl]="spreadsheetSaveUrl"   [locale]="syncfusionLocale"  [enableRtl]="syncfusionRtl"
+
                 (ribbonClick)="onRibbonClick($event)" (ribbonSelect)="onSpreadsheetRibbonSelect()"
                 (actionComplete)="onSpreadsheetActionComplete($event)">
             </ejs-spreadsheet>
@@ -77,7 +79,8 @@
                 <div class="pivot-analysis-layout bg-white">
                     <!-- Table / chart -->
                     <div class="flex-grow-1" style="min-width: 0; height: 100%; overflow: hidden;">
-                        <ejs-pivotview #pivotView id="PivotView" width="100%" height="100%"
+                        <ejs-pivotview      *ngIf="syncfusionLocaleReady"   [locale]="syncfusionLocale"
+    [enableRtl]="syncfusionRtl" #pivotView id="PivotView" width="100%" height="100%"
                             [dataSourceSettings]="pivotSettings" [showFieldList]="false" [showToolbar]="true"
                             [toolbar]="pivotToolbar" [showGroupingBar]="true" [allowCalculatedField]="true"
                             [showTooltip]="true" [displayOption]="pivotDisplay" [chartSettings]="pivotChart"
@@ -91,7 +94,8 @@
                             {{ 'FieldsAndPivotConfiguration' | localize }}
                         </div>
 
-                        <ejs-pivotfieldlist #pivotFieldList id="PivotFieldList" width="100%" renderMode="Fixed"
+                        <ejs-pivotfieldlist   *ngIf="syncfusionLocaleReady" #pivotFieldList id="PivotFieldList" width="100%" renderMode="Fixed"   [locale]="syncfusionLocale"
+    [enableRtl]="syncfusionRtl"
                             [dataSourceSettings]="pivotSettings" [allowCalculatedField]="true"
                             (enginePopulated)="onFieldListReady()">
                         </ejs-pivotfieldlist>

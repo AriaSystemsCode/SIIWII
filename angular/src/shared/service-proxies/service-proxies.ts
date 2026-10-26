@@ -83568,6 +83568,66 @@ export interface IFieldCodePreviewDto {
     [key: string]: any;
 }
 
+export class FieldSettingValueDto implements IFieldSettingValueDto {
+    settingFieldId!: number;
+    value!: string | undefined;
+    settingFieldCode!: string | undefined;
+    settingFieldName!: string | undefined;
+
+    [key: string]: any;
+
+    constructor(data?: IFieldSettingValueDto) {
+        if (data) {
+            for (var property in data) {
+                if (data.hasOwnProperty(property))
+                    (<any>this)[property] = (<any>data)[property];
+            }
+        }
+    }
+
+    init(_data?: any) {
+        if (_data) {
+            for (var property in _data) {
+                if (_data.hasOwnProperty(property))
+                    this[property] = _data[property];
+            }
+            this.settingFieldId = _data["settingFieldId"];
+            this.value = _data["value"];
+            this.settingFieldCode = _data["settingFieldCode"];
+            this.settingFieldName = _data["settingFieldName"];
+        }
+    }
+
+    static fromJS(data: any): FieldSettingValueDto {
+        data = typeof data === 'object' ? data : {};
+        let result = new FieldSettingValueDto();
+        result.init(data);
+        return result;
+    }
+
+    toJSON(data?: any) {
+        data = typeof data === 'object' ? data : {};
+        for (var property in this) {
+            if (this.hasOwnProperty(property))
+                data[property] = this[property];
+        }
+        data["settingFieldId"] = this.settingFieldId;
+        data["value"] = this.value;
+        data["settingFieldCode"] = this.settingFieldCode;
+        data["settingFieldName"] = this.settingFieldName;
+        return data;
+    }
+}
+
+export interface IFieldSettingValueDto {
+    settingFieldId: number;
+    value: string | undefined;
+    settingFieldCode: string | undefined;
+    settingFieldName: string | undefined;
+
+    [key: string]: any;
+}
+
 export class AppFieldListDto implements IAppFieldListDto {
     id!: number;
     fieldDefinitionKey!: string;
@@ -83594,6 +83654,7 @@ export class AppFieldListDto implements IAppFieldListDto {
     creatorUserName!: string | undefined;
     creationTime!: moment.Moment;
     tables!: string[] | undefined;
+    settingValues!: FieldSettingValueDto[] | undefined;
 
     [key: string]: any;
 
@@ -83641,6 +83702,11 @@ export class AppFieldListDto implements IAppFieldListDto {
                 for (let item of _data["tables"])
                     this.tables!.push(item);
             }
+            if (Array.isArray(_data["settingValues"])) {
+                this.settingValues = [] as any;
+                for (let item of _data["settingValues"])
+                    this.settingValues!.push(FieldSettingValueDto.fromJS(item));
+            }
         }
     }
 
@@ -83686,6 +83752,11 @@ export class AppFieldListDto implements IAppFieldListDto {
             for (let item of this.tables)
                 data["tables"].push(item);
         }
+        if (Array.isArray(this.settingValues)) {
+            data["settingValues"] = [];
+            for (let item of this.settingValues)
+                data["settingValues"].push(item.toJSON());
+        }
         return data;
     }
 }
@@ -83716,6 +83787,7 @@ export interface IAppFieldListDto {
     creatorUserName: string | undefined;
     creationTime: moment.Moment;
     tables: string[] | undefined;
+    settingValues: FieldSettingValueDto[] | undefined;
 
     [key: string]: any;
 }
@@ -83780,15 +83852,17 @@ export interface IPagedResultDtoOfAppFieldListDto {
     [key: string]: any;
 }
 
-export class FieldSettingValueDto implements IFieldSettingValueDto {
-    settingFieldId!: number;
-    value!: string | undefined;
-    settingFieldCode!: string | undefined;
-    settingFieldName!: string | undefined;
+export class FieldRevisionErrorDto implements IFieldRevisionErrorDto {
+    code!: number;
+    message!: string | undefined;
+    conflictingRevisionNo!: string | undefined;
+    expectedNewRevisionNo!: string | undefined;
+    currentFieldId!: number;
+    revisionAlreadyExists!: boolean;
 
     [key: string]: any;
 
-    constructor(data?: IFieldSettingValueDto) {
+    constructor(data?: IFieldRevisionErrorDto) {
         if (data) {
             for (var property in data) {
                 if (data.hasOwnProperty(property))
@@ -83803,16 +83877,18 @@ export class FieldSettingValueDto implements IFieldSettingValueDto {
                 if (_data.hasOwnProperty(property))
                     this[property] = _data[property];
             }
-            this.settingFieldId = _data["settingFieldId"];
-            this.value = _data["value"];
-            this.settingFieldCode = _data["settingFieldCode"];
-            this.settingFieldName = _data["settingFieldName"];
+            this.code = _data["code"];
+            this.message = _data["message"];
+            this.conflictingRevisionNo = _data["conflictingRevisionNo"];
+            this.expectedNewRevisionNo = _data["expectedNewRevisionNo"];
+            this.currentFieldId = _data["currentFieldId"];
+            this.revisionAlreadyExists = _data["revisionAlreadyExists"];
         }
     }
 
-    static fromJS(data: any): FieldSettingValueDto {
+    static fromJS(data: any): FieldRevisionErrorDto {
         data = typeof data === 'object' ? data : {};
-        let result = new FieldSettingValueDto();
+        let result = new FieldRevisionErrorDto();
         result.init(data);
         return result;
     }
@@ -83823,24 +83899,29 @@ export class FieldSettingValueDto implements IFieldSettingValueDto {
             if (this.hasOwnProperty(property))
                 data[property] = this[property];
         }
-        data["settingFieldId"] = this.settingFieldId;
-        data["value"] = this.value;
-        data["settingFieldCode"] = this.settingFieldCode;
-        data["settingFieldName"] = this.settingFieldName;
+        data["code"] = this.code;
+        data["message"] = this.message;
+        data["conflictingRevisionNo"] = this.conflictingRevisionNo;
+        data["expectedNewRevisionNo"] = this.expectedNewRevisionNo;
+        data["currentFieldId"] = this.currentFieldId;
+        data["revisionAlreadyExists"] = this.revisionAlreadyExists;
         return data;
     }
 }
 
-export interface IFieldSettingValueDto {
-    settingFieldId: number;
-    value: string | undefined;
-    settingFieldCode: string | undefined;
-    settingFieldName: string | undefined;
+export interface IFieldRevisionErrorDto {
+    code: number;
+    message: string | undefined;
+    conflictingRevisionNo: string | undefined;
+    expectedNewRevisionNo: string | undefined;
+    currentFieldId: number;
+    revisionAlreadyExists: boolean;
 
     [key: string]: any;
 }
 
 export class AppFieldDto implements IAppFieldDto {
+    error!: FieldRevisionErrorDto;
     fieldDefinitionKey!: string;
     tenantId!: number | undefined;
     sourceFieldId!: number | undefined;
@@ -83904,6 +83985,7 @@ export class AppFieldDto implements IAppFieldDto {
                 if (_data.hasOwnProperty(property))
                     this[property] = _data[property];
             }
+            this.error = _data["error"] ? FieldRevisionErrorDto.fromJS(_data["error"]) : <any>undefined;
             this.fieldDefinitionKey = _data["fieldDefinitionKey"];
             this.tenantId = _data["tenantId"];
             this.sourceFieldId = _data["sourceFieldId"];
@@ -83969,6 +84051,7 @@ export class AppFieldDto implements IAppFieldDto {
             if (this.hasOwnProperty(property))
                 data[property] = this[property];
         }
+        data["error"] = this.error ? this.error.toJSON() : <any>undefined;
         data["fieldDefinitionKey"] = this.fieldDefinitionKey;
         data["tenantId"] = this.tenantId;
         data["sourceFieldId"] = this.sourceFieldId;
@@ -84023,6 +84106,7 @@ export class AppFieldDto implements IAppFieldDto {
 }
 
 export interface IAppFieldDto {
+    error: FieldRevisionErrorDto;
     fieldDefinitionKey: string;
     tenantId: number | undefined;
     sourceFieldId: number | undefined;
@@ -84893,6 +84977,7 @@ export class FieldSettingDefinitionDto implements IFieldSettingDefinitionDto {
     fieldName!: string | undefined;
     valueTypeId!: number;
     valueTypeCode!: string | undefined;
+    dataType!: string | undefined;
     defaultValue!: string | undefined;
     required!: boolean;
     allowMultiSelect!: boolean;
@@ -84921,6 +85006,7 @@ export class FieldSettingDefinitionDto implements IFieldSettingDefinitionDto {
             this.fieldName = _data["fieldName"];
             this.valueTypeId = _data["valueTypeId"];
             this.valueTypeCode = _data["valueTypeCode"];
+            this.dataType = _data["dataType"];
             this.defaultValue = _data["defaultValue"];
             this.required = _data["required"];
             this.allowMultiSelect = _data["allowMultiSelect"];
@@ -84951,6 +85037,7 @@ export class FieldSettingDefinitionDto implements IFieldSettingDefinitionDto {
         data["fieldName"] = this.fieldName;
         data["valueTypeId"] = this.valueTypeId;
         data["valueTypeCode"] = this.valueTypeCode;
+        data["dataType"] = this.dataType;
         data["defaultValue"] = this.defaultValue;
         data["required"] = this.required;
         data["allowMultiSelect"] = this.allowMultiSelect;
@@ -84970,6 +85057,7 @@ export interface IFieldSettingDefinitionDto {
     fieldName: string | undefined;
     valueTypeId: number;
     valueTypeCode: string | undefined;
+    dataType: string | undefined;
     defaultValue: string | undefined;
     required: boolean;
     allowMultiSelect: boolean;

@@ -19,7 +19,8 @@ import {
     Chart,
     AccumulationChart
 } from '@syncfusion/ej2-charts';
-
+import { HttpClient } from '@angular/common/http';
+import { L10n, setCulture } from '@syncfusion/ej2-base';
 interface ChartExportItem {
     svg: SVGSVGElement;
     w: number;
@@ -70,32 +71,103 @@ export class DashboardDetailComponent extends AppComponentBase implements OnInit
     drilldownTitle = '';
     drilldownRecords: any[] = [];
 
+    isArLang:boolean=false
+currentLang:string=''
+
+syncfusionLocale = 'en';
+syncfusionRtl = false;
+syncfusionLocaleReady = false;
+
     constructor(
         injector: Injector,
         private route: ActivatedRoute,
         private appDashboardService: AppDashboardServiceProxy,
         private refreshService: SpreadsheetRefreshService,
         private drilldown: DrilldownService,
+            private http: HttpClient,
         private cdr: ChangeDetectorRef
     ) {
         super(injector);
     }
 
-    ngOnInit(): void {
-        const routeId = Number(this.route.snapshot.paramMap.get('id'));
+   async ngOnInit(): Promise<void> {
+       this.currentLang = abp.utils.getCookieValue('Abp.Localization.CultureName')
+        this.currentLang == 'ar' || this.currentLang == 'ar-EG'  ? this.isArLang = true : this.isArLang = false
+    const routeId = Number(
+        this.route.snapshot.paramMap.get('id')
+    );
 
-        if (routeId > 0) {
-            this.dashboardId = routeId;
-        }
-
-        this.loadDashboard();
+    if (routeId > 0) {
+        this.dashboardId = routeId;
     }
+
+    await this.initializeSyncfusionLocale();
+
+    this.loadDashboard();
+}
 
     ngOnDestroy(): void {
         this.dashboardSheets = [];
         clearTimeout(this.resizeTimer);
         this.layoutTimers.forEach(t => clearTimeout(t));
     }
+
+    private async initializeSyncfusionLocale(): Promise<void> {
+
+    this.syncfusionLocaleReady = false;
+
+    const language =
+        abp.utils.getCookieValue('Abp.Localization.CultureName') ||
+        abp.localization.currentLanguage?.name ||
+        'en';
+
+    const isArabic = language.toLowerCase().startsWith('ar');
+
+    this.currentLang = language;
+    this.isArLang = isArabic;
+    this.syncfusionRtl = isArabic;
+
+    if (isArabic) {
+        try {
+
+            const translations = await firstValueFrom(
+                this.http.get<any>('assets/syncfusion/ar.json')
+            );
+
+            L10n.load(
+                translations.ar
+                    ? translations
+                    : { ar: translations }
+            );
+
+            setCulture('ar');
+            this.syncfusionLocale = 'ar';
+
+            console.log('[Dashboard] Syncfusion Arabic loaded');
+
+        } catch (error) {
+
+            console.error(
+                '[Dashboard] Failed to load Arabic localization:',
+                error
+            );
+
+            setCulture('en');
+
+            this.syncfusionLocale = 'en';
+            this.syncfusionRtl = false;
+        }
+
+    } else {
+
+        setCulture('en');
+        this.syncfusionLocale = 'en';
+
+    }
+
+    this.syncfusionLocaleReady = true;
+    this.cdr.detectChanges();
+}
 
     loadDashboard(): void {
         this.loading = true;
@@ -123,7 +195,7 @@ export class DashboardDetailComponent extends AppComponentBase implements OnInit
             },
             error: (error: any) => {
                 console.error('[Dashboard] Dashboard API failed:', error);
-                this.dashboardLoadError = 'Unable to load the dashboard.';
+               this.dashboardLoadError = this.l('UnableToLoadDashboard');
                 this.loading = false;
                 this.hideMainSpinner()
                 this.cdr.detectChanges();
@@ -143,7 +215,9 @@ export class DashboardDetailComponent extends AppComponentBase implements OnInit
             sheetDataSources: saved.sheetDataSources ?? [],
             sheetAnalyses: saved.sheetAnalyses ?? [],
             dashboardWidgets: saved.dashboardWidgets ?? [],
-            updatedDate: saved.updatedDate ?? null
+            updatedDate: saved.updatedDate ?? null,
+            lastRefreshDate: saved.lastRefreshDate,
+            refreshedBy: saved.refreshedBy
         };
     }
 
@@ -298,6 +372,20 @@ export class DashboardDetailComponent extends AppComponentBase implements OnInit
     // REFRESH (same pipeline as the editor)
     // =====================================================
 
+    private updateRefreshInfo(state: SpreadsheetPayload): void {
+        const user = this.appSession.user;
+        const tenant = this.appSession.tenant;
+
+        const fullName = [
+            user?.name,
+            user?.surname
+        ].filter(Boolean).join(' ');
+
+        const now = moment().format('YYYY-MM-DDTHH:mm:ss.SSS') + '0000';
+
+        state.lastRefreshDate = now;
+        state.refreshedBy = `${fullName}`;
+    }
     async refreshDashboard(): Promise<void> {
         if (this.refreshing || this.loading || !this.saved) {
             return;
@@ -314,8 +402,8 @@ export class DashboardDetailComponent extends AppComponentBase implements OnInit
             );
 
             // Update the last successful refresh timestamp.
-            refreshed.updatedDate =
-                moment().format('YYYY-MM-DDTHH:mm:ss.SSS') + '0000';
+            this.updateRefreshInfo(refreshed);
+            refreshed.updatedDate = refreshed.lastRefreshDate;
 
             // Count records from source metadata, not chart/helper rows.
             const recordCount = (refreshed.sheetDataSources ?? [])
@@ -335,8 +423,17 @@ export class DashboardDetailComponent extends AppComponentBase implements OnInit
                     } as any
                 )
             );
-
             this.saved = refreshed;
+            this.dashboard = {
+                ...this.dashboard,
+                spreadsheet: {
+                    ...this.dashboard?.spreadsheet,
+                    lastRefreshDate: refreshed.lastRefreshDate,
+                    refreshedBy: refreshed.refreshedBy,
+                    updatedDate: refreshed.updatedDate
+                }
+            };
+
             this.dashboardWorkbookReady = false;
             this.cdr.detectChanges();
 
@@ -351,14 +448,15 @@ export class DashboardDetailComponent extends AppComponentBase implements OnInit
             this.scheduleMobileLayout();
 
             this.notify.success(
-                'Dashboard refreshed and saved successfully.'
+                  this.l('DashboardRefreshedSuccessfully')
             );
+
 
         } catch (error) {
             console.error('[Dashboard] Refresh or save failed:', error);
-            this.notify.error(
-                'Unable to complete Dashboard refresh and save.'
-            );
+          this.notify.error(
+    this.l('DashboardRefreshFailed')
+);
         } finally {
             this.refreshing = false;
             this.cdr.detectChanges();
@@ -388,9 +486,9 @@ export class DashboardDetailComponent extends AppComponentBase implements OnInit
         }
 
         if (!result.records.length) {
-            this.notify.warn(
-                'No matching source records could be resolved.'
-            );
+         this.notify.warn(
+    this.l('NoMatchingSourceRecords')
+);
             return;
         }
 
@@ -459,7 +557,9 @@ export class DashboardDetailComponent extends AppComponentBase implements OnInit
             pdf.save(this.pdfFileName);
         } catch (error) {
             console.error('Dashboard PDF export failed:', error);
-            this.notify.error('Failed to export Dashboard PDF.');
+           this.notify.error(
+    this.l('DashboardPdfExportFailed')
+);
         } finally {
             this.exportingPdf = false;
             this.cdr.detectChanges();

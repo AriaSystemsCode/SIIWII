@@ -3,7 +3,7 @@
     <!-- ===== HEADER ===== -->
     <div class="d-flex justify-content-between align-items-center border-bottom p-3">
 
-        <h5 class="mb-1">{{ (isEditMode ? 'Edit Data' : 'New Data') | localize }}</h5>
+        <h5 class="mb-1">{{ (isEditMode ? 'Edit Data' : 'NewData') | localize }}</h5>
 
         <div class="d-flex align-items-center gap-2">
 
@@ -26,11 +26,9 @@
 
             <label class="font-weight-bold">{{ 'Table' | localize }}</label>
 
-            <small class="d-block text-muted mb-2">
-                {{ isEditMode
-                    ? ('The table cannot be changed when editing an existing data source.' | localize)
-                    : ''}}
-            </small>
+            <small *ngIf="isEditMode" class="d-block text-muted mb-2">
+    {{ 'TableCannotBeChanged' | localize }}
+</small>
 
             <div *ngIf="isLoadingTables && !isEditMode" class="d-flex align-items-center text-muted mb-2">
                 <i class="fa fa-spinner fa-spin mr-2"></i>{{ 'Loading' | localize }}
@@ -45,7 +43,7 @@
                 [filter]="true"
                 [showClear]="!isEditMode"
                 [disabled]="isEditMode || isAdding || isLoadingTables || isLoadingColumns"
-                placeholder="Select table"
+                 [placeholder]="'SelectTable' | localize"
                 appendTo="body"
                 styleClass="w-100"
                 [style]="{ width: '100%' }"
@@ -115,10 +113,12 @@
                     <!-- read-only summary of the applied filters -->
                     <div *ngIf="filterPreview as root; else noFilters" class="filter-preview">
 
-                        <div class="filter-preview-title">
-                            <span class="filter-match-value">{{ root.matchMode | localize }}</span>
-                            {{ 'of the following conditions' | localize }}:
-                        </div>
+                     <div class="filter-preview-title">
+    <span class="filter-match-value">
+        {{ (root.matchMode === 'any' ? 'Any' : 'All') | localize }}
+    </span>
+    {{ 'OfFollowingConditions' | localize }}:
+</div>
 
                         <ng-container *ngTemplateOutlet="previewGroup; context: { $implicit: root }"></ng-container>
 
@@ -146,11 +146,11 @@
                                 <div *ngIf="node.type === 'group'" class="filter-preview-nested">
 
                                     <div class="filter-preview-nested-title">
-                                        <span class="filter-match-value">
-                                            {{ (node.matchMode === 'any' ? 'any of' : 'all of') | localize }}
-                                            {{ 'these' | localize }}:
-                                        </span>
-                                    </div>
+    <span class="filter-match-value">
+        {{ (node.matchMode === 'any' ? 'AnyOf' : 'AllOf') | localize }}
+        {{ 'These' | localize }}:
+    </span>
+</div>
 
                                     <ng-container *ngTemplateOutlet="previewGroup; context: { $implicit: node }"></ng-container>
 
@@ -202,10 +202,12 @@
                         <span class="insert-destination-content">
                             <strong>{{ 'InsertAsNewSheet' | localize }}</strong>
                             <small class="d-block text-muted">
-                                {{ insertAsNewSheet
-                                    ? 'Create a new worksheet for this data'
-                                    : 'Data will be inserted into the current worksheet' }}
-                            </small>
+    {{
+        (insertAsNewSheet
+            ? 'CreateNewWorksheetForData'
+            : 'InsertIntoCurrentWorksheetDescription') | localize
+    }}
+</small>
                         </span>
 
                     </label>
@@ -215,10 +217,10 @@
                         <i class="fa fa-table mr-2"></i>
                         {{ 'Sheet' | localize }}: <strong>{{ targetSheetName }}</strong>
 
-                        <div *ngIf="targetSheetHasData" class="text-warning small mt-2">
-                            <i class="fa fa-exclamation-triangle mr-1"></i>
-                            Existing worksheet data will be replaced.
-                        </div>
+                       <div *ngIf="targetSheetHasData" class="text-warning small mt-2">
+    <i class="fa fa-exclamation-triangle mr-1"></i>
+    {{ 'ExistingWorksheetDataWillBeReplaced' | localize }}
+</div>
 
                     </div>
 

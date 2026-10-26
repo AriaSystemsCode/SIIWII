@@ -54,6 +54,9 @@ import {
     removeSheetFromRange
 } from '../../models/spreadsheet.utils';
 
+import { HttpClient } from '@angular/common/http';
+import { L10n, setCulture } from '@syncfusion/ej2-base';
+
 @Component({
     selector: 'app-create-or-edit-spreadsheet',
     templateUrl: './create-or-edit-spreadsheet.component.html',
@@ -144,13 +147,13 @@ export class CreateOrEditSpreadsheetComponent extends AppComponentBase implement
     isApplyingChart = false;
     chartAggregation: ChartAggregation = 'None';
     chartAggregationOptions = [
-        { label: 'No Aggregation', value: 'None' },
-        { label: 'Sum', value: 'Sum' },
-        { label: 'Count', value: 'Count' },
-        { label: 'Average', value: 'Average' },
-        { label: 'Minimum', value: 'Min' },
-        { label: 'Maximum', value: 'Max' }
-    ];
+    { label: this.l('NoAggregation'), value: 'None' },
+    { label: this.l('Sum'), value: 'Sum' },
+    { label: this.l('Count'), value: 'Count' },
+    { label: this.l('Average'), value: 'Average' },
+    { label: this.l('Minimum'), value: 'Min' },
+    { label: this.l('Maximum'), value: 'Max' }
+];
 
     // ---- Drilldown (Ctrl + click on a chart point) ----
     drilldownVisible = false;
@@ -161,15 +164,30 @@ export class CreateOrEditSpreadsheetComponent extends AppComponentBase implement
     private listRibbonObserver: MutationObserver | null = null;
     private lastListRibbonLabel = '';
 
+    spreadsheetSaveUrl = 'https://services.syncfusion.com/angular/production/api/spreadsheet/save';
+
+    lastRefreshDate: string | null = null;
+    refreshedBy: string | null = null;
+
+    syncfusionLocale = 'en';
+syncfusionRtl = false;
+syncfusionLocaleReady = false;
+
+isArLang:boolean=false
+currentLang:string=''
     constructor(
         injector: Injector,
         private route: ActivatedRoute,
         private dashboardService: AppDashboardServiceProxy,
         private refreshService: SpreadsheetRefreshService,
         private drilldown: DrilldownService,
+            private http: HttpClient,
         private cdr: ChangeDetectorRef
     ) {
         super(injector);
+
+                  this.currentLang = abp.utils.getCookieValue('Abp.Localization.CultureName')
+        this.currentLang == 'ar' || this.currentLang == 'ar-EG'  ? this.isArLang = true : this.isArLang = false
     }
 
     // =====================================================
@@ -177,6 +195,70 @@ export class CreateOrEditSpreadsheetComponent extends AppComponentBase implement
     // =====================================================
 
     /** Untyped access to Syncfusion APIs missing from the typings. */
+
+    
+
+private async initializeSyncfusionLocale(): Promise<void> {
+    this.syncfusionLocaleReady = false;
+
+    const language =
+        abp.utils.getCookieValue('Abp.Localization.CultureName') ||
+        abp.localization.currentLanguage?.name ||
+        'en';
+
+    const isArabic = language.toLowerCase().startsWith('ar');
+
+    this.isArLang = isArabic;
+    this.syncfusionRtl = isArabic;
+
+    if (isArabic) {
+        try {
+            const translations = await firstValueFrom(
+                this.http.get<any>('assets/syncfusion/ar.json')
+            );
+
+            L10n.load(
+                translations.ar
+                    ? translations
+                    : { ar: translations }
+            );
+
+            setCulture('ar');
+            this.syncfusionLocale = 'ar';
+
+            console.log('[Syncfusion] Arabic localization loaded');
+        } catch (error) {
+            console.error(
+                '[Syncfusion] Arabic localization failed:',
+                error
+            );
+
+            this.syncfusionLocale = 'en';
+            setCulture('en');
+        }
+    } else {
+        setCulture('en');
+        this.syncfusionLocale = 'en';
+    }
+
+    this.pivotChartTypes = [
+        'Column',
+        'Bar',
+        'Area',
+        'Pie',
+        'Doughnut',
+        'Line',
+        'Scatter'
+    ].map(type => ({
+        label: this.l(type),
+        value: type
+    }));
+
+    this.syncfusionLocaleReady = true;
+    this.cdr.detectChanges();
+}
+
+
     private get grid(): any {
         return this.spreadsheet as any;
     }
@@ -313,12 +395,20 @@ export class CreateOrEditSpreadsheetComponent extends AppComponentBase implement
     // LIFECYCLE / LOAD
     // =====================================================
 
+    // ngOnInit(): void {
+    //     this.route.paramMap.subscribe(params => {
+    //         const id = params.get('id');
+    //         this.dashboardId = id ? Number(id) : null;
+    //     });
+    // }
     ngOnInit(): void {
-        this.route.paramMap.subscribe(params => {
-            const id = params.get('id');
-            this.dashboardId = id ? Number(id) : null;
-        });
-    }
+    this.route.paramMap.subscribe(params => {
+        const id = params.get('id');
+        this.dashboardId = id ? Number(id) : null;
+    });
+
+    void this.initializeSyncfusionLocale();
+}
 
     ngOnDestroy(): void {
         this.stopSheetWatcher();
@@ -389,6 +479,8 @@ export class CreateOrEditSpreadsheetComponent extends AppComponentBase implement
         this.analyses = clone(data?.sheetAnalyses ?? []);
         this.widgets = clone(data?.dashboardWidgets ?? []);
         this.spreadsheetUpdatedDate = data?.updatedDate ?? null;
+        this.lastRefreshDate = data?.lastRefreshDate ?? null;
+        this.refreshedBy = data?.refreshedBy ?? null;
 
         const workbook = this.cleanWorkbookJson(data?.workbookJson ?? data);
 
@@ -572,10 +664,10 @@ export class CreateOrEditSpreadsheetComponent extends AppComponentBase implement
             this.categoryRange = categoryText;
             this.seriesRanges = seriesTexts.map(range => ({ range }));
 
-            this.notify.success('Chart data updated.');
+            this.notify.success(this.l('ChartDataUpdated'));
         } catch (error) {
             console.error('[Chart Panel] unable to update chart data:', error);
-            this.notify.error('Unable to update chart data.');
+            this.notify.error(this.l('UnableToUpdateChartData'));
         } finally {
             this.isApplyingChart = false;
             this.cdr.detectChanges();
@@ -760,8 +852,8 @@ export class CreateOrEditSpreadsheetComponent extends AppComponentBase implement
                 [{
                     id: 'spreadsheet_pivot',
                     type: 'Button',
-                    text: 'Pivot Table',
-                    tooltipText: 'Create Pivot Table for the active sheet',
+                    text: this.l('PivotTable'),
+                    tooltipText: this.l('CreatePivotTable'),
                     prefixIcon: 'e-icons e-table',
                     click: () => this.openPivotFromRibbon()
                 }],
@@ -773,8 +865,8 @@ export class CreateOrEditSpreadsheetComponent extends AppComponentBase implement
                 [{
                     id: 'spreadsheet_data_source',
                     type: 'Button',
-                    text: 'New Data Source',
-                    tooltipText: 'Manage Data Source',
+                    text: this.l('NewDataSource'),
+                    tooltipText: this.l('ManageDataSource'),
                     prefixIcon: 'e-icons e-list-unordered',
                     click: () => this.onListRibbonClick()
                 }],
@@ -800,7 +892,7 @@ export class CreateOrEditSpreadsheetComponent extends AppComponentBase implement
 
         const sheetName = this.activeSheetName.trim().toLowerCase();
         const hasSource = this.sheetSources.some(item => String(item.sheetName ?? '').trim().toLowerCase() === sheetName);
-        const label = hasSource ? 'List Properties' : 'New Data source';
+      const label = hasSource ? this.l('ListProperties') : this.l('NewDataSource');
 
         this.lastListRibbonLabel = label;
 
@@ -1267,7 +1359,7 @@ export class CreateOrEditSpreadsheetComponent extends AppComponentBase implement
         console.error('[Spreadsheet] data loading failed:', error);
         this.hideLoading();
         this.resetDataLoad();
-        this.notify.error('Unable to load Spreadsheet data.');
+        this.notify.error(this.l('UnableToLoadSpreadsheetData'));
         this.cdr.detectChanges();
     }
 
@@ -2441,7 +2533,9 @@ export class CreateOrEditSpreadsheetComponent extends AppComponentBase implement
             sheetDataSources: this.cloneSheetSources(this.sheetSources),
             sheetAnalyses: clone(this.analyses),
             dashboardWidgets: clone(this.widgets),
-            updatedDate: this.spreadsheetUpdatedDate
+            updatedDate: this.spreadsheetUpdatedDate,
+            lastRefreshDate: this.lastRefreshDate,
+            refreshedBy: this.refreshedBy
         };
     }
 
@@ -2466,6 +2560,8 @@ export class CreateOrEditSpreadsheetComponent extends AppComponentBase implement
             this.rebuildWidgets(state.workbookJson);
             state.dashboardWidgets = clone(this.widgets);
             state.updatedDate = moment().format('YYYY-MM-DDTHH:mm:ss.SSS') + '0000';
+            this.updateRefreshInfo(state);
+// state.updatedDate = state.lastRefreshDate;
 
             await firstValueFrom(
                 this.dashboardService.saveSpreadSheetJson(dashboardId, {
@@ -2669,6 +2765,23 @@ export class CreateOrEditSpreadsheetComponent extends AppComponentBase implement
 
         return cleaned;
     }
+
+    private updateRefreshInfo(state: SpreadsheetPayload): void {
+    const user = this.appSession.user;
+    const tenant = this.appSession.tenant;
+
+    const fullName = [
+        user?.name,
+        user?.surname
+    ].filter(Boolean).join(' ');
+
+    const now =
+        moment().format('YYYY-MM-DDTHH:mm:ss.SSS') + '0000';
+
+    state.lastRefreshDate = now;
+    state.refreshedBy =
+        `${fullName}`;
+}
     async refreshSpreadsheet(): Promise<void> {
         if (this.isRefreshing || !this.spreadsheet || !this.dashboardId) {
             return;
@@ -2702,8 +2815,8 @@ export class CreateOrEditSpreadsheetComponent extends AppComponentBase implement
             // Save only after all source sheets and charts are refreshed.
             this.loadingMessage = 'Saving refreshed Spreadsheet...';
 
-            refreshed.updatedDate =
-                moment().format('YYYY-MM-DDTHH:mm:ss.SSS') + '0000';
+           this.updateRefreshInfo(refreshed);
+refreshed.updatedDate = refreshed.lastRefreshDate;
 
             await firstValueFrom(
                 this.dashboardService.saveSpreadSheetJson(this.dashboardId, {

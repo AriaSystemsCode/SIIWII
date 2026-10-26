@@ -1,103 +1,72 @@
-<p-dialog [(visible)]="visible" [modal]="true" [draggable]="false" [resizable]="false" [closable]="true"
-    [dismissableMask]="true" [style]="{
-        width: '500px'
-    }" styleClass="dashboard-share-dialog" appendTo="body" (onHide)="closeDialog()">
 
+<p-dialog
+    [(visible)]="visible"
+    [modal]="true"
+    [draggable]="false"
+    [resizable]="false"
+    [closable]="true"
+    [dismissableMask]="true"
+    [style]="{ width: '500px' }"
+    styleClass="dashboard-share-dialog"
+    appendTo="body"
+    (onHide)="closeDialog()">
+
+    <!-- ================= HEADER ================= -->
     <ng-template pTemplate="header">
-
         <div class="share-dialog-header w-100">
 
-            <div class="
-                    d-flex
-                    align-items-center
-                    justify-content-between
-                ">
-
+            <div class="d-flex align-items-center justify-content-between">
                 <h4 class="mb-0">
-
-                    {{
-                    'SharingOptions'
-                    | localize
-                    }}
-
+                    {{ 'SharingOptions' | localize }}
                 </h4>
 
-
                 <span class="share-status">
-
-                    <i class="fas mr-1" [ngClass]="{
-                            'fa-lock':
-                                sharedUsersCount === 0,
-
-                            'fa-users':
-                                sharedUsersCount > 0
+                    <i
+                        class="fas mr-1"
+                        [ngClass]="{
+                            'fa-lock': sharedUsersCount === 0,
+                            'fa-users': sharedUsersCount > 0
                         }">
                     </i>
 
                     {{ shareStatusText }}
-
                 </span>
-
             </div>
 
-
             <span class="dashboard-name">
-
                 {{ dashboardName }}
-
             </span>
 
         </div>
-
     </ng-template>
 
+    <!-- ================= MAIN SHARE SCREEN ================= -->
+    <ng-container *ngIf="mode !== 'confirm' && mode !== 'private'">
 
-    <!-- ============================================= -->
-    <!-- MAIN SHARE SCREEN -->
-    <!-- ============================================= -->
-
-    <ng-container *ngIf="
-            mode !== 'confirm' &&
-            mode !== 'private'
-        ">
-
-
-        <!-- ========================================= -->
-        <!-- TABS -->
-        <!-- ========================================= -->
-
+        <!-- ================= TABS ================= -->
         <div class="share-tabs">
 
-            <button type="button" [class.active]="
-                    mode === 'all'
-                " (click)="selectAll()">
+            <button
+                type="button"
+                [class.active]="mode === 'all'"
+                (click)="selectAll()">
 
-                {{
-                'AllUsers'
-                | localize
-                }}
+                {{ 'AllUsers' | localize }}
 
             </button>
 
+            <button
+                type="button"
+                [class.active]="mode === 'specific'"
+                (click)="selectSpecific()">
 
-            <button type="button" [class.active]="
-                    mode === 'specific'
-                " (click)="selectSpecific()">
-
-                {{
-                'SpecificUsers'
-                | localize
-                }}
+                {{ 'SpecificUsers' | localize }}
 
             </button>
 
         </div>
 
-
-        <!-- ========================================= -->
-        <!-- ALL USERS -->
-        <!-- ========================================= -->
-
+        <!-- ================= ALL USERS ================= -->
         <div *ngIf="mode === 'all'" class="share-content">
 
             <div class="all-users-card">
@@ -105,170 +74,106 @@
                 <div class="all-users-info">
 
                     <div class="share-icon">
-
                         <i class="fas fa-users"></i>
-
                     </div>
-
 
                     <div>
 
                         <div class="all-users-title">
-
-                            {{
-                            'AllUsers'
-                            | localize
-                            }}
-
+                            {{ 'AllUsers' | localize }}
                         </div>
 
-
                         <div class="all-users-description">
-
-                            {{'Everyone who has access can access this dashboard.' | localize}}
-
+                            {{ 'EveryoneCanAccessDashboard' | localize }}
                         </div>
 
                     </div>
 
                 </div>
 
-
-                <p-dropdown [options]="permissionOptions" [(ngModel)]="allUsersAccess" (ngModelChange)="
-                        changeAllUsersAccess(
-                            $event
-                        )
-                    " optionLabel="label" optionValue="value" appendTo="body" styleClass="permission-dropdown" [style]="{
-                        width: '110px'
-                    }">
-
+                <p-dropdown
+                    [options]="permissionOptions"
+                    [(ngModel)]="allUsersAccess"
+                    (ngModelChange)="changeAllUsersAccess($event)"
+                    optionLabel="label"
+                    optionValue="value"
+                    appendTo="body"
+                    styleClass="permission-dropdown"
+                    [style]="{ width: '110px' }">
                 </p-dropdown>
 
             </div>
 
         </div>
 
-
-        <!-- ========================================= -->
-        <!-- SPECIFIC USERS -->
-        <!-- ========================================= -->
-
+        <!-- ================= SPECIFIC USERS ================= -->
         <div *ngIf="mode === 'specific'" class="share-content">
 
-
             <label class="share-label">
-
-                {{
-                'ShareWith'
-                | localize
-                }}
-
+                {{ 'ShareWith' | localize }}
             </label>
 
-
-            <!-- ===================================== -->
-            <!-- USER SEARCH DROPDOWN -->
-            <!-- ===================================== -->
-
-            <p-dropdown [options]="availableUsers" [(ngModel)]="selectedSearchUser" optionLabel="userName"
-                [filter]="true" filterBy="userName,accountName" [showClear]="true" [resetFilterOnHide]="true"
-                appendTo="body" placeholder="{{
-                    'SearchUsersByName'
-                        | localize
-                }}" styleClass="user-search-dropdown" [style]="{
-                    width: '100%'
-                }" (onChange)="
-                    onSearchUserSelected(
-                        $event.value
-                    )
-                ">
+            <!-- ================= USER SEARCH ================= -->
+            <p-dropdown
+                [options]="availableUsers"
+                [(ngModel)]="selectedSearchUser"
+                optionLabel="userName"
+                [filter]="true"
+                filterBy="userName,accountName"
+                [showClear]="true"
+                [resetFilterOnHide]="true"
+                appendTo="body"
+                [placeholder]="'SearchUsersByName' | localize"
+                styleClass="user-search-dropdown"
+                [style]="{ width: '100%' }"
+                (onChange)="onSearchUserSelected($event.value)">
 
                 <!-- Selected value -->
-
                 <ng-template pTemplate="selectedItem" let-user>
 
-                    <div *ngIf="user" class="
-                            d-flex
-                            align-items-center
-                        ">
+                    <div
+                        *ngIf="user"
+                        class="d-flex align-items-center">
 
-                        <div class="
-                                avatar
-                                avatar-small
-                                mr-2
-                            ">
-
-                            {{
-                            getUserInitials(
-                            user.userName
-                            )
-                            }}
-
+                        <div class="avatar avatar-small mr-2">
+                            {{ getUserInitials(user.userName) }}
                         </div>
 
                         <span>
-
                             {{ user.userName }}
-
                         </span>
 
                     </div>
 
                 </ng-template>
 
-
                 <!-- Dropdown option -->
-
                 <ng-template pTemplate="item" let-user>
 
-                    <div class="
-                            user-search-option
-                            d-flex
-                            align-items-center
-                        ">
+                    <div class="user-search-option d-flex align-items-center">
 
-                        <div class="
-                                avatar
-                                avatar-small
-                                mr-2
-                            ">
+                        <div class="avatar avatar-small mr-2">
 
-                            <img *ngIf="
-                                    user.userImage
-                                " [src]="
-                                    user.userImage
-                                " [alt]="
-                                    user.userName
-                                " />
+                            <img
+                                *ngIf="user.userImage"
+                                [src]="user.userImage"
+                                [alt]="user.userName" />
 
-
-                            <span *ngIf="
-                                    !user.userImage
-                                ">
-
-                                {{
-                                getUserInitials(
-                                user.userName
-                                )
-                                }}
-
+                            <span *ngIf="!user.userImage">
+                                {{ getUserInitials(user.userName) }}
                             </span>
 
                         </div>
 
-
                         <div class="user-details">
 
                             <div class="user-name">
-
                                 {{ user.userName }}
-
                             </div>
 
-
-                            <small *ngIf="
-                                    user.accountName
-                                " class="text-muted">
+                            <small
+                                *ngIf="user.accountName"
+                                class="text-muted">
 
                                 {{ user.accountName }}
 
@@ -282,62 +187,35 @@
 
             </p-dropdown>
 
-
-            <!-- ===================================== -->
-            <!-- SHARED USERS -->
-            <!-- ===================================== -->
-
+            <!-- ================= SHARED USERS ================= -->
             <div class="shared-title">
-
-                {{
-                'SharedWith'
-                | localize
-                }}
-
+                {{ 'SharedWith' | localize }}
             </div>
-
 
             <div class="user-list">
 
-                <div *ngFor="
-                        let user
-                        of sharedUsers
-                    " class="user-row" [class.owner-row]="
-                        user.isOwner
-                    ">
-
+                <div
+                    *ngFor="let user of sharedUsers"
+                    class="user-row"
+                    [class.owner-row]="user.isOwner">
 
                     <!-- USER INFO -->
-
                     <div class="user-info">
 
-                        <div class="avatar" [class.owner-avatar]="
-                                user.isOwner
-                            ">
+                        <div
+                            class="avatar"
+                            [class.owner-avatar]="user.isOwner">
 
-                            <img *ngIf="
-                                    user.userImage
-                                " [src]="
-                                    user.userImage
-                                " [alt]="
-                                    user.userName
-                                " />
+                            <img
+                                *ngIf="user.userImage"
+                                [src]="user.userImage"
+                                [alt]="user.userName" />
 
-
-                            <span *ngIf="
-                                    !user.userImage
-                                ">
-
-                                {{
-                                getUserInitials(
-                                user.userName
-                                )
-                                }}
-
+                            <span *ngIf="!user.userImage">
+                                {{ getUserInitials(user.userName) }}
                             </span>
 
                         </div>
-
 
                         <div class="user-details">
 
@@ -345,24 +223,19 @@
 
                                 {{ user.userName }}
 
+                                <span
+                                    *ngIf="user.isOwner"
+                                    class="you-label">
 
-                                <span *ngIf="
-                                        user.isOwner
-                                    " class="you-label">
-
-                                    ({{
-                                    'You'
-                                    | localize
-                                    }})
+                                    ({{ 'You' | localize }})
 
                                 </span>
 
                             </div>
 
-
-                            <small *ngIf="
-                                    user.accountName
-                                " class="user-subtitle">
+                            <small
+                                *ngIf="user.accountName"
+                                class="user-subtitle">
 
                                 {{ user.accountName }}
 
@@ -372,61 +245,38 @@
 
                     </div>
 
+                    <!-- ================= OWNER ================= -->
+                    <div
+                        *ngIf="user.isOwner"
+                        class="owner-label">
 
-                    <!-- ================================= -->
-                    <!-- OWNER -->
-                    <!-- ================================= -->
-
-                    <div *ngIf="user.isOwner" class="owner-label">
-
-                        {{
-                        'Owner'
-                        | localize
-                        }}
+                        {{ 'Owner' | localize }}
 
                     </div>
 
+                    <!-- ================= NON OWNER ================= -->
+                    <div
+                        *ngIf="!user.isOwner"
+                        class="user-actions">
 
-                    <!-- ================================= -->
-                    <!-- NON OWNER -->
-                    <!-- ================================= -->
-
-                    <div *ngIf="
-                            !user.isOwner
-                        " class="user-actions">
-
-
-                        <p-dropdown [options]="permissionOptions" [ngModel]="
-                                getUserAccess(
-                                    user
-                                )
-                            " (ngModelChange)="
-                                changeAccess(
-                                    user,
-                                    $event
-                                )
-                            " optionLabel="label" optionValue="value" appendTo="body" styleClass="permission-dropdown"
-                            [style]="{
-                                width: '105px'
-                            }">
-
+                        <p-dropdown
+                            [options]="permissionOptions"
+                            [ngModel]="getUserAccess(user)"
+                            (ngModelChange)="changeAccess(user, $event)"
+                            optionLabel="label"
+                            optionValue="value"
+                            appendTo="body"
+                            styleClass="permission-dropdown"
+                            [style]="{ width: '105px' }">
                         </p-dropdown>
 
+                        <button
+                            type="button"
+                            class="remove-user"
+                            [title]="'Remove' | localize"
+                            (click)="removeUser(user)">
 
-                        <button type="button" class="remove-user" [title]="
-                                'Remove'
-                                    | localize
-                            " (click)="
-                                removeUser(
-                                    user
-                                )
-                            ">
-
-                            <i class="
-                                    fas
-                                    fa-times
-                                ">
-                            </i>
+                            <i class="fas fa-times"></i>
 
                         </button>
 
@@ -438,38 +288,26 @@
 
         </div>
 
-
-        <!-- ========================================= -->
-        <!-- FOOTER -->
-        <!-- ========================================= -->
-
+        <!-- ================= FOOTER ================= -->
         <div class="share-footer">
 
-            <button type="button" class="make-private" (click)="
-                    requestMakePrivate()
-                ">
+            <button
+                type="button"
+                class="make-private"
+                (click)="requestMakePrivate()">
 
-                <i class="
-                        fas
-                        fa-lock
-                        mr-1
-                    ">
-                </i>
+                <i class="fas fa-lock mr-1"></i>
 
-                {{
-                'MakePrivate'
-                | localize
-                }}
+                {{ 'MakePrivate' | localize }}
 
             </button>
 
+            <button
+                type="button"
+                class="btn btn-primary"
+                (click)="done()">
 
-            <button type="button" class="btn btn-primary" (click)="done()">
-
-                {{
-                'Done'
-                | localize
-                }}
+                {{ 'Done' | localize }}
 
             </button>
 
@@ -477,61 +315,46 @@
 
     </ng-container>
 
-    <ng-container *ngIf="
-            mode === 'confirm'
-        ">
+    <!-- ================= CONFIRM PRIVATE ================= -->
+    <ng-container *ngIf="mode === 'confirm'">
 
         <div class="confirm-content">
 
             <div class="confirm-icon danger">
-
-                <i class="
-                        fas
-                        fa-user-slash
-                    ">
-                </i>
-
+                <i class="fas fa-user-slash"></i>
             </div>
 
-
             <h4>
-                {{'Make this dashboard private?' | localize}}
+                {{ 'MakeDashboardPrivateQuestion' | localize }}
             </h4>
 
-
             <p>
-
-                {{'Everyone currently shared with
-                will lose access.' | localize}}
-
+                {{ 'EveryoneWillLoseAccess' | localize }}
             </p>
 
-
             <p class="secondary-text">
-
-                {{'You can share it again later.' | localize}}
-
+                {{ 'CanShareAgainLater' | localize }}
             </p>
 
         </div>
 
-
         <div class="confirm-actions">
 
-            <button type="button" class="btn btn-light" (click)="
-                    cancelMakePrivate()
-                ">
+            <button
+                type="button"
+                class="btn btn-light"
+                (click)="cancelMakePrivate()">
 
-                {{'Go back' | localize}}
+                {{ 'GoBack' | localize }}
 
             </button>
 
+            <button
+                type="button"
+                class="btn btn-danger"
+                (click)="confirmMakePrivate()">
 
-            <button type="button" class="btn btn-danger" (click)="
-                    confirmMakePrivate()
-                ">
-
-                {{'Remove access' | localize}}
+                {{ 'RemoveAccess' | localize }}
 
             </button>
 
@@ -539,52 +362,42 @@
 
     </ng-container>
 
-
-    <!-- ============================================= -->
-    <!-- PRIVATE -->
-    <!-- ============================================= -->
-
-    <ng-container *ngIf="
-            mode === 'private'
-        ">
+    <!-- ================= PRIVATE ================= -->
+    <ng-container *ngIf="mode === 'private'">
 
         <div class="private-content">
 
             <div class="private-icon">
-
                 <i class="fas fa-lock"></i>
-
             </div>
 
-
             <h4>
-                {{'This dashboard is private' | localize}}
+                {{ 'DashboardIsPrivate' | localize }}
             </h4>
+
             <p>
-                {{'Only you can see it right now.' | localize}}
+                {{ 'OnlyYouCanSeeDashboard' | localize }}
             </p>
 
+            <button
+                type="button"
+                class="btn btn-light mt-3"
+                (click)="shareAgain()">
 
-            <button type="button" class="btn btn-light mt-3" (click)="shareAgain()">
-
-                {{'Share dashboard' | localize}}
+                {{ 'ShareDashboard' | localize }}
 
             </button>
 
         </div>
 
+        <div class="share-footer justify-content-end">
 
-        <div class="
-                share-footer
-                justify-content-end
-            ">
+            <button
+                type="button"
+                class="btn btn-primary"
+                (click)="done()">
 
-            <button type="button" class="btn btn-primary" (click)="done()">
-
-                {{
-                'Done'
-                | localize
-                }}
+                {{ 'Done' | localize }}
 
             </button>
 

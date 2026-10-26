@@ -1,6 +1,7 @@
 import {
     Component,
     EventEmitter,
+    Injector,
     Input,
     OnChanges,
     Output
@@ -20,6 +21,7 @@ import {
     SelectOption
 } from '../../models/dashboard.model';
 import { ExtraAttributeDataService } from '@app/main/app-items/app-item-shared/services/extra-attribute-data.service';
+import { AppComponentBase } from '@shared/common/app-component-base';
 
 @Component({
     selector: 'app-filter-builder',
@@ -27,7 +29,7 @@ import { ExtraAttributeDataService } from '@app/main/app-items/app-item-shared/s
     styleUrls: ['./filter-builder.component.scss'],
     providers: [ExtraAttributeDataService]
 })
-export class FilterBuilderComponent implements OnChanges {
+export class FilterBuilderComponent   extends AppComponentBase implements OnChanges {
 
     @Input() fields: FilterBuilderField[] = [];
     @Input() conditions: FilterBuilderCondition[] = [];  
@@ -43,65 +45,65 @@ export class FilterBuilderComponent implements OnChanges {
     private dropdownOptionsCache = new Map<string, SelectOption[]>();
     private dropdownOptionsCacheKeys = new Map<string, string>();
 
-    readonly matchOptions: SelectOption[] = [
-        { label: 'all', value: 'all' },
-        { label: 'any', value: 'any' }
-    ];
+   readonly matchOptions: SelectOption[] = [
+    { label: this.l('All'), value: 'all' },
+    { label: this.l('Any'), value: 'any' }
+];
 
-    readonly booleanOptions: SelectOption[] = [
-        { label: 'Yes', value: true },
-        { label: 'No', value: false }
-    ];
+readonly booleanOptions: SelectOption[] = [
+    { label: this.l('Yes'), value: true },
+    { label: this.l('No'), value: false }
+];
 
-    private readonly comparisonOperators: SelectOption[] = [
-        { label: 'Equal', value: 'eq' },
-        { label: 'Not equal', value: 'neq' },
-        { label: 'Less than', value: 'lt' },
-        { label: 'Less than or equal', value: 'lte' },
-        { label: 'Greater than', value: 'gt' },
-        { label: 'Greater than or equal', value: 'gte' }
-    ];
+private readonly comparisonOperators: SelectOption[] = [
+    { label: this.l('Equal'), value: 'eq' },
+    { label: this.l('NotEqual'), value: 'neq' },
+    { label: this.l('LessThan'), value: 'lt' },
+    { label: this.l('LessThanOrEqual'), value: 'lte' },
+    { label: this.l('GreaterThan'), value: 'gt' },
+    { label: this.l('GreaterThanOrEqual'), value: 'gte' }
+];
 
-    private readonly textOperators: SelectOption[] = [
-        { label: 'Equal', value: 'eq' },
-        { label: 'Not equal', value: 'neq' },
-        { label: 'Contains', value: 'contains' },
-        { label: 'Does not contain', value: 'notcontains' },
-        { label: 'Starts with', value: 'startswith' },
-        { label: 'Ends with', value: 'endswith' }
-    ];
+private readonly textOperators: SelectOption[] = [
+    { label: this.l('Equal'), value: 'eq' },
+    { label: this.l('NotEqual'), value: 'neq' },
+    { label: this.l('Contains'), value: 'contains' },
+    { label: this.l('DoesNotContain'), value: 'notcontains' },
+    { label: this.l('StartsWith'), value: 'startswith' },
+    { label: this.l('EndsWith'), value: 'endswith' }
+];
 
-    private readonly equalityOperators: SelectOption[] = [
-        { label: 'Equal', value: 'eq' },
-        { label: 'Not equal', value: 'neq' }
-    ];
+private readonly equalityOperators: SelectOption[] = [
+    { label: this.l('Equal'), value: 'eq' },
+    { label: this.l('NotEqual'), value: 'neq' }
+];
 
-    private readonly dateOperators: SelectOption[] = [
-        { label: 'Is in', value: 'in' },
-        { label: 'Is not in', value: 'notin' },
-        { label: 'Equal', value: 'eq' },
-        { label: 'Not equal', value: 'neq' },
-        { label: 'Before', value: 'lt' },
-        { label: 'Before or equal', value: 'lte' },
-        { label: 'After', value: 'gt' },
-        { label: 'After or equal', value: 'gte' }
-    ];
+private readonly dateOperators: SelectOption[] = [
+    { label: this.l('IsIn'), value: 'in' },
+    { label: this.l('IsNotIn'), value: 'notin' },
+    { label: this.l('Equal'), value: 'eq' },
+    { label: this.l('NotEqual'), value: 'neq' },
+    { label: this.l('Before'), value: 'lt' },
+    { label: this.l('BeforeOrEqual'), value: 'lte' },
+    { label: this.l('After'), value: 'gt' },
+    { label: this.l('AfterOrEqual'), value: 'gte' }
+];
 
-    private readonly nullOperators: SelectOption[] = [
-        { label: 'Is Set', value: 'isnotnull' },
-        { label: 'Is Not Set', value: 'isnull' }
-    ];
+private readonly nullOperators: SelectOption[] = [
+    { label: this.l('IsSet'), value: 'isnotnull' },
+    { label: this.l('IsNotSet'), value: 'isnull' }
+];
 
-    readonly datePeriodOptions: SelectOption[] = [
-        { label: 'Today', value: 'today' },
-        { label: 'Last 7 days', value: 'last7days' },
-        { label: 'Last 30 days', value: 'last30days' },
-        { label: 'Month to date', value: 'monthToDate' },
-        { label: 'Last month', value: 'lastMonth' },
-        { label: 'Year to date', value: 'yearToDate' },
-        { label: 'Last 365 days', value: 'last365days' },
-        { label: 'Date range', value: 'dateRange' }
-    ];
+readonly datePeriodOptions: SelectOption[] = [
+    { label: this.l('Today'), value: 'today' },
+    { label: this.l('Last7Days'), value: 'last7days' },
+    { label: this.l('Last30Days'), value: 'last30days' },
+    { label: this.l('MonthToDate'), value: 'monthToDate' },
+    { label: this.l('LastMonth'), value: 'lastMonth' },
+    { label: this.l('YearToDate'), value: 'yearToDate' },
+    { label: this.l('Last365Days'), value: 'last365days' },
+    { label: this.l('DateRange'), value: 'dateRange' }
+];
 
     // ---- Lookup fields 
     private readonly lookupPageSize = 10;
@@ -111,9 +113,13 @@ export class FilterBuilderComponent implements OnChanges {
     private lastRuleId = 0;
 
     constructor(
+         injector: Injector,
         private dynamicApi: DynamicApiDispatcherService,
         private extraAttributeData: ExtraAttributeDataService
-    ) { }
+    ) { 
+        super(injector);
+
+    }
 
     ngOnChanges(): void {
         this.rootGroup = this.filterTree

@@ -1,21 +1,33 @@
 <p-toast></p-toast>
 
-<div class="dashboard-detail-page  px-0">
+<div class="dashboard-detail-page  px-0"  [style.margin-top]="isArLang ? '70px' : '-45px'">
 
     <!-- ================= HEADER ================= -->
     <div class="dash-topbar">
         <div class="dashboard-topbar-content">
 
-            <div class="dashboard-header-info">
-                <span class="dash-icon"><i class="pi pi-chart-bar"></i></span>
-                <div class="dash-meta">
-                    <i class="pi pi-clock"></i>
-                    <span>
-                        {{ 'LastUpdated' | localize }}:
-                        <b>{{ dashboard?.lastViewDate | momentFormat:'L' }}</b>
-                    </span>
-                </div>
-            </div>
+        <div class="dashboard-header-info"
+     *ngIf="dashboard?.spreadsheet?.lastRefreshDate">
+
+    <div class="dash-meta">
+        <i class="pi pi-clock"></i>
+
+        <span>
+            {{ 'LastRefreshed' | localize }}:
+
+            <b>
+                {{ dashboard?.spreadsheet?.lastRefreshDate | momentFormat:'L' }}
+                {{ dashboard?.spreadsheet?.lastRefreshDate | momentFormat:'h:mm a' }}
+            </b>
+        </span>
+    </div>
+
+    <b class="text-end"
+       *ngIf="dashboard?.spreadsheet?.refreshedBy">
+        {{ 'by' | localize }}
+        {{ dashboard?.spreadsheet?.refreshedBy }}
+    </b>
+</div>
 
             <h2 class="dash-title text-truncate" [title]="dashboard?.title">
                 {{ dashboard?.title }}
@@ -65,7 +77,8 @@
             <div *ngIf="!loading && !dashboardLoadError && dashboardWorkbookReady" #dashboardExportArea
                 class="dashboard-sheet-viewer" [class.has-charts]="dashboardHasCharts">
 
-                <ejs-spreadsheet #dashboardSpreadsheet width="100%" height="100%" [sheets]="dashboardSheets"
+                <ejs-spreadsheet #dashboardSpreadsheet width="100%" height="100%" [sheets]="dashboardSheets"  [locale]="syncfusionLocale"
+    [enableRtl]="syncfusionRtl"
                     [activeSheetIndex]="dashboardActiveSheetIndex" [allowChart]="true" [allowEditing]="false"
                     [allowInsert]="false" [allowDelete]="false" [allowSorting]="false" [allowFiltering]="false"
                     [allowOpen]="false" [allowSave]="false" [enableContextMenu]="false" [enableKeyboardShortcut]="false"

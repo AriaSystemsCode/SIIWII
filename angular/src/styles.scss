@@ -715,3 +715,11 @@ html[dir="rtl"] .p-carousel .p-carousel-next .pi {
         margin: 2px 15px !important;
 
 }
+
+
+
+
+[dir="rtl"] .p-datatable td,
+[dir="rtl"] .p-datatable th {
+    text-align: right !important;
+}

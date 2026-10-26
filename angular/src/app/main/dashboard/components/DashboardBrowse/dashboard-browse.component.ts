@@ -76,6 +76,9 @@ export class DashboardBrowseComponent
     shareMode: DashboardShareMode = 'all';
     sharedUsers: DashboardSharedUser[] = [];
 
+        currentLang: string =''
+    isArabic: boolean=false
+
     constructor(
         injector: Injector,
         private router: Router,
@@ -86,6 +89,8 @@ export class DashboardBrowseComponent
     }
 
     ngOnInit(): void {
+                this.currentLang = abp.utils.getCookieValue('Abp.Localization.CultureName')
+        this.currentLang == 'ar' || this.currentLang == 'ar-EG'  ? this.isArabic = true : this.isArabic = false
         this.maxResultCount = this.primengTableHelper.defaultRecordsCountPerPage || 10;
         this.getDashboards();
         this.checkScreenSize();
@@ -236,7 +241,7 @@ goToLastDashboardPage(): void {
 
         if (name === row.title) {
             this.cancelRename();
-            this.notify.warn(this.l('Already Same Name.'));
+        this.notify.warn(this.l('DashboardAlreadySameName'));
             return;
         }
 
@@ -252,10 +257,7 @@ goToLastDashboardPage(): void {
                 row.title = name;
 
                 this.cancelRename();
-
-                this.notify.success(
-                    this.l('Dashboard Renamed Successfuly')
-                );
+this.notify.success(this.l('DashboardRenamedSuccessfully'));
 
             });
     }
@@ -284,30 +286,34 @@ goToLastDashboardPage(): void {
         }
     }
 
-    deleteDashboard(row: any): void {
-        this.message.confirm(
-            this.l(''),
-            this.l('Are you sure you want to delete ', row.title),
-            (
-                confirmed: boolean
-            ) => {
 
-                if (!confirmed) {
-                    return;
-                }
-                this.appDashboardsAppService.deleteDashboard(row.id)
-                    .subscribe(() => {
-                        this.notify.success(
-                            this.l('SuccessfullyDeleted')
-                        );
+deleteDashboard(row: any): void {
+    this.message.confirm(
+        this.l('DeleteDashboardConfirmation'),
+        this.l('DeleteDashboard'),
+        (confirmed: boolean) => {
 
-                        this.reloadFromFirstPage();
-
-                    });
-
+            if (!confirmed) {
+                return;
             }
-        );
-    }
+
+            this.appDashboardsAppService
+                .deleteDashboard(row.id)
+                .subscribe(() => {
+
+                    this.notify.success(
+                        this.l('SuccessfullyDeleted')
+                    );
+
+                    this.reloadFromFirstPage();
+                });
+        },
+        {
+            confirmButtonText: this.l('Yes'),
+            cancelButtonText: this.l('No')
+        }
+    );
+}
 
     reloadFromFirstPage(): void {
         if (this.paginator) {

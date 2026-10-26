@@ -38,6 +38,8 @@ export interface SpreadsheetPayload {
     sheetAnalyses: SavedSheetAnalysis[];
     dashboardWidgets: DashboardWidgetMetadata[];
     updatedDate?: string | null;
+   lastRefreshDate?: string | null;
+refreshedBy?: string | null;
 }
 
 export interface RefreshOptions {
@@ -764,4 +766,5 @@ buildPivotMatrix(pivot: any, records: IDataSet[]): any[][] {
 
         return records;
     }
+    
 }

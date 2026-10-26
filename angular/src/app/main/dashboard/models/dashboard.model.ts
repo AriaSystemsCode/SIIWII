@@ -60,6 +60,8 @@ export interface SavedSpreadsheet {
     sheetDataSources?: SpreadsheetSheetDataSource[];
     sheetAnalyses?: SavedSheetAnalysis[];
     dashboardWidgets?: DashboardWidgetMetadata[];
+    lastRefreshDate?:string;
+    refreshedBy?:string
 }
 
 export interface DashboardWidgetMetadata {

@@ -40,6 +40,7 @@
     "@swimlane/ngx-charts": "^20.1.2",
     "@syncfusion/ej2-angular-pivotview": "^34.2.9",
     "@syncfusion/ej2-angular-spreadsheet": "^34.2.9",
+    "@syncfusion/ej2-locale": "34.2.2",
     "@types/file-saver": "^2.0.1",
     "abp-ng2-module": "^8.0.0",
     "abp-web-resources": "^5.2.0",
