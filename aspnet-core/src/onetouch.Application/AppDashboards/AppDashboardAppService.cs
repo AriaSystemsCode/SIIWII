@@ -102,7 +102,7 @@ namespace onetouch.AppDashboards
                                   Title = o.Name,
                                   LastModificationDate = o.LastModificationTime != null ?
                                   DateTime.Parse(o.LastModificationTime.ToString()) :
-                                  null,
+                                  DateTime.Parse(o.CreationTime.ToString()),
                                   SpreadsheetFilePath =o.EntityAttachments
                                   .FirstOrDefault(z=>z.AttachmentCategoryId== fileCategory)!=null?
                                   _appConfiguration[$"Attachment:Path"] + @"\"
