@@ -215,7 +215,7 @@ namespace onetouch.AppDashboards
 
             //}
             long oind = 0;
-            var returnCond = GenerateConditionList(input.Conditions, "AND", ref oind);
+            var returnCond = GenerateConditionList(input.Conditions, (input.ApplyAnyOfConditions ?"OR":"AND"), ref oind);
             foreach (var conditionRet in returnCond)
             {
                 if (conditionRet == null || conditionRet.ExpressionList == null || conditionRet.ExpressionList.Count == 0)
