@@ -103,7 +103,7 @@ BEGIN TRY
         (N'LD', 2, N'AllowMultiSelect', N'Multi-Select', N'BOOLEAN', N'boolean', N'AdvancedInformation', N'false', 0, 1),
         -- The later cumulative seed promotes this setting to String--Chips,
         -- which does not exist yet when this migration first runs.
-        (N'LD', 3, N'DropdownOptions', N'Dropdown Options', N'LD', N'dropDownList', N'AdvancedInformation', NULL, 1, 0),
+        (N'LD', 3, N'DropdownOptions', N'Dropdown Options', N'LD', N'chips', N'AdvancedInformation', NULL, 1, 0),
         (N'LD', 4, N'Required', N'Required', N'BOOLEAN', N'boolean', N'AdvancedInformation', N'false', 0, 1),
         (N'LD', 5, N'Visible', N'Visible', N'BOOLEAN', N'boolean', N'ExtraAttributes', N'true', 0, 1),
         (N'BOOLEAN', 1, N'DefaultValue', N'Default Value', N'BOOLEAN', N'boolean', N'AdvancedInformation', N'false', 1, 0),

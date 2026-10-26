@@ -74,6 +74,7 @@ BEGIN TRY
         EXEC sys.sp_executesql @historySql, N'@id bigint', @id = @settingFieldId;
 
         UPDATE dbo.AppFields SET FieldTypeId = @chipsTypeId,
+            SourceDataType = N'chips',
             CurrentRevisionNo = @nextRevision,
             LastModificationTime = SYSUTCDATETIME()
         WHERE Id = @settingFieldId AND FieldTypeId = @listTypeId;
@@ -90,6 +91,7 @@ BEGIN TRY
 
     -- The applied setting definition is a snapshot, so update it explicitly.
     UPDATE a SET FieldTypeId = @chipsTypeId,
+                 SourceDataType = f.SourceDataType,
                  AppliedRevisionNo = f.CurrentRevisionNo
     FROM dbo.AppTableFields a
     JOIN dbo.AppFields f ON f.Id = @settingFieldId
@@ -98,6 +100,7 @@ BEGIN TRY
       AND a.FieldName = N'DropdownOptions'
       AND a.FieldDefinitionKey = @definitionKey
       AND (a.FieldTypeId <> @chipsTypeId
+           OR (f.SourceDataType = N'chips' AND (a.SourceDataType IS NULL OR a.SourceDataType <> N'chips'))
            OR a.AppliedRevisionNo <> f.CurrentRevisionNo);
 
     IF (SELECT COUNT(*) FROM dbo.AppTableFields a
