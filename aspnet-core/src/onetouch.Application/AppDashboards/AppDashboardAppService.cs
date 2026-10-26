@@ -749,7 +749,7 @@ namespace onetouch.AppDashboards
 
                 }
             }
-            return  returnList ;
+            return  returnList.OrderBy(z => z.Name).ToList();
         }
         public async Task<onetouch.AppDashboards.Dtos.DynamicQueryResult> GetAllTableData(onetouch.AppDashboards.Dtos.DynamicQueryInput input)
         {
