@@ -92,7 +92,7 @@ namespace onetouch.AppDashboards
                 .Count(z => z.EntityId == s.Id && z.SharedUserId == AbpSession.UserId) > 0));
 
             var pagedAndFilteredDashboards = filteredDashboard
-                    //.OrderBy(input.Sorting ?? "name asc")
+                    .OrderBy(input.Sorting ?? "name asc")
                     .PageBy(input);
             var _dashboards = from o in pagedAndFilteredDashboards
                               select new GetDashboardForViewDto
