@@ -8,6 +8,7 @@ using Abp.Domain.Uow;
 using Abp.EntityFrameworkCore.Uow;
 using Abp.Linq.Extensions;
 using DocumentFormat.OpenXml.Bibliography;
+using DocumentFormat.OpenXml.Spreadsheet;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Identity.Client;
@@ -734,15 +735,31 @@ namespace onetouch.AppDashboards
                                 {
                                     fieldData.IsLookup = true;
                                     var lookupEntity = field.SettingValues.Where(z => z.SettingFieldName.ToUpper() == "ENTITYOBJECTTYPECODE").FirstOrDefault();
-                                    if (lookupEntity!=null)
+                                    if (lookupEntity != null)
                                     {
                                         fieldData.EntityObjectTypeCode = lookupEntity.Value;
                                     }
                                 }
                             }
                             var validEntries = field.SettingValues.Where(z => z.SettingFieldName.ToUpper() == "VALIDENTRIES").FirstOrDefault();
-                            if(validEntries!=null)
+                            if (validEntries != null)
                                 fieldData.ValidEntries = validEntries.Value;
+                            var dataSourceAPI = field.SettingValues.Where(z => z.SettingFieldName.ToUpper() == "DATASOURCEAPI").FirstOrDefault();
+                            if (dataSourceAPI!=null &&!string.IsNullOrEmpty(dataSourceAPI.Value))
+                            {
+                                fieldData.DataSource = new DataSource();
+                                fieldData.DataSource.Api = dataSourceAPI.Value;
+                                var dataSourceService = field.SettingValues.Where(z => z.SettingFieldName.ToUpper() == "DATASOURCESERVICE").FirstOrDefault();
+                                if(dataSourceService!=null && !string.IsNullOrEmpty(dataSourceService.Value))
+                                    fieldData.DataSource.Service = dataSourceService.Value;
+                                var dataSourceParameter = field.SettingValues.Where(z => z.SettingFieldName.ToUpper() == "DATASOURCEPARAMETER").FirstOrDefault();
+                                if (dataSourceParameter != null && !string.IsNullOrEmpty(dataSourceParameter.Value))
+                                    fieldData.DataSource.Parameter= dataSourceParameter.Value;
+                                var dataSourceValueParameter = field.SettingValues.Where(z => z.SettingFieldName.ToUpper() == "DATASOURCEVALUEPARAMETER").FirstOrDefault();
+                                if (dataSourceValueParameter != null && !string.IsNullOrEmpty(dataSourceValueParameter.Value))
+                                    fieldData.DataSource.ValueParameter = dataSourceValueParameter.Value;
+                            }
+
                         }
                         returnList.Add(fieldData);
                     }
