@@ -1477,7 +1477,11 @@ namespace onetouch.AppItems
                 exceptList = query0.Select(e => e.Id).ToList();
             }
             var query = _appItemRepository.GetAll().Include(e => e.EntityFk).ThenInclude(e => e.EntityAttachments)
-                .Where(e => (e.EntityId != input.EntityId) && !exceptList.Contains(e.EntityId) && (e.ParentId == 0 || e.ParentId == null) && (e.IsDeleted == null || e.IsDeleted == false))
+                .Where(e => e.TenantOwner.HasValue && e.TenantOwner != AbpSession.TenantId
+                    && (e.EntityId != input.EntityId)
+                    && !exceptList.Contains(e.EntityId)
+                    && (e.ParentId == 0 || e.ParentId == null)
+                    && (e.IsDeleted == null || e.IsDeleted == false))
                 .WhereIf(!string.IsNullOrEmpty(input.Filter), e => e.Name.Contains(input.Filter) || e.Code.Contains(input.Filter))
                 .Include(e => e.EntityFk.EntityAttachments).ThenInclude(e => e.AttachmentFk);
 
