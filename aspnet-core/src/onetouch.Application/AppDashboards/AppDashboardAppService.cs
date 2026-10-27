@@ -1,6 +1,8 @@
 ﻿using Abp.Application.Services.Dto;
 using Abp.Authorization;
 using Abp.Authorization.Users;
+using Abp.Domain.Entities;
+
 
 //using Abp.Collections.Extensions;
 using Abp.Domain.Repositories;
@@ -447,6 +449,18 @@ namespace onetouch.AppDashboards
 
 
 
+        }
+        public async Task<bool> DashboardTitleUsedBefore(string title)
+        {
+            var dashboardObjectTypeId = await _helper.SystemTables.GetEntityObjectTypeDashboard();
+            var dashboardObj = await _appEntityRepository.GetAll()
+                .Where(z => z.EntityObjectTypeId == dashboardObjectTypeId
+                && z.Name== title && z.TenantId== AbpSession.TenantId).FirstOrDefaultAsync();
+            if (dashboardObj != null)
+            {
+                return true;
+            }
+            return false;
         }
         public async Task UpdateViewDate(long dashboard)
         {
