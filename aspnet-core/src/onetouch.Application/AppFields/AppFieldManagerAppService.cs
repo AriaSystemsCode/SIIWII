@@ -582,6 +582,8 @@ namespace onetouch.AppFields
                     throw new UserFriendlyException("Field was not found.");
                 var canEdit = !field.IsDeleted && PermissionChecker.IsGranted(AppPermissions.Pages_Administration_FieldManager_Edit);
                 var own = field.TenantId == AbpSession.TenantId;
+                var canSync = canEdit && !field.IsHidden && own &&
+                    await FieldSnapshots(field).AnyAsync(x => x.AppliedRevisionNo != field.CurrentRevisionNo);
                 return new GetFieldForEditOutput
                 {
                     Field = await ToDtoForResponse(field),
@@ -590,6 +592,7 @@ namespace onetouch.AppFields
                         CanEditCoreInfo = canEdit,
                         CanEditAttributes = canEdit,
                         CanCreateRevision = CanCreateRevision(field),
+                        CanSync = canSync,
                         CanDelete = !field.IsDeleted && own && PermissionChecker.IsGranted(AppPermissions.Pages_Administration_FieldManager_Delete),
                         CanHide = !field.IsDeleted && AbpSession.TenantId.HasValue && field.TenantId == null,
                         IsTenantCustomCopyRequired = AbpSession.TenantId.HasValue && field.TenantId == null
@@ -873,6 +876,7 @@ namespace onetouch.AppFields
         }
 
         [AbpAuthorize(AppPermissions.Pages_Administration_FieldManager_Edit)]
+        [UnitOfWork(IsolationLevel.Serializable)]
         public async Task<FieldActionResultDto> SyncFieldSnapshots(SyncFieldSnapshotsInput input)
         {
             if (input == null) throw new UserFriendlyException("Field data is required.");
@@ -880,19 +884,24 @@ namespace onetouch.AppFields
                 throw new UserFriendlyException("Select the table for this object type.");
             using (UnitOfWorkManager.Current.DisableFilter(AbpDataFilters.MayHaveTenant))
             {
+                await AcquireRevisionLock(input.AppFieldId);
                 var field = await VisibleFields().Include(x => x.SettingValues)
                     .SingleOrDefaultAsync(x => x.Id == input.AppFieldId && !x.IsHidden);
                 if (field == null) throw new UserFriendlyException("Field was not found.");
                 if (field.TenantId != AbpSession.TenantId)
                     throw new UserFriendlyException("A tenant cannot sync a host field.");
+                if (!string.IsNullOrWhiteSpace(input.ExpectedCurrentRevisionNo) &&
+                    field.CurrentRevisionNo != input.ExpectedCurrentRevisionNo)
+                    throw new UserFriendlyException("The field revision changed. Refresh the field before syncing.");
 
-                var query = _tableFields.GetAll().Where(x => x.FieldDefinitionKey == field.FieldDefinitionKey &&
-                    x.TenantId == AbpSession.TenantId);
+                var query = FieldSnapshots(field);
                 if (input.SycObjectId.HasValue)
                     query = query.Where(x => x.SycObjectId == input.SycObjectId.Value &&
                         x.SycEntityObjectTypeId == input.SycEntityObjectTypeId);
-                var snapshots = await query.Include(x => x.SettingValues).ToListAsync();
-                if (snapshots.Count == 0) throw new UserFriendlyException("No table snapshot was found.");
+                var snapshots = await query.Where(x => x.AppliedRevisionNo != field.CurrentRevisionNo)
+                    .Include(x => x.SettingValues).ToListAsync();
+                if (snapshots.Count == 0)
+                    return new FieldActionResultDto { Success = true, Message = "All table snapshots are up to date." };
                 foreach (var snapshot in snapshots)
                 {
                     snapshot.CopyDefinitionFrom(field);
@@ -901,6 +910,15 @@ namespace onetouch.AppFields
                 return new FieldActionResultDto { Success = true,
                     Message = snapshots.Count + " table snapshot(s) synced." };
             }
+        }
+
+        private IQueryable<AppTableField> FieldSnapshots(AppField field)
+        {
+            var snapshots = _tableFields.GetAll().Where(x => x.FieldDefinitionKey == field.FieldDefinitionKey);
+            // A host field can be used by tenant tables. Tenant fields remain scoped to their owner.
+            if (field.TenantId.HasValue)
+                snapshots = snapshots.Where(x => x.TenantId == field.TenantId);
+            return snapshots;
         }
 
         private static AppTableField CreateTableSnapshot(AppField field, int? tenantId,

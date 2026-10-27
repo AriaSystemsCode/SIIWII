@@ -129,6 +129,7 @@ namespace onetouch.AppFields.Dto
     public class SyncFieldSnapshotsInput
     {
         [Range(1, long.MaxValue)] public long AppFieldId { get; set; }
+        [StringLength(10)] public string ExpectedCurrentRevisionNo { get; set; }
         public long? SycObjectId { get; set; }
         public long? SycEntityObjectTypeId { get; set; }
     }
@@ -207,6 +208,7 @@ namespace onetouch.AppFields.Dto
         public bool CanEditCoreInfo { get; set; }
         public bool CanEditAttributes { get; set; }
         public bool CanCreateRevision { get; set; }
+        public bool CanSync { get; set; }
         public bool CanDelete { get; set; }
         public bool CanHide { get; set; }
         public bool IsTenantCustomCopyRequired { get; set; }
