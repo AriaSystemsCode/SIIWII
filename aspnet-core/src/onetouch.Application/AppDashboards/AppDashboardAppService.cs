@@ -218,6 +218,7 @@ namespace onetouch.AppDashboards
         }
         public async Task<GetDashboardForViewDto> GetDashboardForView(long input)
         {
+
             GetDashboardForViewDto dashboard = new GetDashboardForViewDto();
             var dashboardObjectTypeId = await _helper.SystemTables.GetEntityObjectTypeDashboard();
             var fileCategory = await _helper.SystemTables.GetAttachmentCategoryId("FILE");
@@ -225,8 +226,16 @@ namespace onetouch.AppDashboards
                 .Include(x => x.EntityAttachments).ThenInclude(x => x.AttachmentFk)
                .Where(s => s.EntityObjectTypeId == dashboardObjectTypeId &&
                 s.TenantId == AbpSession.TenantId && s.Id == input);
-                
-            
+            var dashboardObj =await filteredDashboard.FirstOrDefaultAsync();
+            if (dashboardObj != null)
+            {
+                var sharingRecord = await _appEntitySharingRepository.GetAll().Include(z => z.EntityFk)
+                    .Where(z => z.EntityId == input && (z.SharedUserId == null ||
+                    z.SharedUserId == AbpSession.UserId || z.EntityFk.CreatorUserId == AbpSession.UserId)).FirstOrDefaultAsync();
+                if (sharingRecord == null)
+                    return dashboard;
+            }
+
             var _dashboard = from o in filteredDashboard
                               select new GetDashboardForViewDto
                               {
@@ -650,9 +659,27 @@ namespace onetouch.AppDashboards
                 }
                 else
                 {
-                    if (ShareDashboardInfo.UsersList != null && 
+                    if (ShareDashboardInfo.UsersList != null &&
                         ShareDashboardInfo.UsersList.Count > 0)
                     {
+                        //Remove users not found in the incoming list[Start]
+                        var allUsersRecords = await _appEntitySharingRepository.GetAll()
+                       .Where(z => z.EntityId == dashboardObj.Id &&
+                       z.SharedTenantId == AbpSession.TenantId &&
+                       z.SharedUserId != null).ToListAsync();
+                        if (allUsersRecords != null && allUsersRecords.Count > 0)
+                        {
+                            foreach (var sharUser in allUsersRecords)
+                            {
+                                var usershar = ShareDashboardInfo.UsersList.Where(z => z.UserId == sharUser.SharedUserId).FirstOrDefault();
+                                if (usershar == null)
+                                {
+                                    await _appEntitySharingRepository.DeleteAsync(sharUser);
+                                }
+                            }
+                            await CurrentUnitOfWork.SaveChangesAsync();
+                        }
+                        //[End]
                         foreach (var user in ShareDashboardInfo.UsersList)
                         {
                             var userRecord = await _appEntitySharingRepository.GetAll()
@@ -680,7 +707,22 @@ namespace onetouch.AppDashboards
 
                         }
                     }
-
+                    else
+                    {
+                        var allUsersRecords = await _appEntitySharingRepository.GetAll()
+                       .Where(z => z.EntityId == dashboardObj.Id &&
+                       z.SharedTenantId == AbpSession.TenantId &&
+                       z.SharedUserId != null && 
+                       z.SharedUserId != dashboardObj.CreatorUserId).ToListAsync();
+                        if (allUsersRecords != null && allUsersRecords.Count > 0)
+                        {
+                            foreach (var sharUser in allUsersRecords)
+                            {
+                                await _appEntitySharingRepository.DeleteAsync(sharUser);
+                            }
+                            await CurrentUnitOfWork.SaveChangesAsync();
+                        }
+                    }
                 }
             }
 
