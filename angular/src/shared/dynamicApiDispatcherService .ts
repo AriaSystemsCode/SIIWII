@@ -1,55 +1,102 @@
-import { Injectable, Injector } from "@angular/core";
-import { AccountsServiceProxy, AppItemsServiceProxy, MarketplaceAccountsServiceProxy } from "./service-proxies/service-proxies";
+import { Injectable } from '@angular/core';
+import { HttpClient } from '@angular/common/http';
+import { map } from 'rxjs/operators';
 
-@Injectable({ providedIn: 'root' })
-export class DynamicApiDispatcherService {
-
- constructor(private injector: Injector) {}
-
- 
-dispatch(serviceName: string, methodName: string, values: any = {}) {
-
-  const serviceProxies: { [name: string]: any } = {
+import {
     AccountsServiceProxy,
     AppItemsServiceProxy,
     MarketplaceAccountsServiceProxy
-  };
-  const serviceType = serviceProxies[serviceName] ||
-    serviceProxies[serviceName.charAt(0).toUpperCase() + serviceName.slice(1)];
+} from './service-proxies/service-proxies';
 
-  if (!serviceType) {
-    throw new Error(`Service '${serviceName}' not found`);
-  }
+import { AppConsts } from '@shared/AppConsts';
 
-  const selectedService = this.injector.get(serviceType);
+@Injectable()
+export class DynamicApiDispatcherService {
 
-  const selectedMethod = selectedService[methodName];
+    constructor(
+        private accountsServiceProxy: AccountsServiceProxy,
+        private appItemsServiceProxy: AppItemsServiceProxy,
+        private marketplaceAccountsServiceProxy: MarketplaceAccountsServiceProxy,
+        private http: HttpClient
+    ) {}
 
-  if (typeof selectedMethod !== "function") {
-    throw new Error(`Method '${methodName}' not found in service '${serviceName}'`);
-  }
+    dispatch(
+        serviceName: string,
+        methodName: string,
+        values: any = {}
+    ): any {
 
-  const paramNames = this.getParameterNames(selectedMethod);
+        // Special handling for account branches
+        if (
+            serviceName === 'AccountsServiceProxy' &&
+            methodName === 'getAccountBranches'
+        ) {
+            return this.http.get<any>(
+                `${AppConsts.remoteServiceBaseUrl}/api/services/app/Accounts/GetAccountBranches`
+            ).pipe(
+                map(response => response?.result ?? response)
+            );
+        }
 
-  const args = new Array(paramNames.length).fill(undefined);
+        const normalizedServiceName =
+            serviceName.endsWith('ServiceProxy')
+                ? serviceName
+                : `${serviceName}ServiceProxy`;
 
-  paramNames.forEach((p, i) => {
-    if (values.hasOwnProperty(p)) {
-      args[i] = values[p];
+        const serviceMap: Record<string, any> = {
+            AccountsServiceProxy: this.accountsServiceProxy,
+            AppItemsServiceProxy: this.appItemsServiceProxy,
+            MarketplaceAccountsServiceProxy:
+                this.marketplaceAccountsServiceProxy
+        };
+
+        const selectedService =
+            serviceMap[normalizedServiceName];
+
+        if (!selectedService) {
+            throw new Error(
+                `Service '${normalizedServiceName}' not found`
+            );
+        }
+
+        const selectedMethod =
+            selectedService[methodName];
+
+        if (typeof selectedMethod !== 'function') {
+            throw new Error(
+                `Method '${methodName}' not found in '${normalizedServiceName}'`
+            );
+        }
+
+        const paramNames =
+            this.getParameterNames(selectedMethod);
+
+        const args = paramNames.map(param =>
+            Object.prototype.hasOwnProperty.call(values, param)
+                ? values[param]
+                : undefined
+        );
+
+        return selectedMethod.apply(
+            selectedService,
+            args
+        );
     }
-  });
 
-  return selectedMethod.apply(selectedService, args);
-}
+    private getParameterNames(func: Function): string[] {
+        const fnStr = func
+            .toString()
+            .replace(/\/\*[\s\S]*?\*\/|\/\/.*$/gm, '');
 
+        const match = fnStr.match(/\(([^)]*)\)/);
 
+        if (!match) {
+            return [];
+        }
 
-  getParameterNames(func: Function): string[] {
-    const fnStr = func.toString().replace(/\/\/.*$|\/\*[\s\S]*?\*\//mg, ''); // remove comments
-    const result = fnStr.slice(fnStr.indexOf('(') + 1, fnStr.indexOf(')')).match(/([^\s,]+)/g);
-    return result === null ? [] : result;
-  }
-  private normalize(name: string) {
-    return name.charAt(0).toLowerCase() + name.slice(1);
-  }
+        return match[1]
+            .split(',')
+            .map(param => param.trim().split('=')[0].trim())
+            .filter(Boolean);
+    }
 }
