@@ -156,8 +156,8 @@
 
                             <img
                                 *ngIf="user.userImage"
-                                [src]="user.userImage"
-                                [alt]="user.userName" />
+                                [src]="attachmentBaseUrl + '/' + user.userImage"
+                               (error)="onAvatarErr($event)" />
 
                             <span *ngIf="!user.userImage">
                                 {{ getUserInitials(user.userName) }}
@@ -208,8 +208,9 @@
 
                             <img
                                 *ngIf="user.userImage"
-                                [src]="user.userImage"
-                                [alt]="user.userName" />
+                                [src]="attachmentBaseUrl + '/' + user.userImage"
+                                (error)="onAvatarErr($event)"
+                               />
 
                             <span *ngIf="!user.userImage">
                                 {{ getUserInitials(user.userName) }}

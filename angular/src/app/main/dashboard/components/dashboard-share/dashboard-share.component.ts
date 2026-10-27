@@ -26,6 +26,7 @@ import {
 } from '@shared/common/app-component-base';
 
 import { finalize } from 'rxjs/operators';
+import { AppConsts } from '@shared/AppConsts';
 
 
 @Component({
@@ -70,7 +71,10 @@ export class DashboardShareComponent
     }
 ];
 
+    attachmentBaseUrl: string = AppConsts.attachmentBaseUrl
+    defaultAvatar = 'assets/common/images/default-profile-picture.png';
 
+    
     constructor(
         injector: Injector,
         private dashboardService: AppDashboardServiceProxy,
@@ -446,6 +450,12 @@ export class DashboardShareComponent
     private closeAfterSave(): void {
         this.visible = false;
         this.visibleChange.emit(false);
+    }
+
+    
+    onAvatarErr(evt: Event): void {
+
+        (evt.target as HTMLImageElement).src = this.defaultAvatar;
     }
 
     getUserInitials(name: string): string {

@@ -175,6 +175,11 @@ syncfusionLocaleReady = false;
 
 isArLang:boolean=false
 currentLang:string=''
+
+spreadsheetNotFound = false;
+spreadsheetLoading = false;
+
+
     constructor(
         injector: Injector,
         private route: ActivatedRoute,
@@ -426,47 +431,83 @@ private async initializeSyncfusionLocale(): Promise<void> {
         this.loadDashboard();
     }
 
-    private loadDashboard(): void {
-        if (!this.dashboardId || !this.spreadsheet) {
-            return;
-        }
+private loadDashboard(): void {
+    if (!this.dashboardId || !this.spreadsheet) {
+        return;
+    }
 
-        this.ignoreSpreadsheetChanges = true;
+    this.ignoreSpreadsheetChanges = true;
+    this.spreadsheetNotFound = false;
+    this.spreadsheetLoading = true;
 
-        this.dashboardService.getDashboardForView(this.dashboardId).subscribe({
-            next: async (result: any) => {
-                try {
-                    const dashboard = result?.dashboard ?? result;
-                    this.dashboardTtle = dashboard?.title ?? '';
+    this.dashboardService.getDashboardForView(this.dashboardId).subscribe({
+        next: async (result: any) => {
+            try {
+                const dashboard = result?.dashboard ?? result;
 
-                    if (dashboard?.spreadsheet) {
-                        await this.openWorkbook(dashboard.spreadsheet);
-                    } else {
-                        await this.createEmptyWorkbook();
-                    }
-                } catch (error) {
-                    console.error('[Spreadsheet] Failed to initialize dashboard spreadsheet:', error);
-                    this.notify.error('Unable to open Spreadsheet.');
-                } finally {
+                // Dashboard not found
+                if (!dashboard || Number(dashboard.id) === 0) {
+                    this.spreadsheetNotFound = true;
+                    this.dashboardTtle = '';
                     this.isDirty = false;
-                    this.ignoreSpreadsheetChanges = false;
+                    return;
+                }
 
+                this.dashboardTtle = dashboard?.title ?? '';
+
+                if (dashboard?.spreadsheet) {
+                    await this.openWorkbook(dashboard.spreadsheet);
+                } else {
+                    // Existing dashboard without a spreadsheet
+                    await this.createEmptyWorkbook();
+                }
+
+            } catch (error) {
+                console.error(
+                    '[Spreadsheet] Failed to initialize dashboard spreadsheet:',
+                    error
+                );
+
+                this.notify.error(this.l('UnableToLoadSpreadsheet'));
+
+            } finally {
+                this.spreadsheetLoading = false;
+                this.isDirty = false;
+                this.ignoreSpreadsheetChanges = false;
+
+                if (!this.spreadsheetNotFound) {
                     this.syncSheetIdentity();
                     this.syncSheetToUi();
-                    this.startSheetWatcher(); // only after loading
+                    this.startSheetWatcher();
 
                     setTimeout(() => {
                         this.syncSheetToUi();
                         this.cdr.detectChanges();
                     }, 200);
                 }
-            },
-            error: (error: any) => {
-                console.error('[Spreadsheet] Failed to load dashboard:', error);
-                this.notify.error('Unable to load Dashboard.');
+
+                this.cdr.detectChanges();
             }
-        });
-    }
+        },
+
+        error: (error: any) => {
+            console.error(
+                '[Spreadsheet] Failed to load dashboard:',
+                error
+            );
+
+            this.spreadsheetNotFound = error?.status === 404;
+            this.spreadsheetLoading = false;
+            this.ignoreSpreadsheetChanges = false;
+
+            if (!this.spreadsheetNotFound) {
+                this.notify.error(this.l('UnableToLoadDashboard'));
+            }
+
+            this.cdr.detectChanges();
+        }
+    });
+}
 
     /** Loads a saved spreadsheet ({ workbookJson, sheetDataSources, ... }). Also used after Refresh. */
     private async openWorkbook(saved: any): Promise<void> {

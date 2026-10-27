@@ -3,7 +3,7 @@
 <div class="dashboard-detail-page  px-0"  [style.margin-top]="isArLang ? '70px' : '-45px'">
 
     <!-- ================= HEADER ================= -->
-    <div class="dash-topbar">
+    <div class="dash-topbar"  *ngIf="!dashboardNotFound">
         <div class="dashboard-topbar-content">
 
         <div class="dashboard-header-info"
@@ -72,6 +72,23 @@
                     <p>{{ dashboardLoadError }}</p>
                 </div> -->
             </div>
+
+            <!-- Dashboard Not Found -->
+<div
+    *ngIf="!loading && dashboardNotFound"
+    class="dashboard-not-found">
+
+    <i class="pi pi-exclamation-circle"></i>
+
+    <h3>
+        {{ 'DashboardNotFound' | localize }}
+    </h3>
+
+    <p>
+        {{ 'DashboardNotFoundDescription' | localize }}
+    </p>
+
+</div>
 
             <!-- Dashboard sheet (other sheets are hidden, charts still read them) -->
             <div *ngIf="!loading && !dashboardLoadError && dashboardWorkbookReady" #dashboardExportArea

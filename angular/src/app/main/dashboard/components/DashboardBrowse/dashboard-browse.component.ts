@@ -5,9 +5,19 @@ import { PrimengTableHelper } from '@shared/helpers/PrimengTableHelper';
 import { Paginator } from 'primeng/paginator';
 import { Table } from 'primeng/table';
 import { AppDashboardServiceProxy, GetDashboardForViewDto, UserInformationDto } from '@shared/service-proxies/service-proxies';
-import { finalize } from 'rxjs/operators';
 import { AppConsts } from '@shared/AppConsts';
 import { DashboardSharedUser, DashboardShareMode } from '../../models/dashboard.model';
+import { Subject, of } from 'rxjs';
+import {
+    catchError,
+    debounceTime,
+    distinctUntilChanged,
+    finalize,
+    map,
+    switchMap
+} from 'rxjs/operators';
+
+
 @Component({
     selector: 'app-dashboard-browse.component',
     templateUrl: './dashboard-browse.component.html',
@@ -76,8 +86,23 @@ export class DashboardBrowseComponent
     shareMode: DashboardShareMode = 'all';
     sharedUsers: DashboardSharedUser[] = [];
 
-        currentLang: string =''
-    isArabic: boolean=false
+
+    newDashboardTitleUsed = false;
+    renameDashboardTitleUsed = false;
+
+    checkingNewDashboardTitle = false;
+    checkingRenameDashboardTitle = false;
+
+    savingNewDashboard = false;
+    savingRename = false;
+
+    private newTitleChanges = new Subject<string>();
+    private renameTitleChanges = new Subject<string>();
+
+    originalDashboardTitle = '';
+
+    currentLang: string = ''
+    isArabic: boolean = false
 
     constructor(
         injector: Injector,
@@ -89,14 +114,104 @@ export class DashboardBrowseComponent
     }
 
     ngOnInit(): void {
-                this.currentLang = abp.utils.getCookieValue('Abp.Localization.CultureName')
-        this.currentLang == 'ar' || this.currentLang == 'ar-EG'  ? this.isArabic = true : this.isArabic = false
+        this.currentLang = abp.utils.getCookieValue('Abp.Localization.CultureName')
+        this.currentLang == 'ar' || this.currentLang == 'ar-EG' ? this.isArabic = true : this.isArabic = false
         this.maxResultCount = this.primengTableHelper.defaultRecordsCountPerPage || 10;
+          this.setDashboardTitleValidation();
         this.getDashboards();
         this.checkScreenSize();
         window.addEventListener('resize', this.checkScreenSize.bind(this));
 
     }
+
+    private setDashboardTitleValidation(): void {
+
+        this.subscriptions.push(
+            this.newTitleChanges.pipe(
+                debounceTime(400),
+                distinctUntilChanged(),
+                switchMap(title => {
+                    if (!this.isDashboardNameValid(title)) {
+                        return of({ title, used: false });
+                    }
+
+                    return this.appDashboardsAppService
+                        .dashboardTitleUsedBefore(title)
+                        .pipe(
+                            // Do not allow saving when validation fails.
+                            catchError(error => {
+                                console.error('Create title validation failed:', error);
+                                return of(true);
+                            }),
+                            map(used => ({ title, used }))
+                        );
+                })
+            ).subscribe(({ title, used }) => {
+                if (title !== this.newDashboardName.trim()) {
+                    return;
+                }
+
+                this.newDashboardTitleUsed = used;
+                this.checkingNewDashboardTitle = false;
+            })
+        );
+
+        this.subscriptions.push(
+            this.renameTitleChanges.pipe(
+                debounceTime(400),
+                distinctUntilChanged(),
+                switchMap(title => {
+                    if (
+                        !this.isDashboardNameValid(title) ||
+                        title === this.originalDashboardTitle.trim()
+                    ) {
+                        return of({ title, used: false });
+                    }
+
+                    return this.appDashboardsAppService
+                        .dashboardTitleUsedBefore(title)
+                        .pipe(
+                            catchError(error => {
+                                console.error('Rename title validation failed:', error);
+                                return of(true);
+                            }),
+                            map(used => ({ title, used }))
+                        );
+                })
+            ).subscribe(({ title, used }) => {
+                if (title !== this.editingDashboardName.trim()) {
+                    return;
+                }
+
+                this.renameDashboardTitleUsed = used;
+                this.checkingRenameDashboardTitle = false;
+            })
+        );
+    }
+
+    onNewDashboardNameChange(value: string): void {
+        this.newDashboardNameTouched = true;
+        this.newDashboardTitleUsed = false;
+
+        const title = (value || '').trim();
+
+        this.checkingNewDashboardTitle = this.isDashboardNameValid(title);
+        this.newTitleChanges.next(title);
+    }
+
+    onRenameDashboardNameChange(value: string): void {
+        this.renameDashboardNameTouched = true;
+        this.renameDashboardTitleUsed = false;
+
+        const title = (value || '').trim();
+
+        this.checkingRenameDashboardTitle =
+            this.isDashboardNameValid(title) &&
+            title !== this.originalDashboardTitle.trim();
+
+        this.renameTitleChanges.next(title);
+    }
+
     checkScreenSize(): void {
         this.isSmallScreen = window.innerWidth <= 1023;
     }
@@ -138,100 +253,139 @@ export class DashboardBrowseComponent
         this.creatingNewDashboard = false;
         this.newDashboardName = '';
         this.newDashboardNameTouched = false;
+
+        this.newDashboardTitleUsed = false;
+        this.checkingNewDashboardTitle = false;
     }
 
 
-   saveNewDashboard(): void {
+    saveNewDashboard(): void {
+        const name = (this.newDashboardName || '').trim();
 
-    const name = this.newDashboardName?.trim() || '';
+        if (!this.isDashboardNameValid(name)) {
+            this.newDashboardNameTouched = true;
+            this.notify.warn(this.l('DashboardNameLengthValidation'));
+            return;
+        }
 
-    if (!this.isDashboardNameValid(name)) {
-        this.newDashboardNameTouched = true;
-        this.notify.warn(this.l('DashboardNameLengthValidation'));
-        return;
+        if (this.savingNewDashboard) {
+            return;
+        }
+
+        this.savingNewDashboard = true;
+
+        this.appDashboardsAppService
+            .dashboardTitleUsedBefore(name)
+            .subscribe({
+                next: (used: boolean) => {
+                    if (used) {
+                        this.newDashboardTitleUsed = true;
+                        this.checkingNewDashboardTitle = false;
+                        this.savingNewDashboard = false;
+                        return;
+                    }
+
+                    // Do not save if the user changed the title
+                    // while the API request was running.
+                    if (name !== this.newDashboardName.trim()) {
+                        this.savingNewDashboard = false;
+                        return;
+                    }
+
+                    this.showMainSpinner();
+
+                    this.appDashboardsAppService
+                        .createOrEdit({ title: name } as any)
+                        .pipe(
+                            finalize(() => {
+                                this.savingNewDashboard = false;
+                                this.hideMainSpinner();
+                            })
+                        )
+                        .subscribe({
+                            next: () => {
+                                this.cancelCreate();
+                                this.goToLastDashboardPage();
+                            },
+                            error: error => {
+                                console.error('Create dashboard failed:', error);
+                            }
+                        });
+                },
+                error: error => {
+                    console.error('Title validation failed:', error);
+                    this.savingNewDashboard = false;
+                    this.notify.error(this.l('DashboardTitleValidationFailed'));
+                }
+            });
     }
 
-    const newDashboard: any = {
-        title: name
-    };
+    goToLastDashboardPage(): void {
 
-    this.showMainSpinner();
+        const pageSize =
+            this.maxResultCount > 0
+                ? this.maxResultCount
+                : this.primengTableHelper.defaultRecordsCountPerPage || 10;
 
-    this.appDashboardsAppService
-        .createOrEdit(newDashboard)
-        .pipe(
-            finalize(() => {
-                this.hideMainSpinner();
-            })
-        )
-        .subscribe(() => {
-
-            this.cancelCreate();
-
-            // Move to last page after successful creation
-            this.goToLastDashboardPage();
-
-        });
-}
-goToLastDashboardPage(): void {
-
-    const pageSize =
-        this.maxResultCount > 0
-            ? this.maxResultCount
-            : this.primengTableHelper.defaultRecordsCountPerPage || 10;
-
-    this.appDashboardsAppService
-        .getAll(
-            this.filterText || null,
-            this.selectedDashboardFilter.value,
-            this.sorting || null,
-            0,
-            1
-        )
-        .subscribe(result => {
-
-            const totalRecords = result?.totalCount || 0;
-
-            const lastPageIndex = Math.max(
+        this.appDashboardsAppService
+            .getAll(
+                this.filterText || null,
+                this.selectedDashboardFilter.value,
+                this.sorting || null,
                 0,
-                Math.ceil(totalRecords / pageSize) - 1
-            );
+                1
+            )
+            .subscribe(result => {
 
-            const lastPageFirst = lastPageIndex * pageSize;
+                const totalRecords = result?.totalCount || 0;
 
-            this.skipCount = lastPageFirst;
-            this.maxResultCount = pageSize;
+                const lastPageIndex = Math.max(
+                    0,
+                    Math.ceil(totalRecords / pageSize) - 1
+                );
 
-            if (this.paginator) {
+                const lastPageFirst = lastPageIndex * pageSize;
 
-                // Updates paginator UI and triggers onPageChange()
-                this.paginator.changePage(lastPageIndex);
+                this.skipCount = lastPageFirst;
+                this.maxResultCount = pageSize;
 
-            } else {
+                if (this.paginator) {
 
-                this.getDashboards();
+                    this.paginator.changePage(lastPageIndex);
 
-            }
+                } else {
 
-        });
-}
+                    this.getDashboards();
+
+                }
+
+            });
+    }
 
     startRename(row: any): void {
         this.cancelCreate();
         this.editingDashboardId = row.id;
         this.editingDashboardName = row.title || '';
+        this.originalDashboardTitle = row.title || '';
+
         this.renameDashboardNameTouched = false;
+        this.renameDashboardTitleUsed = false;
+        this.checkingRenameDashboardTitle = false;
     }
 
     cancelRename(): void {
         this.editingDashboardId = null;
         this.editingDashboardName = '';
+        this.originalDashboardTitle = '';
         this.renameDashboardNameTouched = false;
+
+        this.renameDashboardTitleUsed = false;
+        this.checkingRenameDashboardTitle = false;
     }
 
-    saveRename(row: any): void {
 
-        const name = this.editingDashboardName?.trim() || '';
+    saveRename(row: any): void {
+        const name = (this.editingDashboardName || '').trim();
 
         if (!this.isDashboardNameValid(name)) {
             this.renameDashboardNameTouched = true;
@@ -239,26 +393,66 @@ goToLastDashboardPage(): void {
             return;
         }
 
-        if (name === row.title) {
+        if (name === (row.title || '').trim()) {
             this.cancelRename();
-        this.notify.warn(this.l('DashboardAlreadySameName'));
             return;
         }
 
-        const editDashboard: any = {
-            id: row.id,
-            title: name
-        };
+        if (this.savingRename) {
+            return;
+        }
+
+        this.savingRename = true;
 
         this.appDashboardsAppService
-            .createOrEdit(editDashboard)
-            .subscribe(() => {
+            .dashboardTitleUsedBefore(name)
+            .subscribe({
+                next: (used: boolean) => {
+                    if (used) {
+                        this.renameDashboardTitleUsed = true;
+                        this.checkingRenameDashboardTitle = false;
+                        this.savingRename = false;
+                        return;
+                    }
 
-                row.title = name;
+                    if (
+                        name !== this.editingDashboardName.trim() ||
+                        this.editingDashboardId !== row.id
+                    ) {
+                        this.savingRename = false;
+                        return;
+                    }
 
-                this.cancelRename();
-this.notify.success(this.l('DashboardRenamedSuccessfully'));
+                    const editDashboard: any = {
+                        id: row.id,
+                        title: name
+                    };
 
+                    this.appDashboardsAppService
+                        .createOrEdit(editDashboard)
+                        .pipe(
+                            finalize(() => {
+                                this.savingRename = false;
+                            })
+                        )
+                        .subscribe({
+                            next: () => {
+                                row.title = name;
+                                this.cancelRename();
+                                this.notify.success(
+                                    this.l('DashboardRenamedSuccessfully')
+                                );
+                            },
+                            error: error => {
+                                console.error('Rename dashboard failed:', error);
+                            }
+                        });
+                },
+                error: error => {
+                    console.error('Title validation failed:', error);
+                    this.savingRename = false;
+                    this.notify.error(this.l('DashboardTitleValidationFailed'));
+                }
             });
     }
 
@@ -287,33 +481,33 @@ this.notify.success(this.l('DashboardRenamedSuccessfully'));
     }
 
 
-deleteDashboard(row: any): void {
-    this.message.confirm(
-        this.l('DeleteDashboardConfirmation'),
-        this.l('DeleteDashboard'),
-        (confirmed: boolean) => {
+    deleteDashboard(row: any): void {
+        this.message.confirm(
+            this.l('DeleteDashboardConfirmation'),
+            this.l('DeleteDashboard'),
+            (confirmed: boolean) => {
 
-            if (!confirmed) {
-                return;
+                if (!confirmed) {
+                    return;
+                }
+
+                this.appDashboardsAppService
+                    .deleteDashboard(row.id)
+                    .subscribe(() => {
+
+                        this.notify.success(
+                            this.l('SuccessfullyDeleted')
+                        );
+
+                        this.reloadFromFirstPage();
+                    });
+            },
+            {
+                confirmButtonText: this.l('Yes'),
+                cancelButtonText: this.l('No')
             }
-
-            this.appDashboardsAppService
-                .deleteDashboard(row.id)
-                .subscribe(() => {
-
-                    this.notify.success(
-                        this.l('SuccessfullyDeleted')
-                    );
-
-                    this.reloadFromFirstPage();
-                });
-        },
-        {
-            confirmButtonText: this.l('Yes'),
-            cancelButtonText: this.l('No')
-        }
-    );
-}
+        );
+    }
 
     reloadFromFirstPage(): void {
         if (this.paginator) {
@@ -356,17 +550,7 @@ deleteDashboard(row: any): void {
                     this.dashboards = result?.items || [];
                     this.primengTableHelper.records = result?.items || [];
                     this.primengTableHelper.totalRecordsCount = result?.totalCount || 0;
-                    this.dashboards.forEach(
-                        row => {
-                            this.loadProfilePicture(row?.creatorUserProfilePictureId);
-                            row?.appEntitySharings
-                                ?.forEach(
-                                    u => {
-                                        this.loadProfilePicture(u?.userProfilePictureId);
-                                    }
-                                );
-                        }
-                    );
+
                 }
             });
 
@@ -374,88 +558,24 @@ deleteDashboard(row: any): void {
 
     }
 
-    onDashboardCreated(
-        res: any
-    ): void {
-
+    onDashboardCreated(res: any): void {
         this.skipCount = 0;
-
         if (this.paginator) {
-
-            const currentPage =
-                this.paginator.getPage
-                    ? this.paginator.getPage()
-                    : 0;
-
+            const currentPage = this.paginator.getPage ? this.paginator.getPage() : 0;
             if (currentPage !== 0) {
-
-                this.paginator
-                    .changePage(0);
-
+                this.paginator.changePage(0);
             } else {
 
                 this.getDashboards();
             }
-
             return;
         }
-
         this.getDashboards();
     }
 
     // =========================================================
     // Profile Pictures
     // =========================================================
-
-    loadProfilePicture(
-        id?: string | null
-    ): void {
-
-        /*
-        if (
-            !id ||
-            this.profilePictureMap[id]
-        ) {
-            return;
-        }
-
-        const subs =
-            this._postService
-                .getProfilePictureAllByID(id)
-                .subscribe(data => {
-
-                    if (
-                        data?.profilePicture
-                    ) {
-
-                        this.profilePictureMap[id] =
-                            'data:image/jpeg;base64,' +
-                            data.profilePicture;
-
-                    } else {
-
-                        this.profilePictureMap[id] =
-                            this.defaultAvatar;
-                    }
-                });
-
-        this.subscriptions.push(subs);
-        */
-    }
-
-    getProfilePicture(
-        id?: string | null
-    ): string {
-
-        if (!id) {
-            return this.defaultAvatar;
-        }
-
-        return (
-            this.profilePictureMap[id] ||
-            this.defaultAvatar
-        );
-    }
 
     onAvatarErr(evt: Event): void {
 

@@ -50,6 +50,7 @@ import { DrilldownDialogComponent } from './components/drilldown-dialog/drilldow
 import { SpreadsheetRefreshService } from
     './services/spreadsheet-refresh.service';
 import { DrilldownService } from './services/drilldown.service';
+import { DynamicApiDispatcherService } from '@shared/dynamicApiDispatcherService ';
 
 @NgModule({
     declarations: [
@@ -112,6 +113,7 @@ import { DrilldownService } from './services/drilldown.service';
           SpreadsheetRefreshService,
           DrilldownService,
           MarketplaceAccountsServiceProxy,
+           DynamicApiDispatcherService,
         { provide: BsDatepickerConfig, useFactory: NgxBootstrapDatePickerConfigService.getDatepickerConfig },
         { provide: BsDaterangepickerConfig, useFactory: NgxBootstrapDatePickerConfigService.getDaterangepickerConfig },
         { provide: BsLocaleService, useFactory: NgxBootstrapDatePickerConfigService.getDatepickerLocale },

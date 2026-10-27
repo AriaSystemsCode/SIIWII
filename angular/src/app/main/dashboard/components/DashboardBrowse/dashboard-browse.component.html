@@ -1,4 +1,3 @@
-
 <div class="mainDiv mx-lg-5 mb-5" [ngClass]="isArabic ? 'mt-ar-dash':''">
   <div class="my-dashboards-page container-fluid">
 
@@ -7,10 +6,7 @@
 
       <!-- Dashboard Filter -->
       <div class="d-flex align-items-center" dropdown container="body">
-        <button
-          class="dropdown-toggle btn btn-sm p-0 d-flex align-items-center"
-          dropdownToggle
-          type="button">
+        <button class="dropdown-toggle btn btn-sm p-0 d-flex align-items-center" dropdownToggle type="button">
 
           <h2 class="page-title m-0 mr-2">
             {{ selectedDashboardFilter.label | localize }}
@@ -19,10 +15,7 @@
 
         <ul *dropdownMenu class="dropdown-menu dashboard-filter-menu">
           <li *ngFor="let opt of dashboardFilterOptions">
-            <button
-              class="dropdown-item dashboard-filter-item"
-              type="button"
-              (click)="selectFilter(opt)">
+            <button class="dropdown-item dashboard-filter-item" type="button" (click)="selectFilter(opt)">
               {{ opt.label | localize }}
             </button>
           </li>
@@ -34,22 +27,14 @@
         <span class="p-input-icon-left search-box">
           <i class="pi pi-search"></i>
 
-          <input
-            #globalSearch
-            type="text"
-            class="searchIn"
-            pInputText
-            [placeholder]="'Search' | localize"
+          <input #globalSearch type="text" class="searchIn" pInputText [placeholder]="'Search' | localize"
             (input)="onGlobalSearch($event)" />
         </span>
       </div>
 
       <!-- Create -->
       <div>
-        <button
-          class="btn create-btn"
-          type="button"
-          (click)="createNew()">
+        <button class="btn create-btn" type="button" (click)="createNew()">
 
           {{ 'CreateNew' | localize }}
           <i class="fas fa-plus ml-2"></i>
@@ -62,13 +47,8 @@
     <div class="shadow-sm main-card">
       <div class="card-body p-0">
 
-        <p-table
-          #dataTable
-          [value]="primengTableHelper.records"
-          [lazy]="false"
-          [paginator]="false"
-          [rows]="primengTableHelper.defaultRecordsCountPerPage"
-          [totalRecords]="primengTableHelper.totalRecordsCount"
+        <p-table #dataTable [value]="primengTableHelper.records" [lazy]="false" [paginator]="false"
+          [rows]="primengTableHelper.defaultRecordsCountPerPage" [totalRecords]="primengTableHelper.totalRecordsCount"
           styleClass="p-datatable-sm dashboards-table">
 
           <!-- HEADER -->
@@ -92,61 +72,51 @@
               <td>
 
                 <!-- Normal Mode -->
-                <a
-                  *ngIf="editingDashboardId !== row.id"
-                  class="dash-link"
-                  href="javascript:;"
+                <a *ngIf="editingDashboardId !== row.id" class="dash-link" href="javascript:;"
                   (click)="openDashboard(row)">
                   {{ row?.title }}
                 </a>
 
                 <!-- Rename Mode -->
-                <div
-                  *ngIf="editingDashboardId === row.id"
-                  class="dashboard-name-edit d-flex align-items-center">
+                <div *ngIf="editingDashboardId === row.id" class="dashboard-name-edit d-flex align-items-center">
 
                   <div class="dashboard-name-input-wrapper">
 
-                    <input
-                      type="text"
-                      class="form-control"
-                      [(ngModel)]="editingDashboardName"
-                      minlength="9"
-                      maxlength="50"
-                      (ngModelChange)="renameDashboardNameTouched = true"
-                      [placeholder]="'DashboardName' | localize"
-                      (keyup.enter)="saveRename(row)"
+                    <input type="text" class="form-control" [(ngModel)]="editingDashboardName" minlength="9"
+                      maxlength="50" (ngModelChange)="onRenameDashboardNameChange($event)"
+                      [placeholder]="'DashboardName' | localize" (keyup.enter)="saveRename(row)"
                       (keyup.escape)="cancelRename()" />
 
-                    <small
-                      *ngIf="
-                        renameDashboardNameTouched &&
-                        !isDashboardNameValid(editingDashboardName)
-                      "
-                      class="dashboard-character-count text-danger">
-
+                    <small *ngIf="
+            renameDashboardNameTouched &&
+            !isDashboardNameValid(editingDashboardName)
+        " class="dashboard-character-count text-danger">
                       {{ 'DashboardNameLengthValidation' | localize }}
+                    </small>
 
+                    <small *ngIf="renameDashboardTitleUsed" class="dashboard-character-count text-danger">
+                      {{ 'DashboardTitleUsedBefore' | localize }}
+                    </small>
+
+                    <small *ngIf="checkingRenameDashboardTitle && !renameDashboardTitleUsed" class="text-muted">
+                      {{ 'CheckingDashboardTitle' | localize }}
                     </small>
 
                   </div>
 
-                  <!-- Save -->
-                  <button
-                    type="button"
-                    class="btn btn-sm btn-link text-success ml-1"
-                    [title]="'Save' | localize"
-                    [disabled]="!isDashboardNameValid(editingDashboardName)"
-                    (click)="saveRename(row)">
+                  <button type="button" class="btn btn-sm btn-link text-success ml-1" [title]="'Save' | localize"
+                    [disabled]="
+        !isDashboardNameValid(editingDashboardName) ||
+        renameDashboardTitleUsed ||
+        checkingRenameDashboardTitle ||
+        savingRename
+    " (click)="saveRename(row)">
 
                     <i class="fas fa-check"></i>
                   </button>
 
                   <!-- Cancel -->
-                  <button
-                    type="button"
-                    class="btn btn-sm btn-link text-muted"
-                    [title]="'Cancel' | localize"
+                  <button type="button" class="btn btn-sm btn-link text-muted" [title]="'Cancel' | localize"
                     (click)="cancelRename()">
 
                     <i class="fas fa-times"></i>
@@ -168,18 +138,13 @@
               <!-- Spreadsheet -->
               <td>
 
-                <a
-                  *ngIf="row?.isEditable || row?.isTheOwner"
-                  class="text-unerline"
-                  href="javascript:;"
+                <a *ngIf="row?.isEditable || row?.isTheOwner" class="text-unerline" href="javascript:;"
                   (click)="openSpreadsheet(row)">
 
                   {{ 'EditSpreadsheet' | localize }}
                 </a>
 
-                <span
-                  *ngIf="!row?.isEditable && !row?.isTheOwner"
-                  class="text-muted">
+                <span *ngIf="!row?.isEditable && !row?.isTheOwner" class="text-muted">
 
                   {{ 'EditSpreadsheet' | localize }}
                 </span>
@@ -211,34 +176,22 @@
                 <div class="sharing-wrap d-flex align-items-center">
                   <div class="avatar-stack">
 
-                    <ng-container
-                      *ngFor="
+                    <ng-container *ngFor="
                         let u of row?.sharedWithUsers | slice:0:3;
                         let i = index
                       ">
 
-                      <img
-                        class="avatar avatar-sm stacked"
-                        [style.zIndex]="10 - i"
-                        [src]="attachmentBaseUrl + u?.userImage"
-                        (error)="onAvatarErr($event)"
-                        [alt]="u?.userName"
-                        [pTooltip]="u?.userName"
-                        tooltipPosition="bottom"
-                        [tooltipEvent]="isSmallScreen ? 'focus' : 'hover'"
-                        [autoHide]="true"
-                        [showDelay]="100"
-                        [hideDelay]="100"
-                        [tabindex]="isSmallScreen ? 0 : null" />
+                      <img class="avatar avatar-sm stacked" [style.zIndex]="10 - i"
+                        [src]="attachmentBaseUrl +'/' + u?.userImage" (error)="onAvatarErr($event)" [alt]="u?.userName"
+                        [pTooltip]="u?.userName" tooltipPosition="bottom"
+                        [tooltipEvent]="isSmallScreen ? 'focus' : 'hover'" [autoHide]="true" [showDelay]="100"
+                        [hideDelay]="100" [tabindex]="isSmallScreen ? 0 : null" />
 
                     </ng-container>
 
                     <!-- More Users -->
-                    <div
-                      *ngIf="row?.sharedWithUsers?.length > 3"
-                      class="avatar avatar-sm stacked more"
-                      (mouseenter)="showShare($event, row)"
-                      (mouseleave)="hideShare()">
+                    <div *ngIf="row?.sharedWithUsers?.length > 3" class="avatar avatar-sm stacked more"
+                      (mouseenter)="showShare($event, row)" (mouseleave)="hideShare()">
 
                       +{{ row?.sharedWithUsers?.length - 3 }}
                     </div>
@@ -250,65 +203,47 @@
               <!-- Actions -->
               <td class="text-center-im">
 
-                <div
-                  *ngIf="row?.isTheOwner"
-                  class="dashboard-actions"
-                  dropdown
-                  container="body">
+                <div *ngIf="row?.isTheOwner" class="dashboard-actions" dropdown container="body">
 
-                  <button
-                    type="button"
-                    class="btn btn-sm action-menu-btn"
-                    dropdownToggle
+                  <button type="button" class="btn btn-sm action-menu-btn" dropdownToggle
                     [title]="'Actions' | localize">
 
                     <i class="fas fa-ellipsis-v"></i>
                   </button>
 
-              <ul
-    *dropdownMenu
-    class="dropdown-menu"
-    [ngClass]="isArabic ? 'dropdown-menu-left dropdown-rtl' : 'dropdown-menu-right dropdown-ltr'">
+                  <ul *dropdownMenu class="dropdown-menu"
+                    [ngClass]="isArabic ? 'dropdown-menu-left dropdown-rtl' : 'dropdown-menu-right dropdown-ltr'">
 
-    <!-- Rename -->
-    <li>
-        <button
-            type="button"
-            class="dropdown-item"
-            (click)="startRename(row)">
+                    <!-- Rename -->
+                    <li>
+                      <button type="button" class="dropdown-item" (click)="startRename(row)">
 
-            <i class="fas fa-pen"></i>
-            <span>{{ 'Rename' | localize }}</span>
-        </button>
-    </li>
+                        <i class="fas fa-pen"></i>
+                        <span>{{ 'Rename' | localize }}</span>
+                      </button>
+                    </li>
 
-    <!-- Sharing -->
-    <li>
-        <button
-            type="button"
-            class="dropdown-item"
-            (click)="openShareDashboard(row)">
+                    <!-- Sharing -->
+                    <li>
+                      <button type="button" class="dropdown-item" (click)="openShareDashboard(row)">
 
-            <i class="fas fa-share-alt"></i>
-            <span>{{ 'Sharing' | localize }}</span>
-        </button>
-    </li>
+                        <i class="fas fa-share-alt"></i>
+                        <span>{{ 'Sharing' | localize }}</span>
+                      </button>
+                    </li>
 
-    <li class="dropdown-divider"></li>
+                    <li class="dropdown-divider"></li>
 
-    <!-- Delete -->
-    <li>
-        <button
-            type="button"
-            class="dropdown-item text-danger"
-            (click)="deleteDashboard(row)">
+                    <!-- Delete -->
+                    <li>
+                      <button type="button" class="dropdown-item text-danger" (click)="deleteDashboard(row)">
 
-            <i class="fas fa-trash-alt"></i>
-            <span>{{ 'Delete' | localize }}</span>
-        </button>
-    </li>
+                        <i class="fas fa-trash-alt"></i>
+                        <span>{{ 'Delete' | localize }}</span>
+                      </button>
+                    </li>
 
-</ul>
+                  </ul>
 
                 </div>
 
@@ -328,47 +263,41 @@
 
                   <div class="dashboard-name-input-wrapper">
 
-                    <input
-                      type="text"
-                      class="form-control form-control-sm"
-                      [(ngModel)]="newDashboardName"
-                      minlength="9"
-                      maxlength="50"
-                      (ngModelChange)="newDashboardNameTouched = true"
-                      [placeholder]="'DashboardName' | localize"
-                      (keyup.enter)="saveNewDashboard()"
-                      (keyup.escape)="cancelCreate()"
-                      autofocus />
+                    <input type="text" class="form-control form-control-sm" [(ngModel)]="newDashboardName" minlength="9"
+                      maxlength="50" (ngModelChange)="onNewDashboardNameChange($event)"
+                      [placeholder]="'DashboardName' | localize" (keyup.enter)="saveNewDashboard()"
+                      (keyup.escape)="cancelCreate()" autofocus />
 
-                    <small
-                      *ngIf="
-                        newDashboardNameTouched &&
-                        !isDashboardNameValid(newDashboardName)
-                      "
-                      class="dashboard-character-count text-danger">
-
+                    <small *ngIf="
+            newDashboardNameTouched &&
+            !isDashboardNameValid(newDashboardName)
+        " class="dashboard-character-count text-danger">
                       {{ 'DashboardNameLengthValidation' | localize }}
+                    </small>
 
+                    <small *ngIf="newDashboardTitleUsed" class="dashboard-character-count text-danger">
+                      {{ 'DashboardTitleUsedBefore' | localize }}
+                    </small>
+
+                    <small *ngIf="checkingNewDashboardTitle && !newDashboardTitleUsed" class="text-muted">
+                      {{ 'CheckingDashboardTitle' | localize }}
                     </small>
 
                   </div>
 
-                  <!-- Save -->
-                  <button
-                    type="button"
-                    class="btn btn-sm btn-link text-success ml-1"
-                    [title]="'Save' | localize"
-                    [disabled]="!isDashboardNameValid(newDashboardName)"
-                    (click)="saveNewDashboard()">
+                  <button type="button" class="btn btn-sm btn-link text-success ml-1" [title]="'Save' | localize"
+                    [disabled]="
+        !isDashboardNameValid(newDashboardName) ||
+        newDashboardTitleUsed ||
+        checkingNewDashboardTitle ||
+        savingNewDashboard
+    " (click)="saveNewDashboard()">
 
                     <i class="fas fa-check"></i>
                   </button>
 
                   <!-- Cancel -->
-                  <button
-                    type="button"
-                    class="btn btn-sm btn-link text-muted"
-                    [title]="'Cancel' | localize"
+                  <button type="button" class="btn btn-sm btn-link text-muted" [title]="'Cancel' | localize"
                     (click)="cancelCreate()">
 
                     <i class="fas fa-times"></i>
@@ -398,10 +327,7 @@
         </p-table>
 
         <!-- SHARING HOVER -->
-        <p-overlayPanel
-          #sharePanel
-          [showCloseIcon]="false"
-          styleClass="share-panel">
+        <p-overlayPanel #sharePanel [showCloseIcon]="false" styleClass="share-panel">
 
           <div class="share-panel-title mb-2">
             {{ 'SharedWith' | localize }}
@@ -409,14 +335,9 @@
 
           <div *ngIf="shareUsers?.length; else emptyShare">
 
-            <div
-              class="share-user d-flex align-items-center"
-              *ngFor="let u of shareUsers">
+            <div class="share-user d-flex align-items-center" *ngFor="let u of shareUsers">
 
-              <img
-                class="avatar avatar-sm"
-                [src]="attachmentBaseUrl + u?.userImage"
-                (error)="onAvatarErr($event)"
+              <img class="avatar avatar-sm" [src]="attachmentBaseUrl + '/' + u?.userImage" (error)="onAvatarErr($event)"
                 [alt]="'User' | localize" />
 
               <span class="ml-2">
@@ -447,9 +368,7 @@
 
         <div class="primeng-paging-container custom-paginator">
 
-          <p-paginator
-            #paginator
-            [rows]="primengTableHelper.defaultRecordsCountPerPage"
+          <p-paginator #paginator [rows]="primengTableHelper.defaultRecordsCountPerPage"
             [totalRecords]="primengTableHelper.totalRecordsCount"
             [rowsPerPageOptions]="primengTableHelper.predefinedRecordsCountPerPage"
             (onPageChange)="onPageChange($event)">
@@ -457,10 +376,10 @@
 
           <div class="total-records-count text-right mr-3">
             {{
-              l(
-                'TotalRecordsCount',
-                primengTableHelper.totalRecordsCount
-              )
+            l(
+            'TotalRecordsCount',
+            primengTableHelper.totalRecordsCount
+            )
             }}
           </div>
 
@@ -473,9 +392,6 @@
 </div>
 
 <!-- Dashboard Sharing Modal -->
-<app-dashboard-share
-  [(visible)]="showShareModal"
-  [dashboardName]="selectedDashboard?.title"
-  [dashboardId]="selectedDashboard?.id"
-  (saved)="onDashboardShareSaved($event)">
+<app-dashboard-share [(visible)]="showShareModal" [dashboardName]="selectedDashboard?.title"
+  [dashboardId]="selectedDashboard?.id" (saved)="onDashboardShareSaved($event)">
 </app-dashboard-share>

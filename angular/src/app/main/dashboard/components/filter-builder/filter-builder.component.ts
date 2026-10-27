@@ -121,20 +121,45 @@ readonly datePeriodOptions: SelectOption[] = [
 
     }
 
-    ngOnChanges(): void {
-        this.rootGroup = this.filterTree
-            ? this.restoreGroup(this.filterTree)
-            : {
-                type: 'group',
-                matchMode: this.matchMode,
-                children: (this.conditions || []).map(condition => ({
-                    type: 'rule' as const,
-                    field: condition.field,
-                    operator: condition.operator || 'eq',
-                    value: this.restoreValue(condition.field, condition.value)
-                }))
-            };
+   ngOnChanges(): void {
+    this.rootGroup = this.filterTree
+        ? this.restoreGroup(this.filterTree)
+        : {
+            type: 'group',
+            matchMode: this.matchMode,
+            children: (this.conditions || []).map(condition => ({
+                type: 'rule' as const,
+                field: condition.field,
+                operator: condition.operator || 'eq',
+                value: this.restoreValue(condition.field, condition.value)
+            }))
+        };
+
+    // Load lookup options for previously saved conditions
+    this.loadSavedLookupOptions(this.rootGroup);
+}
+
+private loadSavedLookupOptions(group: FilterConditionGroup): void {
+    for (const node of group.children) {
+
+        if (node.type === 'group') {
+            this.loadSavedLookupOptions(node);
+            continue;
+        }
+
+        const field = this.getField(node.field);
+
+        if (!field || !this.usesApiLookup(field)) {
+            continue;
+        }
+
+        const state = this.lookups.get(field.name);
+
+        if (!state?.isLoaded && !state?.isLoading) {
+            this.loadLookupOptions(field, false);
+        }
     }
+}
 
     /** Copies a saved group and turns saved date strings back into Date objects. */
     private restoreGroup(group: FilterConditionGroup): FilterConditionGroup {
@@ -640,35 +665,41 @@ readonly datePeriodOptions: SelectOption[] = [
     }
 
     getValueOptionsWithSelection(rule: FilterBuilderRule): SelectOption[] {
+    const field = this.getField(rule.field);
 
-        const field = this.getField(rule.field);
+    if (!field) {
+        return [];
+    }
 
-        if (!field) {
-            return [];
-        }
+    let options = this.getValueOptions(rule);
 
-        let options = this.getValueOptions(rule);
+    if (!this.usesApiLookup(field)) {
+        const visibleCount =
+            this.staticVisible.get(field.name) ?? this.lookupPageSize;
 
-        if (!this.usesApiLookup(field)) {
-            const visibleCount =
-                this.staticVisible.get(field.name) ?? this.lookupPageSize;
+        options = options.slice(0, visibleCount);
+    }
 
-            options = options.slice(0, visibleCount);
-        }
+    const selectedValue = rule.value;
 
-        const selectedValue = rule.value;
+    const hasSelectedValue =
+        selectedValue !== null &&
+        selectedValue !== undefined &&
+        selectedValue !== '';
 
-        const hasSelectedValue =
-            selectedValue !== null &&
-            selectedValue !== undefined &&
-            selectedValue !== '';
+    if (hasSelectedValue) {
+        const selectedOption = options.find(
+            option => String(option.value) === String(selectedValue)
+        );
 
-        if (
-            hasSelectedValue &&
-            !options.some(
-                option => String(option.value) === String(selectedValue)
-            )
-        ) {
+        if (selectedOption) {
+            // Use the actual option value to preserve PrimeNG selection.
+            // This also handles numeric/string ID differences.
+            if (rule.value !== selectedOption.value) {
+                rule.value = selectedOption.value;
+            }
+        } else {
+            // Temporary fallback until the API returns the selected item.
             options = [
                 {
                     label: String(selectedValue),
@@ -677,27 +708,27 @@ readonly datePeriodOptions: SelectOption[] = [
                 ...options
             ];
         }
-
-        // Cache options so PrimeNG receives a stable array reference.
-        const cacheKey = JSON.stringify({
-            field: field.name,
-            options: options.map(option => [
-                option.label,
-                option.value
-            ])
-        });
-
-        const ruleId = this.getRuleId(rule);
-
-        if (this.dropdownOptionsCacheKeys.get(ruleId) === cacheKey) {
-            return this.dropdownOptionsCache.get(ruleId)!;
-        }
-
-        this.dropdownOptionsCacheKeys.set(ruleId, cacheKey);
-        this.dropdownOptionsCache.set(ruleId, options);
-
-        return options;
     }
+
+    const cacheKey = JSON.stringify({
+        field: field.name,
+        options: options.map(option => [
+            option.label,
+            option.value
+        ])
+    });
+
+    const ruleId = this.getRuleId(rule);
+
+    if (this.dropdownOptionsCacheKeys.get(ruleId) === cacheKey) {
+        return this.dropdownOptionsCache.get(ruleId)!;
+    }
+
+    this.dropdownOptionsCacheKeys.set(ruleId, cacheKey);
+    this.dropdownOptionsCache.set(ruleId, options);
+
+    return options;
+}
 
     // ---- loading state and "Load More" ----
 
@@ -832,7 +863,10 @@ readonly datePeriodOptions: SelectOption[] = [
         const records: any[] = result?.items ?? result?.result?.items ?? [];
 
         const labelPath = source.parameter || 'name';
-        const valuePath = source.valueField || 'account.id'; 
+      const valuePath =
+    (source as any).valueParameter ||
+    source.valueField ||
+    'account.id';
 
         const newItems: SelectOption[] = records
             .map(record => {

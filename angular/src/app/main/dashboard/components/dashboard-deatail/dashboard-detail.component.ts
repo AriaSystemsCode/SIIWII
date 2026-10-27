@@ -77,7 +77,7 @@ currentLang:string=''
 syncfusionLocale = 'en';
 syncfusionRtl = false;
 syncfusionLocaleReady = false;
-
+dashboardNotFound = false;
     constructor(
         injector: Injector,
         private route: ActivatedRoute,
@@ -169,39 +169,82 @@ syncfusionLocaleReady = false;
     this.cdr.detectChanges();
 }
 
-    loadDashboard(): void {
-        this.loading = true;
-        this.showMainSpinner()
-        this.dashboardWorkbookReady = false;
-        this.dashboardLoadError = '';
-        this.dashboardSheets = [];
+   loadDashboard(): void {
+    this.loading = true;
+    this.showMainSpinner();
 
-        this.appDashboardService.getDashboardForView(this.dashboardId).subscribe({
+    this.dashboardNotFound = false;
+    this.dashboardWorkbookReady = false;
+    this.dashboardLoadError = '';
+    this.dashboardSheets = [];
+    this.dashboard = null;
+    this.saved = null;
+
+    this.appDashboardService
+        .getDashboardForView(this.dashboardId)
+        .subscribe({
             next: (result: any) => {
                 try {
-                    this.dashboard = result?.dashboard ?? result;
-                    this.saved = this.parseSaved(this.dashboard?.spreadsheet);
+                    const dashboard = result?.dashboard ?? result;
+
+                    // Dashboard does not exist
+                    if (!dashboard || Number(dashboard.id) === 0) {
+                        this.dashboardNotFound = true;
+                        this.dashboardWorkbookReady = false;
+                        this.dashboardSheets = [];
+                        return;
+                    }
+
+                    // Valid dashboard
+                    this.dashboard = dashboard;
+
+                    this.saved = this.parseSaved(
+                        this.dashboard?.spreadsheet
+                    );
+
                     this.showWorkbook(this.saved);
+
                 } catch (error) {
-                    console.error('[Dashboard] Load failed:', error);
-                    this.dashboardLoadError = error instanceof Error ? error.message : 'Unable to load the dashboard.';
+                    console.error(
+                        '[Dashboard] Load failed:',
+                        error
+                    );
+
+                    this.dashboardLoadError =
+                        error instanceof Error
+                            ? error.message
+                            : this.l('UnableToLoadDashboard');
+
                     this.dashboardWorkbookReady = false;
                     this.dashboardSheets = [];
+
                 } finally {
                     this.loading = false;
-                    this.hideMainSpinner()
+                    this.hideMainSpinner();
                     this.cdr.detectChanges();
                 }
             },
+
             error: (error: any) => {
-                console.error('[Dashboard] Dashboard API failed:', error);
-               this.dashboardLoadError = this.l('UnableToLoadDashboard');
+                console.error(
+                    '[Dashboard] Dashboard API failed:',
+                    error
+                );
+
+                if (error?.status === 404) {
+                    this.dashboardNotFound = true;
+                } else {
+                    this.dashboardLoadError =
+                        this.l('UnableToLoadDashboard');
+                }
+
+                this.dashboardWorkbookReady = false;
                 this.loading = false;
-                this.hideMainSpinner()
+                this.hideMainSpinner();
                 this.cdr.detectChanges();
             }
         });
-    }
+}
 
     private parseSaved(raw: any): SpreadsheetPayload {
         const saved = typeof raw === 'string' ? JSON.parse(raw) : raw;

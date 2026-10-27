@@ -3266,10 +3266,13 @@ Please select one of the available linesheet templates
 <text name="ClearDataSourceConfirmation">Are you sure you want to clear all data and remove the linked data source from "{0}"? Click Save on the spreadsheet to persist this change.</text>
 <text name="ReplaceWorksheetConfirmation">The worksheet "{0}" already contains data. Inserting this list will replace its existing contents and linked data source, if any. Do you want to continue?</text>
 <text name="SelectDestinationWorksheet">Please select a destination worksheet.</text>
-
-
-
-
+<text name="DashboardTitleUsedBefore" value="This dashboard title has been used before." />
+<text name="CheckingDashboardTitle" value="Checking dashboard title..." />
+<text name="DashboardTitleValidationFailed" value="Unable to validate the dashboard title. Please try again." />
+<text name="DashboardNotFound" value="Dashboard not found" />
+<text name="DashboardNotFoundDescription" value="This dashboard does not exist or is no longer available." />
+<text name="SpreadsheetNotFound" value="Spreadsheet not found" />
+<text name="SpreadsheetNotFoundDescription" value="This spreadsheet does not exist or is no longer available." />
 
 
 		
