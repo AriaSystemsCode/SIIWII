@@ -160,8 +160,11 @@ namespace onetouch.AppDashboards
                                 {
                                     continue;
                                 }
-                                dashboard.SharedWithUsers.
+                                using (UnitOfWorkManager.Current.DisableFilter(AbpDataFilters.MustHaveTenant, AbpDataFilters.MayHaveTenant))
+                                {
+                                    dashboard.SharedWithUsers.
                                          Add(await _appEntitiesAppService.GetUserInformation(user.Id));
+                                }
 
                             }
                         }
@@ -191,8 +194,11 @@ namespace onetouch.AppDashboards
 
                                 if (user.SharedUserId != null)
                                 {
-                                    dashboard.SharedWithUsers.
+                                    using (UnitOfWorkManager.Current.DisableFilter(AbpDataFilters.MustHaveTenant, AbpDataFilters.MayHaveTenant))
+                                    {
+                                        dashboard.SharedWithUsers.
                                         Add(await _appEntitiesAppService.GetUserInformation(long.Parse(user.SharedUserId.ToString())));
+                                    }
                                 }
                             }
                         }
@@ -338,8 +344,11 @@ namespace onetouch.AppDashboards
                                 {
                                     continue;
                                 }
-                                dashboard.SharedWithUsers.
+                                using (UnitOfWorkManager.Current.DisableFilter(AbpDataFilters.MustHaveTenant, AbpDataFilters.MayHaveTenant))
+                                {
+                                    dashboard.SharedWithUsers.
                                          Add(await _appEntitiesAppService.GetUserInformation(user.Id));
+                                }
 
                             }
                         }
@@ -369,8 +378,11 @@ namespace onetouch.AppDashboards
 
                                 if (user.SharedUserId != null)
                                 {
-                                    dashboard.SharedWithUsers.
+                                    using (UnitOfWorkManager.Current.DisableFilter(AbpDataFilters.MustHaveTenant, AbpDataFilters.MayHaveTenant))
+                                    {
+                                        dashboard.SharedWithUsers.
                                         Add(await _appEntitiesAppService.GetUserInformation(long.Parse(user.SharedUserId.ToString())));
+                                    }
                                 }
                             }
                         }
@@ -499,15 +511,18 @@ namespace onetouch.AppDashboards
 
                     SharingUserInfo userToSharWith = new SharingUserInfo();
                     userToSharWith.UserId = user.Id;
-                    UserInformationDto userToSharWithInfo = await _appEntitiesAppService.GetUserInformation(user.Id);
-
-                    if (userToSharWithInfo != null)
+                    using (UnitOfWorkManager.Current.DisableFilter(AbpDataFilters.MustHaveTenant, AbpDataFilters.MayHaveTenant))
                     {
-                        userToSharWith.UserImage = userToSharWithInfo.UserImage;
-                        userToSharWith.JobTitle = userToSharWithInfo.JobTitle;
-                        userToSharWith.AccountName = userToSharWithInfo.AccountName;
-                        userToSharWith.AccountId = userToSharWithInfo.AccountId;
-                        userToSharWith.UserName = userToSharWithInfo.UserName;
+                        UserInformationDto userToSharWithInfo = await _appEntitiesAppService.GetUserInformation(user.Id);
+
+                        if (userToSharWithInfo != null)
+                        {
+                            userToSharWith.UserImage = userToSharWithInfo.UserImage;
+                            userToSharWith.JobTitle = userToSharWithInfo.JobTitle;
+                            userToSharWith.AccountName = userToSharWithInfo.AccountName;
+                            userToSharWith.AccountId = userToSharWithInfo.AccountId;
+                            userToSharWith.UserName = userToSharWithInfo.UserName;
+                        }
                     }
                     if (string.IsNullOrEmpty(userToSharWith.UserName))
                     {
