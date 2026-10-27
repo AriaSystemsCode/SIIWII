@@ -8,7 +8,7 @@ import { AppComponent } from './app.component';
 import { LOCALE_ID } from '@angular/core';
 
 export function getRemoteServiceBaseUrl(): string {
-    return 'http://192.168.1.148:4212';
+    return 'http://192.168.1.148:4213';
 }
 
 describe('App: onetouch', () => {
