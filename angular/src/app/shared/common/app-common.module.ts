@@ -72,6 +72,7 @@ import { SelectionModalComponent } from "./selection-modals/selection-modal.comp
 import { SendMessageModalComponent } from "@app/main/Messages/SendMessage-Modal.Component";
 import { EditorModule } from 'primeng/editor';
 import { AppAddOnsSideBarComponent } from "@app/admin/sideBarComponents/app-add-ons-side-bar/app-add-ons-side-bar.component";
+import { AttachmentUploaderComponent } from './attachment-uploader/attachment-uploader.component';
 
 @NgModule({
     imports: [
@@ -140,6 +141,7 @@ import { AppAddOnsSideBarComponent } from "@app/admin/sideBarComponents/app-add-
         SelectionModalComponent,
         SendMessageModalComponent,
         AppAddOnsSideBarComponent,
+        AttachmentUploaderComponent,
 
     ],
     exports: [
@@ -162,7 +164,8 @@ import { AppAddOnsSideBarComponent } from "@app/admin/sideBarComponents/app-add-
         MatrixGridComponent,
         GenericFormModalComponent,
         SelectionModalComponent,
-        SendMessageModalComponent
+        SendMessageModalComponent,
+        AttachmentUploaderComponent
     ],
     providers: [
         DateTimeService,

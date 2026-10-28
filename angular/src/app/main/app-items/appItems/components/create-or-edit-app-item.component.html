@@ -1,154 +1,157 @@
-<div [@routerTransition] [ngClass]="{'d-none':displayVariations}">
+<div [@routerTransition] [ngClass]="{'d-none': displayVariations}">
     <form #productForm="ngForm" (ngSubmit)="saveProduct(productForm)">
         <div class="kt-content kt-grid__item kt-grid__item--fluid kt-grid kt-grid--hor font-weight-normal">
+
+            <!-- Sub header -->
             <div class="kt-subheader kt-grid__item ml-5" *ngIf="!displayVariations">
                 <div [class]="containerClass" class="header-bg-soft">
                     <div class="kt-subheader__main">
                         <h3 class="kt-subheader__title">
-                            <span class="font-weight-bold">
-                                {{headerTitle | localize}}
-                            </span>
+                            <span class="font-weight-bold">{{ headerTitle | localize }}</span>
                         </h3>
                         <span class="kt-subheader__separator kt-subheader__separator--v"></span>
-                        <span class="kt-subheader__desc">
-                            {{ headerDesc | localize}}
-                        </span>
+                        <span class="kt-subheader__desc">{{ headerDesc | localize }}</span>
                     </div>
                     <div class="kt-subheader__toolbar">
                         <div class="kt-subheader__wrapper">
-                            <!-- <a (click)="cancel()" class="text-capitalize mr-5" type="button">
-                                <i class="fas fa-arrow-left"></i>
-                                {{ "Back" | localize }}
-                            </a> -->
-
                             <a (click)="cancel()" class="text-capitalize mr-5 p-2 pl-4 pr-4 action-btn-cancel" type="button">
                                 {{ "Cancel" | localize }}
                             </a>
 
-                            <button class="btn        text-capitalize mr-2 action-btn-save" type="submit" [buttonBusy]="saving"
+                            <button class="btn text-capitalize mr-2 action-btn-save" type="submit"
+                                [buttonBusy]="saving"
                                 [busyText]="l('SavingWithThreeDot')"
-                                *ngIf="productForm.touched || formTouched  || listingMode !==1"
-                                [disabled]="appItem?.variationItems?.length <1"
-                                >
-                                <span>{{ listingMode !== undefined ? l("SaveListing") : !id  ?  l("SaveProduct") :  l("SaveChanges") }}</span>
+                                *ngIf="productForm.touched || formTouched || listingMode !== 1"
+                                [disabled]="appItem?.variationItems?.length < 1">
+                                <span>{{ listingMode !== undefined ? l("SaveListing") : !id ? l("SaveProduct") : l("SaveChanges") }}</span>
                             </button>
+
                             <ng-container *ngIf="listingMode === 1 && !productForm.touched && !formTouched">
-                                <button class="btn        text-capitalize mr-2" type="button"
+                                <button class="btn text-capitalize mr-2" type="button"
                                     (click)="openShareProductListingModal()">
-                                    <span>{{l("Publish")}}</span>
+                                    <span>{{ l("Publish") }}</span>
                                 </button>
-                                <button class="btn btn-buttonNo text-capitalize" [disabled]="!appItem.published"
-                                    type="button" (click)="unPublish()">
-                                    <span>{{l("UnPublish")}}</span>
+                                <button class="btn btn-buttonNo text-capitalize" type="button"
+                                    [disabled]="!appItem.published"
+                                    (click)="unPublish()">
+                                    <span>{{ l("UnPublish") }}</span>
                                 </button>
                             </ng-container>
                         </div>
                     </div>
                 </div>
             </div>
-            <div [class]="containerClass + ' kt-grid__item kt-grid__item--fluid mt-5' "
-            [ngClass]="{ 'arabic-top-padding': isArabic }">
+
+            <!-- Product details -->
+            <div [class]="containerClass + ' kt-grid__item kt-grid__item--fluid mt-5'"
+                [ngClass]="{ 'arabic-top-padding': isArabic }">
                 <div class="kt-portlet kt-portlet--mobile">
                     <div class="kt-portlet__body p-0">
-                        <h6 class="font-weight-bold p-3 section-title-box"> {{ 'ProductDetails' | localize}} </h6>
+                        <h6 class="font-weight-bold p-3 section-title-box">{{ 'ProductDetails' | localize }}</h6>
+
                         <div class="row align-items-baseline mb-4 pl-4">
                             <div class="col-lg-2 col-md-3 col-sm-4 col-6">
-                                <h6><span class="text-danger">*</span>{{ 'ProductType' | localize}}</h6>
+                                <h6><span class="text-danger">*</span>{{ 'ProductType' | localize }}</h6>
                             </div>
                             <div class="col">
                                 <div class="wide-drop-down">
-                                    <input type="text" [required]="true" [(ngModel)]="selectedItemTypeData.name"
-                                        name="type" readonly class="form-control bg-white form-control-border-grey input-bg-soft"
-                                        [ngClass]="{'border-danger' : !appItem.entityObjectTypeId && submitted }"
-    #typeModel="ngModel"     [class.border-danger]="typeModel.invalid && typeModel.touched"
-                                        placeholder="{{ 'ProductType' | localize}}">
+                                    <input type="text" name="type" readonly [required]="true"
+                                        class="form-control bg-white form-control-border-grey input-bg-soft"
+                                        [(ngModel)]="selectedItemTypeData.name"
+                                        #typeModel="ngModel"
+                                        [ngClass]="{'border-danger': !appItem.entityObjectTypeId && submitted}"
+                                        [class.border-danger]="typeModel.invalid && typeModel.touched"
+                                        placeholder="{{ 'ProductType' | localize }}">
                                 </div>
                             </div>
                             <div class="col-lg-2 col-md-3 col-sm-4 col-6">
-                                <a class="font-weight-bold link-primary-purple"
-                                    (click)="openSelectAppItemTypeModal()">
-                                    {{ appItem.entityObjectTypeId ? ('Change'|localize) : ('Select'|localize) }}
-                                    {{ 'TheProductType' | localize}}
+                                <a class="font-weight-bold link-primary-purple" (click)="openSelectAppItemTypeModal()">
+                                    {{ appItem.entityObjectTypeId ? ('Change' | localize) : ('Select' | localize) }}
+                                    {{ 'TheProductType' | localize }}
                                 </a>
                             </div>
                         </div>
+
                         <div class="row align-items-baseline pl-4">
                             <div class="col-lg-2 col-md-3 col-sm-4 col-6">
-                                <h6><span class="text-danger">*</span>{{ 'ProductCode' | localize}}</h6>
-                            </div> 
-                            <div class="col mb-4">
-
-                                <app-codes *ngIf="!(appItem?.id>0)" [objectType]="entityObjectType" [editMode]=false
-                                    classes="bg-white" [code]="appItem?.code"
-                                    placeHolder="{{ 'ProductCode' | localize}}" (getCodeValue)="getCodeValue($event)"  [maxlength]="12">
-                                </app-codes>
-                                <app-codes *ngIf="appItem?.id>0" [objectType]="entityObjectType" [readonly]="false"
-                                    [editMode]=true classes="bg-white" [code]="appItem?.code"
-                                    placeHolder="{{ 'ProductCode' | localize}}"
-                                    (getCodeValue)="getCodeValue($event)"
-                                    [maxlength]="12"></app-codes>
+                                <h6><span class="text-danger">*</span>{{ 'ProductCode' | localize }}</h6>
                             </div>
-
+                            <div class="col mb-4">
+                                <app-codes *ngIf="!(appItem?.id > 0)"
+                                    [objectType]="entityObjectType" [editMode]="false"
+                                    classes="bg-white" [code]="appItem?.code" [maxlength]="12"
+                                    placeHolder="{{ 'ProductCode' | localize }}"
+                                    (getCodeValue)="getCodeValue($event)">
+                                </app-codes>
+                                <app-codes *ngIf="appItem?.id > 0"
+                                    [objectType]="entityObjectType" [readonly]="false" [editMode]="true"
+                                    classes="bg-white" [code]="appItem?.code" [maxlength]="12"
+                                    placeHolder="{{ 'ProductCode' | localize }}"
+                                    (getCodeValue)="getCodeValue($event)">
+                                </app-codes>
+                            </div>
                             <div class="col-lg-2 col-md-3 col-sm-4 col-6">
-                                <span class="text-muted">12 {{ 'digits' | localize}}</span>
+                                <span class="text-muted">12 {{ 'digits' | localize }}</span>
                             </div>
                         </div>
+
                         <div class="row align-items-baseline mb-4 pl-4">
                             <div class="col-lg-2 col-md-3 col-sm-4 col-6">
-                                <h6><span class="text-danger">*</span>{{ 'ProductName' | localize}}</h6>
+                                <h6><span class="text-danger">*</span>{{ 'ProductName' | localize }}</h6>
                             </div>
                             <div class="col">
-                                <input type="text" [required]="true" [(ngModel)]="appItem.name" name="name"
+                                <input type="text" name="name" [required]="true"
+                                    class="form-control bg-white form-control-border-grey input-bg-soft"
+                                    [(ngModel)]="appItem.name"
                                     #nameModel="ngModel"
-                                                                        class="form-control bg-white form-control-border-grey input-bg-soft"
-                                      [ngClass]="{'border-danger' : !appItem.name && submitted }"                                                    
-                                        [class.border-danger]="nameModel.invalid && nameModel.touched"
-                                    placeholder="{{ 'ProductName' | localize}}">
+                                    [ngClass]="{'border-danger': !appItem.name && submitted}"
+                                    [class.border-danger]="nameModel.invalid && nameModel.touched"
+                                    placeholder="{{ 'ProductName' | localize }}">
                             </div>
                             <div class="col-lg-2 col-md-3 col-sm-4 col-6">
-                                <span class="text-muted">250 {{ 'digits' | localize}}</span>
+                                <span class="text-muted">250 {{ 'digits' | localize }}</span>
                             </div>
                         </div>
                     </div>
                 </div>
             </div>
+
+            <!-- Description -->
             <div [class]="containerClass + ' kt-grid__item kt-grid__item--fluid'">
                 <div class="kt-portlet kt-portlet--mobile">
                     <div class="kt-portlet__body m-0 p-0">
                         <div class="custom-header m-0 p-0">
-                            <h6 class="font-weight-bold p-3 section-title-box"><span class="text-danger">*</span>{{ 'ProductDescription' | localize}}</h6>
+                            <h6 class="font-weight-bold p-3 section-title-box">
+                                <span class="text-danger">*</span>{{ 'ProductDescription' | localize }}
+                            </h6>
                             <p class="hint m-0 p-0 pl-5 ml-5">
                                 <img class="mr-2" src="../../../../../assets/Items/Vector2.png" />
-                                {{ 'BuyersMayAlsoBeInterestedInTheseItemSpecifics' | localize}}
+                                {{ 'BuyersMayAlsoBeInterestedInTheseItemSpecifics' | localize }}
                             </p>
                         </div>
                         <div class="row mt-4 pl-5 ml-5">
                             <div class="col-md-8 custom-tab">
                                 <tabset>
                                     <tab heading="{{ 'Standard' | localize }}" (selectTab)="triggerDescription($event, 0)">
-                                        <div *ngIf="activeDescriptionIndex==0">
-                                            <p-editor
+                                        <div *ngIf="activeDescriptionIndex == 0">
+                                            <p-editor name="description"
+                                                class="editor-height-300"
                                                 [required]="true"
-                                                [appFixPEditorAutoScroll]="appItem.description"
-                                                #editorModel="ngModel"
-                                                [ngClass]="{'invalid-editor': editorModel.invalid && editorModel.touched}"
-                                                name="description"
                                                 [readonly]="readonlyDesc"
+                                                [appFixPEditorAutoScroll]="appItem.description"
                                                 [(ngModel)]="appItem.description"
-                                                class="editor-height-300">
+                                                #editorModel="ngModel"
+                                                [ngClass]="{'invalid-editor': editorModel.invalid && editorModel.touched}">
                                             </p-editor>
                                         </div>
                                     </tab>
                                     <tab heading="{{ 'HTML' | localize }}" (selectTab)="triggerDescription($event, 1)">
                                         <div class="form-group" *ngIf="activeDescriptionIndex == 1">
-                                            <textarea
-                                                [required]="true"
-                                                name="description"
-                                                placeholder="{{ 'description' | localize}}"
-                                                [(ngModel)]="appItem.description"
+                                            <textarea name="description" id="exampleFormControlTextarea1" rows="5"
                                                 class="form-control textarea-white-bg"
-                                                id="exampleFormControlTextarea1"
-                                                rows="5"
+                                                [required]="true"
+                                                placeholder="{{ 'description' | localize }}"
+                                                [(ngModel)]="appItem.description"
                                                 #descModel="ngModel"
                                                 [class.border-danger]="descModel.invalid && descModel.touched"></textarea>
                                         </div>
@@ -159,139 +162,50 @@
                     </div>
                 </div>
             </div>
-            <div [class]="containerClass + ' kt-grid__item kt-grid__item--fluid' ">
+
+            <!-- Categories -->
+            <div [class]="containerClass + ' kt-grid__item kt-grid__item--fluid'">
                 <div class="kt-portlet kt-portlet--mobile">
                     <div class="kt-portlet__body">
                         <div class="row align-items-baseline mb-4 border p-4 rounded-lg box-rounded-12">
-                            <div class="">
-                                <h6  class="font-weight-bold">{{ 'Categories' | localize}}:</h6>
+                            <div>
+                                <h6 class="font-weight-bold">{{ 'Categories' | localize }}:</h6>
                             </div>
                             <div>
-                                <div
-                                    class="aria-tag-wrapper d-flex flex-wrap pt-3 pb-0 pl-3 pr-0   rounded-lg thin-scroll">
-                                    <div class="mb-3" *ngIf="!categories?.length;else categoriesElse">{{
-                                        'NoCategoriesSelected' | localize}} ...</div>
+                                <div class="aria-tag-wrapper d-flex flex-wrap pt-3 pb-0 pl-3 pr-0 rounded-lg thin-scroll">
+                                    <div class="mb-3" *ngIf="!categories?.length; else categoriesElse">
+                                        {{ 'NoCategoriesSelected' | localize }} ...
+                                    </div>
                                     <ng-template #categoriesElse>
                                         <a class="aria-tag border mb-3 mr-3 pb-2 pl-3 position-relative pr-3 pt-2 rounded-lg"
-                                            *ngFor="let category of categories;index  as i"
-                                            [ngClass]="{'removed' : category.removed}">
-                                            {{category?.entityDto?.entityObjectCategoryName}}
+                                            *ngFor="let category of categories; index as i"
+                                            [ngClass]="{'removed': category.removed}">
+                                            {{ category?.entityDto?.entityObjectCategoryName }}
                                             <span *ngIf="!category.removed"
-                                                class="bg-white position-absolute aria-tag-action remove-tag  rounded-circle"
-                                                (click)="removeCategory(category,i)">
+                                                class="bg-white position-absolute aria-tag-action remove-tag rounded-circle"
+                                                (click)="removeCategory(category, i)">
                                                 <i class="flaticon2-delete"></i>
                                             </span>
                                             <span *ngIf="category?.removed"
-                                                class="bg-white position-absolute aria-tag-action undo-tag rounded-circle "
+                                                class="bg-white position-absolute aria-tag-action undo-tag rounded-circle"
                                                 (click)="undoCategory(category)">
                                                 <i class="flaticon2-circular-arrow"></i>
                                             </span>
                                         </a>
                                         <a class="font-weight-bold mt-2 text-primary pointer"
-                                            (click)="loadMoreCategories()"
-                                            *ngIf="categories.length < categoriesTotalCount">
+                                            *ngIf="categories.length < categoriesTotalCount"
+                                            (click)="loadMoreCategories()">
                                             {{ 'showmore' | localize }} ...
                                         </a>
                                     </ng-template>
                                 </div>
                             </div>
                             <div class="col-lg-2 col-md-3 col-sm-4 col-6">
-                                <a class="text-primary pointer font-weight-bold border p-3 box-rounded-6" (click)="openSelectCategoriesModal()">
-                                    <span *ngIf="categories?.length" class="mr-1">+</span>     {{ categories?.length ? ('Add'|localize) : ('Select'|localize) }}
-                                    {{ 'Categories' | localize}}
-                                </a>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            </div>
-            <div [class]="containerClass + ' kt-grid__item kt-grid__item--fluid' ">
-                <div class="kt-portlet kt-portlet--mobile">
-                    <div class="kt-portlet__body">
-                        <div class="row align-items-baseline mb-4 border p-4 rounded-lg box-rounded-12">
-                            <div class="">
-                                <h6  class="font-weight-bold">{{ 'Classifications' | localize}}:</h6>
-                            </div>
-                            <div>
-                                <div
-                                    class="aria-tag-wrapper d-flex flex-wrap pt-3 pb-0 pl-3 pr-0   rounded-lg thin-scroll">
-                                    <div class="mb-3" *ngIf="!classifications?.length;else classificationElse">
-                                        {{ 'NoClassificationsSelected' | localize}} ...
-                                    </div>
-                                    <ng-template #classificationElse>
-                                        <a class="aria-tag border mb-3 mr-3 pb-2 pl-3 position-relative pr-3 pt-2 rounded-lg"
-                                            *ngFor="let classification of classifications;index  as i"
-                                            [ngClass]="{'removed' : classification.removed}">
-                                            {{classification?.entityDto?.entityObjectClassificationName}}
-                                            <span *ngIf="!classification.removed"
-                                                class="bg-white position-absolute aria-tag-action remove-tag  rounded-circle"
-                                                (click)="removeClassification(classification,i)">
-                                                <i class="flaticon2-delete"></i>
-                                            </span>
-                                            <span *ngIf="classification?.removed"
-                                                class="bg-white position-absolute aria-tag-action undo-tag rounded-circle "
-                                                (click)="undoClassification(classification)">
-                                                <i class="flaticon2-circular-arrow"></i>
-                                            </span>
-                                        </a>
-                                        <a class="font-weight-bold mt-2 text-primary pointer"
-                                            (click)="loadMoreClassifications()"
-                                            *ngIf="classifications.length < classificationsTotalCount">
-                                            {{ 'showmore' | localize }} ...
-                                        </a>
-                                    </ng-template>
-                                </div>
-                            </div>
-                            <div class="col-lg-2 col-md-3 col-sm-4 col-6">
-                                <a class="text-primary pointer font-weight-bold border p-3 box-rounded-6" (click)="openSelectClassificationsModal()">
-                                    <span *ngIf="classifications?.length" class="mr-1">+</span>   {{ classifications?.length ? ('Add'|localize) : ('Select'|localize) }}
-                                    {{ 'Classifications' | localize}}
-                                </a>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            </div>
-            <div [class]="containerClass + ' kt-grid__item kt-grid__item--fluid' ">
-                <div class="kt-portlet kt-portlet--mobile">
-                    <div class="kt-portlet__body">
-                        <div class="row align-items-baseline mb-4 border p-4 rounded-lg box-rounded-12">
-                            <div class="">
-                                <h6 class="font-weight-bold">{{ 'Departments' | localize}}:</h6>
-                            </div>
-                            <div>
-                                <div
-                                    class="aria-tag-wrapper d-flex flex-wrap pt-3 pb-0 pl-3 pr-0   rounded-lg thin-scroll">
-                                    <div class="mb-3" *ngIf="!departments?.length;else departmentsElse">{{
-                                        'NoDepartmentsSelected' | localize}} ...</div>
-                                    <ng-template #departmentsElse>
-                                        <a class="aria-tag border mb-3 mr-3 pb-2 pl-3 position-relative pr-3 pt-2 rounded-lg"
-                                            *ngFor="let department of departments;index  as i"
-                                            [ngClass]="{'removed' : department.removed}">
-                                            {{department?.entityDto?.entityObjectCategoryName}}
-                                            <span *ngIf="!department.removed"
-                                                class="bg-white position-absolute aria-tag-action remove-tag  rounded-circle"
-                                                (click)="removeDepartment(department,i)">
-                                                <i class="flaticon2-delete"></i>
-                                            </span>
-                                            <span *ngIf="department?.removed"
-                                                class="bg-white position-absolute aria-tag-action undo-tag rounded-circle "
-                                                (click)="undoDepartment(department)">
-                                                <i class="flaticon2-circular-arrow"></i>
-                                            </span>
-                                        </a>
-                                        <a class="font-weight-bold mt-2 text-primary pointer"
-                                            (click)="loadMoreDepartments()"
-                                            *ngIf="departments.length < departmentsTotalCount">
-                                            {{ 'showmore' | localize }} ...
-                                        </a>
-                                    </ng-template>
-                                </div>
-                            </div>
-                            <div class="col-lg-2 col-md-3 col-sm-4 col-6">
-                                <a class="text-primary pointer font-weight-bold border p-3 box-rounded-6" (click)="openSelectDepartmentsModal()">
-                                    <span *ngIf="departments?.length" class="mr-1">+</span>   {{ departments?.length ? ('Add'|localize) : ('Select'|localize) }}
-                                    {{ 'Departments' | localize}}
+                                <a class="text-primary pointer font-weight-bold border p-3 box-rounded-6"
+                                    (click)="openSelectCategoriesModal()">
+                                    <span *ngIf="categories?.length" class="mr-1">+</span>
+                                    {{ categories?.length ? ('Add' | localize) : ('Select' | localize) }}
+                                    {{ 'Categories' | localize }}
                                 </a>
                             </div>
                         </div>
@@ -299,47 +213,149 @@
                 </div>
             </div>
 
-            <div [class]="containerClass + ' kt-grid__item kt-grid__item--fluid' ">
+            <!-- Classifications -->
+            <div [class]="containerClass + ' kt-grid__item kt-grid__item--fluid'">
                 <div class="kt-portlet kt-portlet--mobile">
                     <div class="kt-portlet__body">
                         <div class="row align-items-baseline mb-4 border p-4 rounded-lg box-rounded-12">
-                            <div class="">
-                                <h6 class="font-weight-bold">{{ 'Relatedproducts' | localize}}:</h6>
+                            <div>
+                                <h6 class="font-weight-bold">{{ 'Classifications' | localize }}:</h6>
                             </div>
                             <div>
-                                <div
-                                    class="aria-tag-wrapper d-flex flex-wrap pt-3 pb-0 pl-3 pr-0   rounded-lg thin-scroll">
-                                    <div class="mb-3" *ngIf="!relatedItems?.length;else relatedItemElse">{{
-                                        'noproductsarelinked' | localize}} ...</div>
+                                <div class="aria-tag-wrapper d-flex flex-wrap pt-3 pb-0 pl-3 pr-0 rounded-lg thin-scroll">
+                                    <div class="mb-3" *ngIf="!classifications?.length; else classificationElse">
+                                        {{ 'NoClassificationsSelected' | localize }} ...
+                                    </div>
+                                    <ng-template #classificationElse>
+                                        <a class="aria-tag border mb-3 mr-3 pb-2 pl-3 position-relative pr-3 pt-2 rounded-lg"
+                                            *ngFor="let classification of classifications; index as i"
+                                            [ngClass]="{'removed': classification.removed}">
+                                            {{ classification?.entityDto?.entityObjectClassificationName }}
+                                            <span *ngIf="!classification.removed"
+                                                class="bg-white position-absolute aria-tag-action remove-tag rounded-circle"
+                                                (click)="removeClassification(classification, i)">
+                                                <i class="flaticon2-delete"></i>
+                                            </span>
+                                            <span *ngIf="classification?.removed"
+                                                class="bg-white position-absolute aria-tag-action undo-tag rounded-circle"
+                                                (click)="undoClassification(classification)">
+                                                <i class="flaticon2-circular-arrow"></i>
+                                            </span>
+                                        </a>
+                                        <a class="font-weight-bold mt-2 text-primary pointer"
+                                            *ngIf="classifications.length < classificationsTotalCount"
+                                            (click)="loadMoreClassifications()">
+                                            {{ 'showmore' | localize }} ...
+                                        </a>
+                                    </ng-template>
+                                </div>
+                            </div>
+                            <div class="col-lg-2 col-md-3 col-sm-4 col-6">
+                                <a class="text-primary pointer font-weight-bold border p-3 box-rounded-6"
+                                    (click)="openSelectClassificationsModal()">
+                                    <span *ngIf="classifications?.length" class="mr-1">+</span>
+                                    {{ classifications?.length ? ('Add' | localize) : ('Select' | localize) }}
+                                    {{ 'Classifications' | localize }}
+                                </a>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Departments -->
+            <div [class]="containerClass + ' kt-grid__item kt-grid__item--fluid'">
+                <div class="kt-portlet kt-portlet--mobile">
+                    <div class="kt-portlet__body">
+                        <div class="row align-items-baseline mb-4 border p-4 rounded-lg box-rounded-12">
+                            <div>
+                                <h6 class="font-weight-bold">{{ 'Departments' | localize }}:</h6>
+                            </div>
+                            <div>
+                                <div class="aria-tag-wrapper d-flex flex-wrap pt-3 pb-0 pl-3 pr-0 rounded-lg thin-scroll">
+                                    <div class="mb-3" *ngIf="!departments?.length; else departmentsElse">
+                                        {{ 'NoDepartmentsSelected' | localize }} ...
+                                    </div>
+                                    <ng-template #departmentsElse>
+                                        <a class="aria-tag border mb-3 mr-3 pb-2 pl-3 position-relative pr-3 pt-2 rounded-lg"
+                                            *ngFor="let department of departments; index as i"
+                                            [ngClass]="{'removed': department.removed}">
+                                            {{ department?.entityDto?.entityObjectCategoryName }}
+                                            <span *ngIf="!department.removed"
+                                                class="bg-white position-absolute aria-tag-action remove-tag rounded-circle"
+                                                (click)="removeDepartment(department, i)">
+                                                <i class="flaticon2-delete"></i>
+                                            </span>
+                                            <span *ngIf="department?.removed"
+                                                class="bg-white position-absolute aria-tag-action undo-tag rounded-circle"
+                                                (click)="undoDepartment(department)">
+                                                <i class="flaticon2-circular-arrow"></i>
+                                            </span>
+                                        </a>
+                                        <a class="font-weight-bold mt-2 text-primary pointer"
+                                            *ngIf="departments.length < departmentsTotalCount"
+                                            (click)="loadMoreDepartments()">
+                                            {{ 'showmore' | localize }} ...
+                                        </a>
+                                    </ng-template>
+                                </div>
+                            </div>
+                            <div class="col-lg-2 col-md-3 col-sm-4 col-6">
+                                <a class="text-primary pointer font-weight-bold border p-3 box-rounded-6"
+                                    (click)="openSelectDepartmentsModal()">
+                                    <span *ngIf="departments?.length" class="mr-1">+</span>
+                                    {{ departments?.length ? ('Add' | localize) : ('Select' | localize) }}
+                                    {{ 'Departments' | localize }}
+                                </a>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Related products -->
+            <div [class]="containerClass + ' kt-grid__item kt-grid__item--fluid'">
+                <div class="kt-portlet kt-portlet--mobile">
+                    <div class="kt-portlet__body">
+                        <div class="row align-items-baseline mb-4 border p-4 rounded-lg box-rounded-12">
+                            <div>
+                                <h6 class="font-weight-bold">{{ 'Relatedproducts' | localize }}:</h6>
+                            </div>
+                            <div>
+                                <div class="aria-tag-wrapper d-flex flex-wrap pt-3 pb-0 pl-3 pr-0 rounded-lg thin-scroll">
+                                    <div class="mb-3" *ngIf="!relatedItems?.length; else relatedItemElse">
+                                        {{ 'noproductsarelinked' | localize }} ...
+                                    </div>
                                     <ng-template #relatedItemElse>
                                         <a class="aria-tag border mb-3 mr-3 pb-2 pl-3 position-relative pr-3 pt-2 rounded-lg"
-                                            *ngFor="let relatedItem of relatedItems;index  as i"
-                                            [ngClass]="{'removed' : relatedItem.removed}">
-                                            <!-- {{relatedItem?.entityDto?.appItemName}}-->
-                                            {{relatedItem?.entityDto?.appItemCode}}
+                                            *ngFor="let relatedItem of relatedItems; index as i"
+                                            [ngClass]="{'removed': relatedItem.removed}">
+                                            {{ relatedItem?.entityDto?.appItemCode }}
                                             <span *ngIf="!relatedItem.removed"
-                                                class="bg-white position-absolute aria-tag-action remove-tag  rounded-circle"
-                                                (click)="removeRelatedItem(relatedItem,i)">
+                                                class="bg-white position-absolute aria-tag-action remove-tag rounded-circle"
+                                                (click)="removeRelatedItem(relatedItem, i)">
                                                 <i class="flaticon2-delete"></i>
                                             </span>
                                             <span *ngIf="relatedItem?.removed"
-                                                class="bg-white position-absolute aria-tag-action undo-tag rounded-circle "
+                                                class="bg-white position-absolute aria-tag-action undo-tag rounded-circle"
                                                 (click)="undoRelatedItem(relatedItem)">
                                                 <i class="flaticon2-circular-arrow"></i>
                                             </span>
                                         </a>
                                         <a class="font-weight-bold mt-2 text-primary pointer"
-                                            (click)="loadMoreRelatedItems()"
-                                            *ngIf="relatedItems.length < relatedItemsTotalCount">
+                                            *ngIf="relatedItems.length < relatedItemsTotalCount"
+                                            (click)="loadMoreRelatedItems()">
                                             {{ 'showmore' | localize }} ...
                                         </a>
                                     </ng-template>
                                 </div>
                             </div>
                             <div class="col-lg-6 col-md-3 col-sm-4 col-6">
-                                <a class="text-primary pointer font-weight-bold border p-3 box-rounded-6" (click)="openSelectRelatedItemsModal()">
-                                    <span  *ngIf="relatedItems?.length"  class="mr-1">+</span>   {{ relatedItems?.length ? ('Add'|localize) : ('Select'|localize)}}
-                                    {{ 'Relatedproducts' | localize}}
+                                <a class="text-primary pointer font-weight-bold border p-3 box-rounded-6"
+                                    (click)="openSelectRelatedItemsModal()">
+                                    <span *ngIf="relatedItems?.length" class="mr-1">+</span>
+                                    {{ relatedItems?.length ? ('Add' | localize) : ('Select' | localize) }}
+                                    {{ 'Relatedproducts' | localize }}
                                 </a>
                             </div>
                         </div>
@@ -347,298 +363,267 @@
                 </div>
             </div>
 
-
-            <div [class]="containerClass + ' kt-grid__item kt-grid__item--fluid' ">
+            <!-- Attachments -->
+            <div [class]="containerClass + ' kt-grid__item kt-grid__item--fluid'">
                 <div class="kt-portlet kt-portlet--mobile">
-                    <div class="kt-portlet__body  p-0">
+                    <div class="kt-portlet__body p-0">
                         <div class="row align-items-baseline mb-5 item-photos">
                             <div class="col-12 item-photos-header pb-2">
-                                <div class="d-flex  justify-content-between">
+                                <div class="d-flex justify-content-between">
                                     <div class="w-100">
                                         <h6 class="font-weight-bold p-3 section-title-box">
-                                          <span class="text-danger">*</span>  {{ 'ParentItemAttachments' | localize}}
+                                            <span class="text-danger">*</span> {{ 'ParentItemAttachments' | localize }}
                                         </h6>
-                                            <p class="hint m-0 p-0 pl-5 ml-5 mt-4">
-                                                <!-- <i class="pr-2 fa fa-bell"></i>  -->
-                                                <img  class="mr-2"  src="../../../../../assets/Items/Vector2.png"/>  {{ 'YouCanChangeTheVariationTypeToAddMorePhotos' | localize}}
+                                        <p class="hint m-0 p-0 pl-5 ml-5 mt-4">
+                                            <img class="mr-2" src="../../../../../assets/Items/Vector2.png" />
+                                            {{ 'YouCanChangeTheVariationTypeToAddMorePhotos' | localize }}
                                         </p>
                                     </div>
                                     <div>
-                                        <!-- <button type="button" class="bg-white btn  p-1 text-center mr-2">
-                                            <i class="flaticon-multimedia-4 m-0 p-0"></i>
-                                        </button> -->
-                                        <button (click)="removeAllAttachments()" type="button"
-                                            class="bg-white btn  p-1 text-center"
-                                            [disabled]="attachmentsSrcs.length == 1">
+                                        <button type="button" class="bg-white btn p-1 text-center"
+                                            [disabled]="!appItem?.entityAttachments?.length"
+                                            (click)="removeAllAttachments()">
                                             <i class="flaticon-delete m-0 p-0"></i>
                                         </button>
                                     </div>
                                 </div>
                             </div>
+
                             <div class="col-12 item-photos-body pt-4 pb-5 ml-5 pl-5">
                                 <div class="row pt-3 pb-3 pl-3">
-                                    <div class="image-wrapper mb-5 image-wrapper-variant" [ngClass]="{'upload':!attachment}"
+                                    <div class="image-wrapper mb-5 image-wrapper-variant d-flex justify-content-center"
                                         *ngFor="let attachment of attachmentsSrcs; index as i"
+                                        [ngClass]="{'upload': !attachment}"
                                         (dragover)="onDragOver($event)"
-     (dragleave)="onDragLeave($event)"
-     (drop)="onDrop($event, i)"
->
-                                        <label *ngIf="!attachment"
-                                            class="d-flex flex-column justify-content-center h-100 align-items-center"
-                                            for="file_{{i}}">
-                                            <div
-                                                class="align-items-end d-flex justify-content-center upload-image-icons mt-3">
-                                               <!--  <div class="left-icon">
-                                                    <i class="fa-photo-video fas "></i>
-                                                </div>
-                                                <div class="middle-icon">
-                                                    <i class="fa-clipboard-list fas "></i>
-                                                </div>
-                                                <div class="right-icon">
-                                                    <i class="fas fa-file-video "></i>
-                                                </div> -->
-                                                <div class="middle-icon">
-                                                    <i class="fas " > <img src="../../../assets/placeholders/cloud-add.png" /> </i>
-                                                </div>
-                                            </div>
-                                            <div class="text-center">
-                                                <p class="attachment-copy">
-                                                    {{'ChooseFileOrDragDropHere'| localize }}
-                                                    <p >
-                                                <!-- <a class="btn        btn-sm mb-3 upload-btn">
-                                                    {{ 'AddAttachedFile' | localize}}
-                                                </a> -->
-                                                <p>
-                                                    <!-- {{ 'YouCanSendUpTo25MBInAttachments' | localize}}. -->
-                                                    {{ 'SupportedFormatsAndSize' | localize}}.   
-                                                </p>
-                                                <p class="attachment-aspect-note">*{{'ImageAspectRatio16_9'| localize}}</p>
+                                        (dragleave)="onDragLeave($event)"
+                                        (drop)="onDrop($event, i)">
 
-                                                <a class="btn btn-primary btn-sm mb-3 upload-btn">
-                                                    <!-- {{ 'AddAttachedFile' | localize}} -->
-                                                    {{ 'AddAttachment' | localize}}
-                                                </a>
-                                            </div>
-                                        </label>
+                                        <!-- Empty slot -->
+                                        <button *ngIf="!attachment" type="button" class="btn btn-primary upload-btn"
+                                            (click)="openAttachmentPanel(i)">
+                                            <i class="fa fa-plus mr-2"></i>
+                                            {{ 'AddAttachment' | localize }}
+                                        </button>
+
+                                        <!-- Filled slot -->
                                         <a *ngIf="attachment"
                                             class="d-flex flex-column justify-content-center h-100 align-items-center kt-avatar">
-                                            <div
-                                                class="d-flex flex-column justify-content-center h-100 w-100 position-absolute view-img-overlay">
-                                                <div class="text-center mb-3">
-                                                    <i class="fa-photo-video fas bg-transparent text-white fa-3x"></i>
-                                                </div>
-                                                <div class="text-center" *ngIf="isImageFile(appItem.entityAttachments[i]?.fileName)">
-                                                    <button type="button"
-                                                        class="btn btn-dark text-white border-lg border-white"
-                                                        (click)="openImageViewer(attachment)">
-                                                        {{ 'ImagePreview' | localize}}
-                                                    </button>
-                                                </div>
-                                                <div class="bg-white kt-avatar__upload" for="file"
-                                                    (click)="removeAttach(i)">
-                                                    <!-- <i class="fa fa-times text-danger"></i> -->
-                                                    <img  class="mr-2"  src="../../../../../assets/Items/Frame 1707478667.png"/>
-                                                </div>
+                                            <div class="bg-white kt-avatar__upload" (click)="removeAttach(i)">
+                                                <img class="" src="../../../../../assets/Items/Frame 1707478667.png" />
                                             </div>
-                                            <!-- <img *ngIf="!appItem.entityAttachments && !appItem.entityAttachments.length" src="../../../../../assets/img/Untitled.png"/> -->
-                                            <!-- <img *ngIf="attachment" [src]="attachment" /> -->
-                                            <img *ngIf="isImageFile(appItem.entityAttachments[i]?.fileName)"
-                                            [src]="attachment" />
 
-                                        <img *ngIf="isVideoFile(appItem.entityAttachments[i]?.fileName)"
-                                            src="../../../../../assets/Items/video-Icon.png" />
+                                            <img *ngIf="isGalleryImage(i)" class="attachment-gallery-preview"
+                                                [src]="attachment"
+                                                (click)="openOriginalAttachment(i)" />
 
-                                        <img *ngIf="isPdfFile(appItem.entityAttachments[i]?.fileName)"
-                                            src="../../../../../assets/Items/pdf-Icon.png" />
+                                            <div *ngIf="isGalleryPdf(i)" class="attachment-preview-wrapper"
+                                                (click)="openOriginalAttachment(i)">
+                                                <img class="attachment-gallery-preview" alt="PDF preview" [src]="attachment" />
+                                                <span class="attachment-type-label">PDF</span>
+                                            </div>
 
-                                            
-                                            <a class="select-default-image default-image-link p-2 d-block"
-                                            *ngIf="isImageFile(appItem.entityAttachments[i]?.fileName)"
+                                            <div *ngIf="isGalleryVideo(i)" class="attachment-preview-wrapper"
+                                                (click)="openOriginalAttachment(i)">
+                                                <video class="attachment-gallery-preview"
+                                                    preload="metadata" muted playsinline
+                                                    [src]="galleryAttachments[i].originalUrl">
+                                                </video>
+                                                <span class="video-play-overlay">
+                                                    <i class="fas fa-play"></i>
+                                                </span>
+                                            </div>
+
+                                            <a *ngIf="isGalleryImage(i)"
+                                                class="select-default-image default-image-link p-2 d-block"
                                                 (click)="setDefaultImage(i)">
                                                 <i class="fa fa-check-square mr-2"
-                                                    [ngClass]="defaultImageIndex == i? 'text-purple':'text-grey' "> </i>
-                                             <label class="text-purple">  {{ 'Default Image' | localize}}</label> 
+                                                    [ngClass]="defaultImageIndex === i ? 'text-purple' : 'text-grey'"></i>
+                                                <label class="text-purple">{{ 'Default Image' | localize }}</label>
                                             </a>
 
-
                                             <a class="p-2 visible-marketplace-toggle">
-                                           <label class="text-purple d-flex align-items-center cursor-pointer">
-                                             <input 
-                                                                                             [class.is-disabled]="defaultImageIndex == i"
-                                               type="checkbox" 
-                                               class="mr-2" 
-                                                                                             [checked]="appItem?.entityAttachments[i]?.isPublic !== false || defaultImageIndex == i" 
-                                                                                             (change)="setVisibleinMarketplaceImage(i, $event.target.checked)"
-                                             />
-                                             {{ 'VisibleInMarketplace' | localize }}
-                                           </label>
-                                         </a>
-                                         
+                                                <label class="text-purple d-flex align-items-center cursor-pointer">
+                                                    <input type="checkbox" class="mr-2"
+                                                        [class.is-disabled]="defaultImageIndex == i"
+                                                        [checked]="appItem?.entityAttachments[i]?.isPublic !== false || defaultImageIndex == i"
+                                                        (change)="setVisibleinMarketplaceImage(i, $event.target.checked)" />
+                                                    {{ 'VisibleInMarketplace' | localize }}
+                                                </label>
+                                            </a>
                                         </a>
-                                        <input type="file" id="file_{{i}}" class="d-none input-bg-soft border-none" #file
-                                            (change)="fileChange($event,productImageCategory,i,undefined,true)"
-                                           >
                                     </div>
 
+                                    <!-- Uploader side panel -->
+                                    <div class="attachment-panel-overlay" *ngIf="showAttachmentPanel"
+                                        (click)="closeAttachmentPanel()">
+                                        <div class="attachment-panel-container" (click)="$event.stopPropagation()">
+                                            <app-attachment-uploader
+                                                [maxFileSizeMB]="5"
+                                                [aspectRatio]="'16:9'"
+                                                [allowPdf]="true"
+                                                [allowVideo]="true"
+                                                [showThumbnailForMedia]="true"
+                                                (attachmentSelected)="onSharedAttachmentSelected($event)">
+                                            </app-attachment-uploader>
+                                        </div>
+                                    </div>
                                 </div>
                             </div>
                         </div>
                     </div>
                 </div>
             </div>
-            <div [class]="containerClass + ' kt-grid__item kt-grid__item--fluid' ">
+
+            <!-- Price & stock -->
+            <div [class]="containerClass + ' kt-grid__item kt-grid__item--fluid'">
                 <div class="kt-portlet kt-portlet--mobile">
-                    <div class="kt-portlet__body  p-0">
+                    <div class="kt-portlet__body p-0">
                         <div class="row align-items-end mb-4">
                             <div class="col-12">
                                 <h6 class="font-weight-bold p-3 section-title-box">
-                                  <span class="text-danger">*</span>  {{ 'Price' | localize}}
+                                    <span class="text-danger">*</span> {{ 'Price' | localize }}
                                 </h6>
                             </div>
-                            <div class=" ml-4 pl-4 row pt-4 price-gap" *ngIf="defaultCurrencyMSRPPriceIndex > -1">
+
+                            <div class="ml-4 pl-4 row pt-4 price-gap" *ngIf="defaultCurrencyMSRPPriceIndex > -1">
                                 <div class="row mr-5 pr-5">
                                     <h6 class="font-weight-bold pt-3 pr-2">
                                         <span class="text-danger">*</span>
-                                        {{ languageSettingName!='en-GB' ? ("MSRP" | localize) : ( "RRP" | localize) }}
+                                        {{ languageSettingName != 'en-GB' ? ("MSRP" | localize) : ("RRP" | localize) }}
                                     </h6>
                                     <div class="d-flex align-items-baseline">
-                                        <span class="mr-2">{{appItem.appItemPriceInfos[defaultCurrencyMSRPPriceIndex].currencySymbol}}</span>
-                                        <input type="number" step="any" name="price" class="form-control input-bg-soft"
-                                            id="AppItem_Price" #AppItem_Price="ngModel"
+                                        <span class="mr-2">{{ appItem.appItemPriceInfos[defaultCurrencyMSRPPriceIndex].currencySymbol }}</span>
+                                        <input type="number" step="any" name="price" id="AppItem_Price"
+                                            class="form-control input-bg-soft"
+                                            #AppItem_Price="ngModel"
                                             [ngModel]="convertTodecimal(appItem.appItemPriceInfos[defaultCurrencyMSRPPriceIndex].price)"
-                                            [ngModelOptions]="{updateOn:'blur'}"
-                                            (ngModelChange)="appItem.appItemPriceInfos[defaultCurrencyMSRPPriceIndex].price=convertTodecimal($event)">
+                                            [ngModelOptions]="{updateOn: 'blur'}"
+                                            (ngModelChange)="appItem.appItemPriceInfos[defaultCurrencyMSRPPriceIndex].price = convertTodecimal($event)">
                                     </div>
                                 </div>
                             </div>
 
-                            <div class=" ml-4 pl-4 row pt-4 price-gap" *ngIf="defaultCurrencyMSRPPriceIndex <= -1">
+                            <div class="ml-4 pl-4 row pt-4 price-gap" *ngIf="defaultCurrencyMSRPPriceIndex <= -1">
                                 <div class="row mr-5 pr-5">
                                     <h6 class="font-weight-bold pt-3 pr-2">
                                         <span class="text-danger">*</span>
-                                        {{ languageSettingName!='en-GB' ? ("MSRP" | localize) : ( "RRP" | localize) }}
+                                        {{ languageSettingName != 'en-GB' ? ("MSRP" | localize) : ("RRP" | localize) }}
                                     </h6>
                                     <div class="d-flex align-items-baseline">
                                         <span class="mr-2 ml-2"></span>
-                                        <input type="number" step="any" name="price" class="form-control input-bg-soft"
-                                            id="AppItem_Price" #AppItem_Price="ngModel"
+                                        <input type="number" step="any" name="price" id="AppItem_Price"
+                                            class="form-control input-bg-soft"
+                                            #AppItem_Price="ngModel"
                                             [ngModel]="0"
-                                            [ngModelOptions]="{updateOn:'blur'}">
+                                            [ngModelOptions]="{updateOn: 'blur'}">
                                     </div>
                                 </div>
                             </div>
+
                             <div class="d-flex flex-row ml-5 pl-5 mr-5 pr-5">
-                                <h6  class="font-weight-bold mr-3"><span class="text-danger">*</span>
-                                    {{ 'AvailableQuantity' | localize}}
+                                <h6 class="font-weight-bold mr-3">
+                                    <span class="text-danger">*</span> {{ 'AvailableQuantity' | localize }}
                                 </h6>
-                                <p-inputNumber [ariaRequired]="true" mode="decimal" #AppItem_StockAvailability="ngModel"
-                                    [(ngModel)]="appItem.stockAvailability" name="stockAvailability" [min]="0"
+                                <p-inputNumber mode="decimal" name="stockAvailability"
+                                    class="bg-input custom-style"
+                                    [ariaRequired]="true"
+                                    [min]="0"
                                     [disabled]="appItem?.variationItems?.length || sellVariationChecked"
-                                    (ngModelChange)="stockAvailabilityChanged($event)" class="bg-input custom-style"    
-    #stockModel="ngModel"
-[styleClass]="stockModel.invalid && stockModel.touched ? 'invalid-number' : ''">
+                                    [(ngModel)]="appItem.stockAvailability"
+                                    #AppItem_StockAvailability="ngModel"
+                                    [styleClass]="AppItem_StockAvailability.invalid && AppItem_StockAvailability.touched ? 'invalid-number' : ''"
+                                    (ngModelChange)="stockAvailabilityChanged($event)">
                                 </p-inputNumber>
                                 <span class="ml-2">
                                     <validation-messages [formCtrl]="AppItem_StockAvailability"></validation-messages>
                                 </span>
                             </div>
+
                             <div *ngIf="defaultCurrencyMSRPPriceIndex > -1">
                                 <div class="d-flex align-items-baseline ml-5 pl-5">
-                                    <button class="btn mr-5 ml-5 advanced-pricing-btn w-100" type="button"
+                                    <button type="button" class="btn mr-5 ml-5 advanced-pricing-btn w-100"
                                         (click)="showAdvancedPricingModal()">
-                                        {{'AdvancedPricing' | localize}}
+                                        {{ 'AdvancedPricing' | localize }}
                                     </button>
                                 </div>
                             </div>
 
-                                                
-<div class="col-12 pl-4 ml-4 mt-3 mb-3">
-    <div class="d-flex flex-row justify-content-between">
-                <div class="row mr-5 pr-5">
-                    <h6 class="font-weight-bold pt-3 pr-2">
-                        {{ "TaxRate" | localize}}
-                    </h6>
-                    <div class="d-flex align-items-baseline">
-
-                                                <input
-                        type="number"
-                        step="any"
-                        name="taxRate"
+                            <div class="col-12 pl-4 ml-4 mt-3 mb-3">
+                                <div class="d-flex flex-row justify-content-between">
+                                    <div class="row mr-5 pr-5">
+                                        <h6 class="font-weight-bold pt-3 pr-2">{{ "TaxRate" | localize }}</h6>
+                                        <div class="d-flex align-items-baseline">
+                                            <input type="number" step="any" name="taxRate"
                                                 class="form-control input-bg-soft"
-                        #taxRate="ngModel"
-                        [(ngModel)]="appItem.taxRate"
-                        (blur)="fixNegative()"
-                      />
-                      
-                    </div>
-                </div>
-  
-    </div>
-  </div>
+                                                #taxRate="ngModel"
+                                                [(ngModel)]="appItem.taxRate"
+                                                (blur)="fixNegative()" />
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+
                             <div class="col-10 pl-4 ml-4 mt-4">
                                 <span>
-                                    <input type="checkbox" [(ngModel)]="sellVariationChecked" name="showVariationsBtn"
-                                    
-                                        (ngModelChange)="askToRemoveAllVariations($event)"
-                                        class="input-bg-soft border-none pointer-none"/>
+                                    <input type="checkbox" name="showVariationsBtn"
+                                        class="input-bg-soft border-none pointer-none"
+                                        [(ngModel)]="sellVariationChecked"
+                                        (ngModelChange)="askToRemoveAllVariations($event)" />
                                 </span>
-                                <span>
-                                    {{'PleaseCheckThisBoxIfYouSellMultipleVariationsOfYourProduct' | localize}}.
-                                </span>
+                                <span>{{ 'PleaseCheckThisBoxIfYouSellMultipleVariationsOfYourProduct' | localize }}.</span>
                             </div>
                         </div>
-
-    
                     </div>
                 </div>
             </div>
 
-    
-              
-            
-            <div [class]="containerClass + ' kt-grid__item kt-grid__item--fluid' ">
+            <!-- Variations -->
+            <div [class]="containerClass + ' kt-grid__item kt-grid__item--fluid'">
                 <div class="kt-portlet kt-portlet--mobile">
                     <div class="kt-portlet__body">
                         <div class="align-items-baseline"
-                            *ngIf="!(!appItem?.variationItems?.length  && listingMode !== undefined)">
+                            *ngIf="!(!appItem?.variationItems?.length && listingMode !== undefined)">
                             <div class="col-sm-4 col-6">
                                 <h6 class="font-weight-bold">
-                                    <span class="text-danger">*</span>    {{ 'Variations' | localize}}
-                                     <span class="variation-required-note">
-                                         {{'Variationrequiredtosave' | localize}} 
-                                    </span>
+                                    <span class="text-danger">*</span> {{ 'Variations' | localize }}
+                                    <span class="variation-required-note">{{ 'Variationrequiredtosave' | localize }}</span>
                                 </h6>
-                              
                             </div>
+
                             <div class="col" *ngIf="!appItem?.variationItems?.length">
                                 <div class="d-flex align-items-center">
-                                    <button type="button" class="btn create-variation-btn" [disabled]="!sellVariationChecked"
-                                        (click)="showCreateOrEditVariationPage()">{{"CreateVariation" | localize}}
+                                    <button type="button" class="btn create-variation-btn"
+                                        [disabled]="!sellVariationChecked"
+                                        (click)="showCreateOrEditVariationPage()">
+                                        {{ "CreateVariation" | localize }}
                                     </button>
                                     <div class="hint w-50 ml-3">
-                                        <!-- <i class="pr-2 fa fa-bell"></i>  -->
-                                         <img  class="mr-2"  src="../../../../../assets/Items/Vector2.png"/> {{
-                                        'IfYouSellMultipleVariationsOfYourItem,YouCanListAllOfThemInOneMulti-Quantity,Fixed-priceListing.ThisSavesYouTimeAndMoney.'
-                                        | localize}}
+                                        <img class="mr-2" src="../../../../../assets/Items/Vector2.png" />
+                                        {{ 'IfYouSellMultipleVariationsOfYourItem,YouCanListAllOfThemInOneMulti-Quantity,Fixed-priceListing.ThisSavesYouTimeAndMoney.' | localize }}
                                     </div>
                                 </div>
                             </div>
+
                             <div class="col" *ngIf="appItem?.variationItems?.length">
                                 <div class="d-flex flex-column">
                                     <div class="mb-3">
-                                        <app-variations-meta-info [showPriceRange]='true'
-                                            [extraAttributes]="this.selectedItemTypeData?.extraAttributes?.extraAttributes"
+                                        <app-variations-meta-info
+                                            [showPriceRange]="true"
+                                            [extraAttributes]="selectedItemTypeData?.extraAttributes?.extraAttributes"
                                             [variations]="appItem.variationItems"
                                             [stockAvailability]="appItem.stockAvailability">
                                         </app-variations-meta-info>
                                     </div>
                                     <div class="text-right">
                                         <button type="button" class="m-2 btn btn-outline-primary edit-variations-btn"
-                                            (click)="showCreateOrEditVariationPage()">{{ 'EditVariations' |
-                                            localize}}</button>
+                                            (click)="showCreateOrEditVariationPage()">
+                                            {{ 'EditVariations' | localize }}
+                                        </button>
                                         <button type="button" class="btn remove-all-btn edit-variations-btn"
-                                            *ngIf="listingMode === undefined" (click)="removeAllVariations()">{{
-                                            'RemoveAll' | localize}}</button>
+                                            *ngIf="listingMode === undefined"
+                                            (click)="removeAllVariations()">
+                                            {{ 'RemoveAll' | localize }}
+                                        </button>
                                     </div>
                                 </div>
                             </div>
@@ -647,9 +632,10 @@
                 </div>
             </div>
 
+            <!-- Extra attributes (Recommended / Additional) -->
             <div class="d-flex flex-column">
                 <div [class]="containerClass + ' kt-grid__item kt-grid__item--fluid'"
-                    [ngStyle]="{'order':extraAttributeObject.value.orderOfDisplay}"
+                    [ngStyle]="{'order': extraAttributeObject.value.orderOfDisplay}"
                     *ngFor="let extraAttributeObject of extraAttributes | keyvalue">
                     <div class="kt-portlet kt-portlet--mobile">
                         <div class="kt-portlet__body">
@@ -657,147 +643,135 @@
                                 <p-accordionTab>
                                     <ng-template pTemplate="header">
                                         <div class="d-inline-block custom-header p-3 ml-3">
-                                            <h6 class="mb-1 font-weight-bold">{{extraAttributeObject.value.header | localize}}</h6>
-                                            <p class="hint m-0 p-0">{{extraAttributeObject.value.title | localize}}</p>
+                                            <h6 class="mb-1 font-weight-bold">{{ extraAttributeObject.value.header | localize }}</h6>
+                                            <p class="hint m-0 p-0">{{ extraAttributeObject.value.title | localize }}</p>
                                         </div>
                                     </ng-template>
+
                                     <div class="row pl-3 mt-4">
                                         <div class="col-lg-8 col-md-10 col">
-                                            <div class="row  pt-4">
+                                            <div class="row pt-4">
                                                 <div class="col-md-6 col-12 mb-4"
-                                                    [ngClass]="{ 'd-none' : extraAttr.isSelectedOnVariation && extraAttr.isVariation}"
-                                                    *ngFor="let extraAttr of extraAttributeObject.value.extraAttributes">
+                                                    *ngFor="let extraAttr of extraAttributeObject.value.extraAttributes"
+                                                    [ngClass]="{'d-none': extraAttr.isSelectedOnVariation && extraAttr.isVariation}">
                                                     <div *ngIf="!extraAttr.isSelectedOnVariation && !extraAttr.isVariation">
                                                         <div>
-                                                            <label>{{extraAttr.name | localize}}</label>
+                                                            <label>{{ extraAttr.name | localize }}</label>
                                                         </div>
                                                         <div class="d-flex align-items-center">
 
-                                                            <div class="wide-drop-down d-flex flex-grow-1 "
+                                                            <!-- Lookup: multi select -->
+                                                            <div class="wide-drop-down d-flex flex-grow-1"
                                                                 *ngIf="extraAttr?.paginationSetting && extraAttr?.acceptMultipleValues && extraAttr.isLookup">
                                                                 <div class="flex-grow-1 mr-1">
                                                                     <p-multiSelect
-                                                                        [options]="extraAttr.paginationSetting.list"
-                                                                        [styleClass]="'w-100'"
-                                                                        [(ngModel)]="extraAttr.selectedValues"
                                                                         name="extraAttr_{{extraAttr.name}}"
+                                                                        [styleClass]="'w-100'"
+                                                                        [options]="extraAttr.paginationSetting.list"
+                                                                        [(ngModel)]="extraAttr.selectedValues"
                                                                         [placeholder]="l('Select') + ' ' + extraAttr.name"
-                                                                        (onChange)="multiValuesExtraAttributeOnChange($event,extraAttr)">
+                                                                        (onChange)="multiValuesExtraAttributeOnChange($event, extraAttr)">
                                                                     </p-multiSelect>
-                                                                    <!-- <app-dropdown-with-pagination
-                                                                        [paginationSettings]="extraAttr.paginationSetting"
-                                                                        [title]='extraAttr.name'
-                                                                        [selectionType]='DropdownSelection.Multi'
-                                                                        [initialValues]="extraAttr.selectedValues"
-                                                                        (selectionChanged)='multiValuesExtraAttributeOnChange($event,extraAttr)'
-                                                                        (loadMoreData)="loadMoreLookupData(extraAttr)"
-                                                                    >
-                                                                    </app-dropdown-with-pagination> -->
                                                                 </div>
                                                             </div>
 
-                                                            <div class="wide-drop-down flex-grow-1 "
+                                                            <!-- Lookup: single select -->
+                                                            <div class="wide-drop-down flex-grow-1"
                                                                 *ngIf="extraAttr?.paginationSetting && !extraAttr?.acceptMultipleValues && extraAttr.isLookup">
-                                                                <!-- <app-dropdown-with-pagination
-                                                                    [paginationSettings]="extraAttr.paginationSetting"
-                                                                    [title]='extraAttr.name'
-                                                                    [selectionType]='DropdownSelection.Single'
-                                                                    (selectionChanged)='singleValueExtraAttributeOnChange($event,extraAttr)'
-                                                                    (loadMoreData)="loadMoreLookupData(extraAttr)"
-                                                                >
-                                                                </app-dropdown-with-pagination> -->
-                                                                <p-dropdown [options]="extraAttr.paginationSetting.list"
-                                                                    [styleClass]="'w-100'"
-                                                                    [(ngModel)]="extraAttr.selectedValues"
+                                                                <p-dropdown
                                                                     name="extraAttr_{{extraAttr.name}}"
+                                                                    [styleClass]="'w-100'"
+                                                                    [options]="extraAttr.paginationSetting.list"
+                                                                    [(ngModel)]="extraAttr.selectedValues"
                                                                     [placeholder]="l('Select') + ' ' + extraAttr.name"
-                                                                    (onChange)="singleValueExtraAttributeOnChange($event,extraAttr)">
+                                                                    (onChange)="singleValueExtraAttributeOnChange($event, extraAttr)">
                                                                 </p-dropdown>
                                                             </div>
+
+                                                            <!-- String -->
                                                             <div class="flex-grow-1"
                                                                 *ngIf="extraAttr.dataType === 'string' && !extraAttr.isLookup">
-                                                                <input type="text"
-                                                                    (keyup)="notLookupExtraAttributeOnChange($event.target.value,extraAttr)"
+                                                                <input type="text" id="extraAttr{{extraAttr.name}}"
                                                                     name="{{extraAttr.name}}"
-                                                                    placeholder="{{extraAttr.name}}"
                                                                     class="form-control input-bg-soft"
-                                                                    id="extraAttr{{extraAttr.name}}"
+                                                                    placeholder="{{extraAttr.name}}"
                                                                     [(ngModel)]="extraAttr.selectedValues"
-                                                                    >
+                                                                    (keyup)="notLookupExtraAttributeOnChange($event.target.value, extraAttr)">
                                                             </div>
+
+                                                            <!-- Boolean -->
                                                             <div class="flex-grow-1"
-                                                                *ngIf="extraAttr.dataType === 'boolean' || extraAttr.dataType === 'bit' ">
+                                                                *ngIf="extraAttr.dataType === 'boolean' || extraAttr.dataType === 'bit'">
                                                                 <div class="radio-inline mt-2">
                                                                     <label class="radio radio-accent radio-primary mr-4"
                                                                         for="extraAttr{{extraAttr.name}}_1">
-                                                                        <input type="radio"
-                                                                            (click)="notLookupExtraAttributeOnChange('true',extraAttr)"
-                                                                            name="extraAttr_{{extraAttr.name}}"
+                                                                        <input type="radio" class="input-bg-soft border-none"
                                                                             id="extraAttr{{extraAttr.name}}_1"
+                                                                            name="extraAttr_{{extraAttr.name}}"
                                                                             [value]="'true'"
-                                                                            [(ngModel)]="extraAttr.selectedValues" 
-                                                                            class="input-bg-soft border-none"/>
+                                                                            [(ngModel)]="extraAttr.selectedValues"
+                                                                            (click)="notLookupExtraAttributeOnChange('true', extraAttr)" />
                                                                         {{ "Yes" | localize }}
                                                                     </label>
                                                                     <label class="radio radio-accent radio-primary"
                                                                         for="extraAttr{{extraAttr.name}}_0">
-                                                                        <input type="radio"
-                                                                            (click)="notLookupExtraAttributeOnChange('false',extraAttr)"
-                                                                            name="extraAttr_{{extraAttr.name}}"
+                                                                        <input type="radio" class="input-bg-soft border-none"
                                                                             id="extraAttr{{extraAttr.name}}_0"
+                                                                            name="extraAttr_{{extraAttr.name}}"
                                                                             [value]="'false'"
                                                                             [(ngModel)]="extraAttr.selectedValues"
-                                                                            class="input-bg-soft border-none">
+                                                                            (click)="notLookupExtraAttributeOnChange('false', extraAttr)">
                                                                         {{ "No" | localize }}
                                                                     </label>
                                                                     <a *ngIf="extraAttr.selectedValues"
                                                                         class="ml-5 pointer text-black-50 font-weight-bold"
                                                                         (click)="resetExtraAttributeSelectedValue(extraAttr)">
-                                                                        Reset</a>
+                                                                        Reset
+                                                                    </a>
                                                                 </div>
                                                             </div>
-                                                            <div class="flex-grow-1"
-                                                                *ngIf="extraAttr.dataType === 'Datetime' ">
-                                                                <input type="text"
-                                                                    (ngModelChange)="notLookupExtraAttributeOnChange($event,extraAttr)"
-                                                                    (keyup)="notLookupExtraAttributeOnChange($event.target.value,extraAttr)"
-                                                                    name="{{extraAttr.name}}" autocomplete="off"
-                                                                    placeholder="{{extraAttr.name}}"
-                                                                    class="form-control"
-                                                                    [bsConfig]="{ dateInputFormat: 'YYYY-MM-DD' }"
-                                                                    bsDatepicker id="extraAttr{{extraAttr.name}}"
-                                                                    [(ngModel)]="extraAttr.selectedValues"
-                                                                    class="input-bg-soft border-none">
-                                                            </div>
-                                                            <div class="flex-grow-1"
-                                                                *ngIf="extraAttr.dataType === 'Numeric' ">
-                                                                <input type="number"
-                                                                    (keyup)="notLookupExtraAttributeOnChange($event.target.value,extraAttr)"
-                                                                    name="{{extraAttr.name}}"
-                                                                    placeholder="{{extraAttr.name}}"
-                                                                    class="form-control input-bg-soft border-none"
+
+                                                            <!-- Date -->
+                                                            <div class="flex-grow-1" *ngIf="extraAttr.dataType === 'Datetime'">
+                                                                <input type="text" bsDatepicker autocomplete="off"
                                                                     id="extraAttr{{extraAttr.name}}"
-                                                                    [(ngModel)]="extraAttr.selectedValues">
+                                                                    name="{{extraAttr.name}}"
+                                                                    class="form-control input-bg-soft border-none"
+                                                                    placeholder="{{extraAttr.name}}"
+                                                                    [bsConfig]="{ dateInputFormat: 'YYYY-MM-DD' }"
+                                                                    [(ngModel)]="extraAttr.selectedValues"
+                                                                    (ngModelChange)="notLookupExtraAttributeOnChange($event, extraAttr)"
+                                                                    (keyup)="notLookupExtraAttributeOnChange($event.target.value, extraAttr)">
                                                             </div>
 
-                                                            <!-- <p class="ml-2" *ngIf="extraAttr.isLookup && !extraAttr?.lookupData?.length">{{ "NoData" | localize }} ...</p> -->
+                                                            <!-- Numeric -->
+                                                            <div class="flex-grow-1" *ngIf="extraAttr.dataType === 'Numeric'">
+                                                                <input type="number" id="extraAttr{{extraAttr.name}}"
+                                                                    name="{{extraAttr.name}}"
+                                                                    class="form-control input-bg-soft border-none"
+                                                                    placeholder="{{extraAttr.name}}"
+                                                                    [(ngModel)]="extraAttr.selectedValues"
+                                                                    (keyup)="notLookupExtraAttributeOnChange($event.target.value, extraAttr)">
+                                                            </div>
+
                                                             <a class="border rounded text-primary add-new-lookup-btn ml-3"
                                                                 *ngIf="extraAttr.isLookup && extraAttr.allowAddNew"
                                                                 (click)="openCreateNewAppEntityModal(extraAttr)">
                                                                 <i class="fas fa-pen"></i>
                                                             </a>
                                                         </div>
-
                                                     </div>
                                                 </div>
+
                                                 <div>
                                                     <small class="ml-2"
-                                                        *ngIf="!extraAttributeObject.value?.extraAttributes?.length && !appItem.entityObjectTypeId">{{
-                                                        "PleaseSelectAProductTypeFirst" | localize }}</small>
+                                                        *ngIf="!extraAttributeObject.value?.extraAttributes?.length && !appItem.entityObjectTypeId">
+                                                        {{ "PleaseSelectAProductTypeFirst" | localize }}
+                                                    </small>
                                                     <small class="ml-2"
-                                                        *ngIf="!extraAttributeObject.value?.extraAttributes?.length && appItem.entityObjectTypeId">{{
-                                                        "No" | localize }} {{extraAttributeObject.value.header}} {{
-                                                        "Attributes" | localize }}</small>
+                                                        *ngIf="!extraAttributeObject.value?.extraAttributes?.length && appItem.entityObjectTypeId">
+                                                        {{ "No" | localize }} {{ extraAttributeObject.value.header }} {{ "Attributes" | localize }}
+                                                    </small>
                                                 </div>
                                             </div>
                                         </div>
@@ -814,16 +788,28 @@
 </div>
 
 <div [@routerTransition] *ngIf="displayVariations">
-    <app-create-edit-app-item-variations [extraVariationsTypes]="extraVariationsTypes" [appItem]="appItem" [selectedItemTypeData]="selectedItemTypeData"
-        (cancel)="hideVariations($event)" [defaultAppItemImage]="this.attachmentsSrcs[this.defaultImageIndex]"
-        (applyVariations)="applyVariations($event)" [isListing]="listingMode !== undefined" [listingMode]="listingMode"
-        [currencies]="selectedCurrencies" [updateVariation]="updateVariation" [productTypeId]="productTypeId"
-        [productCode]="appItem.code">
+    <app-create-edit-app-item-variations
+        [extraVariationsTypes]="extraVariationsTypes"
+        [appItem]="appItem"
+        [selectedItemTypeData]="selectedItemTypeData"
+        [defaultAppItemImage]="attachmentsSrcs[defaultImageIndex]"
+        [isListing]="listingMode !== undefined"
+        [listingMode]="listingMode"
+        [currencies]="selectedCurrencies"
+        [updateVariation]="updateVariation"
+        [productTypeId]="productTypeId"
+        [productCode]="appItem.code"
+        (cancel)="hideVariations($event)"
+        (applyVariations)="applyVariations($event)">
     </app-create-edit-app-item-variations>
 </div>
 
-
-<app-advanced-pricing *ngIf="showAdvancedPricing" [appItem]="appItem" [prices]="appItem.appItemPriceInfos"
-    [allCurrencies]="allCurrencies" [readOnly]="false" (_submit)="productAdvancedPriceChangesHandler($event)"
-    (_cancel)="hideAdvancedPricingModal()" (updateVariation)="onUpdateVariation($event)">
+<app-advanced-pricing *ngIf="showAdvancedPricing"
+    [appItem]="appItem"
+    [prices]="appItem.appItemPriceInfos"
+    [allCurrencies]="allCurrencies"
+    [readOnly]="false"
+    (_submit)="productAdvancedPriceChangesHandler($event)"
+    (_cancel)="hideAdvancedPricingModal()"
+    (updateVariation)="onUpdateVariation($event)">
 </app-advanced-pricing>

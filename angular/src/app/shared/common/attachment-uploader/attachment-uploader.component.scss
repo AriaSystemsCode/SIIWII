@@ -1,0 +1,569 @@
+
+:host {
+    display: block;
+    width: 100%;
+    height: 100%;
+    min-height: 0;
+}
+
+/* =========================================
+   MAIN CONTAINER
+========================================= */
+
+.attachment-uploader {
+    display: flex;
+    flex-direction: column;
+    width: 100%;
+    height: 100%;
+    min-height: 0;
+    background: #fff;
+    border: 1px solid #e5e7eb;
+    border-radius: 12px;
+    overflow: hidden;
+}
+
+/* =========================================
+   SCROLLABLE CONTENT
+========================================= */
+
+.attachment-uploader-content {
+    flex: 1 1 auto;
+    min-height: 0;
+    overflow-y: auto;
+    overflow-x: hidden;
+    padding: 20px;
+
+    scrollbar-width: thin;
+    scrollbar-color: #d5d0e6 transparent;
+
+    &::-webkit-scrollbar {
+        width: 6px;
+    }
+
+    &::-webkit-scrollbar-track {
+        background: transparent;
+    }
+
+    &::-webkit-scrollbar-thumb {
+        background: #d5d0e6;
+        border-radius: 10px;
+    }
+
+    &::-webkit-scrollbar-thumb:hover {
+        background: #a69bc8;
+    }
+}
+
+/* =========================================
+   UPLOAD HEADER
+========================================= */
+
+.upload-heading {
+    display: flex;
+    align-items: center;
+    gap: 16px;
+    margin-bottom: 24px;
+
+    > i {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        flex-shrink: 0;
+
+        width: 56px;
+        height: 56px;
+        padding: 12px;
+
+        font-size: 24px;
+        color: #7770a5;
+        background: #f8f6fc;
+        border: 1px solid #e4dff0;
+        border-radius: 50%;
+    }
+
+    h5 {
+        font-size: 16px;
+        font-weight: 600;
+        color: #29243b;
+        margin: 0 0 6px;
+    }
+
+    p {
+        font-size: 13px;
+        color: #7770a5;
+        margin: 0;
+        line-height: 1.5;
+    }
+}
+
+/* =========================================
+   UPLOAD ZONE
+========================================= */
+
+.upload-zone {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+
+    width: 100%;
+    min-height: 180px;
+
+    border: 2px dashed #d7d7e2;
+    border-radius: 12px;
+    background: #fafafe;
+
+    transition:
+        border-color 0.2s ease,
+        background-color 0.2s ease;
+
+    &:hover {
+        border-color: #8174b5;
+        background: #f7f5fc;
+    }
+
+    &:focus-within {
+        border-color: #8174b5;
+    }
+}
+
+/* =========================================
+   UPLOAD LABEL
+========================================= */
+
+.upload-label {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+
+    gap: 8px;
+    width: 100%;
+    padding: 24px 16px;
+
+    text-align: center;
+    cursor: pointer;
+
+    i {
+        font-size: 28px;
+        color: #8174b5;
+        margin-bottom: 4px;
+    }
+
+    span {
+        font-size: 14px;
+        font-weight: 600;
+        color: #514778;
+    }
+
+    small {
+        display: block;
+        font-size: 12px;
+        color: #888;
+        line-height: 1.5;
+    }
+}
+
+/* =========================================
+   SELECTED ATTACHMENT PREVIEW
+========================================= */
+
+.preview-wrapper {
+    display: flex;
+    justify-content: center;
+    width: 100%;
+    margin-top: 16px;
+}
+
+.preview-card {
+    position: relative;
+    width: 100%;
+    max-width: 420px;
+
+    overflow: hidden;
+    border: 1px solid #e5e5ed;
+    border-radius: 12px;
+    background: #f8f8fb;
+}
+
+.main-preview {
+    display: block;
+    width: 100%;
+    height: 260px;
+    max-height: 45vh;
+    object-fit: contain;
+    background: #f8f8fb;
+}
+
+/* Video preview */
+
+video.main-preview {
+    background: #111;
+    object-fit: contain;
+}
+
+/* =========================================
+   PDF LOADING / FALLBACK
+========================================= */
+
+.preview-loading,
+.preview-fallback {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+
+    gap: 12px;
+    width: 100%;
+    height: 260px;
+
+    background: #f8f8fb;
+    color: #8172b0;
+    text-align: center;
+}
+
+.preview-loading {
+    i {
+        font-size: 30px;
+    }
+
+    span {
+        font-size: 13px;
+        color: #7770a5;
+    }
+}
+
+.preview-fallback {
+    i {
+        font-size: 52px;
+        color: #8174b5;
+    }
+}
+
+/* =========================================
+   REMOVE PREVIEW BUTTON
+========================================= */
+
+.remove-preview-btn {
+    position: absolute;
+    top: 10px;
+    right: 10px;
+    z-index: 2;
+
+    display: flex;
+    align-items: center;
+    justify-content: center;
+
+    width: 32px;
+    height: 32px;
+    padding: 0;
+
+    border: none;
+    border-radius: 50%;
+
+    background: rgba(30, 30, 30, 0.7);
+    color: #fff;
+
+    font-size: 14px;
+    cursor: pointer;
+
+    transition:
+        background-color 0.2s ease,
+        transform 0.2s ease;
+
+    &:hover {
+        background: #dc3545;
+        transform: scale(1.05);
+    }
+
+    &:focus-visible {
+        outline: 2px solid #8174b5;
+        outline-offset: 2px;
+    }
+}
+
+/* =========================================
+   PDF THUMBNAIL SECTION
+========================================= */
+
+.thumbnail-section {
+    width: 100%;
+    margin-top: 24px;
+
+    h6 {
+        font-size: 14px;
+        font-weight: 600;
+        color: #29243b;
+        margin-bottom: 12px;
+    }
+}
+
+.thumbnail-zone {
+    min-height: 130px;
+    background: #fafafe;
+
+    .upload-label {
+        padding: 20px 12px;
+
+        i {
+            font-size: 25px;
+        }
+
+        span {
+            font-size: 13px;
+        }
+    }
+}
+
+/* =========================================
+   SELECTED PDF THUMBNAIL
+========================================= */
+
+.thumbnail-selected {
+    position: relative;
+    width: 100%;
+    max-width: 260px;
+
+    overflow: hidden;
+    border: 1px solid #e5e5ed;
+    border-radius: 12px;
+    background: #f8f8fb;
+}
+
+.thumbnail-preview {
+    display: block;
+    width: 100%;
+    height: 160px;
+    object-fit: contain;
+    background: #f8f8fb;
+}
+
+/* =========================================
+   ERROR MESSAGE
+========================================= */
+
+.attachment-uploader-content .text-danger {
+    font-size: 12px;
+    line-height: 1.5;
+    margin-top: 12px;
+}
+
+/* =========================================
+   FIXED BOTTOM FOOTER
+========================================= */
+
+.attachment-uploader-footer {
+    flex: 0 0 auto;
+
+    display: flex;
+    align-items: center;
+    justify-content: flex-end;
+    gap: 12px;
+
+    width: 100%;
+    padding: 16px 20px;
+
+    background: #fff;
+    border-top: 1px solid #e9e9ef;
+    box-shadow: 0 -3px 12px rgba(0, 0, 0, 0.04);
+
+    z-index: 5;
+
+    .btn {
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+
+        min-width: 110px;
+        min-height: 40px;
+        padding: 9px 20px;
+
+        border-radius: 8px;
+        font-size: 13px;
+        font-weight: 600;
+        line-height: 1.4;
+
+        transition: all 0.2s ease;
+    }
+
+    .btn-light {
+        background: #f5f5f8;
+        border: 1px solid #e5e5ed;
+        color: #514778;
+
+        &:hover {
+            background: #ebe9f1;
+        }
+    }
+
+    .bgPurple {
+        background: #7770a5;
+        border: 1px solid #7770a5;
+        color: #fff;
+
+        &:hover:not(:disabled) {
+            background: #625a91;
+            border-color: #625a91;
+        }
+
+        &:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+        }
+    }
+}
+
+/* =========================================
+   TABLET
+========================================= */
+
+@media (max-width: 991px) {
+    .attachment-uploader-content {
+        padding: 18px;
+    }
+
+    .main-preview {
+        height: 230px;
+    }
+
+    .preview-loading,
+    .preview-fallback {
+        height: 230px;
+    }
+
+    .attachment-uploader-footer {
+        padding: 14px 18px;
+    }
+}
+
+/* =========================================
+   MOBILE
+========================================= */
+
+@media (max-width: 767px) {
+    .attachment-uploader {
+        border-radius: 10px;
+    }
+
+    .attachment-uploader-content {
+        padding: 14px;
+    }
+
+    .upload-heading {
+        gap: 12px;
+        margin-bottom: 18px;
+
+        > i {
+            width: 46px;
+            height: 46px;
+            font-size: 20px;
+            padding: 10px;
+        }
+
+        h5 {
+            font-size: 15px;
+        }
+
+        p {
+            font-size: 12px;
+        }
+    }
+
+    .upload-zone {
+        min-height: 150px;
+    }
+
+    .upload-label {
+        padding: 18px 12px;
+        gap: 6px;
+
+        i {
+            font-size: 24px;
+        }
+
+        span {
+            font-size: 13px;
+        }
+
+        small {
+            font-size: 11px;
+        }
+    }
+
+    .preview-wrapper {
+        margin-top: 12px;
+    }
+
+    .preview-card {
+        max-width: 100%;
+    }
+
+    .main-preview {
+        height: 200px;
+        max-height: 35vh;
+    }
+
+    .preview-loading,
+    .preview-fallback {
+        height: 200px;
+    }
+
+    .thumbnail-section {
+        margin-top: 18px;
+
+        h6 {
+            font-size: 13px;
+        }
+    }
+
+    .thumbnail-zone {
+        min-height: 110px;
+    }
+
+    .thumbnail-selected {
+        max-width: 100%;
+    }
+
+    .thumbnail-preview {
+        height: 140px;
+    }
+
+    .remove-preview-btn {
+        width: 30px;
+        height: 30px;
+        top: 8px;
+        right: 8px;
+    }
+
+    .attachment-uploader-footer {
+        padding: 12px 14px;
+        gap: 10px;
+
+        .btn {
+            flex: 1;
+            min-width: 0;
+            min-height: 40px;
+            padding: 9px 12px;
+            font-size: 13px;
+        }
+    }
+}
+
+/* =========================================
+   RTL / ARABIC SUPPORT
+========================================= */
+
+:host-context([dir="rtl"]) {
+    .upload-heading {
+        flex-direction: row;
+        text-align: right;
+    }
+
+    .remove-preview-btn {
+        right: auto;
+        left: 10px;
+    }
+
+    .attachment-uploader-footer {
+        direction: rtl;
+    }
+}

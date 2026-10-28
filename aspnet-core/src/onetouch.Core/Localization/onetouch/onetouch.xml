@@ -3033,6 +3033,12 @@ Please select one of the available linesheet templates
 		<text name="Price Range">Price Range</text>
 		<text name="Amount Range">Amount Range</text>
 
+<text name="SelectAndUploadYourFiles"></text>
+<text name="ClickToUpload"></text>
+<text name="ThumbnailImageOptional"></text>
+<text name="GeneratingPdfPreview"></text>
+<text name="COLOR">Color</text>
+
 		
   </texts>  
 </localizationDictionary>
