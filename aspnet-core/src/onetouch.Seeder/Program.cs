@@ -177,10 +177,10 @@ public static class Program
 
 public static class SeedRelease
 {
-    // Increment when the cumulative seed snapshot changes. Version 16
-    // corrects the DropdownOptions chips data type in existing databases.
+    // Increment when the cumulative seed snapshot changes. Version 18
+    // moves Field Manager settings to their revised display sections.
     // This is not an EF schema version.
-    public const int RequiredVersion = 16;
+    public const int RequiredVersion = 18;
 }
 
 public sealed record Target(string Label, string ConnectionString, string Identity)

@@ -51,18 +51,18 @@ BEGIN TRY
     INSERT #OwnerTypes (TypeCode, TypeName) VALUES
         (N'IN', N'Integer--Numeric input'),
         (N'IC', N'Integer--Currency'),
-        (N'LD', N'List--Dropdown'),
+        (N'LD', N'String--Dropdown'),
         (N'BOOLEAN', N'Boolean--Checkbox');
 
     UPDATE o SET TypeId = t.Id
     FROM #OwnerTypes AS o
     JOIN dbo.SycEntityObjectTypes AS t ON t.ObjectId = @fieldObjectId
         AND t.ParentId = @fieldRootId AND t.Code = o.TypeCode
-        AND t.Name = o.TypeName AND t.IsDeleted = 0;
+        AND (t.Name = o.TypeName OR (o.TypeCode = N'LD' AND t.Name = N'List--Dropdown')) AND t.IsDeleted = 0;
     IF EXISTS (SELECT 1 FROM #OwnerTypes WHERE TypeId IS NULL)
        OR EXISTS (SELECT 1 FROM #OwnerTypes o JOIN dbo.SycEntityObjectTypes t
           ON t.ObjectId = @fieldObjectId AND t.ParentId = @fieldRootId
-         AND t.Code = o.TypeCode AND t.Name = o.TypeName AND t.IsDeleted = 0
+         AND t.Code = o.TypeCode AND (t.Name = o.TypeName OR (o.TypeCode = N'LD' AND t.Name = N'List--Dropdown')) AND t.IsDeleted = 0
           GROUP BY o.TypeCode HAVING COUNT(*) <> 1)
         THROW 51403, 'A required Field Manager field type is missing or duplicated.', 1;
 

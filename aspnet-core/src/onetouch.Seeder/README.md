@@ -7,7 +7,7 @@ It reuses the existing seed helper; translation generation is not changed.
 ## Release contract
 
 `SeedRelease.RequiredVersion` in `Program.cs` is the version-controlled required
-seed snapshot (version 13 promotes DropdownOptions to String--Chips). Increment it whenever
+seed snapshot (version 18 moves Field Manager setting sections). Increment it whenever
 the cumulative seed routines or their assets change. It is not an arbitrary
 command-line value.
 Each database records successful snapshots in `dbo.__OneTouchSeedHistory`.
@@ -77,6 +77,15 @@ Databases already marked version 11 must apply this snapshot to receive them.
 Version 13 changes the List--Dropdown `DropdownOptions` setting's value type
 from List--Dropdown to String--Chips. It keeps the setting ID and code, records
 a new revision, and updates its applied Field Manager snapshot.
+
+Version 17 renames the `LD` field type to String--Dropdown and removes the
+superseded `SD` String--dropDownList type. Existing references are moved to
+`LD` before removal. The earlier seed scripts remain rerunnable after this
+consolidation.
+
+Version 18 moves the twelve type-owned settings to the revised Advanced
+Information and Extra Attributes sections. Previous revisions remain intact;
+the new definition revisions and applied table snapshots use the new Usage.
 
 Existing `Clients.IsSeeded` values are ignored and left untouched. Do not mark old
 databases version 1 merely because that flag is True: run the new seed baseline.

@@ -9,7 +9,7 @@ SELECT f.Id, f.CurrentRevisionNo, f.SourceDataType
 INTO #BeforeField
 FROM dbo.AppFields f JOIN dbo.SycEntityObjectTypes t ON t.Id = f.EntitySycObjectId
 JOIN dbo.SydObjects o ON o.Id = t.ObjectId
-WHERE o.Code = N'FIELD' AND t.Code = N'LD' AND t.Name = N'List--Dropdown'
+WHERE o.Code = N'FIELD' AND t.Code = N'LD' AND t.Name IN (N'List--Dropdown', N'String--Dropdown')
   AND f.FieldName = N'DropdownOptions' AND f.TenantId IS NULL AND f.IsDeleted = 0;
 IF (SELECT COUNT(*) FROM #BeforeField) <> 1
     THROW 51930, 'Test needs one promoted List--Dropdown DropdownOptions field.', 1;

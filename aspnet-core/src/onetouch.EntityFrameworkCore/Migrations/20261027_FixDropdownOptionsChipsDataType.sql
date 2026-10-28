@@ -19,7 +19,7 @@ BEGIN TRY
           AND TenantId IS NULL AND IsDeleted = 0);
     DECLARE @listTypeId bigint = (SELECT Id FROM dbo.SycEntityObjectTypes
         WHERE ObjectId = @fieldObjectId AND ParentId = @fieldRootId
-          AND Code = N'LD' AND Name = N'List--Dropdown'
+          AND Code = N'LD' AND Name IN (N'List--Dropdown', N'String--Dropdown')
           AND TenantId IS NULL AND IsDeleted = 0);
     DECLARE @chipsTypeId bigint = (SELECT Id FROM dbo.SycEntityObjectTypes
         WHERE ObjectId = @fieldObjectId AND ParentId = @fieldRootId

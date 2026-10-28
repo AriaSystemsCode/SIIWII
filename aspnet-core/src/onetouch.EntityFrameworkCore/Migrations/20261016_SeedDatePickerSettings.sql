@@ -42,6 +42,10 @@ BEGIN TRY
     DECLARE @dateTypeId bigint = (SELECT Id FROM dbo.SycEntityObjectTypes
         WHERE ObjectId = @fieldObjectId AND ParentId = @fieldRootId
           AND Code = N'DP' AND Name = N'Date--Date picker' AND IsDeleted = 0);
+    DECLARE @dateFormatTypeCode nvarchar(50) = CASE WHEN EXISTS (
+        SELECT 1 FROM dbo.SycEntityObjectTypes
+        WHERE ObjectId = @fieldObjectId AND ParentId = @fieldRootId
+          AND Code = N'SD' AND IsDeleted = 0) THEN N'SD' ELSE N'LD' END;
 
     -- DateFormat and the date-typed DefaultValue were previously seeded with
     -- no owning type. The Boolean settings were shared with String--Textbox;
@@ -83,7 +87,7 @@ BEGIN TRY
     INSERT #SeedDatePickerSettings (Ordinal, FieldName, TypeCode, [Section], AllowNull, Required, DefaultValue)
     VALUES
         (1, N'AllowNull',    N'BOOLEAN', N'AdvancedInformation', 0, 1, N'false'),
-        (2, N'DateFormat',   N'SD',      N'AdvancedInformation', 1, 0, NULL),
+        (2, N'DateFormat',   @dateFormatTypeCode, N'AdvancedInformation', 1, 0, NULL),
         (3, N'DefaultValue', N'DP',      N'AdvancedInformation', 1, 0, NULL),
         (4, N'Required',     N'BOOLEAN', N'AdvancedInformation', 0, 1, N'false'),
         (5, N'Visible',      N'BOOLEAN', N'ExtraAttributes',     0, 1, N'true');
@@ -289,7 +293,7 @@ END CATCH;
 SELECT (SELECT COUNT(*) FROM dbo.AppFields f
         JOIN dbo.SydObjects o ON o.Id = f.SycObjectId
         JOIN dbo.SycEntityObjectTypes t ON t.Id = f.FieldTypeId
-        JOIN (VALUES (N'AllowNull',N'BOOLEAN'), (N'DateFormat',N'SD'),
+        JOIN (VALUES (N'AllowNull',N'BOOLEAN'), (N'DateFormat',@dateFormatTypeCode),
                      (N'DefaultValue',N'DP'), (N'Required',N'BOOLEAN'),
                      (N'Visible',N'BOOLEAN')) s(FieldName,TypeCode)
           ON s.FieldName = f.FieldName AND s.TypeCode = t.Code
