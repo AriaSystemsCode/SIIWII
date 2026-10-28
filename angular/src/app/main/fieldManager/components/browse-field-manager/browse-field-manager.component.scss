@@ -354,6 +354,34 @@
     font-size: 11px;
 }
 
+.field-group-panel + .field-group-panel {
+    border-top: 1px solid #dfe1e8;
+}
+
+.field-groups .field-group-toggle {
+    display: flex;
+    width: 100%;
+    height: auto;
+    align-items: center;
+    gap: 8px;
+    margin: 0;
+    padding: 10px 14px;
+    background: #f7f1f7;
+    text-align: left;
+}
+
+.field-group-count {
+    margin-left: auto;
+    color: #647086;
+    font-size: 12px;
+    font-weight: 600;
+}
+
+.field-group-scroll {
+    max-height: min(62vh, 400px);
+    overflow: auto;
+}
+
 .w-150 {
     width: 150px;
 }
@@ -508,6 +536,11 @@
 ::ng-deep .field-manager-table .p-datatable-wrapper {
     max-height: min(62vh, 400px);
     overflow: auto !important;
+}
+
+::ng-deep .field-manager-group-table .p-datatable-wrapper {
+    max-height: none;
+    overflow: visible !important;
 }
 
 ::ng-deep .field-manager-table .p-datatable-table {

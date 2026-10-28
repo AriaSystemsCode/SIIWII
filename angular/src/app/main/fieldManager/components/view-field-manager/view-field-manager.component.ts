@@ -5,7 +5,7 @@ import { forkJoin } from 'rxjs';
 import { finalize } from 'rxjs/operators';
 import { AppComponentBase } from '@shared/common/app-component-base';
 import { AppFieldDto, AppFieldHistoryDto, CreateOrEditFieldInput, ExtraAttributesSource, FieldLookupDto, FieldSettingValueDto, SycEntityObjectTypesServiceProxy } from '@shared/service-proxies/service-proxies';
-import { FieldManagerService, FIELD_USAGE_TITLES } from '../../field-manager.service';
+import { FieldManagerService, getFieldUsageTitle } from '../../field-manager.service';
 import { CreateOrEditFieldManagerComponent } from '../create-or-edit-field-manager/create-or-edit-field-manager.component';
 import Swal from 'sweetalert2';
 
@@ -37,6 +37,7 @@ export class ViewFieldManagerComponent extends AppComponentBase implements OnIni
     private groupsSource: FieldSettingValueDto[] | undefined;
     private groupsCache: { usage: string, settings: FieldSettingValueDto[] }[] = [];
     private usageRequest = 0;
+    private collapsedUsages = new Set<string>();
 
     constructor(
         injector: Injector,
@@ -58,10 +59,33 @@ export class ViewFieldManagerComponent extends AppComponentBase implements OnIni
     }
 
     usageTitle(usage: string): string {
-        if (FIELD_USAGE_TITLES[usage]) return FIELD_USAGE_TITLES[usage];
+        const selectedFieldType = this.fieldTypes.find(type => type.id === this.item?.fieldTypeId);
+          const fieldType = selectedFieldType?.name || '';
+                const [dataType = '', widgetName = ''] = fieldType.split('--').map(part => part.trim());
+
+        const dynamicTitle = getFieldUsageTitle(usage, dataType, widgetName);
+        if (dynamicTitle) return dynamicTitle;
         const key = (usage || '').split('.').pop() || '';
         const localized = this.l(key);
         return localized && localized !== key ? localized : key.replace(/([a-z])([A-Z])/g, '$1 $2');
+    }
+
+    hasSettingsValue(settings: FieldSettingValueDto[]): boolean {
+        return (settings || []).some(setting => {
+            const value: any = setting.value;
+            if (value === null || value === undefined) return false;
+            if (typeof value === 'string') return value.trim().length > 0;
+            if (Array.isArray(value)) return value.length > 0;
+            return true;
+        });
+    }
+
+    isUsageCollapsed(usage: string): boolean {
+        return this.collapsedUsages.has(usage);
+    }
+
+    toggleUsage(usage: string): void {
+        if (!this.collapsedUsages.delete(usage)) this.collapsedUsages.add(usage);
     }
 
     private buildSettingGroups(values: FieldSettingValueDto[]): { usage: string, settings: FieldSettingValueDto[] }[] {
@@ -157,7 +181,7 @@ export class ViewFieldManagerComponent extends AppComponentBase implements OnIni
         Swal.fire({
             title: '',
             text: 'Update dictionary with the latest revision',
-            icon: 'question',
+            icon: 'info',
             showCancelButton: true,
             confirmButtonText: 'Yes',
             cancelButtonText: 'No',

@@ -134,6 +134,9 @@
 }
 
 .history-action i { font-size: 13px; }
+.sync-action { border-color: #F6851D; background-color: #F6851D; color: #fff;border: none }
+.sync-action:hover,
+.sync-action:focus { border-color: #F6851D; background-color: #F6851D; color: #fff;border: none }
 .history-action:hover { background: #f3ecf3; color: #4a0d4a; }
 .history-action:focus { outline: 0; box-shadow: 0 0 0 3px rgba(74, 13, 74, .15); color: #4a0d4a; }
 .history-action:disabled { cursor: not-allowed; background: transparent; color: #000104; box-shadow: none; }
@@ -188,12 +191,17 @@
 .badge-draft { background: #fff4dc; color: #a86a05; }
 
 .detail-heading { align-items: flex-start; }
-.revision-identity { display: flex; flex-direction: column; align-items: flex-end; gap: 6px; white-space: nowrap;place-items: center; }
+.revision-identity { display: flex; flex-direction: row; align-items: center; justify-content: flex-end; gap: 10px; white-space: nowrap; }
 .revision-number { margin-top: 5px; color: #30425f; font-size: 13px; font-weight: 750; line-height: 26px; }
 .field-card { margin-bottom: 15px; padding: 18px 20px 10px; }
 .card-section-heading { display: flex; align-items: center; justify-content: space-between; gap: 15px; margin-bottom: 13px; }
 .card-section-heading > div { display: flex; align-items: center; gap: 10px; }
 .card-section-heading h3 { margin: 0; color: #253650; font-size: 14px; font-weight: 750; }
+.usage-group { margin-bottom: 12px; border: 1px solid #e4eaf3; border-radius: 8px; overflow: hidden; }
+.usage-toggle { display: flex; align-items: center; justify-content: space-between; width: 100%; padding: 10px 14px; border: 0; background: #f5f8fc; color: #4a0d4a; text-align: left; cursor: pointer; }
+.usage-title { margin: 0; color: #4a0d4a; font-size: 12px; font-weight: 700; }
+.usage-toggle i { color: #4a0d4a; font-size: 12px; }
+.usage-content { padding: 2px 14px 10px; }
 .section-icon { display: inline-flex; width: 29px; height: 29px; align-items: center; justify-content: center; border-radius: 8px; background: #f7f1f7; color: #4a0d4a; font-size: 13px; }
 .readonly-note, .editable-note { color: #77869d; font-size: 10px; font-weight: 650; white-space: nowrap; }
 .readonly-note i { margin-right: 4px; }

@@ -3108,5 +3108,7 @@ Please select one of the available linesheet templates
 		<text name="AddfromExistingField(s)"> Add from Existing Field(s) </text>
 		<text name="OptionsList"> Options List </text>
 		<text name="FieldsAddedSuccessfully"> Fields Added Successfully </text>
+		<text name="EnterReferenceNumber">Enter Reference Number </text>
+	
 	</texts>  
 </localizationDictionary>

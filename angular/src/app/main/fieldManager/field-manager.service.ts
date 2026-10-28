@@ -22,10 +22,16 @@ import {
     PreviewFieldCodeInput
 } from '@shared/service-proxies/service-proxies';
 
-export const FIELD_USAGE_TITLES: { [usage: string]: string } = {
-    'FieldManager.AdvancedInformation': 'Basic Field Extra Data Information',
-    'FieldManager.ExtraAttributes': 'Advanced Field Extra Data Information'
+export const FIELD_USAGE_TITLES: { [usage: string]: (dataType: string, widgetName: string) => string } = {
+    'FieldManager.AdvancedInformation': (dataType, _widgetName) =>
+        dataType ? `${dataType} Field Settings` : 'Basic Field Settings',
+    'FieldManager.ExtraAttributes': (_dataType, widgetName) =>
+        widgetName ? `${widgetName} Settings` : 'Advanced Field Settings'
 };
+
+export function getFieldUsageTitle(usage: string, dataType: string, widgetName: string): string | undefined {
+    return FIELD_USAGE_TITLES[usage]?.(dataType, widgetName);
+}
 
 type DtoConstructor<T extends object> = {
     new (...args: any[]): T;
@@ -34,7 +40,7 @@ type DtoConstructor<T extends object> = {
 
 @Injectable()
 export class FieldManagerService {
-    private readonly pageSize = 1000;
+    private readonly pageSize = 10;
 
     constructor(private appFieldManagerProxy: AppFieldManagerServiceProxy) { }
 
@@ -92,15 +98,33 @@ export class FieldManagerService {
     }
 
     getFieldsForNode(node: ObjectTypeTreeNodeDto | null): Observable<AppFieldListDto[]> {
-        return this.getFieldPage(node, 0)
+        return this.getFieldsPage(node, 0)
             .pipe(map(fields => fields.filter(field => !field.isHidden)));
     }
 
-    getUnlinkedFields(tableId: number, sycEntityObjectTypeId: number | null): Observable<AppFieldDto[]> {
-        return this.getUnlinkedFieldPage(tableId, sycEntityObjectTypeId ?? undefined, 0);
+    getFieldsPageForNode(
+        node: ObjectTypeTreeNodeDto | null,
+        skipCount: number,
+        maxResultCount: number,
+        searchText?: string,
+        isStandard?: boolean,
+        sorting?: string
+    ) {
+        const selectedObjectTypeId = node?.nodeType === 'ObjectType' ? node.id : undefined;
+        const selectedObjectId = node && node.nodeType !== 'ObjectType' ? node.sycObjectId : undefined;
+        return this.appFieldManagerProxy.getFields(
+            selectedObjectId, selectedObjectTypeId, true,
+            searchText || undefined, undefined, undefined, undefined, undefined, undefined, undefined,
+            isStandard, undefined, undefined, undefined, undefined, sorting || undefined,
+            skipCount, maxResultCount
+        );
     }
 
-    private getUnlinkedFieldPage(
+    getUnlinkedFields(tableId: number, sycEntityObjectTypeId: number | null): Observable<AppFieldDto[]> {
+        return this.getUnlinkedFieldsPage(tableId, sycEntityObjectTypeId ?? undefined, 0);
+    }
+
+    private getUnlinkedFieldsPage(
         tableId: number,
         sycEntityObjectTypeId: number | undefined,
         skipCount: number
@@ -108,16 +132,16 @@ export class FieldManagerService {
         return this.appFieldManagerProxy.getUnlinkedFields(
             tableId, sycEntityObjectTypeId, undefined, undefined, skipCount, this.pageSize
         ).pipe(switchMap(response => {
-            const items = response.items || [];
-            const nextSkipCount = skipCount + items.length;
-            return items.length && nextSkipCount < response.totalCount
-                ? this.getUnlinkedFieldPage(tableId, sycEntityObjectTypeId, nextSkipCount)
-                    .pipe(map(next => [...items, ...next]))
-                : of(items);
+            const fields = response.items || [];
+            const nextSkipCount = skipCount + fields.length;
+            return fields.length && nextSkipCount < response.totalCount
+                ? this.getUnlinkedFieldsPage(tableId, sycEntityObjectTypeId, nextSkipCount)
+                    .pipe(map(nextFields => [...fields, ...nextFields]))
+                : of(fields);
         }));
     }
 
-    private getFieldPage(node: ObjectTypeTreeNodeDto | null, skipCount: number): Observable<AppFieldListDto[]> {
+    private getFieldsPage(node: ObjectTypeTreeNodeDto | null, skipCount: number): Observable<AppFieldListDto[]> {
         const selectedObjectTypeId = node?.nodeType === 'ObjectType' ? node.id : undefined;
         const selectedObjectId = node && node.nodeType !== 'ObjectType' ? node.sycObjectId : undefined;
         return this.appFieldManagerProxy.getFields(
@@ -126,11 +150,11 @@ export class FieldManagerService {
             undefined, undefined, undefined, undefined, undefined, undefined,
             skipCount, this.pageSize
         ).pipe(switchMap(response => {
-            const items = response.items || [];
-            const nextSkipCount = skipCount + items.length;
-            return items.length && nextSkipCount < response.totalCount
-                ? this.getFieldPage(node, nextSkipCount).pipe(map(next => [...items, ...next]))
-                : of(items);
+            const fields = response.items || [];
+            const nextSkipCount = skipCount + fields.length;
+            return fields.length && nextSkipCount < response.totalCount
+                ? this.getFieldsPage(node, nextSkipCount).pipe(map(nextFields => [...fields, ...nextFields]))
+                : of(fields);
         }));
     }
 

@@ -59,11 +59,13 @@
     <div class="field-manager-toolbar mb-5 pb-5">
         <div class="field-manager-search">
             <i class="fa fa-search"></i>
-            <input [(ngModel)]="filterText" [placeholder]="'SearchFields' | localize" type="text" />
+            <input [(ngModel)]="filterText" (ngModelChange)="onSearchChange()"
+                [placeholder]="'SearchFields' | localize" type="text" />
         </div>
         <label class="group-filter-btn">
             <i class="flaticon-layers mt-2"></i>
-            <select [(ngModel)]="groupBy" [attr.aria-label]="'GroupBy' | localize" class="ml-0">
+            <select [(ngModel)]="groupBy" (ngModelChange)="onGroupByChange($event)"
+                [attr.aria-label]="'GroupBy' | localize" class="ml-0">
                 <option *ngFor="let group of groupOptions" [value]="group.value">
                     {{ group.label | localize }}
                 </option>
@@ -71,7 +73,8 @@
         </label>
         <label class="extra-data-filter" *ngIf="activePanel === 'all'">
             <i class="flaticon-layers"></i>
-            <select [(ngModel)]="extraDataFilter" [attr.aria-label]="'ExtraData' | localize">
+            <select [(ngModel)]="extraDataFilter" (ngModelChange)="onExtraDataFilterChange()"
+                [attr.aria-label]="'ExtraData' | localize">
                 <option value="all">All Fields</option>
                 <option value="without">Standard Fields</option>
                 <option value="only">Extra Data Fields</option>
@@ -80,25 +83,12 @@
     </div>
 
     <div class="field-manager-table-wrapper" *ngIf="activePanel === 'all' || selectedEntityId !== null">
-        <p-table #dataTable [value]="groupedItems" [paginator]="true" [rows]="10"
+        <p-table *ngIf="groupBy === 'none'" #dataTable [value]="groupedFields" [paginator]="true" [lazy]="true"
+            [first]="first" [rows]="rows" [totalRecords]="totalRecords" [loading]="loading"
+            (onLazyLoad)="loadFieldsPage($event)"
             [rowsPerPageOptions]="[10, 25, 50]"
             styleClass="field-manager-table"
-            [rowGroupMode]="groupBy === 'none' ? null : 'subheader'" groupRowsBy="groupValue"
-            [sortField]="groupBy === 'none' ? null : 'groupValue'" sortMode="single"
             [tableStyle]="{'width': '100%'}">
-                                <ng-template pTemplate="groupheader" let-item>
-                                    <tr *ngIf="groupBy !== 'none'" class="field-group-row">
-                                        <td colspan="10">
-                                            <button type="button" class="field-group-toggle"
-                                                (click)="toggleGroup(item.groupValue, $event)"
-                                                [attr.aria-label]="isGroupExpanded(item.groupValue) ? 'Collapse group' : 'Expand group'">
-                                                <i class="fa" [class.fa-chevron-down]="isGroupExpanded(item.groupValue)"
-                                                    [class.fa-chevron-right]="!isGroupExpanded(item.groupValue)"></i>
-                                            </button>
-                                            <strong> {{ getGroupDisplayValue(item) }}</strong>
-                                        </td>
-                                    </tr>
-                                </ng-template>
                                 <ng-template pTemplate="header">
                                     <tr>
                                         <th pSortableColumn="fieldCode" class="purpleColor field-code-column">
@@ -130,7 +120,7 @@
                                             <p-sortIcon field="fieldLevelName"></p-sortIcon>
                                         </th>
                                         <th pSortableColumn="trackingNo" class="purpleColor field-tracking-column">
-                                            {{ 'TrackingNumber' | localize }}
+                                            {{ 'ReferenceNumber' | localize }}
                                             <p-sortIcon field="trackingNo"></p-sortIcon>
                                         </th>
                                         <th pSortableColumn="isExtraField" class="purpleColor field-extra-data-column">
@@ -140,41 +130,94 @@
                                         <th class="purpleColor text-right">{{ 'Actions' | localize }}</th>
                                     </tr>
                                 </ng-template>
-                                <ng-template pTemplate="body" let-item>
-                                    <tr *ngIf="isGroupExpanded(item.groupValue)">
-                                        <td>{{ item.fieldCode }}</td>
-                                        <td>{{ item.fieldName }}</td>
-                                        <td>{{ item.fieldTypeName }}</td>
-                                        <td>{{ (item.tables || []).join(', ') }}</td>
-                                        <td>{{ item.statusName }}</td>
-                                        <td>{{ item.revisionNo }}</td>
-                                        <td>{{ item.fieldLevelName }}</td>
-                                        <td>{{ item.trackingNo }}</td>
-                                        <td>{{ item.isExtraField ? 'true' : 'false' }}</td>
+                                <ng-template pTemplate="body" let-field>
+                                    <tr>
+                                        <td>{{ field.fieldCode }}</td>
+                                        <td>{{ field.fieldName }}</td>
+                                        <td>{{ field.fieldTypeName }}</td>
+                                        <td [attr.title]="(field.tables || []).join(', ')">{{ tablesDisplay(field.tables) }}</td>
+                                        <td>{{ field.statusName }}</td>
+                                        <td>{{ field.revisionNo }}</td>
+                                        <td>{{ field.fieldLevelName }}</td>
+                                        <td>{{ field.trackingNo }}</td>
+                                        <td>{{ field.isExtraField ? 'true' : 'false' }}</td>
                                         <td class="text-right field-actions">
                                             <button type="button" class="field-action-menu" [title]="'Actions' | localize"
-                                                (click)="toggleActions(item, $event)">
+                                                (click)="toggleActions(field, $event)">
                                                 <span></span><span></span><span></span>
                                             </button>
                                         </td>
                                     </tr>
                                 </ng-template>
                                 <ng-template pTemplate="emptymessage">
-                                    <tr>
+                                    <tr *ngIf="!loading">
                                         <td colspan="10" class="text-center text-muted">{{ 'NoData' | localize }}</td>
                                     </tr>
                                 </ng-template>
         </p-table>
+
+        <div class="field-groups" *ngIf="groupBy !== 'none'">
+            <section class="field-group-panel" *ngFor="let group of groupedFieldGroups">
+                <button type="button" class="field-group-toggle"
+                    (click)="toggleGroup(group.value, $event)"
+                    [attr.aria-label]="isGroupExpanded(group.value) ? 'Collapse group' : 'Expand group'"
+                    [attr.aria-expanded]="isGroupExpanded(group.value)">
+                    <i class="fa" [class.fa-chevron-down]="isGroupExpanded(group.value)"
+                        [class.fa-chevron-right]="!isGroupExpanded(group.value)"></i>
+                    <strong>{{ group.label }}</strong>
+                    <span class="field-group-count">{{ group.fields.length }}</span>
+                </button>
+                <div class="field-group-scroll" *ngIf="isGroupExpanded(group.value)">
+                    <p-table [value]="group.fields" [paginator]="false" styleClass="field-manager-table field-manager-group-table"
+                        [tableStyle]="{'width': '100%'}">
+                        <ng-template pTemplate="header">
+                            <tr>
+                                <th>{{ 'FieldCode' | localize }}</th>
+                                <th>{{ 'FieldName' | localize }}</th>
+                                <th>{{ 'FieldType' | localize }}</th>
+                                <th>{{ 'Tables' | localize }}</th>
+                                <th>{{ 'Status' | localize }}</th>
+                                <th>{{ 'Revision' | localize }}</th>
+                                <th>{{ 'FieldLevel' | localize }}</th>
+                                <th>{{ 'ReferenceNumber' | localize }}</th>
+                                <th>{{ 'ExtraData' | localize }}</th>
+                                <th class="text-right">{{ 'Actions' | localize }}</th>
+                            </tr>
+                        </ng-template>
+                        <ng-template pTemplate="body" let-field>
+                            <tr>
+                                <td>{{ field.fieldCode }}</td>
+                                <td>{{ field.fieldName }}</td>
+                                <td>{{ field.fieldTypeName }}</td>
+                                <td [attr.title]="(field.tables || []).join(', ')">{{ tablesDisplay(field.tables) }}</td>
+                                <td>{{ field.statusName }}</td>
+                                <td>{{ field.revisionNo }}</td>
+                                <td>{{ field.fieldLevelName }}</td>
+                                <td>{{ field.trackingNo }}</td>
+                                <td>{{ field.isExtraField ? 'true' : 'false' }}</td>
+                                <td class="text-right field-actions">
+                                    <button type="button" class="field-action-menu" [title]="'Actions' | localize"
+                                        (click)="toggleActions(field, $event)">
+                                        <span></span><span></span><span></span>
+                                    </button>
+                                </td>
+                            </tr>
+                        </ng-template>
+                    </p-table>
+                </div>
+            </section>
+            <div class="text-center text-muted p-3" *ngIf="!loading && !groupedFieldGroups.length">{{ 'NoData' | localize }}</div>
+        </div>
     </div>
 
-    <div *ngIf="activeActionItem as actionItem" class="field-action-links"
+    <div *ngIf="activeActionField as actionField" class="field-action-links"
         [ngStyle]="{ top: actionMenuPosition.top + 'px', left: actionMenuPosition.left + 'px' }"
         (click)="$event.stopPropagation()">
-        <button type="button" (click)="view(actionItem)">{{ 'View' | localize }}</button>
-        <!-- <button *ngIf="permissions.canEditField && actionItem.canEdit" type="button" (click)="CreateNewRevision(actionItem)">{{ 'CreateNewRevision' | localize }}</button>
-        <button *ngIf="permissions.canDuplicateField" type="button" (click)="duplicate(actionItem)">{{ 'DuplicateField' | localize }}</button>
-        <button *ngIf="permissions.canEditField && actionItem.canHide" type="button" (click)="hide(actionItem)">{{ 'Hide' | localize }}</button>-->
-        <button *ngIf="actionItem.canDelete" type="button" (click)="delete(actionItem)">{{ 'Delete' | localize }}</button> 
+        <button type="button" (click)="view(actionField)">{{ 'View' | localize }}</button>
+        <!-- <button *ngIf="permissions.canEditField && actionField.canEdit" type="button" (click)="CreateNewRevision(actionField)">{{ 'CreateNewRevision' | localize }}</button>
+        <button *ngIf="permissions.canDuplicateField" type="button" (click)="duplicate(actionField)">{{ 'DuplicateField' | localize }}</button>
+        <button *ngIf="permissions.canEditField && actionField.canHide" type="button" (click)="hide(actionField)">{{ 'Hide' | localize }}</button>-->
+        <button *ngIf="actionField.canDelete" type="button" (click)="delete(actionField)">{{ 'Delete' | localize }}</button> 
     </div>
 
     <div class="field-manager-empty-selection" *ngIf="activePanel === 'entity' && selectedEntityId === null">
@@ -185,7 +228,7 @@
         (saved)="onCreateOrEditDone()"></app-create-or-edit-field-manager>
     <app-view-field-manager #viewFieldManagerModal (revisionSaved)="onRevisionSaved()"
         (closed)="onViewClosed()"></app-view-field-manager>
- <app-existing-fields-modal #existingFieldsModal [items]="items" [entityId]="selectedEntityId"
+ <app-existing-fields-modal #existingFieldsModal [items]="fields" [entityId]="selectedEntityId"
              [objectTypeId]="selectedNode?.nodeType === 'ObjectType' ? selectedNode?.id : null"
      [tableName]="selectedEntityPath.length ? selectedEntityPath[selectedEntityPath.length - 1].name : ''"
      (added)="onExistingFieldsAdded($event)"></app-existing-fields-modal>

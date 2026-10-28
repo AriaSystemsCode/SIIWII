@@ -2,7 +2,7 @@ import { Component, EventEmitter, Injector, OnInit, Output, ViewChild } from '@a
 import { ActivatedRoute, Router } from '@angular/router';
 import { ModalDirective } from 'ngx-bootstrap/modal';
 import { AppComponentBase } from '@shared/common/app-component-base';
-import { FieldManagerService, FIELD_USAGE_TITLES } from '../../field-manager.service';
+import { FieldManagerService, getFieldUsageTitle } from '../../field-manager.service';
 import { ExtraAttributeDataService } from '@app/main/app-items/app-item-shared/services/extra-attribute-data.service';
 import Swal from 'sweetalert2';
 import * as moment from 'moment';
@@ -345,7 +345,10 @@ export class CreateOrEditFieldManagerComponent extends AppComponentBase implemen
     }
 
     usageTitle(usage: string): string {
-        if (FIELD_USAGE_TITLES[usage]) return FIELD_USAGE_TITLES[usage];
+        const fieldType = this.selectedFieldType?.name || '';
+        const [dataType = '', widgetName = ''] = fieldType.split('--').map(part => part.trim());
+        const dynamicTitle = getFieldUsageTitle(usage, dataType, widgetName);
+        if (dynamicTitle) return dynamicTitle;
         const key = (usage || '').split('.').pop() || '';
         const localized = this.l(key);
         return localized && localized !== key ? localized : key.replace(/([a-z])([A-Z])/g, '$1 $2');

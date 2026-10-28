@@ -38,7 +38,7 @@
                     </div>
                     <div class="form-group">
                         <label for="fieldDescription">{{ 'Description' | localize }}</label>
-                        <textarea id="fieldDescription" name="description" class="form-control field-value-control field-description"
+                        <textarea id="fieldDescription" name="description" rows="5" class="field-value-control field-description"
                             [(ngModel)]="item.description"></textarea>
                     </div>
                     <div class="field-form-grid">
@@ -80,9 +80,9 @@
                         </div>
                    
                     <div class="form-group">
-                        <label for="trackingNumber">{{ 'TrackingNumber' | localize }} #</label>
-                        <input id="trackingNumber" name="trackingNumber" type="text" class="form-control field-value-control"
-                            [(ngModel)]="item.trackingNo" [placeholder]="'EnterTrackingNumber' | localize" />
+                        <label for="ReferenceNumber">{{ 'ReferenceNumber' | localize }} #</label>
+                        <input id="ReferenceNumber" name="ReferenceNumber" type="text" class="form-control field-value-control"
+                            [(ngModel)]="item.trackingNo" [placeholder]="'EnterReferenceNumber' | localize" />
                     </div>
                     </div>
                        

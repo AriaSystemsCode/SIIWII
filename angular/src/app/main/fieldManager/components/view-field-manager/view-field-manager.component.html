@@ -25,7 +25,7 @@
                             <i class="fa fa-undo"></i> Restore Revision
                         </button>
                         <button *ngIf="viewState === 'details' && !isViewingHistoryRevision && canCreateRevision" type="button"
-                            class="btn history-action" [disabled]="!canSync"
+                            class="btn history-action sync-action" [disabled]="!canSync"
                             [attr.title]="canSync ? null : 'Sync is not available for this field'" (click)="syncField()">
                             <i class="fa fa-sync"></i> Sync
                         </button>
@@ -71,27 +71,29 @@
                             <div class="detail-item detail-wide"><span>Description</span><strong>{{ item.description || '—' }}</strong></div>
                             <div class="detail-item"><span>Field Level</span><strong>{{ item.fieldLevelCode || '—' }}</strong></div>
                             <div class="detail-item"><span>Status</span><strong>{{ item.fieldStatusCode || '—' }}</strong></div>
-                            <div class="detail-item"><span>Tracking #</span><strong>{{ item.trackingNo || '—' }}</strong></div>
+                            <div class="detail-item"><span>Reference #</span><strong>{{ item.trackingNo || '—' }}</strong></div>
                             <div class="detail-item"><span>Field Type</span><strong>{{ fieldTypeName(item.fieldTypeId) || '—' }}</strong></div>
                         </div>
                     </section>
 
                     
-                    <section class="field-card advanced-card" *ngFor="let group of settingGroups">
-                        <div class="card-section-heading"><div><h3>{{ usageTitle(group.usage) }}</h3></div></div>
-                        <div class="detail-grid advanced-grid">
-                            <div class="detail-item" *ngFor="let setting of group.settings">
-                                <span>{{ setting.settingFieldName | localize }}</span>
-                                <strong>{{ setting.value || '—' }}</strong>
+                    <ng-container *ngFor="let group of settingGroups">
+                        <section class="usage-group" *ngIf="hasSettingsValue(group.settings)">
+                            <button type="button" class="usage-toggle" (click)="toggleUsage(group.usage)"
+                                    [attr.aria-expanded]="!isUsageCollapsed(group.usage)">
+                                    <span class="usage-title">{{ usageTitle(group.usage) }}</span>
+                                    <i class="fa" [ngClass]="isUsageCollapsed(group.usage) ? 'fa-chevron-down' : 'fa-chevron-up'"></i>
+                            </button>
+                            <div class="usage-content" [hidden]="isUsageCollapsed(group.usage)">
+                                <div class="detail-grid advanced-grid">
+                                    <div class="detail-item" *ngFor="let setting of group.settings">
+                                        <span>{{ setting.settingFieldName | localize }}</span>
+                                        <strong>{{ setting.value || '—' }}</strong>
+                                    </div>
+                                </div>
                             </div>
-                        </div>
-                    </section>
-                    <section class="field-card advanced-card" *ngIf="!item.settingValues?.length">
-                        <div class="card-section-heading"><div><h3>Advanced Information</h3></div></div>
-                        <div class="detail-grid advanced-grid">
-                            <div class="detail-item"><strong>—</strong></div>
-                        </div>
-                    </section>
+                        </section>
+                    </ng-container>
                 </ng-container>
 
             </div>

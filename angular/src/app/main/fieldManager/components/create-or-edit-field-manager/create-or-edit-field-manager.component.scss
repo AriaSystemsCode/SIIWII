@@ -174,11 +174,28 @@ select.form-control.field-value-control option {
     background-color: #fff;
 }
 
-textarea.form-control.field-description {
-    height: 52px;
-    resize: vertical;
+:host ::ng-deep textarea#fieldDescription.field-description {
+    display: block !important;
+    width: 100%;
+    // height: 120px !important;
+    // min-height: 40px !important;
+    // max-height: none !important;
+    resize: vertical !important;
+    overflow: auto !important;
+    box-sizing: border-box;
+    padding: 3px 7px;
+    border: 1px solid #aeb2b8;
+    border-radius: 3px;
+    background-color: #fff;
+    color: #212529 !important;
+    font-size: 11px;
 }
 
+:host ::ng-deep textarea#fieldDescription.field-description:focus {
+    border-color: #4a0d4a;
+    outline: 0;
+    box-shadow: 0 0 0 0.1rem rgba(74, 13, 74, 0.15);
+}
 .field-form-section {
     margin: 14px -9px 0;
     padding: 10px 9px 3px;
