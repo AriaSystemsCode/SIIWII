@@ -36,7 +36,7 @@
                 </div>
             </div>
         </div>
-        <div [class]="containerClass + ' kt-grid__item kt-grid__item--fluid'" *ngIf="!loading">
+        <div [class]="containerClass + ' kt-grid__item kt-grid__item--fluid'" *ngIf="!loading" [style.margin-top]="isArabic ? '85px !important' : null">
             <div class="row">
                 <div class="col-md-12" style="z-index: 0;">
                     <tabset #dashboardTabs [justified]="true" [ngClass]="{'nav-hidden': !moreThanOnePage()}">

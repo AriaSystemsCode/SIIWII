@@ -1024,3 +1024,8 @@ body .roles-multiselect .p-multiselect-trigger {
     flex: 0 0 40px;
     align-self: stretch;
 }
+@media (min-width: 1025px) {
+    html[dir="rtl"] .mt-ar{
+        margin-top: 85px !important;
+    }
+}
