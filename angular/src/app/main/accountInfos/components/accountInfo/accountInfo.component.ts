@@ -463,16 +463,16 @@ private accountRefreshService: AccountRefreshService
             this.accountInfoTemp.accountLevel =
                 this.accountLevel;
 
-            if (this.accountId) {
+         
+if (this.accountId) {
+    await this.getAccountDataForView();
+} else {
+    this.resetNewAccountState();
 
-                await this.getAccountDataForView();
+    this.loadInitData();
+    this.setProfileData();
+}
 
-            } else {
-
-                this.loadInitData();
-
-                this.setProfileData();
-            }
 
             return;
         }
@@ -494,7 +494,7 @@ private accountRefreshService: AccountRefreshService
             }
             // Create My Account
             else {
-
+                this.resetNewAccountState();
                 await this.getMyAccountDataForEdit();
             }
 
@@ -572,24 +572,38 @@ getAccountTypes(): void {
 }
 
 
-    getAccountDataForEdit(): void {
+getAccountDataForEdit(): void {
+    this.accountTypeResolved = false;
 
-        this.loadInitData()
-        this.showMainSpinner()
-        this._AccountsServiceProxy.getAccountForEdit(this.accountId)
-            .pipe(
-                finalize(
-                    () => this.hideMainSpinner()
-                )
-            )
-            .subscribe((res) => {
-                this.getForEditResult = res
-                this.setProfileData(res)
-                this.setSelectedMarketplaceRoles();
-                 this.getExtrAttributes()
+    this.loadInitData();
+    this.showMainSpinner();
 
+    this._AccountsServiceProxy
+        .getAccountForEdit(this.accountId)
+        .pipe(
+            finalize(() => {
+                this.accountTypeResolved = true;
+                this.hideMainSpinner();
             })
-    }
+        )
+        .subscribe({
+            next: (res) => {
+                this.getForEditResult = res;
+
+                this.setProfileData(res);
+                this.setSelectedMarketplaceRoles();
+                this.getExtrAttributes();
+
+                this.touched = false;
+            },
+            error: (err) => {
+                console.error(
+                    'Failed to load account for edit',
+                    err
+                );
+            }
+        });
+}
 
   async getMyAccountDataForEdit(): Promise<void> {
 
@@ -1160,15 +1174,33 @@ getAccountTypes(): void {
         );
 
     }
-    triggerProfile($event?) {
-        if ($event) $event.stopPropagation() //prevent event bubbling
-        if (this.currentTab == AccountInfoPageTabs.ProfileCreateOrEdit) {
-            this.changeTab(AccountInfoPageTabs.ProfileView)
-        } else {
-            this.changeTab(AccountInfoPageTabs.ProfileCreateOrEdit)
-        }
-        if (!this.accountDataForView) this.getMyAccountDataForView()
+    
+triggerProfile($event?: Event): void {
+    $event?.stopPropagation();
+
+    if (
+        this.currentTab ===
+        AccountInfoPageTabs.ProfileCreateOrEdit
+    ) {
+        this.changeTab(AccountInfoPageTabs.ProfileView);
+        return;
     }
+
+    this.accountId =
+        this.accountId ||
+        this.accountDataForView?.id;
+
+    if (!this.accountId) {
+        return;
+    }
+
+    this.touched = false;
+
+    this.changeTab(
+        AccountInfoPageTabs.ProfileCreateOrEdit
+    );
+}
+
     getCotactData(event) {
         this.editedContactPerData = event
 
@@ -3032,13 +3064,45 @@ onPersonalEditCancel(): void {
 }
 
 get currentAccountTypeId(): number | null {
+    const editType = this.accountInfoTemp?.accountTypeId;
+    const viewType = this.accountDataForView?.accountTypeId;
 
-    return (
-        this.accountDataForView?.accountTypeId ??
-        this.accountInfoTemp?.accountTypeId ??
-        null
-    );
+    if (this.accountId) {
+        return editType || viewType || null;
+    }
+
+    return editType || null;
 }
+
+
+private resetNewAccountState(): void {
+    this.accountDataForView = undefined;
+    this.accountContactForView = undefined;
+    this.getForEditResult = undefined;
+    this.entityExtraData = undefined;
+
+    this.accountInfoTemp = new CreateOrEditAccountInfoDto();
+    this.accountInfoTemp.accountLevel = this.accountLevel;
+
+    this.accountInfoTemp.entityAttachments = [];
+    this.accountInfoTemp.entityCategories = [];
+    this.accountInfoTemp.entityClassifications = [];
+    this.accountInfoTemp.entityExtraData = [];
+
+    this.selectedRoles = [];
+    this.previousSelectedRoles = [];
+    this.availableConnections = [];
+    this.connectionsInfo = [];
+    this.availableConnectionsInfo = [];
+
+    this.touched = false;
+    this.saving = false;
+    this.displaySaveAccount = false;
+
+    this.companyLogo = undefined;
+    this.coverPhoto = undefined;
+}
+
 
 get isPersonalAccount(): boolean {
     return this.currentAccountTypeId === 21;

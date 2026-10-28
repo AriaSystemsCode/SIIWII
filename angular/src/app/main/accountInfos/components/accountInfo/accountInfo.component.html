@@ -21,28 +21,45 @@
                         </span>
                     </div>
                     <div class="kt-subheader__toolbar">
-                        <div class="kt-subheader__wrapper"
-                              *ngIf="
-        accountInfoTemp?.accountTypeId != 21 &&
+                     
+<div
+    class="kt-subheader__wrapper"
+    *ngIf="
+        accountTypeResolved &&
+        currentTab === accountInfoPageTabsEnum.ProfileCreateOrEdit &&
         (
-            (!viewMode &&
-             currentTab === accountInfoPageTabsEnum.ProfileCreateOrEdit)
-            ||
-            (accountDataForView?.isConnected &&
-             currentTab === accountInfoPageTabsEnum.ProfileCreateOrEdit)
-        )
-    ">
+            accountDataForView?.isManual ||
+            accountDataForView?.isConnected ||
+            isManualAccount ||
+            isExternalAccount ||
+            isMyAccount
+        ) &&
+        currentAccountTypeId !== 21
+    "
+>
+    <a
+        class="btn btnCancel w-auto mr-4"
+        (click)="resetFormData()"
+    >
+        {{ l('Cancel') }}
+    </a>
 
-                            <a class="btn btnCancel w-auto mr-4 " (click)="resetFormData()">
-                                <span>{{l("Cancel")}}</span>
-                            </a>
-                            <button type="submit" class="btn bgPurple btn-1bc5bd w-auto " [buttonBusy]="saving"
-                                [busyText]="l('SavingWithThreeDot')" (click)="save()"
-                                [disabled]="!accountInfoForm.form.valid || !touched || !selectedRoles?.length">
-                                <span>{{l("Save")}}</span>
-                            </button>
+    <button
+        type="button"
+        class="btn bgPurple btn-1bc5bd w-auto"
+        [buttonBusy]="saving"
+        [busyText]="l('SavingWithThreeDot')"
+        (click)="save()"
+        [disabled]="
+            !accountInfoForm.form.valid ||
+            !touched ||
+            !selectedRoles?.length
+        "
+    >
+        {{ l('Save') }}
+    </button>
+</div>
 
-                        </div>
                     </div>
                 </div>
             </div>
@@ -238,9 +255,7 @@
                                 </li>
 
                                 <li class="nav-item">
-                                    <!-- <a class="nav-link profile-nav-link justify-content-between"
-                                        (click)="changeTab(!accountInfoTemp?.id && !accountId ? accountInfoPageTabsEnum.ProfileCreateOrEdit : accountInfoPageTabsEnum.ProfileView)"
-                                        [ngClass]="{'active': currentTab == accountInfoPageTabsEnum.ProfileView || currentTab === accountInfoPageTabsEnum.ProfileCreateOrEdit}"> -->
+                                 
                                         <a
     class="nav-link profile-nav-link justify-content-between"
     (click)="openProfileTab()"
@@ -434,18 +449,10 @@
                     <div class="col rendered-content">
                  <div
     class="tab1"
-    *ngIf="
+      *ngIf="
         accountTypeResolved &&
-        (
-            isManualAccountCreate ||
-            isExternalAccountCreate ||
-            (
-                currentAccountTypeId != null &&
-                !isPersonalAccount
-            )
-        ) &&
-        currentTab ===
-            accountInfoPageTabsEnum.ProfileCreateOrEdit
+        !isPersonalAccount &&
+        currentTab === accountInfoPageTabsEnum.ProfileCreateOrEdit
     ">
                             <div [class]="containerClass + ' kt-grid__item kt-grid__item--fluid'">
 
