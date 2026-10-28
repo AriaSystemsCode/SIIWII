@@ -5,12 +5,18 @@ import { UrlHelper } from '@shared/helpers/UrlHelper';
 import { DOCUMENT } from '@angular/common';
 import { OffcanvasOptions } from '@metronic/app/core/_base/layout/directives/offcanvas.directive';
 import { AppConsts } from '@shared/AppConsts';
-import { AccountsServiceProxy, LanguageServiceProxy} from '@shared/service-proxies/service-proxies';
-import { ActivatedRoute, NavigationEnd, NavigationStart, Router } from '@angular/router';
+import { AccountsServiceProxy} from '@shared/service-proxies/service-proxies';
+import {  NavigationEnd,Router } from '@angular/router';
 import { Subscription } from 'rxjs';
 import { filter } from 'rxjs/operators';
 import { AppNavigationService } from '../../nav/app-navigation.service';
 import { AppMenu } from '../../nav/app-menu';
+import { OnDestroy } from '@angular/core';
+import { Subject } from 'rxjs';
+import { takeUntil } from 'rxjs/operators';
+import { AccountRefreshService } from '@shared/utils/account-refresh.service';
+
+
 
 @Component({
     selector: 'default-layout',
@@ -49,12 +55,16 @@ export class DefaultLayoutComponent extends ThemesLayoutBaseComponent implements
     isAuthenticated = this.appSession?.user
     hideTopbar: boolean = false;
 
+    
+
     constructor(
         injector: Injector,
         @Inject(DOCUMENT) private document: Document,
         private _accountsServiceProxy: AccountsServiceProxy,
         private _router:Router,
         private _appNavigationService: AppNavigationService,
+private accountRefreshService: AccountRefreshService
+
 
     ) {
         super(injector);
@@ -62,6 +72,23 @@ export class DefaultLayoutComponent extends ThemesLayoutBaseComponent implements
     }
 
     ngOnInit() {
+        
+this.accountRefreshService.accountUpdated$
+    .pipe(takeUntil(this.destroy$))
+    .subscribe(data => {
+
+        if (data?.name) {
+
+            this.accountSummary = {
+                ...(this.accountSummary || {}),
+                name: data.name
+            };
+        }
+
+        // Do not immediately request GetAccountSummary here:
+        // it could return an older name and overwrite the new one.
+    });
+
         this.currentLang = abp.utils.getCookieValue('Abp.Localization.CultureName')
         this.currentLang == 'ar' || this.currentLang == 'ar-EG'  ? this.isArabic = true : this.isArabic = false
         this.installationMode = UrlHelper.isInstallUrl(location.href);
@@ -90,17 +117,39 @@ export class DefaultLayoutComponent extends ThemesLayoutBaseComponent implements
 
         return this._appNavigationService.showMenuItem(menuItem);
     }
-    getSidebarInfo(){
+    // getSidebarInfo(){
    
-        this._accountsServiceProxy.getAccountSummary().subscribe(result =>{
-            this.accountSummary = result;
+    //     this._accountsServiceProxy.getAccountSummary().subscribe(result =>{
+    //         this.accountSummary = result;
 
-            if(result.logoUrl!=undefined)
-                this.tenantLogo=`${this.attachmentBaseUrl}/${this.accountSummary.logoUrl}`
+    //         if(result.logoUrl!=undefined)
+    //             this.tenantLogo=`${this.attachmentBaseUrl}/${this.accountSummary.logoUrl}`
 
-        })
-    }
+    //     })
+    // }
  
+    
+getSidebarInfo(): void {
+    this._accountsServiceProxy
+        .getAccountSummary()
+        .pipe(takeUntil(this.destroy$))
+        .subscribe({
+            next: result => {
+                this.accountSummary = result;
+
+                this.tenantLogo = result?.logoUrl
+                    ? `${this.attachmentBaseUrl}/${result.logoUrl}`
+                    : this.defaultLogo;
+            },
+            error: error => {
+                console.error(
+                    'Failed to refresh account summary',
+                    error
+                );
+            }
+        });
+}
+
     onupdateAccountSummary($event){
         this.accountSummary=$event;
     }
@@ -164,5 +213,13 @@ export class DefaultLayoutComponent extends ThemesLayoutBaseComponent implements
           cleanPath === `/app/main/account/${route}`
         );
       }
+
+
+ngOnDestroy(): void {
+    this.destroy$.next(true);
+    this.destroy$.complete();
+}
+
+      
       
 }
