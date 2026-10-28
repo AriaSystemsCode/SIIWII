@@ -11,6 +11,12 @@ namespace onetouch.Web.Controllers
         [HttpPost("Save")]
         public IActionResult Save([FromForm] SaveSettings saveSettings)
         {
+            
+            if (saveSettings == null ||
+                  string.IsNullOrEmpty(saveSettings.JSONData))
+            {
+                return BadRequest("Spreadsheet data is missing.");
+            }
             return Workbook.Save(saveSettings);
         }
     }

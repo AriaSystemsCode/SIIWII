@@ -56,6 +56,7 @@ import {
 
 import { HttpClient } from '@angular/common/http';
 import { L10n, setCulture } from '@syncfusion/ej2-base';
+import { AppConsts } from '@shared/AppConsts';
 
 @Component({
     selector: 'app-create-or-edit-spreadsheet',
@@ -164,7 +165,7 @@ export class CreateOrEditSpreadsheetComponent extends AppComponentBase implement
     private listRibbonObserver: MutationObserver | null = null;
     private lastListRibbonLabel = '';
 
-    spreadsheetSaveUrl = 'https://services.syncfusion.com/angular/production/api/spreadsheet/save';
+    spreadsheetSaveUrl = AppConsts.attachmentBaseUrl + '/api/Spreadsheet/Save';
 
     lastRefreshDate: string | null = null;
     refreshedBy: string | null = null;

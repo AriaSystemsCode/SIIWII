@@ -70,6 +70,7 @@ using Abp.MultiTenancy;
 using Microsoft.AspNetCore.Http;
 
 using k8s.KubeConfigModels;
+using Syncfusion.Licensing;
 
 namespace onetouch.Web.Startup
 {
@@ -410,6 +411,16 @@ namespace onetouch.Web.Startup
 
         public void Configure(IApplicationBuilder app, IWebHostEnvironment env, ILoggerFactory loggerFactory)
         {
+            var licenseKey = _appConfiguration["Syncfusion:LicenseKey"];
+
+            if (string.IsNullOrWhiteSpace(licenseKey))
+            {
+                throw new InvalidOperationException(
+                "Syncfusion license key is missing."
+                );
+            }
+
+            SyncfusionLicenseProvider.RegisterLicense(licenseKey);
             /*var builder = new DbContextOptionsBuilder<onetouchDbContext>();
             builder.UseSqlServer(_appConfiguration["ConnectionStrings:Default"]);
 

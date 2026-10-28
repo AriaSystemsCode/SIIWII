@@ -43730,6 +43730,100 @@ export class SessionServiceProxy {
 }
 
 @Injectable()
+export class SpreadsheetServiceProxy {
+    private http: HttpClient;
+    private baseUrl: string;
+    protected jsonParseReviver: ((key: string, value: any) => any) | undefined = undefined;
+
+    constructor(@Inject(HttpClient) http: HttpClient, @Optional() @Inject(API_BASE_URL) baseUrl?: string) {
+        this.http = http;
+        this.baseUrl = baseUrl !== undefined && baseUrl !== null ? baseUrl : "";
+    }
+
+    /**
+     * @param saveUrl (optional) 
+     * @param jSONData (optional) 
+     * @param saveType (optional) 
+     * @param fileName (optional) 
+     * @param fileContentType (optional) 
+     * @param allowCustomFormula (optional) 
+     * @param versionType (optional) 
+     * @param pdfLayoutSettings (optional) 
+     * @return Success
+     */
+    save(saveUrl: string | null | undefined, jSONData: string | null | undefined, saveType: SaveType | undefined, fileName: string | null | undefined, fileContentType: ContentType | undefined, allowCustomFormula: boolean | undefined, versionType: VersionType | undefined, pdfLayoutSettings: string | null | undefined): Observable<void> {
+        let url_ = this.baseUrl + "/api/Spreadsheet/Save";
+        url_ = url_.replace(/[?&]$/, "");
+
+        const content_ = new FormData();
+        if (saveUrl !== null && saveUrl !== undefined)
+            content_.append("SaveUrl", saveUrl.toString());
+        if (jSONData !== null && jSONData !== undefined)
+            content_.append("JSONData", jSONData.toString());
+        if (saveType === null || saveType === undefined)
+            throw new Error("The parameter 'saveType' cannot be null.");
+        else
+            content_.append("SaveType", saveType.toString());
+        if (fileName !== null && fileName !== undefined)
+            content_.append("FileName", fileName.toString());
+        if (fileContentType === null || fileContentType === undefined)
+            throw new Error("The parameter 'fileContentType' cannot be null.");
+        else
+            content_.append("FileContentType", fileContentType.toString());
+        if (allowCustomFormula === null || allowCustomFormula === undefined)
+            throw new Error("The parameter 'allowCustomFormula' cannot be null.");
+        else
+            content_.append("AllowCustomFormula", allowCustomFormula.toString());
+        if (versionType === null || versionType === undefined)
+            throw new Error("The parameter 'versionType' cannot be null.");
+        else
+            content_.append("VersionType", versionType.toString());
+        if (pdfLayoutSettings !== null && pdfLayoutSettings !== undefined)
+            content_.append("PdfLayoutSettings", pdfLayoutSettings.toString());
+
+        let options_ : any = {
+            body: content_,
+            observe: "response",
+            responseType: "blob",
+            headers: new HttpHeaders({
+            })
+        };
+
+        return this.http.request("post", url_, options_).pipe(_observableMergeMap((response_ : any) => {
+            return this.processSave(response_);
+        })).pipe(_observableCatch((response_: any) => {
+            if (response_ instanceof HttpResponseBase) {
+                try {
+                    return this.processSave(response_ as any);
+                } catch (e) {
+                    return _observableThrow(e) as any as Observable<void>;
+                }
+            } else
+                return _observableThrow(response_) as any as Observable<void>;
+        }));
+    }
+
+    protected processSave(response: HttpResponseBase): Observable<void> {
+        const status = response.status;
+        const responseBlob =
+            response instanceof HttpResponse ? response.body :
+            (response as any).error instanceof Blob ? (response as any).error : undefined;
+
+        let _headers: any = {}; if (response.headers) { for (let key of response.headers.keys()) { _headers[key] = response.headers.get(key); }}
+        if (status === 200) {
+            return blobToText(responseBlob).pipe(_observableMergeMap((_responseText: string) => {
+            return _observableOf(null as any);
+            }));
+        } else if (status !== 200 && status !== 204) {
+            return blobToText(responseBlob).pipe(_observableMergeMap((_responseText: string) => {
+            return throwException("An unexpected server error occurred.", status, _responseText, _headers);
+            }));
+        }
+        return _observableOf(null as any);
+    }
+}
+
+@Injectable()
 export class StripePaymentServiceProxy {
     private http: HttpClient;
     private baseUrl: string;
@@ -114338,6 +114432,34 @@ export interface IUpdateUserSignInTokenOutput {
     encodedTenantId: string | undefined;
 
     [key: string]: any;
+}
+
+export enum SaveType {
+    Xlsx = 0,
+    Xls = 1,
+    Csv = 2,
+    Pdf = 3,
+}
+
+export enum ContentType {
+    Excel97 = 0,
+    Excel2000 = 1,
+    Excel2007 = 2,
+    Excel2010 = 3,
+    Excel2013 = 4,
+    Excel2016 = 5,
+    Xlsx = 6,
+    CSV = 7,
+    PDF = 8,
+}
+
+export enum VersionType {
+    Excel97to2003 = 0,
+    Excel2007 = 1,
+    Excel2010 = 2,
+    Excel2013 = 3,
+    Excel2016 = 4,
+    Xlsx = 5,
 }
 
 export class StripeConfigurationDto implements IStripeConfigurationDto {

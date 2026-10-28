@@ -174,6 +174,8 @@ namespace onetouch.Web.Startup
 
         public override void Initialize()
         {
+            IocManager.Register<SpreadsheetController>(
+        DependencyLifeStyle.Transient);
             IocManager.RegisterAssemblyByConvention(typeof(onetouchWebHostModule).GetAssembly());
             //IocManager.Register(typeof(WebDocumentViewerController), DependencyLifeStyle.Transient);
             //IocManager.Register(typeof(QueryBuilderController), DependencyLifeStyle.Transient);
