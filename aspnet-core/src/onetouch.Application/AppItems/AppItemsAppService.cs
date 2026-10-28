@@ -1476,8 +1476,18 @@ namespace onetouch.AppItems
                       });
                 exceptList = query0.Select(e => e.Id).ToList();
             }
+
+            var sharedMarketplaceItemCodes =
+                from marketplaceItem in _appMarketplaceItem.GetAll()
+                join sharing in _appMarketplaceItemSharing.GetAll()
+                    on marketplaceItem.Id equals sharing.AppMarketplaceItemId
+                where (AbpSession.TenantId.HasValue && sharing.SharedTenantId == AbpSession.TenantId.Value)
+                    || (AbpSession.UserId.HasValue && sharing.SharedUserId == AbpSession.UserId.Value)
+                select marketplaceItem.Code;
+
             var query = _appItemRepository.GetAll().Include(e => e.EntityFk).ThenInclude(e => e.EntityAttachments)
-                .Where(e => e.TenantOwner != AbpSession.TenantId
+                .Where(e => (e.SharingLevel == 1
+                        || (e.SharingLevel == 2 && sharedMarketplaceItemCodes.Contains(e.SSIN)))
                     && (e.EntityId != input.EntityId)
                     && !exceptList.Contains(e.EntityId)
                     && (e.ParentId == 0 || e.ParentId == null)
