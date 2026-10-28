@@ -4,7 +4,8 @@
         <div class="modal-content">
             <div class="modal-header">
                 <h5 class="modal-title" id="existingFieldsModalLabel">
-                    {{ 'AddExistingFieldsTo' | localize }} {{ tableName }}
+                     {{ 'AddfromExistingField(s)' | localize }} {{ 'To' | localize }} {{ tableName }}
+                   
                 </h5>
                 <button type="button" class="close" [attr.aria-label]="'Close' | localize" (click)="close()">
                     <span aria-hidden="true">&times;</span>

@@ -2,7 +2,7 @@
   <div class="col-12">
     <div class="row pt-4">
       <!-- Loop through extra attributes -->
-      <div class="{{fromSetting ? 'col-12' : 'col-md-6'}} col-12 mb-3"
+      <div class="{{fromSetting || singleColumn ? 'col-12' : 'col-md-6'}} col-12 mb-3"
            *ngFor="let extraAttr of extraAttributeObject.value.filteredExtraAttributes">
         <div class="dynamic-attribute-field">
           <!-- Label -->

@@ -24,9 +24,10 @@
                             type="button" class="btn history-action" (click)="restoreRevision()">
                             <i class="fa fa-undo"></i> Restore Revision
                         </button>
-                        <button *ngIf="viewState === 'details' && !isViewingHistoryRevision" type="button"
-                            class="btn  history-action" (click)="goToHistory()">
-                            <i class="fa fa-history"></i> Revision Log
+                        <button *ngIf="viewState === 'details' && !isViewingHistoryRevision && canCreateRevision" type="button"
+                            class="btn history-action" [disabled]="!canSync"
+                            [attr.title]="canSync ? null : 'Sync is not available for this field'" (click)="syncField()">
+                            <i class="fa fa-sync"></i> Sync
                         </button>
                            <button *ngIf="viewState === 'details' && !isViewingHistoryRevision && canCreateRevision" type="button"
                             class="btn  revision-primary" (click)="createNewRevision()">
@@ -38,6 +39,7 @@
                 <ng-container *ngIf="viewState === 'history'">
                     <app-field-revision-history
                         [revisions]="revisions"
+                        [currentRevisionNo]="currentItem?.currentRevisionNo"
                         (revisionSelected)="openRevision($event)">
                     </app-field-revision-history>
                 </ng-container>
@@ -49,10 +51,14 @@
                             <!-- <p>{{ selectedRevision?.status === 'Previous' ? 'Read-only historical revision' : 'Current field configuration' }}</p> -->
                         </div>
                         <div class="revision-identity">
+                            
                             <span class="revision-number">Revision #{{ revisionLabel }}</span>
-                            <span class="status-badge badge-current">
+                            <button *ngIf="!isViewingHistoryRevision" type="button" class="btn history-action" (click)="goToHistory()">
+                                <i class="fa fa-history"></i> Revision Log
+                            </button>
+                           <!--  <span class="status-badge badge-current">
                                 <i class="fa fa-1x fa-check"></i> Current
-                            </span>
+                            </span> -->
                         </div>
                     </div>
 
@@ -71,16 +77,19 @@
                     </section>
 
                     
-                    <section class="field-card advanced-card">
-                        <div class="card-section-heading"><div><h3>Advanced Information</h3></div></div>
+                    <section class="field-card advanced-card" *ngFor="let group of settingGroups">
+                        <div class="card-section-heading"><div><h3>{{ usageTitle(group.usage) }}</h3></div></div>
                         <div class="detail-grid advanced-grid">
-                            <div class="detail-item" *ngFor="let setting of item.settingValues">
+                            <div class="detail-item" *ngFor="let setting of group.settings">
                                 <span>{{ setting.settingFieldName | localize }}</span>
                                 <strong>{{ setting.value || '—' }}</strong>
                             </div>
-                            <div class="detail-item" *ngIf="!item.settingValues?.length">
-                                <strong>—</strong>
-                            </div>
+                        </div>
+                    </section>
+                    <section class="field-card advanced-card" *ngIf="!item.settingValues?.length">
+                        <div class="card-section-heading"><div><h3>Advanced Information</h3></div></div>
+                        <div class="detail-grid advanced-grid">
+                            <div class="detail-item"><strong>—</strong></div>
                         </div>
                     </section>
                 </ng-container>

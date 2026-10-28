@@ -2,7 +2,7 @@ import { Component, EventEmitter, Injector, OnInit, Output, ViewChild } from '@a
 import { ActivatedRoute, Router } from '@angular/router';
 import { ModalDirective } from 'ngx-bootstrap/modal';
 import { AppComponentBase } from '@shared/common/app-component-base';
-import { FieldManagerService } from '../../field-manager.service';
+import { FieldManagerService, FIELD_USAGE_TITLES } from '../../field-manager.service';
 import { ExtraAttributeDataService } from '@app/main/app-items/app-item-shared/services/extra-attribute-data.service';
 import Swal from 'sweetalert2';
 import * as moment from 'moment';
@@ -31,6 +31,7 @@ export class CreateOrEditFieldManagerComponent extends AppComponentBase implemen
     fieldTypeSettings: ExtraAttribute[] = [];
     dynamicInputsForViewDto: any;
     dynamicSettingsObject: any = { value: { extraAttributes: [], filteredExtraAttributes: [], header: 'AdvancedInformation' } };
+    settingGroups: { usage: string, extraAttributeObject: any }[] = [];
     selectedObjectTypeId: number | null = null;
     entityParentId: number | null = null;
     private codePreviewRequest = 0;
@@ -333,15 +334,39 @@ export class CreateOrEditFieldManagerComponent extends AppComponentBase implemen
         this.generateCode();
     }
 
+    private collapsedUsages = new Set<string>();
+
+    isUsageCollapsed(usage: string): boolean {
+        return this.collapsedUsages.has(usage);
+    }
+
+    toggleUsage(usage: string): void {
+        if (!this.collapsedUsages.delete(usage)) this.collapsedUsages.add(usage);
+    }
+
+    usageTitle(usage: string): string {
+        if (FIELD_USAGE_TITLES[usage]) return FIELD_USAGE_TITLES[usage];
+        const key = (usage || '').split('.').pop() || '';
+        const localized = this.l(key);
+        return localized && localized !== key ? localized : key.replace(/([a-z])([A-Z])/g, '$1 $2');
+    }
+
     onDynamicSettingsChanged(values: any[]): void {
-        const incomingValues = values || [];
+        const currentAttributeIds = new Set(
+            (this.dynamicSettingsObject.value.extraAttributes as ExtraAttribute[]).map(setting => setting.attributeId)
+        );
+        const incomingValues = (values || []).filter(value => currentAttributeIds.has(value.attributeId));
         const incomingAttributeIds = new Set(incomingValues.map(value => value.attributeId));
+        // Drop values left over from a previous field type.
         const existingValues = (this.item.settingValues || []).filter(value =>
-            !incomingAttributeIds.has(value.settingFieldId)
+            !incomingAttributeIds.has(value.settingFieldId) && currentAttributeIds.has(value.settingFieldId)
         );
 
         const updatedRows = incomingValues.reduce((result: AppEntityExtraDataDto[], value: any) => {
-            const definition = this.fieldTypeSettings.find(setting => setting.attributeId === value.attributeId);
+            // Use the attributes currently rendered; fieldTypeSettings can lag behind a superseded request.
+            const definition = (this.dynamicSettingsObject.value.extraAttributes as ExtraAttribute[])
+                .find(setting => setting.attributeId === value.attributeId)
+                ?? this.fieldTypeSettings.find(setting => setting.attributeId === value.attributeId);
             const isChips = (definition?.dataType || '').toLowerCase() === 'chips';
             const selectedValues: any[] = value.acceptMultipleValues || isChips
                 ? (Array.isArray(value.value) ? value.value : [])
@@ -375,6 +400,10 @@ export class CreateOrEditFieldManagerComponent extends AppComponentBase implemen
                         : String(normalizedValue);
                 return row;
             });
+            if (isChips && rows.length > 1) {
+                rows[0].attributeValue = rows.map(row => row.attributeValue).join('|');
+                return result.concat(rows[0]);
+            }
             return result.concat(rows);
         }, []);
 
@@ -456,6 +485,12 @@ export class CreateOrEditFieldManagerComponent extends AppComponentBase implemen
                 })
                 .filter(value => value !== undefined && value !== null);
             const isChips = dataType === 'chips';
+            if (isChips) {
+                const flattened: any[] = [];
+                savedSelections.forEach(value =>
+                    flattened.push(...(typeof value === 'string' ? value.split('|').filter(Boolean) : [value])));
+                savedSelections.splice(0, savedSelections.length, ...flattened);
+            }
             const defaultSelections = isChips && typeof setting.defaultValue === 'string'
                 ? setting.defaultValue.split('|').map(value => value.trim()).filter(Boolean)
                 : setting.defaultValue;
@@ -483,6 +518,19 @@ export class CreateOrEditFieldManagerComponent extends AppComponentBase implemen
                 header: 'AdvancedInformation'
             }
         };
+
+        // Stable object references per usage so dynamicInputs does not re-run ngOnChanges every cycle.
+        const groups = new Map<string, any[]>();
+        attributes.forEach(attribute => {
+            const usage = (attribute as any).usage || 'UNSPECIFIED';
+            groups.set(usage, [...(groups.get(usage) || []), attribute]);
+        });
+        this.settingGroups = Array.from(groups.entries()).map(([usage, filtered]) => ({
+            usage,
+            extraAttributeObject: {
+                value: { extraAttributes: attributes, filteredExtraAttributes: filtered, header: usage }
+            }
+        }));
     }
 
     private loadFieldTypeSettingLookups(settings: ExtraAttribute[], request: number): void {

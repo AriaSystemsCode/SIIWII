@@ -31,6 +31,7 @@ export class dynamicInputs extends AppComponentBase implements OnInit, OnChanges
   selectedExtraData: any[] = [];
   @Input() appTransactionsForViewDto: any;
   @Input() fromSetting: boolean = false;
+  @Input() singleColumn: boolean = false;
   @Input() dynamicInputsForViewDto: any;
   originalValuesMap = new Map<number, any>();
 
@@ -175,7 +176,6 @@ private normalizeChipValues(values: any): string[] {
 }
 
 onDropdownChange(extraAttr: any) {
-debugger;
   this.onAnyInputChange(); // update normal data
 
   const updatedDataMap = new Map<number, any>();

@@ -8,6 +8,8 @@ import {
     AppFieldListDto,
     AppFieldManagerServiceProxy,
     FieldCreateOrEditMetadataDto,
+    FieldActionResultDto,
+    SyncFieldSnapshotsInput,
     GetFieldForEditOutput,
     FieldLookupDto,
     FieldManagerPermissionDto,
@@ -19,6 +21,11 @@ import {
     ObjectTypeTreeNodeDto,
     PreviewFieldCodeInput
 } from '@shared/service-proxies/service-proxies';
+
+export const FIELD_USAGE_TITLES: { [usage: string]: string } = {
+    'FieldManager.AdvancedInformation': 'Basic Field Extra Data Information',
+    'FieldManager.ExtraAttributes': 'Advanced Field Extra Data Information'
+};
 
 type DtoConstructor<T extends object> = {
     new (...args: any[]): T;
@@ -188,6 +195,10 @@ export class FieldManagerService {
 
     getFieldHistory(appFieldId: number): Observable<AppFieldHistoryDto[]> {
         return this.appFieldManagerProxy.getFieldHistory(appFieldId);
+    }
+
+    syncFieldSnapshots(appFieldId: number): Observable<FieldActionResultDto> {
+        return this.appFieldManagerProxy.syncFieldSnapshots(new SyncFieldSnapshotsInput({ appFieldId } as any));
     }
 
     previewFieldCode(fieldTypeId: number): Observable<string> {

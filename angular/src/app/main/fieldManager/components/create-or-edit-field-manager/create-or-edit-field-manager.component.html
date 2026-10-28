@@ -96,14 +96,24 @@
                     </div>
 
                     <section class="field-form-section" *ngIf="fieldTypeSettings.length">
-                        <h4 class="field-section-title">{{ 'AdvancedInformation' | localize }}</h4>
-                        <app-dynamicInputs
-                            [extraAttributeObject]="dynamicSettingsObject"
-                            [entityObjectTypeId]="item.fieldTypeId"
-                            [entityType]="'Field'"
-                            [dynamicInputsForViewDto]="dynamicInputsForViewDto"
-                            (extraDataChanged)="onDynamicSettingsChanged($event)">
-                        </app-dynamicInputs>
+                        <!-- <h4 class="field-section-title">{{ 'AdvancedInformation' | localize }}</h4> -->
+                        <div class="usage-group" *ngFor="let group of settingGroups">
+                            <button type="button" class="usage-toggle" (click)="toggleUsage(group.usage)"
+                                [attr.aria-expanded]="!isUsageCollapsed(group.usage)">
+                                <span class="field-section-title mb-0">{{ usageTitle(group.usage) }}</span>
+                                <i class="fa" [ngClass]="isUsageCollapsed(group.usage) ? 'fa-chevron-down' : 'fa-chevron-up'"></i>
+                            </button>
+                            <div [hidden]="isUsageCollapsed(group.usage)">
+                                <app-dynamicInputs
+                                    [extraAttributeObject]="group.extraAttributeObject"
+                                    [entityObjectTypeId]="item.fieldTypeId"
+                                    [entityType]="'Field'"
+                                    [singleColumn]="true"
+                                    [dynamicInputsForViewDto]="dynamicInputsForViewDto"
+                                    (extraDataChanged)="onDynamicSettingsChanged($event)">
+                                </app-dynamicInputs>
+                            </div>
+                        </div>
                     </section>
                   
                   <!--   <section class="field-form-section extra-attributes-form">

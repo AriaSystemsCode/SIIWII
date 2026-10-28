@@ -26,7 +26,7 @@
 .revision-table td { height: 55px; padding: 9px 18px; border-top: 1px solid #edf1f6; color: #52617a; font-size: 12px; }
 .revision-table tbody tr:hover { background: #fbfcff; }
 .revision-table .revision-number { color: #253650; font-weight: 700; }
-.revision-table .actions-column { width: 112px; text-align: right; }
+.revision-table .actions-column { width: 200px; text-align: right; white-space: nowrap; }
 .details-button {
     display: inline-flex;
     align-items: center;
@@ -41,4 +41,16 @@
 }
 .details-button:hover { border-color: #4a0d4a; background: #f7f1f7; color: #4a0d4a; }
 .details-button i { font-size: 9px; }
+.status-badge {
+    display: inline-flex;
+    align-items: center;
+    gap: 4px;
+    margin-right: 8px;
+    padding: 4px 9px;
+    border-radius: 20px;
+    font-size: 10px;
+    font-weight: 750;
+    line-height: 1.2;
+}
+.badge-current { background: #e5f7ee; color: #188653; }
 .empty-history { height: 90px !important; text-align: center; }
