@@ -173,6 +173,8 @@ namespace onetouch.Web.Startup
             _hostingEnvironment = env;
             _appConfiguration = env.GetAppConfiguration();
             CopyAssets();
+            SyncfusionLicenseProvider.RegisterLicense(
+ "Ngo9BigBOggjHTQxAR8/V1JAaF5cX2pCd1p/TH5YfUNzdUVEY1ZUTXxaS1ZhSXxVdkxhXH5dcHxRQ2FeVUJ9XEY=");
         }
         public void CopyAssets()
         {
@@ -411,16 +413,17 @@ namespace onetouch.Web.Startup
 
         public void Configure(IApplicationBuilder app, IWebHostEnvironment env, ILoggerFactory loggerFactory)
         {
-            var licenseKey = _appConfiguration["Syncfusion:LicenseKey"];
+          
+            //var licenseKey = _appConfiguration["Syncfusion:LicenseKey"];
 
-            if (string.IsNullOrWhiteSpace(licenseKey))
-            {
-                throw new InvalidOperationException(
-                "Syncfusion license key is missing."
-                );
-            }
+            //if (string.IsNullOrWhiteSpace(licenseKey))
+            //{
+            //    throw new InvalidOperationException(
+            //    "Syncfusion license key is missing."
+            //    );
+            //}
 
-            SyncfusionLicenseProvider.RegisterLicense(licenseKey);
+            //SyncfusionLicenseProvider.RegisterLicense(licenseKey);
             /*var builder = new DbContextOptionsBuilder<onetouchDbContext>();
             builder.UseSqlServer(_appConfiguration["ConnectionStrings:Default"]);
 

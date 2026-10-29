@@ -100,8 +100,7 @@
     <PackageReference Include="Microsoft.Extensions.DependencyInjection.Abstractions" Version="8.0.2" />
     <PackageReference Include="Microsoft.VisualStudio.Azure.Containers.Tools.Targets" Version="1.17.0" />
     <PackageReference Include="PuppeteerSharp" Version="7.1.0" />
-    <PackageReference Include="Syncfusion.EJ2.AspNet.Core" Version="35.1.42" />
-    <PackageReference Include="Syncfusion.EJ2.Spreadsheet.AspNet.Core" Version="35.1.42" />
+    <PackageReference Include="Syncfusion.EJ2.Spreadsheet.AspNet.Core" Version="34.2.9" />
     <PackageReference Include="System.Diagnostics.Debug" Version="4.3.0" />
   </ItemGroup>
   <ItemGroup>
