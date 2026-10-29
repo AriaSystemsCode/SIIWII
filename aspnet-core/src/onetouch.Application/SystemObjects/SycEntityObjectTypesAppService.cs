@@ -259,7 +259,9 @@ namespace onetouch.SystemObjects
                 case "IN":
                 case "IC": return "Numeric";
                 case "LI": return "dropDownList";
+                case "LD": return "dropDownList";
                 case "SD": return "dropDownList";
+                case "SC": return "chips";
                 default: return "string";
             }
         }

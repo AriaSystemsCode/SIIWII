@@ -41,6 +41,17 @@ BEGIN TRY
         WHERE ObjectId = @fieldObjectId AND Code = N'FIELD'
           AND ParentId IS NULL AND TenantId IS NULL AND IsDeleted = 0);
 
+    -- The replacement type has already been consolidated. Do not recreate SD
+    -- during later host-seeder runs.
+    IF EXISTS (SELECT 1 FROM dbo.SycEntityObjectTypes
+        WHERE ObjectId = @fieldObjectId AND ParentId = @fieldRootId
+          AND Code = N'LD' AND Name = N'String--Dropdown'
+          AND TenantId IS NULL AND IsDeleted = 0)
+    BEGIN
+        COMMIT TRANSACTION;
+        RETURN;
+    END;
+
     IF (SELECT COUNT(*) FROM dbo.SycEntityObjectTypes
         WHERE ObjectId = @fieldObjectId AND ParentId = @fieldRootId
           AND Code = N'ST' AND TenantId IS NULL AND IsDeleted = 0) <> 1

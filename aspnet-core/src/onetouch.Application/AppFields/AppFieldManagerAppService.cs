@@ -582,6 +582,8 @@ namespace onetouch.AppFields
                     throw new UserFriendlyException("Field was not found.");
                 var canEdit = !field.IsDeleted && PermissionChecker.IsGranted(AppPermissions.Pages_Administration_FieldManager_Edit);
                 var own = field.TenantId == AbpSession.TenantId;
+                var canSync = canEdit && !field.IsHidden && own &&
+                    await FieldSnapshots(field).AnyAsync(x => x.AppliedRevisionNo != field.CurrentRevisionNo);
                 return new GetFieldForEditOutput
                 {
                     Field = await ToDtoForResponse(field),
@@ -589,6 +591,8 @@ namespace onetouch.AppFields
                     {
                         CanEditCoreInfo = canEdit,
                         CanEditAttributes = canEdit,
+                        CanCreateRevision = CanCreateRevision(field),
+                        CanSync = canSync,
                         CanDelete = !field.IsDeleted && own && PermissionChecker.IsGranted(AppPermissions.Pages_Administration_FieldManager_Delete),
                         CanHide = !field.IsDeleted && AbpSession.TenantId.HasValue && field.TenantId == null,
                         IsTenantCustomCopyRequired = AbpSession.TenantId.HasValue && field.TenantId == null
@@ -615,6 +619,11 @@ namespace onetouch.AppFields
                     revisionField.CreatorUserName = revisionField.CreatorUserId.HasValue &&
                         userNames.TryGetValue(revisionField.CreatorUserId.Value, out var creatorName)
                         ? creatorName : null;
+                    // Seeded fields may acquire their first history row on the first edit.
+                    // Revision 00 was created with the field, not when that row was archived.
+                    var isInitialRevision = x.RevisionNo == "00";
+                    var revisionCreatedAt = isInitialRevision ? x.CreationTime : x.ChangedAt;
+                    var revisionCreatorId = isInitialRevision ? x.CreatorUserId : x.ChangedBy;
                     return new AppFieldHistoryDto
                     {
                         Id = x.Id,
@@ -623,9 +632,9 @@ namespace onetouch.AppFields
                         RevisionNo = x.RevisionNo,
                         ChangeType = x.ChangeType,
                         Field = revisionField,
-                        ChangedAt = x.ChangedAt,
-                        ChangedBy = x.ChangedBy,
-                        ChangedByName = x.ChangedBy.HasValue && userNames.TryGetValue(x.ChangedBy.Value, out var changedByName)
+                        ChangedAt = revisionCreatedAt,
+                        ChangedBy = revisionCreatorId,
+                        ChangedByName = revisionCreatorId.HasValue && userNames.TryGetValue(revisionCreatorId.Value, out var changedByName)
                             ? changedByName : null,
                         RestoredFromRevisionNo = x.RestoredFromRevisionNo
                     };
@@ -647,6 +656,8 @@ namespace onetouch.AppFields
                 var field = await VisibleFields().Include(x => x.SettingValues)
                     .SingleOrDefaultAsync(x => x.Id == input.AppFieldId && !x.IsDeleted && !x.IsHidden);
                 if (field == null) throw new UserFriendlyException("Field was not found.");
+                if (!CanCreateRevision(field))
+                    throw new UserFriendlyException("You cannot create a revision for this field.");
                 if (field.TenantId != AbpSession.TenantId)
                     throw new UserFriendlyException("A tenant cannot restore a host field.");
                 if (field.CurrentRevisionNo != input.ExpectedCurrentRevisionNo)
@@ -704,6 +715,8 @@ namespace onetouch.AppFields
                             NextRevision(existingCopy.CurrentRevisionNo), existingCopy.Id) };
                 }
                 if (field == null) throw new UserFriendlyException("Field was not found.");
+                if (!CanCreateRevision(field))
+                    throw new UserFriendlyException("You cannot create a revision for this field.");
                 var revisionError = await EnsureRevisionAvailable(field, input.ExpectedCurrentRevisionNo);
                 if (revisionError != null)
                     return new AppFieldDto { Error = revisionError };
@@ -863,6 +876,7 @@ namespace onetouch.AppFields
         }
 
         [AbpAuthorize(AppPermissions.Pages_Administration_FieldManager_Edit)]
+        [UnitOfWork(IsolationLevel.Serializable)]
         public async Task<FieldActionResultDto> SyncFieldSnapshots(SyncFieldSnapshotsInput input)
         {
             if (input == null) throw new UserFriendlyException("Field data is required.");
@@ -870,19 +884,24 @@ namespace onetouch.AppFields
                 throw new UserFriendlyException("Select the table for this object type.");
             using (UnitOfWorkManager.Current.DisableFilter(AbpDataFilters.MayHaveTenant))
             {
+                await AcquireRevisionLock(input.AppFieldId);
                 var field = await VisibleFields().Include(x => x.SettingValues)
                     .SingleOrDefaultAsync(x => x.Id == input.AppFieldId && !x.IsHidden);
                 if (field == null) throw new UserFriendlyException("Field was not found.");
                 if (field.TenantId != AbpSession.TenantId)
                     throw new UserFriendlyException("A tenant cannot sync a host field.");
+                if (!string.IsNullOrWhiteSpace(input.ExpectedCurrentRevisionNo) &&
+                    field.CurrentRevisionNo != input.ExpectedCurrentRevisionNo)
+                    throw new UserFriendlyException("The field revision changed. Refresh the field before syncing.");
 
-                var query = _tableFields.GetAll().Where(x => x.FieldDefinitionKey == field.FieldDefinitionKey &&
-                    x.TenantId == AbpSession.TenantId);
+                var query = FieldSnapshots(field);
                 if (input.SycObjectId.HasValue)
                     query = query.Where(x => x.SycObjectId == input.SycObjectId.Value &&
                         x.SycEntityObjectTypeId == input.SycEntityObjectTypeId);
-                var snapshots = await query.Include(x => x.SettingValues).ToListAsync();
-                if (snapshots.Count == 0) throw new UserFriendlyException("No table snapshot was found.");
+                var snapshots = await query.Where(x => x.AppliedRevisionNo != field.CurrentRevisionNo)
+                    .Include(x => x.SettingValues).ToListAsync();
+                if (snapshots.Count == 0)
+                    return new FieldActionResultDto { Success = true, Message = "All table snapshots are up to date." };
                 foreach (var snapshot in snapshots)
                 {
                     snapshot.CopyDefinitionFrom(field);
@@ -891,6 +910,15 @@ namespace onetouch.AppFields
                 return new FieldActionResultDto { Success = true,
                     Message = snapshots.Count + " table snapshot(s) synced." };
             }
+        }
+
+        private IQueryable<AppTableField> FieldSnapshots(AppField field)
+        {
+            var snapshots = _tableFields.GetAll().Where(x => x.FieldDefinitionKey == field.FieldDefinitionKey);
+            // A host field can be used by tenant tables. Tenant fields remain scoped to their owner.
+            if (field.TenantId.HasValue)
+                snapshots = snapshots.Where(x => x.TenantId == field.TenantId);
+            return snapshots;
         }
 
         private static AppTableField CreateTableSnapshot(AppField field, int? tenantId,
@@ -911,7 +939,12 @@ namespace onetouch.AppFields
             // Older releases recorded every new revision immediately. Keep those rows immutable.
             if (!await _history.GetAll().AnyAsync(x => x.AppFieldId == field.Id &&
                 x.RevisionNo == field.CurrentRevisionNo))
-                await RecordHistory(field, "Edit");
+            {
+                var isInitialRevision = field.CurrentRevisionNo == "00";
+                await RecordHistory(field, isInitialRevision ? "Create" : "Edit",
+                    changedAt: isInitialRevision ? field.CreationTime : field.LastModificationTime ?? DateTime.UtcNow,
+                    changedBy: isInitialRevision ? field.CreatorUserId : field.LastModifierUserId);
+            }
         }
 
         private async Task ValidateFieldInput(CreateOrEditFieldInput input)
@@ -1013,7 +1046,8 @@ namespace onetouch.AppFields
                 field.SettingValues.Add(CopyCurrentSettingValue(value, field.TenantId));
         }
 
-        private async Task RecordHistory(AppField field, string changeType, string restoredFromRevisionNo = null)
+        private async Task RecordHistory(AppField field, string changeType, string restoredFromRevisionNo = null,
+            DateTime? changedAt = null, long? changedBy = null)
         {
             await _history.InsertAsync(new AppFieldHistory
             {
@@ -1069,8 +1103,8 @@ namespace onetouch.AppFields
                 IsDeleted = field.IsDeleted,
                 DeleterUserId = field.DeleterUserId,
                 DeletionTime = field.DeletionTime,
-                ChangedAt = DateTime.UtcNow,
-                ChangedBy = AbpSession.UserId
+                ChangedAt = changedAt ?? DateTime.UtcNow,
+                ChangedBy = changedAt.HasValue ? changedBy : AbpSession.UserId
             });
             // Persist each revision before returning a successful save response. The
             // surrounding unit of work still commits the field and history atomically.
@@ -1096,6 +1130,23 @@ namespace onetouch.AppFields
                 (!AbpSession.TenantId.HasValue && level == "Tenant"))
                 throw new UserFriendlyException("Select a valid field level.");
             return level;
+        }
+
+        private bool CanCreateRevision(AppField field)
+        {
+            if (field.IsDeleted || field.IsHidden ||
+                !PermissionChecker.IsGranted(AppPermissions.Pages_Administration_FieldManager_Edit))
+                return false;
+
+            switch (field.FieldLevelCode)
+            {
+                case "Application":
+                    return !AbpSession.TenantId.HasValue && !field.TenantId.HasValue;
+                case "Tenant":
+                    return AbpSession.TenantId.HasValue && field.TenantId == AbpSession.TenantId;
+                default:
+                    return false;
+            }
         }
 
         private async Task<string> NextFieldCode(AppField field, bool acquireLock = true)

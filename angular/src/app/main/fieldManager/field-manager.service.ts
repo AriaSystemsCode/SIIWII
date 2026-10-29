@@ -2,22 +2,36 @@ import { Injectable } from '@angular/core';
 import { Observable, of } from 'rxjs';
 import { map, switchMap } from 'rxjs/operators';
 import {
+    AppEntityExtraDataDto,
     AppFieldDto,
     AppFieldHistoryDto,
     AppFieldListDto,
     AppFieldManagerServiceProxy,
     FieldCreateOrEditMetadataDto,
-    ExtraAttribute,
+    FieldActionResultDto,
+    SyncFieldSnapshotsInput,
+    GetFieldForEditOutput,
     FieldLookupDto,
     FieldManagerPermissionDto,
     CreateOrEditFieldInput,
-    FieldSettingValueDto,
     EntityDtoOfInt64,
+    FieldSettingValueDto,
     LinkExistingFieldsInput,
     LinkExistingFieldsResultDto,
     ObjectTypeTreeNodeDto,
     PreviewFieldCodeInput
 } from '@shared/service-proxies/service-proxies';
+
+export const FIELD_USAGE_TITLES: { [usage: string]: (dataType: string, widgetName: string) => string } = {
+    'FieldManager.AdvancedInformation': (dataType, _widgetName) =>
+        dataType ? `${dataType} Field Settings` : 'Basic Field Settings',
+    'FieldManager.ExtraAttributes': (_dataType, widgetName) =>
+        widgetName ? `${widgetName} Settings` : 'Advanced Field Settings'
+};
+
+export function getFieldUsageTitle(usage: string, dataType: string, widgetName: string): string | undefined {
+    return FIELD_USAGE_TITLES[usage]?.(dataType, widgetName);
+}
 
 type DtoConstructor<T extends object> = {
     new (...args: any[]): T;
@@ -26,7 +40,7 @@ type DtoConstructor<T extends object> = {
 
 @Injectable()
 export class FieldManagerService {
-    private readonly pageSize = 1000;
+    private readonly pageSize = 10;
 
     constructor(private appFieldManagerProxy: AppFieldManagerServiceProxy) { }
 
@@ -45,54 +59,34 @@ export class FieldManagerService {
             : Object.assign(new targetType(), data);
     }
 
-    mapExtraAttributeValuesToSettings(
-        values: any[],
-        definitions: ExtraAttribute[],
-        attributes: any[]
-    ): FieldSettingValueDto[] {
-        return (values || []).reduce((mapped: FieldSettingValueDto[], entry: any) => {
-            const definition = definitions.find(item => item.attributeId === entry.attributeId);
-            const attribute = (attributes || []).find(item => item.attributeId === entry.attributeId);
-            const dataType = (definition?.dataType || '').toLowerCase();
-            const isMultiple = entry.acceptMultipleValues === true || dataType === 'chips';
-            const selectedValues = isMultiple
-                ? (Array.isArray(entry.value) ? entry.value : [])
-                : [entry.value];
+    // One extra-data row per selected value; lookup rows carry attributeValueId instead of text.
+    toSettingValues(rows: AppEntityExtraDataDto[] | undefined): FieldSettingValueDto[] {
+        return (rows || []).map(row => {
+            const settingValue = new FieldSettingValueDto();
+            settingValue.settingFieldId = row.attributeId;
+            settingValue.settingFieldCode = row.attributeCode;
+            settingValue.value = row.attributeValue ??
+                (row.attributeValueId != null ? String(row.attributeValueId) : undefined);
+            if (row.attributeValueId != null) {
+                settingValue.appFieldsOptionId = row.attributeValueId;
+                settingValue.optionCode = row.attributeValueFkCode;
+                settingValue.optionName = row.attributeValueFkName;
+            }
+            return settingValue;
+        });
+    }
 
-            selectedValues.forEach((selectedValue: any) => {
-                if (selectedValue === undefined || selectedValue === null || selectedValue === '') return;
-
-                const isOptionObject = typeof selectedValue === 'object' && selectedValue !== null &&
-                    Object.prototype.hasOwnProperty.call(selectedValue, 'value');
-                const selectedId = isOptionObject ? selectedValue.value : selectedValue;
-                const selectedCode = isOptionObject ? selectedValue.code : undefined;
-                const option = entry.isLookup
-                    ? attribute?.paginationSetting?.list?.find((item: any) =>
-                        String(item.value) === String(selectedId) || item.code === selectedCode
-                    )
-                    : undefined;
-                const setting = new FieldSettingValueDto();
-                setting.settingFieldId = entry.attributeId;
-                setting.settingFieldCode = definition?.code;
-                setting.settingFieldName = definition?.name;
-                const mappedValue = option?.label != null
-                    ? String(option.label)
-                    : dataType.includes('date') || dataType.includes('time')
-                        ? (selectedId instanceof Date ? selectedId.toISOString() : String(selectedId))
-                        : String(selectedId);
-                setting.value = mappedValue;
-
-                if (option) {
-                    setting.appFieldsOptionId = option.value;
-                    setting.optionCode = option.code;
-                    setting.optionName = option.label;
-                }
-
-                mapped.push(setting);
-            });
-
-            return mapped;
-        }, []);
+    toExtraData(settingValues: FieldSettingValueDto[] | undefined): AppEntityExtraDataDto[] {
+        return (settingValues || []).map(settingValue => {
+            const row = new AppEntityExtraDataDto();
+            row.attributeId = settingValue.settingFieldId;
+            row.attributeCode = settingValue.settingFieldCode;
+            row.attributeValue = settingValue.value;
+            row.attributeValueId = settingValue.appFieldsOptionId;
+            row.attributeValueFkCode = settingValue.optionCode;
+            row.attributeValueFkName = settingValue.optionName;
+            return row;
+        });
     }
 
     getEntityTree(): Observable<ObjectTypeTreeNodeDto[]> {
@@ -104,15 +98,33 @@ export class FieldManagerService {
     }
 
     getFieldsForNode(node: ObjectTypeTreeNodeDto | null): Observable<AppFieldListDto[]> {
-        return this.getFieldPage(node, 0)
+        return this.getFieldsPage(node, 0)
             .pipe(map(fields => fields.filter(field => !field.isHidden)));
     }
 
-    getUnlinkedFields(tableId: number, sycEntityObjectTypeId: number | null): Observable<AppFieldDto[]> {
-        return this.getUnlinkedFieldPage(tableId, sycEntityObjectTypeId ?? undefined, 0);
+    getFieldsPageForNode(
+        node: ObjectTypeTreeNodeDto | null,
+        skipCount: number,
+        maxResultCount: number,
+        searchText?: string,
+        isStandard?: boolean,
+        sorting?: string
+    ) {
+        const selectedObjectTypeId = node?.nodeType === 'ObjectType' ? node.id : undefined;
+        const selectedObjectId = node && node.nodeType !== 'ObjectType' ? node.sycObjectId : undefined;
+        return this.appFieldManagerProxy.getFields(
+            selectedObjectId, selectedObjectTypeId, true,
+            searchText || undefined, undefined, undefined, undefined, undefined, undefined, undefined,
+            isStandard, undefined, undefined, undefined, undefined, sorting || undefined,
+            skipCount, maxResultCount
+        );
     }
 
-    private getUnlinkedFieldPage(
+    getUnlinkedFields(tableId: number, sycEntityObjectTypeId: number | null): Observable<AppFieldDto[]> {
+        return this.getUnlinkedFieldsPage(tableId, sycEntityObjectTypeId ?? undefined, 0);
+    }
+
+    private getUnlinkedFieldsPage(
         tableId: number,
         sycEntityObjectTypeId: number | undefined,
         skipCount: number
@@ -120,16 +132,16 @@ export class FieldManagerService {
         return this.appFieldManagerProxy.getUnlinkedFields(
             tableId, sycEntityObjectTypeId, undefined, undefined, skipCount, this.pageSize
         ).pipe(switchMap(response => {
-            const items = response.items || [];
-            const nextSkipCount = skipCount + items.length;
-            return items.length && nextSkipCount < response.totalCount
-                ? this.getUnlinkedFieldPage(tableId, sycEntityObjectTypeId, nextSkipCount)
-                    .pipe(map(next => [...items, ...next]))
-                : of(items);
+            const fields = response.items || [];
+            const nextSkipCount = skipCount + fields.length;
+            return fields.length && nextSkipCount < response.totalCount
+                ? this.getUnlinkedFieldsPage(tableId, sycEntityObjectTypeId, nextSkipCount)
+                    .pipe(map(nextFields => [...fields, ...nextFields]))
+                : of(fields);
         }));
     }
 
-    private getFieldPage(node: ObjectTypeTreeNodeDto | null, skipCount: number): Observable<AppFieldListDto[]> {
+    private getFieldsPage(node: ObjectTypeTreeNodeDto | null, skipCount: number): Observable<AppFieldListDto[]> {
         const selectedObjectTypeId = node?.nodeType === 'ObjectType' ? node.id : undefined;
         const selectedObjectId = node && node.nodeType !== 'ObjectType' ? node.sycObjectId : undefined;
         return this.appFieldManagerProxy.getFields(
@@ -138,11 +150,11 @@ export class FieldManagerService {
             undefined, undefined, undefined, undefined, undefined, undefined,
             skipCount, this.pageSize
         ).pipe(switchMap(response => {
-            const items = response.items || [];
-            const nextSkipCount = skipCount + items.length;
-            return items.length && nextSkipCount < response.totalCount
-                ? this.getFieldPage(node, nextSkipCount).pipe(map(next => [...items, ...next]))
-                : of(items);
+            const fields = response.items || [];
+            const nextSkipCount = skipCount + fields.length;
+            return fields.length && nextSkipCount < response.totalCount
+                ? this.getFieldsPage(node, nextSkipCount).pipe(map(nextFields => [...fields, ...nextFields]))
+                : of(fields);
         }));
     }
 
@@ -195,14 +207,22 @@ export class FieldManagerService {
     }
 
     getFieldForEdit(id: number): Observable<AppFieldDto> {
+        return this.getFieldForEditWithPermissions(id).pipe(map(response => response.field));
+    }
+
+    getFieldForEditWithPermissions(id: number): Observable<GetFieldForEditOutput> {
         return this.appFieldManagerProxy.getFieldForEdit(id).pipe(map(response => {
             if (!response.field) throw new Error('Field details were not returned.');
-            return response.field;
+            return response;
         }));
-    }    
+    }
 
     getFieldHistory(appFieldId: number): Observable<AppFieldHistoryDto[]> {
         return this.appFieldManagerProxy.getFieldHistory(appFieldId);
+    }
+
+    syncFieldSnapshots(appFieldId: number): Observable<FieldActionResultDto> {
+        return this.appFieldManagerProxy.syncFieldSnapshots(new SyncFieldSnapshotsInput({ appFieldId } as any));
     }
 
     previewFieldCode(fieldTypeId: number): Observable<string> {

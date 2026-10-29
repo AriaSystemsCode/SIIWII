@@ -84658,6 +84658,8 @@ export interface ILinkExistingFieldsResultDto {
 export class FieldEditPermissionDto implements IFieldEditPermissionDto {
     canEditCoreInfo!: boolean;
     canEditAttributes!: boolean;
+    canCreateRevision!: boolean;
+    canSync!: boolean;
     canDelete!: boolean;
     canHide!: boolean;
     isTenantCustomCopyRequired!: boolean;
@@ -84681,6 +84683,8 @@ export class FieldEditPermissionDto implements IFieldEditPermissionDto {
             }
             this.canEditCoreInfo = _data["canEditCoreInfo"];
             this.canEditAttributes = _data["canEditAttributes"];
+            this.canCreateRevision = _data["canCreateRevision"];
+            this.canSync = _data["canSync"];
             this.canDelete = _data["canDelete"];
             this.canHide = _data["canHide"];
             this.isTenantCustomCopyRequired = _data["isTenantCustomCopyRequired"];
@@ -84702,6 +84706,8 @@ export class FieldEditPermissionDto implements IFieldEditPermissionDto {
         }
         data["canEditCoreInfo"] = this.canEditCoreInfo;
         data["canEditAttributes"] = this.canEditAttributes;
+        data["canCreateRevision"] = this.canCreateRevision;
+        data["canSync"] = this.canSync;
         data["canDelete"] = this.canDelete;
         data["canHide"] = this.canHide;
         data["isTenantCustomCopyRequired"] = this.isTenantCustomCopyRequired;
@@ -84712,6 +84718,8 @@ export class FieldEditPermissionDto implements IFieldEditPermissionDto {
 export interface IFieldEditPermissionDto {
     canEditCoreInfo: boolean;
     canEditAttributes: boolean;
+    canCreateRevision: boolean;
+    canSync: boolean;
     canDelete: boolean;
     canHide: boolean;
     isTenantCustomCopyRequired: boolean;
@@ -85129,6 +85137,7 @@ export interface IEntityDtoOfInt64 {
 
 export class SyncFieldSnapshotsInput implements ISyncFieldSnapshotsInput {
     appFieldId!: number;
+    expectedCurrentRevisionNo!: string | undefined;
     sycObjectId!: number | undefined;
     sycEntityObjectTypeId!: number | undefined;
 
@@ -85150,6 +85159,7 @@ export class SyncFieldSnapshotsInput implements ISyncFieldSnapshotsInput {
                     this[property] = _data[property];
             }
             this.appFieldId = _data["appFieldId"];
+            this.expectedCurrentRevisionNo = _data["expectedCurrentRevisionNo"];
             this.sycObjectId = _data["sycObjectId"];
             this.sycEntityObjectTypeId = _data["sycEntityObjectTypeId"];
         }
@@ -85169,6 +85179,7 @@ export class SyncFieldSnapshotsInput implements ISyncFieldSnapshotsInput {
                 data[property] = this[property];
         }
         data["appFieldId"] = this.appFieldId;
+        data["expectedCurrentRevisionNo"] = this.expectedCurrentRevisionNo;
         data["sycObjectId"] = this.sycObjectId;
         data["sycEntityObjectTypeId"] = this.sycEntityObjectTypeId;
         return data;
@@ -85177,6 +85188,7 @@ export class SyncFieldSnapshotsInput implements ISyncFieldSnapshotsInput {
 
 export interface ISyncFieldSnapshotsInput {
     appFieldId: number;
+    expectedCurrentRevisionNo: string | undefined;
     sycObjectId: number | undefined;
     sycEntityObjectTypeId: number | undefined;
 
