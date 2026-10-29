@@ -75,7 +75,6 @@ export class BrowseFieldManagerComponent extends AppComponentBase implements OnI
     }
 
     ngOnInit(): void {
-        const fieldsRequest = ++this.fieldsRequest;
         this.showMainSpinner();
         forkJoin({
             permissions: this.fieldManagerService.getPagePermissions().pipe(catchError(() => {
@@ -88,7 +87,6 @@ export class BrowseFieldManagerComponent extends AppComponentBase implements OnI
             }))
         }).pipe(finalize(() => this.hideMainSpinner())).subscribe(result => {
             this.permissions = result.permissions;
-            if (fieldsRequest !== this.fieldsRequest) return;
             this.entityTree = result.tree;
             this.loadFields();
         });
