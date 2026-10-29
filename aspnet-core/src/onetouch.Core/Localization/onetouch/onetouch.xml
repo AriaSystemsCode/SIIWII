@@ -3047,5 +3047,13 @@ Please select one of the available linesheet templates
 	    <text name="EmailConfirmationCodeException">EmailConfirmationCode should be set in order to send email activation link.</text>
 	    <text name="PasswordCodeException">PasswordResetCode should be set in order to send password reset link.</text>
 	    <text name="ResetPassword">This email is sent to you to reset and re-create your password.</text>
+
+<text name="SelectAndUploadYourFiles"></text>
+<text name="ClickToUpload"></text>
+<text name="ThumbnailImageOptional"></text>
+<text name="GeneratingPdfPreview"></text>
+<text name="COLOR">Color</text>
+
+		
   </texts>  
 </localizationDictionary>

@@ -1,24 +1,65 @@
 @import '../../../../../assets/styles/base/variables';
 @import '../../../../../assets/styles/base/placeholders';
 
-// to be removed after styling refactor - start
+// ==========================================================================
+// Host & global overrides
+// ==========================================================================
 :host {
     color: #464E5F;
 }
 
-
-// to be removed from here after removing from style.scss
+// to be removed after styling refactor
 .kt-portlet {
     margin-top: 0 !important;
 }
 
-// to be removed after styling refactor - end
+:host ::ng-deep .editor-height-300 .ql-container {
+    height: 300px;
+}
 
-
-.form-control {
-    &:hover {
-       // border-color: lighten( $blue, 50% );
+// global: modals are rendered outside the host element
+::ng-deep {
+    .ngLeft {
+        margin-left: 0 !important;
+        margin-top: 0 !important;
     }
+}
+
+input.ng-pristine.ng-invalid.ng-touched,
+textarea.ng-pristine.ng-invalid.ng-touched {
+    border: 1px solid red !important;
+}
+
+// ==========================================================================
+// Utilities & theme overrides
+// ==========================================================================
+.text-danger {
+    color: #F6851D !important;
+}
+
+.text-primary,
+.text-purple {
+    color: #4A0D4A !important;
+}
+
+.border-none {
+    border: none !important;
+}
+
+.pointer-none {
+    pointer-events: none;
+}
+
+.box-rounded-12 {
+    border-radius: 12px;
+}
+
+.box-rounded-6 {
+    border-radius: 6px;
+}
+
+.price-gap {
+    gap: 20px;
 }
 
 .hint {
@@ -26,33 +67,51 @@
     color: $grey-5;
 }
 
+.variation-required-note {
+    color: #5f6368;
+    font-size: 11px;
+    margin-left: 20px;
+}
+
+.arabic-top-padding {
+    padding-top: 100px;
+}
+
+.link-primary-purple {
+    color: #4a0d4a !important;
+    cursor: pointer;
+}
+
+// ==========================================================================
+// Layout blocks
+// ==========================================================================
 .custom-header {
     margin-left: 15rem;
 }
 
-
-.price {
-    width: 6rem;
+.header-bg-soft,
+.section-title-box,
+.input-bg-soft {
+    background-color: #eeeeee !important;
 }
 
-:host ::ng-deep .editor-height-300 .ql-container {
-    height: 300px;
+.section-title-box {
+    border-radius: 5px;
 }
 
 .textarea-white-bg {
     background-color: #fff !important;
 }
 
-.image-wrapper-variant {
-    border: 1px solid #4a0d4a !important;
-    margin-bottom: 115px !important;
-    border-radius: 12px !important;
+.bg-input {
+    background-color: #EEEEEE !important;
+    border-radius: 8px !important;
+    border: 1px solid #EEEEEE !important;
 }
 
-.header-bg-soft {
-    background-color: #eeeeee !important;
-}
-
+// ==========================================================================
+// Buttons
+// ==========================================================================
 .action-btn-cancel {
     border-radius: 5px;
     background-color: #fff !important;
@@ -81,40 +140,89 @@
     color: #fff !important;
 }
 
-.section-title-box {
-    background-color: #eeeeee !important;
-    border-radius: 5px;
+.add-new-lookup-btn {
+    padding: 0.5rem 0.9rem;
+    border: 1px solid #999;
 }
 
-.input-bg-soft {
-    background-color: #eeeeee !important;
+// ==========================================================================
+// Tags (categories / classifications / departments / related products)
+// ==========================================================================
+.aria-tag-wrapper {
+    max-height: 300px;
+    overflow-y: auto;
 }
 
-.link-primary-purple {
-    color: #4a0d4a !important;
-    cursor: pointer;
+.aria-tag {
+    background-color: #EEEEEE;
 }
 
-.box-rounded-12 {
-    border-radius: 12px;
+// ==========================================================================
+// Attachments gallery
+// ==========================================================================
+.image-wrapper-variant {
+    border: 1px solid #4a0d4a !important;
+    margin-bottom: 115px !important;
+    border-radius: 12px !important;
 }
 
-.box-rounded-6 {
+.image-wrapper {
+    position: relative;
+       width: 277px;
+    height: 300px;
+    margin-right: 2rem;
+    border: 1px dashed #DADADA;
     border-radius: 6px;
+    background-color: white;
+    cursor: pointer;
+
+    &.upload {
+        border: 1px dashed #DADADA !important;
+    }
+
+    img {
+        max-height: 100%;
+        max-width: 100%;
+    }
+
+    label {
+        cursor: pointer;
+    }
+
+    i {
+        color: #999999;
+    }
+
+    .upload-btn.btn {
+        height: 50px;
+        margin: auto;
+        border-radius: 5px;
+        border-color: #c8c8c8 !important;
+        background-color: #4A0D4A !important;
+        color: white !important;
+        font-weight: 500;
+        @extend %transition-all-3ms;
+    }
+
+    &:hover {
+        cursor: pointer;
+        box-shadow: 0px 0px 6px #0000001A;
+        @extend %transition-all-3ms;
+
+        .upload-btn.btn {
+            color: $white !important;
+        }
+
+        .select-default-image {
+            display: block;
+        }
+    }
 }
 
-.price-gap {
-    gap: 20px;
-}
-
-.attachment-copy {
-    font-weight: bold;
-    color: black;
-    white-space: nowrap;
-}
-
-.attachment-aspect-note {
-    color: #f6851d !important;
+.select-default-image {
+    display: none;
+    position: absolute;
+    bottom: -50px;
 }
 
 .default-image-link {
@@ -127,32 +235,75 @@
     bottom: -100px;
 }
 
-.border-none {
-    border: none !important;
+.attachment-gallery-preview {
+    width: 100%;
+    height: 100%;
+    // object-fit: contain;
+    cursor: pointer;
+    border-radius: 8px;
 }
 
-.pointer-none {
-    pointer-events: none;
+.attachment-preview-wrapper {
+    position: relative;
+    width: 100%;
+    height: 100%;
+    cursor: pointer;
+    overflow: hidden;
 }
 
-.variation-required-note {
-    color: #5f6368;
+.attachment-type-label {
+    position: absolute;
+    bottom: 8px;
+    left: 8px;
+    padding: 3px 8px;
+    background: rgba(0, 0, 0, 0.7);
+    color: white;
+    border-radius: 4px;
     font-size: 11px;
-    margin-left: 20px;
+    font-weight: 600;
 }
 
-.arabic-top-padding {
-    padding-top: 100px;
+.video-play-overlay {
+    position: absolute;
+    inset: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    pointer-events: none;
+
+    i {
+        color: white;
+        background: rgba(0, 0, 0, 0.6);
+        padding: 16px;
+        border-radius: 50%;
+    }
 }
 
+// Uploader side panel
+.attachment-panel-overlay {
+    position: fixed;
+    inset: 0;
+    z-index: 1050;
+    background: rgba(0, 0, 0, 0.45);
+    display: flex;
+    justify-content: flex-end;
+}
+
+.attachment-panel-container {
+    width: min(100%, 450px);
+    height: 100%;
+    overflow-y: auto;
+    background: white;
+    padding: 24px;
+    box-shadow: -4px 0 20px rgba(0, 0, 0, 0.12);
+}
+
+// ==========================================================================
+// Responsive
+// ==========================================================================
 @media (max-width: 1024px) {
     .custom-header {
         margin-left: 0;
-    }
-
-    .image-wrapper {
-        width: 100%;
-        margin-right: 1rem;
     }
 
     .visible-marketplace-toggle {
@@ -201,17 +352,16 @@
         flex-wrap: wrap;
         align-items: flex-start !important;
         padding: 1rem !important;
-    }
 
-    .kt-portlet__body > .row.align-items-baseline.mb-4.border.p-4.rounded-lg.box-rounded-12 > div {
-        width: 100%;
-        max-width: 100%;
+        > div {
+            width: 100%;
+            max-width: 100%;
+        }
     }
 
     .aria-tag-wrapper {
         padding-left: 0.5rem !important;
         padding-right: 0.5rem !important;
-        max-height: 240px;
     }
 
     .wide-drop-down,
@@ -256,7 +406,6 @@
         gap: 12px;
     }
 
-    .attachment-copy,
     .variation-required-note {
         white-space: normal;
     }
@@ -308,16 +457,16 @@
     }
 }
 
-@media (max-width: 576px) {
-    .price {
-        width: 100%;
+@media (max-width: 767px) {
+    .attachment-panel-container {
+        padding: 12px;
     }
+}
 
+@media (max-width: 576px) {
     .image-wrapper,
     .image-wrapper-variant {
-        height: auto;
         min-height: 230px;
-        margin-right: 0;
     }
 
     .kt-subheader__wrapper > .action-btn-cancel,
@@ -328,180 +477,6 @@
     }
 }
 
-
-
-.cancel {
-    font-weight: 600;
-}
-
-.image-wrapper {
-    border: 1px solid $grey-1;
-    border: 1px dashed #DADADA;
-    &.upload {
-        border: none;
-        filter: grayscale(1);
-        border: 1px dashed #DADADA !important;
-    }
-    width: 290px;
-    height: 276px;
-    background-color: white;
-    margin-right: 2rem;
-    border-radius: 6px;
-    cursor: pointer;
-    img {
-        max-height: 100%;
-        max-width: 100%;
-    }
-    label {
-        cursor: pointer;
-    }
-    .upload-image-icons {
-        position: relative;
-        width: 150px;
-        height: 60px;
-        @extend %transition-all-3ms;
-    }
-    i {
-        color: #999999;
-    }
-    .left-icon,
-    .right-icon,
-    .middle-icon {
-        position: absolute;
-        @extend %transition-all-3ms;
-    }
-    .left-icon,
-    .right-icon {
-        font-size: 1.9rem;
-    }
-    .middle-icon {
-        top: 0;
-        font-size: 3rem;
-    }
-    .left-icon{
-        left: 0;
-    }
-    .right-icon {
-        right: 0;
-    }
-    .upload-btn.btn {
-       // background-color: #c8c8c8!important;
-       // color: #000!important;
-        background-color: #4A0D4A !important;
-    color: white !important;
-    border-radius: 5px;
-        border-color: #c8c8c8!important;
-        font-weight: 500;
-        @extend %transition-all-3ms;
-    }
-    .view-img-overlay {
-        opacity: 0;
-        z-index: 0;
-        border: 1px solid;
-        border-radius: 12px !important;
-        @extend %transition-all-3ms;
-    }
-
-    .view-img-overlay  .kt-avatar__upload {
-            opacity: 1; /* Always visible */
-            background-color: rgba(0, 0, 0, 0.5);
-            z-index: 2; /* Ensure it's on top */
-            display: block; /* Ensure visibility */
-        
-    }
-
-    &{     filter: none !important;
-    }
-    &:hover {
-        cursor: pointer;
-        box-shadow: 0px 0px 6px #0000001A;
-        @extend %transition-all-3ms;
-        filter: none !important;
-        .upload-btn.btn {
-           // background-color: $blue!important;
-            color: $white!important;
-           // border-color: $blue!important;
-            font-weight: 500;
-            @extend %transition-all-3ms;
-        }
-        .upload-image-icons {
-            height: 50px;
-            width: 109px;
-            @extend %transition-all-3ms;
-        }
-        .view-img-overlay {
-            opacity: 1;
-            background-color: rgba(0,0,0,0.5);
-            @extend %transition-all-3ms;
-        }
-        .select-default-image {
-            display: block;
-        }
-    }
-}
-
-.select-default-image {
-    display: none;
-    position: absolute;
-    bottom: -50px;
-}
-
-.item-photos {
-    .item-photos-header {
-      // background-color: #3699FF1A;
-    }
-    .item-photos-body {
-      //  background-color: #F5FAFF;
-    }
-}
-
-input.ng-pristine.ng-invalid.ng-touched,
-textarea.ng-pristine.ng-invalid.ng-touched {
-    border: 1px solid red!important;
-}
-
-
-.add-new-lookup-btn {
-    padding: 0.5rem 0.9rem;
-    border: 1px  solid #999;
-}
-
-
-.aria-tag-wrapper {
-    max-height: 300px;
-    overflow-y: auto;
-}
-
-.text-danger {
-    color: #F6851D !important;
-}
-
-
-.text-primary {
-    color: #4A0D4A !important;
-}
-
-.aria-tag
-{
-    background-color: #EEEEEE;
-}
-
-
-.bg-input{
- background-color: #EEEEEE !important;
- border-radius: 8px !important;
-  border: 1px solid #EEEEEE !important;
-}
-
-
-.text-purple{
-    color: #4A0D4A !important;
-}
-
-
-::ng-deep {
-    .ngLeft {
-        margin-left: 0 !important;
-        margin-top: 0 !important;
-    }
+.kt-avatar__upload{
+    z-index: 9;
 }
