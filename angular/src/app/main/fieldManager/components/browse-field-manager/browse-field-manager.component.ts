@@ -9,6 +9,7 @@ import { forkJoin, Observable, of } from 'rxjs';
 import { catchError, finalize } from 'rxjs/operators';
 import { AppFieldListDto, FieldManagerPermissionDto, ObjectTypeTreeNodeDto } from '@shared/service-proxies/service-proxies';
 import { LazyLoadEvent } from 'primeng/api';
+import Swal from 'sweetalert2';
 
 type GroupedField = Omit<AppFieldListDto, 'init' | 'toJSON'> & { groupValue: string };
 type FieldGroup = { value: string, label: string, fields: GroupedField[] };
@@ -394,8 +395,18 @@ export class BrowseFieldManagerComponent extends AppComponentBase implements OnI
 
     hide(field: AppFieldListDto): void {
         this.closeActions();
-        this.askToConfirm('Hide this field for your tenant?', this.l('Confirm')).subscribe(confirmed => {
-            if (!confirmed) return;
+        Swal.fire({
+            title: '',
+            text: 'Hide this field for your tenant?',
+            icon: 'info',
+            showCancelButton: true,
+            confirmButtonText: 'Ok',
+            cancelButtonText: 'Cancel',
+            allowOutsideClick: false, 
+            allowEscapeKey: false,
+            backdrop: true
+        }).then(result => {
+            if (!result.isConfirmed) return;
             this.fieldManagerService.hideField(field.id).subscribe({
                 next: () => {
                     this.loadFields();
@@ -413,14 +424,18 @@ export class BrowseFieldManagerComponent extends AppComponentBase implements OnI
 
     delete(field: AppFieldListDto): void {
         this.closeActions();
-        var isConfirmed: Observable<boolean>;
-        isConfirmed = this.askToConfirm(
-            this.l("AreYouSureYouWantToDeleteThisField?"), 
-            this.l("Confirm")
-        );
-
-        isConfirmed.subscribe((res) => {
-            if (res) {
+        Swal.fire({
+            title: '',
+            text: this.l('AreYouSureYouWantToDeleteThisField?'),
+            icon: 'info',
+            showCancelButton: true,
+            confirmButtonText: 'Ok',
+            cancelButtonText: 'Cancel',
+            allowOutsideClick: false,
+            allowEscapeKey: false,
+            backdrop: true
+        }).then(result => {
+            if (result.isConfirmed) {
                 this.fieldManagerService.deleteServerField(field.id).subscribe({
                     next: () => {
                         this.loadFields();
@@ -428,7 +443,6 @@ export class BrowseFieldManagerComponent extends AppComponentBase implements OnI
                     },
                     error: () => this.notify.error('Could not delete the field.')
                 });
-
             }
         });
     }

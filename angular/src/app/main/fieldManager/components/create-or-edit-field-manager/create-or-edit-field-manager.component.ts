@@ -192,7 +192,7 @@ export class CreateOrEditFieldManagerComponent extends AppComponentBase implemen
                     Swal.fire({
                         title: '',
                         text: `Revision ${saveError.conflictingRevisionNo} has already been saved. Do you want to create revision ${saveError.expectedNewRevisionNo}?`,
-                        icon: 'warning',
+                        icon: 'info',
                         showCancelButton: true,
                         confirmButtonText: 'Create revision',
                         cancelButtonText: 'Cancel',
@@ -245,13 +245,6 @@ export class CreateOrEditFieldManagerComponent extends AppComponentBase implemen
                             allowOutsideClick: false,
                             allowEscapeKey: false,
                             backdrop: true,
-                            customClass: {
-                                popup: "popup-class",
-                                icon: "icon-class",
-                                content: "content-class",
-                                actions: "actions-class",
-                                confirmButton: "confirm-button-class2",
-                            },
                     }).then((result) => {
                         if (result.isConfirmed) {
                             this.active = false;
