@@ -468,7 +468,7 @@
                                     <p-multiSelect [options]="roles" [(ngModel)]="selectedRoles"
                                         [ngModelOptions]="{ standalone: true }" optionLabel="name" optionValue="name"
                                         placeholder="Select Roles" [maxSelectedLabels]="3" class="w-100 md:w-80"
-                                        display="chip">
+                                        display="chip"    (onChange)="onPersonalRolesChange($event)">
                                     </p-multiSelect>
                                 </div>
                             </div>

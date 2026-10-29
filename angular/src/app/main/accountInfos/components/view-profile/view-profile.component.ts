@@ -127,6 +127,9 @@ cancelEdit =
     private personalModeInitialized =
     false;
 
+    private marketplaceDefaultsInitialized = false;
+private marketplaceRolesAccountKey: string | null = null;
+
     constructor(
         injector: Injector,
         private _appEntitiesServiceProxy: AppEntitiesServiceProxy,
@@ -958,43 +961,31 @@ buildMarketplaceRolesExtraData(): AppEntityExtraDataDto[] {
     return [dto];
 }
 
-// updateMarketplaceRolesExtraData(): void {
-//   if (!this.accountData) return;
 
-//   const existingExtraData = this.accountData.entityExtraData || this.entityExtraData || [];
-
-//   const updated = [
-//     ...existingExtraData.filter(x => x.attributeId !== 610),
-//     ...this.buildMarketplaceRolesExtraData()
-//   ];
-
-
-//   this.accountData.entityExtraData = updated;
-//   this.entityExtraData = updated;
-// }
 
 updateMarketplaceRolesExtraData(): void {
-
-    if (!this.accountData) {
-        return;
-    }
+    if (!this.accountData) return;
 
     const existing =
         this.accountData.entityExtraData ||
         this.entityExtraData ||
         [];
 
-    this.accountData.entityExtraData = [
-        ...existing.filter(
-            x => x.attributeId !== 610
-        ),
+    const otherAttributes = existing.filter(
+        x =>
+            Number(x.attributeId) !== 610 &&
+            String(x.attributeCode || '').toUpperCase() !==
+                'MARKETPLACE-ROLE'
+    );
+
+    const updated = [
+        ...otherAttributes,
         ...this.buildMarketplaceRolesExtraData()
     ];
 
-    this.entityExtraData =
-        this.accountData.entityExtraData;
+    this.accountData.entityExtraData = updated;
+    this.entityExtraData = updated;
 }
-
 
 setSelectedMarketplaceRoles(): void {
     const isMarketplaceRole = (item: any): boolean =>
@@ -1175,81 +1166,67 @@ private ensurePersonalModels(): void {
 }
 
 getExtrAttributes(): void {
-
-    const accountType =
-        this.accountData?.accountType;
+    const accountType = this.accountData?.accountType;
 
     if (!accountType) {
         this.roles = [];
         return;
     }
 
-    this._sycEntityObjectTypesServiceProxy
-        .getAllWithExtraAttributesByCode(
-            accountType,
-            ''
-        )
-        .subscribe(result => {
+    const accountKey = `${this.accountData?.id ?? 'new'}-${accountType}`;
 
+    if (this.marketplaceRolesAccountKey !== accountKey) {
+        this.marketplaceRolesAccountKey = accountKey;
+        this.marketplaceDefaultsInitialized = false;
+    }
+
+    this._sycEntityObjectTypesServiceProxy
+        .getAllWithExtraAttributesByCode(accountType, '')
+        .subscribe(result => {
             const marketplaceRoleAttribute =
-                result?.[0]
-                    ?.extraAttributes
-                    ?.extraAttributes
-                    ?.find(
-                        x =>
-                            x.code ===
-                            'MARKETPLACE-ROLE'
-                    );
+                result?.[0]?.extraAttributes?.extraAttributes
+                    ?.find(x => x.code === 'MARKETPLACE-ROLE');
 
             if (!marketplaceRoleAttribute) {
                 this.roles = [];
+                return;
+            }
 
-                if (this.createMode) {
-                    this.selectedRoles = [];
+            this.roles = (marketplaceRoleAttribute.validEntries || '')
+                .split('|')
+                .map(x => x.trim())
+                .filter(Boolean)
+                .map(x => ({ name: x }));
+
+            if (this.createMode) {
+                if (!this.marketplaceDefaultsInitialized) {
+                    this.selectedRoles =
+                        (marketplaceRoleAttribute.defaultValue || '')
+                            .split('|')
+                            .map(x => x.trim())
+                            .filter(Boolean);
+
+                    this.previousSelectedRoles = [
+                        ...this.selectedRoles
+                    ];
+
+                    this.marketplaceDefaultsInitialized = true;
+                    this.updateMarketplaceRolesExtraData();
                 }
 
                 return;
             }
 
-
-            // Available roles
-            this.roles =
-                (
-                    marketplaceRoleAttribute
-                        .validEntries || ''
-                )
-                    .split('|')
-                    .map(x => x.trim())
-                    .filter(Boolean)
-                    .map(x => ({
-                        name: x
-                    }));
-
-
-            // CREATE
-            if (this.createMode) {
-
-                this.selectedRoles =
-                    (
-                        marketplaceRoleAttribute
-                            .defaultValue || ''
-                    )
-                        .split('|')
-                        .map(x => x.trim())
-                        .filter(Boolean);
-
-                this.previousSelectedRoles = [
-                    ...this.selectedRoles
-                ];
-
-                this.updateMarketplaceRolesExtraData();
-
-                return;
-            }
-
-
-            // EDIT
+            // Existing account: load saved roles
             this.setSelectedMarketplaceRoles();
         });
+}
+
+onPersonalRolesChange(event: any): void {
+    this.selectedRoles = [...(event?.value ?? [])];
+
+    this.previousSelectedRoles = [...this.selectedRoles];
+
+    this.updateMarketplaceRolesExtraData();
 }
 }

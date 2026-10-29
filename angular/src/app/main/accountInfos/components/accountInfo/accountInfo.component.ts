@@ -1480,52 +1480,87 @@ triggerProfile($event?: Event): void {
         this.previousSelectedRoles = [...(this.selectedRoles || [])];
     }
 
-    onRolesChange(event?: any): void {
-        if (this.isRestoringRoles) return;
+  onRolesChange(event?: any): void {
+    if (this.isRestoringRoles) return;
 
-        const oldRoles = this.previousSelectedRoles || [];
-        const newRoles = event?.value || this.selectedRoles || [];
+    const oldRoles = this.previousSelectedRoles || [];
+    const newRoles: string[] = [
+        ...(event?.value ?? this.selectedRoles ?? [])
+    ];
 
-        const removedRoles = oldRoles.filter(role => !newRoles.includes(role));
+    const removedRoles = oldRoles.filter(
+        role => !newRoles.includes(role)
+    );
 
-        if (!removedRoles.length) {
-            this.previousSelectedRoles = [...newRoles];
-            this.selectedRoles = [...newRoles];
-            this.changeTouchState();
-            return;
-        }
+    this.selectedRoles = newRoles;
 
-        this.selectedRoles = [...newRoles];
-        this.validateRemovedRoles(removedRoles);
+    // CREATE: no existing relationships to validate
+    if (!this.accountInfoTemp?.id) {
+        this.previousSelectedRoles = [...newRoles];
+        this.updateMarketplaceRolesExtraData();
+        this.changeTouchState();
+        return;
     }
 
-    private validateRemovedRoles(removedRoles: string[]): void {
-        const accountSSIN = this.accountDataForView?.ssin || this.accountInfoTemp?.ssin;
+    // EDIT: roles added without removing anything
+    if (!removedRoles.length) {
+        this.previousSelectedRoles = [...newRoles];
+        this.updateMarketplaceRolesExtraData();
+        this.changeTouchState();
+        return;
+    }
 
-        if (!accountSSIN) {
-            this.restoreRemovedRoles(removedRoles);
-            return;
-        }
+    // EDIT: validate removed roles against existing relationships
+    this.validateRemovedRoles(removedRoles);
+}
 
-        removedRoles.forEach(role => {
-            this._AccountsServiceProxy
-                .roleCanbeRemoved(accountSSIN, role)
-                .subscribe((canRemove: boolean) => {
+  private validateRemovedRoles(removedRoles: string[]): void {
+    const accountSSIN =
+        this.accountDataForView?.ssin ||
+        this.accountInfoTemp?.ssin;
+
+    // New account: no validation required
+    if (!this.accountInfoTemp?.id) {
+        this.previousSelectedRoles = [...this.selectedRoles];
+        this.updateMarketplaceRolesExtraData();
+        this.changeTouchState();
+        return;
+    }
+
+    // Existing account: cannot validate without SSIN
+    if (!accountSSIN) {
+        this.restoreRemovedRoles(removedRoles);
+        return;
+    }
+
+    removedRoles.forEach(role => {
+        this._AccountsServiceProxy
+            .roleCanbeRemoved(accountSSIN, role)
+            .subscribe({
+                next: (canRemove: boolean) => {
                     if (!canRemove) {
                         this.restoreRemovedRoles([role]);
 
                         this.notify.warn(
-                            this.l('This role cannot be removed because it is used in an existing relationship.')
+                            this.l(
+                                'This role cannot be removed because it is used in an existing relationship.'
+                            )
                         );
-
-                        return;
+                    } else {
+                        this.previousSelectedRoles = [
+                            ...(this.selectedRoles || [])
+                        ];
                     }
 
-                    this.previousSelectedRoles = [...(this.selectedRoles || [])];
+                    this.updateMarketplaceRolesExtraData();
                     this.changeTouchState();
-                });
-        });
-    }
+                },
+                error: () => {
+                    this.restoreRemovedRoles([role]);
+                }
+            });
+    });
+}
 
     private restoreRemovedRoles(rolesToRestore: string[]): void {
         this.isRestoringRoles = true;
@@ -1537,10 +1572,15 @@ triggerProfile($event?: Event): void {
             ])
         ];
 
-        setTimeout(() => {
-            this.isRestoringRoles = false;
-            this.previousSelectedRoles = [...(this.selectedRoles || [])];
-        });
+    setTimeout(() => {
+    this.isRestoringRoles = false;
+
+    this.previousSelectedRoles = [
+        ...(this.selectedRoles || [])
+    ];
+
+    this.updateMarketplaceRolesExtraData();
+});
     }
     saveMyAccount() {
         this.accountInfoTemp.entityExtraData ??= [];
