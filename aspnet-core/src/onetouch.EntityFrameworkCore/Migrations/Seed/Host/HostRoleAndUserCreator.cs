@@ -8,6 +8,7 @@ using Abp.MultiTenancy;
 using Abp.Localization;
 using Abp.Notifications;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore.Storage;
 using onetouch.Authorization;
 using onetouch.Authorization.Roles;
 using onetouch.Authorization.Users;
@@ -54,7 +55,64 @@ namespace onetouch.Migrations.Seed.Host
             //MMT-Iteration37[End]
             SeedExtraAttributes();
             AsyncHelper.RunSync(() => CreateHostSystemData());
+            CreateHostFieldManagerData();
 
+        }
+
+        private void CreateHostFieldManagerData()
+        {
+            var scriptNames = new[]
+            {
+                "20261012_SeedAppEntityFields.sql",
+                "20261002_SeedTransactionHeaderFields.sql",
+                "20261013_SeedTransactionDetailFields.sql",
+                "20261014_SeedStringTextboxSettings.sql",
+                "20261020_SeedStringDropdownDateFormat.sql",
+                "20261016_SeedDatePickerSettings.sql",
+                "20261016_SetDatePickerExtraAttributes.sql",
+                "20261016_SeedRemainingFieldTypeSettings.sql",
+                "20261018_SeedSingleValueFieldSettings.sql",
+                "20261019_SeedStringChipsSettings.sql",
+                "20261021_PromoteDropdownOptionsToChips.sql"
+            };
+
+            var previousTimeout = _context.Database.GetCommandTimeout();
+            try
+            {
+                if (!previousTimeout.HasValue)
+                    _context.Database.SetCommandTimeout(180);
+
+                var ownsTransaction = _context.Database.CurrentTransaction == null;
+                using (var transaction = ownsTransaction ? _context.Database.BeginTransaction() : null)
+                {
+                    foreach (var scriptName in scriptNames)
+                    {
+                        var resourceName = "onetouch.Migrations.Seed." + scriptName;
+                        using (var stream = typeof(HostRoleAndUserCreator).Assembly.GetManifestResourceStream(resourceName))
+                        {
+                            if (stream == null)
+                                throw new InvalidOperationException("Missing Field Manager seed resource: " + resourceName);
+
+                            using (var reader = new StreamReader(stream))
+                            using (var command = _context.Database.GetDbConnection().CreateCommand())
+                            {
+                                // ExecuteSqlRaw treats JSON braces in seed scripts as
+                                // string-format placeholders and throws FormatException.
+                                command.CommandText = reader.ReadToEnd();
+                                command.CommandTimeout = _context.Database.GetCommandTimeout() ?? 30;
+                                command.Transaction = _context.Database.CurrentTransaction?.GetDbTransaction();
+                                command.ExecuteNonQuery();
+                            }
+                        }
+                    }
+
+                    transaction?.Commit();
+                }
+            }
+            finally
+            {
+                _context.Database.SetCommandTimeout(previousTimeout);
+            }
         }
 
         private async Task AddMissingTextsAsync<T>(
@@ -508,6 +566,22 @@ namespace onetouch.Migrations.Seed.Host
                 _context.SaveChanges();
             }
             //MMT40[Start]
+            //I52[Start]
+            var sydObjects_Dashboard= _context.SydObjects.IgnoreQueryFilters().FirstOrDefault(
+       r => r.Code == "DASHBOARD");
+            if (sydObjects_Dashboard == null && ObjectTypeCodeEntity != null && ObjectTypeCodeEntity.Id > 0)
+            {
+                sydObjects_Dashboard = new SystemObjects.SydObject
+                {
+                    Code = "DASHBOARD",
+                    Name = "Dashboard",
+                    ObjectTypeCode = ObjectTypeCodeEntity.Code,
+                    ObjectTypeId = ObjectTypeCodeEntity.Id
+                };
+                _context.SydObjects.Add(sydObjects_Dashboard);
+                _context.SaveChanges();
+            }
+            //I52[End]
             var sydObjects_MarketplaceRelationship = _context.SydObjects.IgnoreQueryFilters().FirstOrDefault(
         r => r.Code == "MARKETPLACECONTACTRELATIONSHIP");
             if (sydObjects_MarketplaceRelationship == null && ObjectTypeCodeEntity != null && ObjectTypeCodeEntity.Id > 0)
@@ -584,9 +658,9 @@ namespace onetouch.Migrations.Seed.Host
             #endregion Add missing SydObjects
 
             #region Add missing sycEntityObjectTypes
-            var parents = "ITEM,CONTACT,CONTACT,LOOKUP,LOOKUP,LOOKUP,ITEM,ITEM,ITEM,LISTING,CATEGORY,DEPARTMENT,CLASSIFICATION,CONTACT,CONTACT,CONTACT,CONTACT,SCALE,TRANSACTION,TRANSACTION,LOOKUP,STANDARDFEATURE,STANDARDSUBSCRIPTIONPLAN,TENANTACTIVITYLOG,LOOKUP,TRANSACTION,MESSAGE-DATA,MESSAGE-DATA,MESSAGE-DATA,MESSAGE-DATA,LOOKUP,LOOKUP,LOOKUP,LOOKUP,MARKETPLACECONTACTRELATIONSHIP,MARKETPLACECONTACTRELATIONSHIP,MARKETPLACECONTACTRELATIONSHIP,MARKETPLACECONTACTRELATIONSHIP,MARKETPLACECONTACTRELATIONSHIP,MARKETPLACECONTACTRELATIONSHIP,MARKETPLACECONTACTRELATIONSHIP,MARKETPLACECONTACTRELATIONSHIP,LOOKUP,MARKETPLACECONTACTRELATIONSHIP,MARKETPLACECONTACTRELATIONSHIP,MARKETPLACECONTACTRELATIONSHIP,MARKETPLACECONTACTRELATIONSHIP,MARKETPLACECONTACTRELATIONSHIP,MARKETPLACECONTACTRELATIONSHIP,MARKETPLACECONTACTRELATIONSHIP,MARKETPLACECONTACTRELATIONSHIP,MARKETPLACECONTACTRELATIONSHIP,MARKETPLACECONTACTRELATIONSHIP,MARKETPLACECONTACTRELATIONSHIP,MARKETPLACECONTACTRELATIONSHIP,MARKETPLACECONTACTRELATIONSHIP".ToUpper().Split(',');
-            var codes = "CHARGES,HOST,TENANT,TRANSACTIONCHARGES,CHARGETYPES,BACKGROUND,PRODUCTVARIATION,PRODUCT,LISTINGVARIATION,LISTING,CATEGORY,DEPARTMENT,CLASSIFICATION,BRANCH,BUSINESS,GROUP,PERSONAL,SIZESCALE,SALESORDER,PURCHASEORDER,SHIPVIA,STANDARDFEATURE,STANDARDSUBSCRIPTIONPLAN,TENANTACTIVITYLOG,UOM,ARINVOICE,MESSAGE,COMMENT,REVIEW,QUESTION,MARKETPLACESECTIONTYPE,MARKETPLACESECTION,MARKETPLACEBLOCKTYPE,MARKETPLACESECTIONBLOCK,P00B,P00G,P00P,B00P,B00G,B00B,G00P,G00B,MARKETPLACECONTACTRELATIONSHIP,S00B,S0SR,S0BO,B00S,B0SR,B0BO,SR0S,SR0B,SRBO,BO0S,BO0B,BOSR,G00G".ToUpper().Split(',');
-            var names = "CHARGES,HOST,TENANT,Transaction Charges,Charge Types,Background,Product Variation,Product,Listing Variation,Listing,Category,Department,Classification,Branch,BUSINESS,Group,Personal,Size Scale,Sales Order,Purchase Order,Ship Via,Standard Feature,Standard Subscription Plan,Tenant Activity Log,Unit Of Measurement,AR Invoice,Message,Comment,Review,Question,Marketplace Section Type,Marketplace Section,Marketplace Block Type,Marketplace Section Block,Person follow Business,Person join Group,Person follow Person,Business hire Person,Business join Group,Business follow Business,Group invite Person,Group invite Business,Marketplace Contact Relationship,Sell to this Buyer,Connect to this Sales agent,Sell to this Buying Office,Buy from this Seller,Buy from this Sales agent,Connect to this Buying agent,Sell on behalf of this Seller,Sell to this Buyer,Connect to this Buying agent,Buy from this Seller,Buy on behalf this Buyer,Connect to this Sales agent,Group follow Group".Split(',');
+            var parents = "ITEM,CONTACT,CONTACT,LOOKUP,LOOKUP,LOOKUP,ITEM,ITEM,ITEM,LISTING,CATEGORY,DEPARTMENT,CLASSIFICATION,CONTACT,CONTACT,CONTACT,CONTACT,SCALE,TRANSACTION,TRANSACTION,LOOKUP,STANDARDFEATURE,STANDARDSUBSCRIPTIONPLAN,TENANTACTIVITYLOG,LOOKUP,TRANSACTION,MESSAGE-DATA,MESSAGE-DATA,MESSAGE-DATA,MESSAGE-DATA,LOOKUP,LOOKUP,LOOKUP,LOOKUP,MARKETPLACECONTACTRELATIONSHIP,MARKETPLACECONTACTRELATIONSHIP,MARKETPLACECONTACTRELATIONSHIP,MARKETPLACECONTACTRELATIONSHIP,MARKETPLACECONTACTRELATIONSHIP,MARKETPLACECONTACTRELATIONSHIP,MARKETPLACECONTACTRELATIONSHIP,MARKETPLACECONTACTRELATIONSHIP,LOOKUP,MARKETPLACECONTACTRELATIONSHIP,MARKETPLACECONTACTRELATIONSHIP,MARKETPLACECONTACTRELATIONSHIP,MARKETPLACECONTACTRELATIONSHIP,MARKETPLACECONTACTRELATIONSHIP,MARKETPLACECONTACTRELATIONSHIP,MARKETPLACECONTACTRELATIONSHIP,MARKETPLACECONTACTRELATIONSHIP,MARKETPLACECONTACTRELATIONSHIP,MARKETPLACECONTACTRELATIONSHIP,MARKETPLACECONTACTRELATIONSHIP,MARKETPLACECONTACTRELATIONSHIP,MARKETPLACECONTACTRELATIONSHIP,DASHBOARD".ToUpper().Split(',');
+            var codes = "CHARGES,HOST,TENANT,TRANSACTIONCHARGES,CHARGETYPES,BACKGROUND,PRODUCTVARIATION,PRODUCT,LISTINGVARIATION,LISTING,CATEGORY,DEPARTMENT,CLASSIFICATION,BRANCH,BUSINESS,GROUP,PERSONAL,SIZESCALE,SALESORDER,PURCHASEORDER,SHIPVIA,STANDARDFEATURE,STANDARDSUBSCRIPTIONPLAN,TENANTACTIVITYLOG,UOM,ARINVOICE,MESSAGE,COMMENT,REVIEW,QUESTION,MARKETPLACESECTIONTYPE,MARKETPLACESECTION,MARKETPLACEBLOCKTYPE,MARKETPLACESECTIONBLOCK,P00B,P00G,P00P,B00P,B00G,B00B,G00P,G00B,MARKETPLACECONTACTRELATIONSHIP,S00B,S0SR,S0BO,B00S,B0SR,B0BO,SR0S,SR0B,SRBO,BO0S,BO0B,BOSR,G00G,DASHBOARD".ToUpper().Split(',');
+            var names = "CHARGES,HOST,TENANT,Transaction Charges,Charge Types,Background,Product Variation,Product,Listing Variation,Listing,Category,Department,Classification,Branch,BUSINESS,Group,Personal,Size Scale,Sales Order,Purchase Order,Ship Via,Standard Feature,Standard Subscription Plan,Tenant Activity Log,Unit Of Measurement,AR Invoice,Message,Comment,Review,Question,Marketplace Section Type,Marketplace Section,Marketplace Block Type,Marketplace Section Block,Person follow Business,Person join Group,Person follow Person,Business hire Person,Business join Group,Business follow Business,Group invite Person,Group invite Business,Marketplace Contact Relationship,Sell to this Buyer,Connect to this Sales agent,Sell to this Buying Office,Buy from this Seller,Buy from this Sales agent,Connect to this Buying agent,Sell on behalf of this Seller,Sell to this Buyer,Connect to this Buying agent,Buy from this Seller,Buy on behalf this Buyer,Connect to this Sales agent,Group follow Group,Dashboard".Split(',');
             //var parents = "LOOKUP,ITEM,ITEM,ITEM,LISTING,CATEGORY,DEPARTMENT,CLASSIFICATION,CONTACT,CONTACT,CONTACT,CONTACT,SCALE,TRANSACTION,TRANSACTION,LOOKUP,STANDARDFEATURE,STANDARDSUBSCRIPTIONPLAN,TENANTACTIVITYLOG,LOOKUP,TRANSACTION,MESSAGE-DATA,MESSAGE-DATA,MESSAGE-DATA,MESSAGE-DATA,MARKETPLACECONTACTRELATIONSHIP,MARKETPLACECONTACTRELATIONSHIP,MARKETPLACECONTACTRELATIONSHIP,MARKETPLACECONTACTRELATIONSHIP,MARKETPLACECONTACTRELATIONSHIP,MARKETPLACECONTACTRELATIONSHIP,MARKETPLACECONTACTRELATIONSHIP,MARKETPLACECONTACTRELATIONSHIP,LOOKUP".ToUpper().Split(',');
             //var codes = "BACKGROUND,PRODUCTVARIATION,PRODUCT,LISTINGVARIATION,LISTING,CATEGORY,DEPARTMENT,CLASSIFICATION,BRANCH,BUSINESS,GROUP,PERSONAL,SIZESCALE,SALESORDER,PURCHASEORDER,SHIPVIA,STANDARDFEATURE,STANDARDSUBSCRIPTIONPLAN,TENANTACTIVITYLOG,UOM,ARINVOICE,MESSAGE,COMMENT,REVIEW,QUESTION,PTB,PTG,PTP,BTP,BTG,BTB,GTP,GTB,MARKETPLACECONTACTRELATIONSHIP".ToUpper().Split(',');
             //var names = "Background,Product Variation,Product,Listing Variation,Listing,Category,Department,Classification,Branch,BUSINESS,Group,Personal,Size Scale,Sales Order,Purchase Order,Ship Via,Standard Feature,Standard Subscription Plan,Tenant Activity Log,Unit Of Measurement,AR Invoice,Message,Comment,Review,Question,Person relation with Business,Person relation with Group,Person relation with Person,Business relation with Person,Business relation with Group,Business relation with Business,Group relation with Person,Group relation with Business,Marketplace Contact Relationship".Split(',');

@@ -10,11 +10,11 @@
     <TargetFramework>net7.0</TargetFramework>
   </PropertyGroup>
   <ItemGroup>
-    <PackageReference Include="Abp" Version="5.7.0" />
+    <PackageReference Include="Abp" Version="8.0.0" />
     <PackageReference Include="IdentityModel" Version="4.2.0" />
   </ItemGroup>
   <ItemGroup>
-    <PackageReference Include="Abp.Web.Common" Version="5.7.0" />
+    <PackageReference Include="Abp.Web.Common" Version="8.0.0" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\..\src\onetouch.Application.Shared\onetouch.Application.Shared.csproj" />

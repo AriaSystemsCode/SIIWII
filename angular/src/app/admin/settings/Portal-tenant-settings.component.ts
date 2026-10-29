@@ -3,7 +3,7 @@ import { Component, Injector, OnInit, QueryList, ViewChildren } from '@angular/c
 import { AppConsts } from '@shared/AppConsts';
 import { appModuleAnimation } from '@shared/animations/routerTransition';
 import { AppComponentBase } from '@shared/common/app-component-base';
-import { SettingScopes, SendTestEmailInput, TenantSettingsEditDto, TenantSettingsServiceProxy, SycEntityObjectTypesServiceProxy, GetAllEntityObjectTypeOutput, LookupLabelDto, AppEntityExtraDataDto, AppEntitiesServiceProxy, SystemTablesServiceProxy, GetAppEntityForEditOutput, AppEntityDto } from '@shared/service-proxies/service-proxies';
+import { SettingScopes, SendTestEmailInput, TenantSettingsEditDto, TenantSettingsServiceProxy, SycEntityObjectTypesServiceProxy, GetAllEntityObjectTypeOutput, LookupLabelDto, AppEntityExtraDataDto, AppEntitiesServiceProxy, SystemTablesServiceProxy, GetAppEntityForEditOutput, AppEntityDto, ExtraAttributesSource } from '@shared/service-proxies/service-proxies';
 import { FileUploader, FileUploaderOptions } from 'ng2-file-upload';
 import { finalize } from 'rxjs/operators';
 import { ExtraAttributeDataService } from '@app/main/app-items/app-item-shared/services/extra-attribute-data.service';
@@ -265,7 +265,8 @@ dynamicInputsComponents!: QueryList<dynamicInputs>;
 
   getAppItemTypeExtraAttributesById() {
     this._systemTablesServiceProxy.getEntityObjectTypeTenantId().pipe(finalize(() => {
-      this._sycEntityObjectTypesServiceProxy.getAllWithExtraAttributes(this.entityObjectTypeTenantId)
+                  let source: ExtraAttributesSource=0;
+      this._sycEntityObjectTypesServiceProxy.getAllWithExtraAttributes(this.entityObjectTypeTenantId,source)
         .subscribe((res) => {
           if (res?.length > 0) {
             this.allAttributes = res[0]?.extraAttributes.extraAttributes;
@@ -447,3 +448,5 @@ dynamicInputsComponents!: QueryList<dynamicInputs>;
 }
 
 }
+
+

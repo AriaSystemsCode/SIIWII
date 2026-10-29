@@ -454,6 +454,7 @@ export class CreateOrEditAppItemComponent
     }
 
     getAppItemTypeExtraAttributesById(id: number) {
+                    let source: ExtraAttributesSource=0;
         if (!id) return;
         return this._sycEntityObjectTypesServiceProxy.getAllWithExtraAttributes(id);
     }

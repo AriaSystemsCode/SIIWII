@@ -736,3 +736,10 @@ body .modal.show .modal-dialog.modalCenter.upload-modal .modal-content.upload-mo
     width: 100% !important;
     max-width: 626px !important;
 }
+
+
+
+[dir="rtl"] .p-datatable td,
+[dir="rtl"] .p-datatable th {
+    text-align: right !important;
+}

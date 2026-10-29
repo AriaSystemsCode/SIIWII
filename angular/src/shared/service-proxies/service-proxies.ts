@@ -6585,6 +6585,800 @@ export class AppAdvertisementsServiceProxy {
 }
 
 @Injectable()
+export class AppDashboardServiceProxy {
+    private http: HttpClient;
+    private baseUrl: string;
+    protected jsonParseReviver: ((key: string, value: any) => any) | undefined = undefined;
+
+    constructor(@Inject(HttpClient) http: HttpClient, @Optional() @Inject(API_BASE_URL) baseUrl?: string) {
+        this.http = http;
+        this.baseUrl = baseUrl !== undefined && baseUrl !== null ? baseUrl : "";
+    }
+
+    /**
+     * @param filter (optional) 
+     * @param sorting (optional) 
+     * @param skipCount (optional) 
+     * @param maxResultCount (optional) 
+     * @return Success
+     */
+    getAll(filter: string | null | undefined, sharingLevel: DashboardFilterType, sorting: string | null | undefined, skipCount: number | undefined, maxResultCount: number | undefined): Observable<PagedResultDtoOfGetDashboardForViewDto> {
+        let url_ = this.baseUrl + "/api/services/app/AppDashboard/GetAll?";
+        if (filter !== undefined && filter !== null)
+            url_ += "Filter=" + encodeURIComponent("" + filter) + "&";
+        if (sharingLevel === undefined || sharingLevel === null)
+            throw new Error("The parameter 'sharingLevel' must be defined and cannot be null.");
+        else
+            url_ += "SharingLevel=" + encodeURIComponent("" + sharingLevel) + "&";
+        if (sorting !== undefined && sorting !== null)
+            url_ += "Sorting=" + encodeURIComponent("" + sorting) + "&";
+        if (skipCount === null)
+            throw new Error("The parameter 'skipCount' cannot be null.");
+        else if (skipCount !== undefined)
+            url_ += "SkipCount=" + encodeURIComponent("" + skipCount) + "&";
+        if (maxResultCount === null)
+            throw new Error("The parameter 'maxResultCount' cannot be null.");
+        else if (maxResultCount !== undefined)
+            url_ += "MaxResultCount=" + encodeURIComponent("" + maxResultCount) + "&";
+        url_ = url_.replace(/[?&]$/, "");
+
+        let options_ : any = {
+            observe: "response",
+            responseType: "blob",
+            headers: new HttpHeaders({
+                "Accept": "text/plain"
+            })
+        };
+
+        return this.http.request("get", url_, options_).pipe(_observableMergeMap((response_ : any) => {
+            return this.processGetAll(response_);
+        })).pipe(_observableCatch((response_: any) => {
+            if (response_ instanceof HttpResponseBase) {
+                try {
+                    return this.processGetAll(response_ as any);
+                } catch (e) {
+                    return _observableThrow(e) as any as Observable<PagedResultDtoOfGetDashboardForViewDto>;
+                }
+            } else
+                return _observableThrow(response_) as any as Observable<PagedResultDtoOfGetDashboardForViewDto>;
+        }));
+    }
+
+    protected processGetAll(response: HttpResponseBase): Observable<PagedResultDtoOfGetDashboardForViewDto> {
+        const status = response.status;
+        const responseBlob =
+            response instanceof HttpResponse ? response.body :
+            (response as any).error instanceof Blob ? (response as any).error : undefined;
+
+        let _headers: any = {}; if (response.headers) { for (let key of response.headers.keys()) { _headers[key] = response.headers.get(key); }}
+        if (status === 200) {
+            return blobToText(responseBlob).pipe(_observableMergeMap((_responseText: string) => {
+            let result200: any = null;
+            let resultData200 = _responseText === "" ? null : JSON.parse(_responseText, this.jsonParseReviver);
+            result200 = PagedResultDtoOfGetDashboardForViewDto.fromJS(resultData200);
+            return _observableOf(result200);
+            }));
+        } else if (status !== 200 && status !== 204) {
+            return blobToText(responseBlob).pipe(_observableMergeMap((_responseText: string) => {
+            return throwException("An unexpected server error occurred.", status, _responseText, _headers);
+            }));
+        }
+        return _observableOf(null as any);
+    }
+
+    /**
+     * @param input (optional) 
+     * @return Success
+     */
+    getDashboardForView(input: number | undefined): Observable<GetDashboardForViewDto> {
+        let url_ = this.baseUrl + "/api/services/app/AppDashboard/GetDashboardForView?";
+        if (input === null)
+            throw new Error("The parameter 'input' cannot be null.");
+        else if (input !== undefined)
+            url_ += "input=" + encodeURIComponent("" + input) + "&";
+        url_ = url_.replace(/[?&]$/, "");
+
+        let options_ : any = {
+            observe: "response",
+            responseType: "blob",
+            headers: new HttpHeaders({
+                "Accept": "text/plain"
+            })
+        };
+
+        return this.http.request("get", url_, options_).pipe(_observableMergeMap((response_ : any) => {
+            return this.processGetDashboardForView(response_);
+        })).pipe(_observableCatch((response_: any) => {
+            if (response_ instanceof HttpResponseBase) {
+                try {
+                    return this.processGetDashboardForView(response_ as any);
+                } catch (e) {
+                    return _observableThrow(e) as any as Observable<GetDashboardForViewDto>;
+                }
+            } else
+                return _observableThrow(response_) as any as Observable<GetDashboardForViewDto>;
+        }));
+    }
+
+    protected processGetDashboardForView(response: HttpResponseBase): Observable<GetDashboardForViewDto> {
+        const status = response.status;
+        const responseBlob =
+            response instanceof HttpResponse ? response.body :
+            (response as any).error instanceof Blob ? (response as any).error : undefined;
+
+        let _headers: any = {}; if (response.headers) { for (let key of response.headers.keys()) { _headers[key] = response.headers.get(key); }}
+        if (status === 200) {
+            return blobToText(responseBlob).pipe(_observableMergeMap((_responseText: string) => {
+            let result200: any = null;
+            let resultData200 = _responseText === "" ? null : JSON.parse(_responseText, this.jsonParseReviver);
+            result200 = GetDashboardForViewDto.fromJS(resultData200);
+            return _observableOf(result200);
+            }));
+        } else if (status !== 200 && status !== 204) {
+            return blobToText(responseBlob).pipe(_observableMergeMap((_responseText: string) => {
+            return throwException("An unexpected server error occurred.", status, _responseText, _headers);
+            }));
+        }
+        return _observableOf(null as any);
+    }
+
+    /**
+     * @param body (optional) 
+     * @return Success
+     */
+    createOrEdit(body: CreateOrEditDashboard | undefined): Observable<boolean> {
+        let url_ = this.baseUrl + "/api/services/app/AppDashboard/CreateOrEdit";
+        url_ = url_.replace(/[?&]$/, "");
+
+        const content_ = JSON.stringify(body);
+
+        let options_ : any = {
+            body: content_,
+            observe: "response",
+            responseType: "blob",
+            headers: new HttpHeaders({
+                "Content-Type": "application/json-patch+json",
+                "Accept": "text/plain"
+            })
+        };
+
+        return this.http.request("post", url_, options_).pipe(_observableMergeMap((response_ : any) => {
+            return this.processCreateOrEdit(response_);
+        })).pipe(_observableCatch((response_: any) => {
+            if (response_ instanceof HttpResponseBase) {
+                try {
+                    return this.processCreateOrEdit(response_ as any);
+                } catch (e) {
+                    return _observableThrow(e) as any as Observable<boolean>;
+                }
+            } else
+                return _observableThrow(response_) as any as Observable<boolean>;
+        }));
+    }
+
+    protected processCreateOrEdit(response: HttpResponseBase): Observable<boolean> {
+        const status = response.status;
+        const responseBlob =
+            response instanceof HttpResponse ? response.body :
+            (response as any).error instanceof Blob ? (response as any).error : undefined;
+
+        let _headers: any = {}; if (response.headers) { for (let key of response.headers.keys()) { _headers[key] = response.headers.get(key); }}
+        if (status === 200) {
+            return blobToText(responseBlob).pipe(_observableMergeMap((_responseText: string) => {
+            let result200: any = null;
+            let resultData200 = _responseText === "" ? null : JSON.parse(_responseText, this.jsonParseReviver);
+                result200 = resultData200 !== undefined ? resultData200 : <any>null;
+    
+            return _observableOf(result200);
+            }));
+        } else if (status !== 200 && status !== 204) {
+            return blobToText(responseBlob).pipe(_observableMergeMap((_responseText: string) => {
+            return throwException("An unexpected server error occurred.", status, _responseText, _headers);
+            }));
+        }
+        return _observableOf(null as any);
+    }
+
+    /**
+     * @param title (optional) 
+     * @return Success
+     */
+    dashboardTitleUsedBefore(title: string | null | undefined): Observable<boolean> {
+        let url_ = this.baseUrl + "/api/services/app/AppDashboard/DashboardTitleUsedBefore?";
+        if (title !== undefined && title !== null)
+            url_ += "title=" + encodeURIComponent("" + title) + "&";
+        url_ = url_.replace(/[?&]$/, "");
+
+        let options_ : any = {
+            observe: "response",
+            responseType: "blob",
+            headers: new HttpHeaders({
+                "Accept": "text/plain"
+            })
+        };
+
+        return this.http.request("post", url_, options_).pipe(_observableMergeMap((response_ : any) => {
+            return this.processDashboardTitleUsedBefore(response_);
+        })).pipe(_observableCatch((response_: any) => {
+            if (response_ instanceof HttpResponseBase) {
+                try {
+                    return this.processDashboardTitleUsedBefore(response_ as any);
+                } catch (e) {
+                    return _observableThrow(e) as any as Observable<boolean>;
+                }
+            } else
+                return _observableThrow(response_) as any as Observable<boolean>;
+        }));
+    }
+
+    protected processDashboardTitleUsedBefore(response: HttpResponseBase): Observable<boolean> {
+        const status = response.status;
+        const responseBlob =
+            response instanceof HttpResponse ? response.body :
+            (response as any).error instanceof Blob ? (response as any).error : undefined;
+
+        let _headers: any = {}; if (response.headers) { for (let key of response.headers.keys()) { _headers[key] = response.headers.get(key); }}
+        if (status === 200) {
+            return blobToText(responseBlob).pipe(_observableMergeMap((_responseText: string) => {
+            let result200: any = null;
+            let resultData200 = _responseText === "" ? null : JSON.parse(_responseText, this.jsonParseReviver);
+                result200 = resultData200 !== undefined ? resultData200 : <any>null;
+    
+            return _observableOf(result200);
+            }));
+        } else if (status !== 200 && status !== 204) {
+            return blobToText(responseBlob).pipe(_observableMergeMap((_responseText: string) => {
+            return throwException("An unexpected server error occurred.", status, _responseText, _headers);
+            }));
+        }
+        return _observableOf(null as any);
+    }
+
+    /**
+     * @param dashboard (optional) 
+     * @return Success
+     */
+    updateViewDate(dashboard: number | undefined): Observable<void> {
+        let url_ = this.baseUrl + "/api/services/app/AppDashboard/UpdateViewDate?";
+        if (dashboard === null)
+            throw new Error("The parameter 'dashboard' cannot be null.");
+        else if (dashboard !== undefined)
+            url_ += "dashboard=" + encodeURIComponent("" + dashboard) + "&";
+        url_ = url_.replace(/[?&]$/, "");
+
+        let options_ : any = {
+            observe: "response",
+            responseType: "blob",
+            headers: new HttpHeaders({
+            })
+        };
+
+        return this.http.request("put", url_, options_).pipe(_observableMergeMap((response_ : any) => {
+            return this.processUpdateViewDate(response_);
+        })).pipe(_observableCatch((response_: any) => {
+            if (response_ instanceof HttpResponseBase) {
+                try {
+                    return this.processUpdateViewDate(response_ as any);
+                } catch (e) {
+                    return _observableThrow(e) as any as Observable<void>;
+                }
+            } else
+                return _observableThrow(response_) as any as Observable<void>;
+        }));
+    }
+
+    protected processUpdateViewDate(response: HttpResponseBase): Observable<void> {
+        const status = response.status;
+        const responseBlob =
+            response instanceof HttpResponse ? response.body :
+            (response as any).error instanceof Blob ? (response as any).error : undefined;
+
+        let _headers: any = {}; if (response.headers) { for (let key of response.headers.keys()) { _headers[key] = response.headers.get(key); }}
+        if (status === 200) {
+            return blobToText(responseBlob).pipe(_observableMergeMap((_responseText: string) => {
+            return _observableOf(null as any);
+            }));
+        } else if (status !== 200 && status !== 204) {
+            return blobToText(responseBlob).pipe(_observableMergeMap((_responseText: string) => {
+            return throwException("An unexpected server error occurred.", status, _responseText, _headers);
+            }));
+        }
+        return _observableOf(null as any);
+    }
+
+    /**
+     * @param dashboard (optional) 
+     * @return Success
+     */
+    deleteDashboard(dashboard: number | undefined): Observable<boolean> {
+        let url_ = this.baseUrl + "/api/services/app/AppDashboard/DeleteDashboard?";
+        if (dashboard === null)
+            throw new Error("The parameter 'dashboard' cannot be null.");
+        else if (dashboard !== undefined)
+            url_ += "dashboard=" + encodeURIComponent("" + dashboard) + "&";
+        url_ = url_.replace(/[?&]$/, "");
+
+        let options_ : any = {
+            observe: "response",
+            responseType: "blob",
+            headers: new HttpHeaders({
+                "Accept": "text/plain"
+            })
+        };
+
+        return this.http.request("delete", url_, options_).pipe(_observableMergeMap((response_ : any) => {
+            return this.processDeleteDashboard(response_);
+        })).pipe(_observableCatch((response_: any) => {
+            if (response_ instanceof HttpResponseBase) {
+                try {
+                    return this.processDeleteDashboard(response_ as any);
+                } catch (e) {
+                    return _observableThrow(e) as any as Observable<boolean>;
+                }
+            } else
+                return _observableThrow(response_) as any as Observable<boolean>;
+        }));
+    }
+
+    protected processDeleteDashboard(response: HttpResponseBase): Observable<boolean> {
+        const status = response.status;
+        const responseBlob =
+            response instanceof HttpResponse ? response.body :
+            (response as any).error instanceof Blob ? (response as any).error : undefined;
+
+        let _headers: any = {}; if (response.headers) { for (let key of response.headers.keys()) { _headers[key] = response.headers.get(key); }}
+        if (status === 200) {
+            return blobToText(responseBlob).pipe(_observableMergeMap((_responseText: string) => {
+            let result200: any = null;
+            let resultData200 = _responseText === "" ? null : JSON.parse(_responseText, this.jsonParseReviver);
+                result200 = resultData200 !== undefined ? resultData200 : <any>null;
+    
+            return _observableOf(result200);
+            }));
+        } else if (status !== 200 && status !== 204) {
+            return blobToText(responseBlob).pipe(_observableMergeMap((_responseText: string) => {
+            return throwException("An unexpected server error occurred.", status, _responseText, _headers);
+            }));
+        }
+        return _observableOf(null as any);
+    }
+
+    /**
+     * @param dashboardId (optional) 
+     * @return Success
+     */
+    getTenantAllUser(dashboardId: number | undefined): Observable<SharingUserInfo[]> {
+        let url_ = this.baseUrl + "/api/services/app/AppDashboard/GetTenantAllUser?";
+        if (dashboardId === null)
+            throw new Error("The parameter 'dashboardId' cannot be null.");
+        else if (dashboardId !== undefined)
+            url_ += "dashboardId=" + encodeURIComponent("" + dashboardId) + "&";
+        url_ = url_.replace(/[?&]$/, "");
+
+        let options_ : any = {
+            observe: "response",
+            responseType: "blob",
+            headers: new HttpHeaders({
+                "Accept": "text/plain"
+            })
+        };
+
+        return this.http.request("get", url_, options_).pipe(_observableMergeMap((response_ : any) => {
+            return this.processGetTenantAllUser(response_);
+        })).pipe(_observableCatch((response_: any) => {
+            if (response_ instanceof HttpResponseBase) {
+                try {
+                    return this.processGetTenantAllUser(response_ as any);
+                } catch (e) {
+                    return _observableThrow(e) as any as Observable<SharingUserInfo[]>;
+                }
+            } else
+                return _observableThrow(response_) as any as Observable<SharingUserInfo[]>;
+        }));
+    }
+
+    protected processGetTenantAllUser(response: HttpResponseBase): Observable<SharingUserInfo[]> {
+        const status = response.status;
+        const responseBlob =
+            response instanceof HttpResponse ? response.body :
+            (response as any).error instanceof Blob ? (response as any).error : undefined;
+
+        let _headers: any = {}; if (response.headers) { for (let key of response.headers.keys()) { _headers[key] = response.headers.get(key); }}
+        if (status === 200) {
+            return blobToText(responseBlob).pipe(_observableMergeMap((_responseText: string) => {
+            let result200: any = null;
+            let resultData200 = _responseText === "" ? null : JSON.parse(_responseText, this.jsonParseReviver);
+            if (Array.isArray(resultData200)) {
+                result200 = [] as any;
+                for (let item of resultData200)
+                    result200!.push(SharingUserInfo.fromJS(item));
+            }
+            else {
+                result200 = <any>null;
+            }
+            return _observableOf(result200);
+            }));
+        } else if (status !== 200 && status !== 204) {
+            return blobToText(responseBlob).pipe(_observableMergeMap((_responseText: string) => {
+            return throwException("An unexpected server error occurred.", status, _responseText, _headers);
+            }));
+        }
+        return _observableOf(null as any);
+    }
+
+    /**
+     * @param dashboardId (optional) 
+     * @return Success
+     */
+    makeDashboardPrivate(dashboardId: number | undefined): Observable<void> {
+        let url_ = this.baseUrl + "/api/services/app/AppDashboard/MakeDashboardPrivate?";
+        if (dashboardId === null)
+            throw new Error("The parameter 'dashboardId' cannot be null.");
+        else if (dashboardId !== undefined)
+            url_ += "dashboardId=" + encodeURIComponent("" + dashboardId) + "&";
+        url_ = url_.replace(/[?&]$/, "");
+
+        let options_ : any = {
+            observe: "response",
+            responseType: "blob",
+            headers: new HttpHeaders({
+            })
+        };
+
+        return this.http.request("post", url_, options_).pipe(_observableMergeMap((response_ : any) => {
+            return this.processMakeDashboardPrivate(response_);
+        })).pipe(_observableCatch((response_: any) => {
+            if (response_ instanceof HttpResponseBase) {
+                try {
+                    return this.processMakeDashboardPrivate(response_ as any);
+                } catch (e) {
+                    return _observableThrow(e) as any as Observable<void>;
+                }
+            } else
+                return _observableThrow(response_) as any as Observable<void>;
+        }));
+    }
+
+    protected processMakeDashboardPrivate(response: HttpResponseBase): Observable<void> {
+        const status = response.status;
+        const responseBlob =
+            response instanceof HttpResponse ? response.body :
+            (response as any).error instanceof Blob ? (response as any).error : undefined;
+
+        let _headers: any = {}; if (response.headers) { for (let key of response.headers.keys()) { _headers[key] = response.headers.get(key); }}
+        if (status === 200) {
+            return blobToText(responseBlob).pipe(_observableMergeMap((_responseText: string) => {
+            return _observableOf(null as any);
+            }));
+        } else if (status !== 200 && status !== 204) {
+            return blobToText(responseBlob).pipe(_observableMergeMap((_responseText: string) => {
+            return throwException("An unexpected server error occurred.", status, _responseText, _headers);
+            }));
+        }
+        return _observableOf(null as any);
+    }
+
+    /**
+     * @param body (optional) 
+     * @return Success
+     */
+    shareDashboard(body: ShareDashboardInfo | undefined): Observable<void> {
+        let url_ = this.baseUrl + "/api/services/app/AppDashboard/ShareDashboard";
+        url_ = url_.replace(/[?&]$/, "");
+
+        const content_ = JSON.stringify(body);
+
+        let options_ : any = {
+            body: content_,
+            observe: "response",
+            responseType: "blob",
+            headers: new HttpHeaders({
+                "Content-Type": "application/json-patch+json",
+            })
+        };
+
+        return this.http.request("post", url_, options_).pipe(_observableMergeMap((response_ : any) => {
+            return this.processShareDashboard(response_);
+        })).pipe(_observableCatch((response_: any) => {
+            if (response_ instanceof HttpResponseBase) {
+                try {
+                    return this.processShareDashboard(response_ as any);
+                } catch (e) {
+                    return _observableThrow(e) as any as Observable<void>;
+                }
+            } else
+                return _observableThrow(response_) as any as Observable<void>;
+        }));
+    }
+
+    protected processShareDashboard(response: HttpResponseBase): Observable<void> {
+        const status = response.status;
+        const responseBlob =
+            response instanceof HttpResponse ? response.body :
+            (response as any).error instanceof Blob ? (response as any).error : undefined;
+
+        let _headers: any = {}; if (response.headers) { for (let key of response.headers.keys()) { _headers[key] = response.headers.get(key); }}
+        if (status === 200) {
+            return blobToText(responseBlob).pipe(_observableMergeMap((_responseText: string) => {
+            return _observableOf(null as any);
+            }));
+        } else if (status !== 200 && status !== 204) {
+            return blobToText(responseBlob).pipe(_observableMergeMap((_responseText: string) => {
+            return throwException("An unexpected server error occurred.", status, _responseText, _headers);
+            }));
+        }
+        return _observableOf(null as any);
+    }
+
+    /**
+     * @param dashboardId (optional) 
+     * @param body (optional) 
+     * @return Success
+     */
+    saveSpreadSheetJson(dashboardId: number | undefined, body: any | null | undefined): Observable<void> {
+        let url_ = this.baseUrl + "/api/services/app/AppDashboard/SaveSpreadSheetJson?";
+        if (dashboardId === null)
+            throw new Error("The parameter 'dashboardId' cannot be null.");
+        else if (dashboardId !== undefined)
+            url_ += "dashboardId=" + encodeURIComponent("" + dashboardId) + "&";
+        url_ = url_.replace(/[?&]$/, "");
+
+        const content_ = JSON.stringify(body);
+
+        let options_ : any = {
+            body: content_,
+            observe: "response",
+            responseType: "blob",
+            headers: new HttpHeaders({
+                "Content-Type": "application/json-patch+json",
+            })
+        };
+
+        return this.http.request("post", url_, options_).pipe(_observableMergeMap((response_ : any) => {
+            return this.processSaveSpreadSheetJson(response_);
+        })).pipe(_observableCatch((response_: any) => {
+            if (response_ instanceof HttpResponseBase) {
+                try {
+                    return this.processSaveSpreadSheetJson(response_ as any);
+                } catch (e) {
+                    return _observableThrow(e) as any as Observable<void>;
+                }
+            } else
+                return _observableThrow(response_) as any as Observable<void>;
+        }));
+    }
+
+    protected processSaveSpreadSheetJson(response: HttpResponseBase): Observable<void> {
+        const status = response.status;
+        const responseBlob =
+            response instanceof HttpResponse ? response.body :
+            (response as any).error instanceof Blob ? (response as any).error : undefined;
+
+        let _headers: any = {}; if (response.headers) { for (let key of response.headers.keys()) { _headers[key] = response.headers.get(key); }}
+        if (status === 200) {
+            return blobToText(responseBlob).pipe(_observableMergeMap((_responseText: string) => {
+            return _observableOf(null as any);
+            }));
+        } else if (status !== 200 && status !== 204) {
+            return blobToText(responseBlob).pipe(_observableMergeMap((_responseText: string) => {
+            return throwException("An unexpected server error occurred.", status, _responseText, _headers);
+            }));
+        }
+        return _observableOf(null as any);
+    }
+
+    /**
+     * @param tableName (optional) 
+     * @return Success
+     */
+    getTableFieldsList(tableName: string | null | undefined): Observable<ExtraAttribute[]> {
+        let url_ = this.baseUrl + "/api/services/app/AppDashboard/GetTableFieldsList?";
+        if (tableName !== undefined && tableName !== null)
+            url_ += "tableName=" + encodeURIComponent("" + tableName) + "&";
+        url_ = url_.replace(/[?&]$/, "");
+
+        let options_ : any = {
+            observe: "response",
+            responseType: "blob",
+            headers: new HttpHeaders({
+                "Accept": "text/plain"
+            })
+        };
+
+        return this.http.request("get", url_, options_).pipe(_observableMergeMap((response_ : any) => {
+            return this.processGetTableFieldsList(response_);
+        })).pipe(_observableCatch((response_: any) => {
+            if (response_ instanceof HttpResponseBase) {
+                try {
+                    return this.processGetTableFieldsList(response_ as any);
+                } catch (e) {
+                    return _observableThrow(e) as any as Observable<ExtraAttribute[]>;
+                }
+            } else
+                return _observableThrow(response_) as any as Observable<ExtraAttribute[]>;
+        }));
+    }
+
+    protected processGetTableFieldsList(response: HttpResponseBase): Observable<ExtraAttribute[]> {
+        const status = response.status;
+        const responseBlob =
+            response instanceof HttpResponse ? response.body :
+            (response as any).error instanceof Blob ? (response as any).error : undefined;
+
+        let _headers: any = {}; if (response.headers) { for (let key of response.headers.keys()) { _headers[key] = response.headers.get(key); }}
+        if (status === 200) {
+            return blobToText(responseBlob).pipe(_observableMergeMap((_responseText: string) => {
+            let result200: any = null;
+            let resultData200 = _responseText === "" ? null : JSON.parse(_responseText, this.jsonParseReviver);
+            if (Array.isArray(resultData200)) {
+                result200 = [] as any;
+                for (let item of resultData200)
+                    result200!.push(ExtraAttribute.fromJS(item));
+            }
+            else {
+                result200 = <any>null;
+            }
+            return _observableOf(result200);
+            }));
+        } else if (status !== 200 && status !== 204) {
+            return blobToText(responseBlob).pipe(_observableMergeMap((_responseText: string) => {
+            return throwException("An unexpected server error occurred.", status, _responseText, _headers);
+            }));
+        }
+        return _observableOf(null as any);
+    }
+
+    /**
+     * @param tenantId (optional) 
+     * @param tableName (optional) 
+     * @param fields (optional) 
+     * @param conditions (optional) 
+     * @param lastUpdateDate (optional) 
+     * @param applyAnyOfConditions (optional) 
+     * @param sorting (optional) 
+     * @param skipCount (optional) 
+     * @param maxResultCount (optional) 
+     * @return Success
+     */
+    getAllTableData(tenantId: number | undefined, tableName: string | null | undefined, fields: string[] | null | undefined, conditions: DynamicCondition[] | null | undefined, lastUpdateDate: moment.Moment | null | undefined, applyAnyOfConditions: boolean | undefined, sorting: string | null | undefined, skipCount: number | undefined, maxResultCount: number | undefined): Observable<DynamicQueryResult> {
+        let url_ = this.baseUrl + "/api/services/app/AppDashboard/GetAllTableData?";
+        if (tenantId === null)
+            throw new Error("The parameter 'tenantId' cannot be null.");
+        else if (tenantId !== undefined)
+            url_ += "TenantId=" + encodeURIComponent("" + tenantId) + "&";
+        if (tableName !== undefined && tableName !== null)
+            url_ += "TableName=" + encodeURIComponent("" + tableName) + "&";
+        if (fields !== undefined && fields !== null)
+            fields && fields.forEach(item => { url_ += "Fields=" + encodeURIComponent("" + item) + "&"; });
+        if (conditions !== undefined && conditions !== null)
+            conditions && conditions.forEach((item, index) => {
+                for (let attr in item)
+        			if (item.hasOwnProperty(attr)) {
+        				url_ += "Conditions[" + index + "]." + attr + "=" + encodeURIComponent("" + (item as any)[attr]) + "&";
+        			}
+            });
+        if (lastUpdateDate !== undefined && lastUpdateDate !== null)
+            url_ += "LastUpdateDate=" + encodeURIComponent(lastUpdateDate ? "" + lastUpdateDate.toISOString() : "") + "&";
+        if (applyAnyOfConditions === null)
+            throw new Error("The parameter 'applyAnyOfConditions' cannot be null.");
+        else if (applyAnyOfConditions !== undefined)
+            url_ += "ApplyAnyOfConditions=" + encodeURIComponent("" + applyAnyOfConditions) + "&";
+        if (sorting !== undefined && sorting !== null)
+            url_ += "Sorting=" + encodeURIComponent("" + sorting) + "&";
+        if (skipCount === null)
+            throw new Error("The parameter 'skipCount' cannot be null.");
+        else if (skipCount !== undefined)
+            url_ += "SkipCount=" + encodeURIComponent("" + skipCount) + "&";
+        if (maxResultCount === null)
+            throw new Error("The parameter 'maxResultCount' cannot be null.");
+        else if (maxResultCount !== undefined)
+            url_ += "MaxResultCount=" + encodeURIComponent("" + maxResultCount) + "&";
+        url_ = url_.replace(/[?&]$/, "");
+
+        let options_ : any = {
+            observe: "response",
+            responseType: "blob",
+            headers: new HttpHeaders({
+                "Accept": "text/plain"
+            })
+        };
+
+        return this.http.request("get", url_, options_).pipe(_observableMergeMap((response_ : any) => {
+            return this.processGetAllTableData(response_);
+        })).pipe(_observableCatch((response_: any) => {
+            if (response_ instanceof HttpResponseBase) {
+                try {
+                    return this.processGetAllTableData(response_ as any);
+                } catch (e) {
+                    return _observableThrow(e) as any as Observable<DynamicQueryResult>;
+                }
+            } else
+                return _observableThrow(response_) as any as Observable<DynamicQueryResult>;
+        }));
+    }
+
+    protected processGetAllTableData(response: HttpResponseBase): Observable<DynamicQueryResult> {
+        const status = response.status;
+        const responseBlob =
+            response instanceof HttpResponse ? response.body :
+            (response as any).error instanceof Blob ? (response as any).error : undefined;
+
+        let _headers: any = {}; if (response.headers) { for (let key of response.headers.keys()) { _headers[key] = response.headers.get(key); }}
+        if (status === 200) {
+            return blobToText(responseBlob).pipe(_observableMergeMap((_responseText: string) => {
+            let result200: any = null;
+            let resultData200 = _responseText === "" ? null : JSON.parse(_responseText, this.jsonParseReviver);
+            result200 = DynamicQueryResult.fromJS(resultData200);
+            return _observableOf(result200);
+            }));
+        } else if (status !== 200 && status !== 204) {
+            return blobToText(responseBlob).pipe(_observableMergeMap((_responseText: string) => {
+            return throwException("An unexpected server error occurred.", status, _responseText, _headers);
+            }));
+        }
+        return _observableOf(null as any);
+    }
+
+    /**
+     * @return Success
+     */
+    getTablesList(): Observable<string[]> {
+        let url_ = this.baseUrl + "/api/services/app/AppDashboard/GetTablesList";
+        url_ = url_.replace(/[?&]$/, "");
+
+        let options_ : any = {
+            observe: "response",
+            responseType: "blob",
+            headers: new HttpHeaders({
+                "Accept": "text/plain"
+            })
+        };
+
+        return this.http.request("get", url_, options_).pipe(_observableMergeMap((response_ : any) => {
+            return this.processGetTablesList(response_);
+        })).pipe(_observableCatch((response_: any) => {
+            if (response_ instanceof HttpResponseBase) {
+                try {
+                    return this.processGetTablesList(response_ as any);
+                } catch (e) {
+                    return _observableThrow(e) as any as Observable<string[]>;
+                }
+            } else
+                return _observableThrow(response_) as any as Observable<string[]>;
+        }));
+    }
+
+    protected processGetTablesList(response: HttpResponseBase): Observable<string[]> {
+        const status = response.status;
+        const responseBlob =
+            response instanceof HttpResponse ? response.body :
+            (response as any).error instanceof Blob ? (response as any).error : undefined;
+
+        let _headers: any = {}; if (response.headers) { for (let key of response.headers.keys()) { _headers[key] = response.headers.get(key); }}
+        if (status === 200) {
+            return blobToText(responseBlob).pipe(_observableMergeMap((_responseText: string) => {
+            let result200: any = null;
+            let resultData200 = _responseText === "" ? null : JSON.parse(_responseText, this.jsonParseReviver);
+            if (Array.isArray(resultData200)) {
+                result200 = [] as any;
+                for (let item of resultData200)
+                    result200!.push(item);
+            }
+            else {
+                result200 = <any>null;
+            }
+            return _observableOf(result200);
+            }));
+        } else if (status !== 200 && status !== 204) {
+            return blobToText(responseBlob).pipe(_observableMergeMap((_responseText: string) => {
+            return throwException("An unexpected server error occurred.", status, _responseText, _headers);
+            }));
+        }
+        return _observableOf(null as any);
+    }
+}
+
+@Injectable()
 export class AppEntitiesServiceProxy {
     private http: HttpClient;
     private baseUrl: string;
@@ -10851,6 +11645,62 @@ export class AppEntitiesServiceProxy {
     }
 
     /**
+     * @param userId (optional) 
+     * @return Success
+     */
+    getUserInformation(userId: number | undefined): Observable<UserInformationDto> {
+        let url_ = this.baseUrl + "/api/services/app/AppEntities/GetUserInformation?";
+        if (userId === null)
+            throw new Error("The parameter 'userId' cannot be null.");
+        else if (userId !== undefined)
+            url_ += "userId=" + encodeURIComponent("" + userId) + "&";
+        url_ = url_.replace(/[?&]$/, "");
+
+        let options_ : any = {
+            observe: "response",
+            responseType: "blob",
+            headers: new HttpHeaders({
+                "Accept": "text/plain"
+            })
+        };
+
+        return this.http.request("get", url_, options_).pipe(_observableMergeMap((response_ : any) => {
+            return this.processGetUserInformation(response_);
+        })).pipe(_observableCatch((response_: any) => {
+            if (response_ instanceof HttpResponseBase) {
+                try {
+                    return this.processGetUserInformation(response_ as any);
+                } catch (e) {
+                    return _observableThrow(e) as any as Observable<UserInformationDto>;
+                }
+            } else
+                return _observableThrow(response_) as any as Observable<UserInformationDto>;
+        }));
+    }
+
+    protected processGetUserInformation(response: HttpResponseBase): Observable<UserInformationDto> {
+        const status = response.status;
+        const responseBlob =
+            response instanceof HttpResponse ? response.body :
+            (response as any).error instanceof Blob ? (response as any).error : undefined;
+
+        let _headers: any = {}; if (response.headers) { for (let key of response.headers.keys()) { _headers[key] = response.headers.get(key); }}
+        if (status === 200) {
+            return blobToText(responseBlob).pipe(_observableMergeMap((_responseText: string) => {
+            let result200: any = null;
+            let resultData200 = _responseText === "" ? null : JSON.parse(_responseText, this.jsonParseReviver);
+            result200 = UserInformationDto.fromJS(resultData200);
+            return _observableOf(result200);
+            }));
+        } else if (status !== 200 && status !== 204) {
+            return blobToText(responseBlob).pipe(_observableMergeMap((_responseText: string) => {
+            return throwException("An unexpected server error occurred.", status, _responseText, _headers);
+            }));
+        }
+        return _observableOf(null as any);
+    }
+
+    /**
      * @param numberOfPosts (optional) 
      * @param numberOfDays (optional) 
      * @return Success
@@ -12725,6 +13575,1167 @@ export class AppFeaturesServiceProxy {
             else {
                 result200 = <any>null;
             }
+            return _observableOf(result200);
+            }));
+        } else if (status !== 200 && status !== 204) {
+            return blobToText(responseBlob).pipe(_observableMergeMap((_responseText: string) => {
+            return throwException("An unexpected server error occurred.", status, _responseText, _headers);
+            }));
+        }
+        return _observableOf(null as any);
+    }
+}
+
+@Injectable()
+export class AppFieldManagerServiceProxy {
+    private http: HttpClient;
+    private baseUrl: string;
+    protected jsonParseReviver: ((key: string, value: any) => any) | undefined = undefined;
+
+    constructor(@Inject(HttpClient) http: HttpClient, @Optional() @Inject(API_BASE_URL) baseUrl?: string) {
+        this.http = http;
+        this.baseUrl = baseUrl !== undefined && baseUrl !== null ? baseUrl : "";
+    }
+
+    /**
+     * @return Success
+     */
+    getPagePermissions(): Observable<FieldManagerPermissionDto> {
+        let url_ = this.baseUrl + "/api/services/app/AppFieldManager/GetPagePermissions";
+        url_ = url_.replace(/[?&]$/, "");
+
+        let options_ : any = {
+            observe: "response",
+            responseType: "blob",
+            headers: new HttpHeaders({
+                "Accept": "text/plain"
+            })
+        };
+
+        return this.http.request("get", url_, options_).pipe(_observableMergeMap((response_ : any) => {
+            return this.processGetPagePermissions(response_);
+        })).pipe(_observableCatch((response_: any) => {
+            if (response_ instanceof HttpResponseBase) {
+                try {
+                    return this.processGetPagePermissions(response_ as any);
+                } catch (e) {
+                    return _observableThrow(e) as any as Observable<FieldManagerPermissionDto>;
+                }
+            } else
+                return _observableThrow(response_) as any as Observable<FieldManagerPermissionDto>;
+        }));
+    }
+
+    protected processGetPagePermissions(response: HttpResponseBase): Observable<FieldManagerPermissionDto> {
+        const status = response.status;
+        const responseBlob =
+            response instanceof HttpResponse ? response.body :
+            (response as any).error instanceof Blob ? (response as any).error : undefined;
+
+        let _headers: any = {}; if (response.headers) { for (let key of response.headers.keys()) { _headers[key] = response.headers.get(key); }}
+        if (status === 200) {
+            return blobToText(responseBlob).pipe(_observableMergeMap((_responseText: string) => {
+            let result200: any = null;
+            let resultData200 = _responseText === "" ? null : JSON.parse(_responseText, this.jsonParseReviver);
+            result200 = FieldManagerPermissionDto.fromJS(resultData200);
+            return _observableOf(result200);
+            }));
+        } else if (status !== 200 && status !== 204) {
+            return blobToText(responseBlob).pipe(_observableMergeMap((_responseText: string) => {
+            return throwException("An unexpected server error occurred.", status, _responseText, _headers);
+            }));
+        }
+        return _observableOf(null as any);
+    }
+
+    /**
+     * @return Success
+     */
+    getObjectTypeTree(): Observable<ObjectTypeTreeNodeDto[]> {
+        let url_ = this.baseUrl + "/api/services/app/AppFieldManager/GetObjectTypeTree";
+        url_ = url_.replace(/[?&]$/, "");
+
+        let options_ : any = {
+            observe: "response",
+            responseType: "blob",
+            headers: new HttpHeaders({
+                "Accept": "text/plain"
+            })
+        };
+
+        return this.http.request("get", url_, options_).pipe(_observableMergeMap((response_ : any) => {
+            return this.processGetObjectTypeTree(response_);
+        })).pipe(_observableCatch((response_: any) => {
+            if (response_ instanceof HttpResponseBase) {
+                try {
+                    return this.processGetObjectTypeTree(response_ as any);
+                } catch (e) {
+                    return _observableThrow(e) as any as Observable<ObjectTypeTreeNodeDto[]>;
+                }
+            } else
+                return _observableThrow(response_) as any as Observable<ObjectTypeTreeNodeDto[]>;
+        }));
+    }
+
+    protected processGetObjectTypeTree(response: HttpResponseBase): Observable<ObjectTypeTreeNodeDto[]> {
+        const status = response.status;
+        const responseBlob =
+            response instanceof HttpResponse ? response.body :
+            (response as any).error instanceof Blob ? (response as any).error : undefined;
+
+        let _headers: any = {}; if (response.headers) { for (let key of response.headers.keys()) { _headers[key] = response.headers.get(key); }}
+        if (status === 200) {
+            return blobToText(responseBlob).pipe(_observableMergeMap((_responseText: string) => {
+            let result200: any = null;
+            let resultData200 = _responseText === "" ? null : JSON.parse(_responseText, this.jsonParseReviver);
+            if (Array.isArray(resultData200)) {
+                result200 = [] as any;
+                for (let item of resultData200)
+                    result200!.push(ObjectTypeTreeNodeDto.fromJS(item));
+            }
+            else {
+                result200 = <any>null;
+            }
+            return _observableOf(result200);
+            }));
+        } else if (status !== 200 && status !== 204) {
+            return blobToText(responseBlob).pipe(_observableMergeMap((_responseText: string) => {
+            return throwException("An unexpected server error occurred.", status, _responseText, _headers);
+            }));
+        }
+        return _observableOf(null as any);
+    }
+
+    /**
+     * @return Success
+     */
+    getFieldCreateOrEditMetadata(): Observable<FieldCreateOrEditMetadataDto> {
+        let url_ = this.baseUrl + "/api/services/app/AppFieldManager/GetFieldCreateOrEditMetadata";
+        url_ = url_.replace(/[?&]$/, "");
+
+        let options_ : any = {
+            observe: "response",
+            responseType: "blob",
+            headers: new HttpHeaders({
+                "Accept": "text/plain"
+            })
+        };
+
+        return this.http.request("get", url_, options_).pipe(_observableMergeMap((response_ : any) => {
+            return this.processGetFieldCreateOrEditMetadata(response_);
+        })).pipe(_observableCatch((response_: any) => {
+            if (response_ instanceof HttpResponseBase) {
+                try {
+                    return this.processGetFieldCreateOrEditMetadata(response_ as any);
+                } catch (e) {
+                    return _observableThrow(e) as any as Observable<FieldCreateOrEditMetadataDto>;
+                }
+            } else
+                return _observableThrow(response_) as any as Observable<FieldCreateOrEditMetadataDto>;
+        }));
+    }
+
+    protected processGetFieldCreateOrEditMetadata(response: HttpResponseBase): Observable<FieldCreateOrEditMetadataDto> {
+        const status = response.status;
+        const responseBlob =
+            response instanceof HttpResponse ? response.body :
+            (response as any).error instanceof Blob ? (response as any).error : undefined;
+
+        let _headers: any = {}; if (response.headers) { for (let key of response.headers.keys()) { _headers[key] = response.headers.get(key); }}
+        if (status === 200) {
+            return blobToText(responseBlob).pipe(_observableMergeMap((_responseText: string) => {
+            let result200: any = null;
+            let resultData200 = _responseText === "" ? null : JSON.parse(_responseText, this.jsonParseReviver);
+            result200 = FieldCreateOrEditMetadataDto.fromJS(resultData200);
+            return _observableOf(result200);
+            }));
+        } else if (status !== 200 && status !== 204) {
+            return blobToText(responseBlob).pipe(_observableMergeMap((_responseText: string) => {
+            return throwException("An unexpected server error occurred.", status, _responseText, _headers);
+            }));
+        }
+        return _observableOf(null as any);
+    }
+
+    /**
+     * @param body (optional) 
+     * @return Success
+     */
+    previewFieldCode(body: PreviewFieldCodeInput | undefined): Observable<FieldCodePreviewDto> {
+        let url_ = this.baseUrl + "/api/services/app/AppFieldManager/PreviewFieldCode";
+        url_ = url_.replace(/[?&]$/, "");
+
+        const content_ = JSON.stringify(body);
+
+        let options_ : any = {
+            body: content_,
+            observe: "response",
+            responseType: "blob",
+            headers: new HttpHeaders({
+                "Content-Type": "application/json-patch+json",
+                "Accept": "text/plain"
+            })
+        };
+
+        return this.http.request("post", url_, options_).pipe(_observableMergeMap((response_ : any) => {
+            return this.processPreviewFieldCode(response_);
+        })).pipe(_observableCatch((response_: any) => {
+            if (response_ instanceof HttpResponseBase) {
+                try {
+                    return this.processPreviewFieldCode(response_ as any);
+                } catch (e) {
+                    return _observableThrow(e) as any as Observable<FieldCodePreviewDto>;
+                }
+            } else
+                return _observableThrow(response_) as any as Observable<FieldCodePreviewDto>;
+        }));
+    }
+
+    protected processPreviewFieldCode(response: HttpResponseBase): Observable<FieldCodePreviewDto> {
+        const status = response.status;
+        const responseBlob =
+            response instanceof HttpResponse ? response.body :
+            (response as any).error instanceof Blob ? (response as any).error : undefined;
+
+        let _headers: any = {}; if (response.headers) { for (let key of response.headers.keys()) { _headers[key] = response.headers.get(key); }}
+        if (status === 200) {
+            return blobToText(responseBlob).pipe(_observableMergeMap((_responseText: string) => {
+            let result200: any = null;
+            let resultData200 = _responseText === "" ? null : JSON.parse(_responseText, this.jsonParseReviver);
+            result200 = FieldCodePreviewDto.fromJS(resultData200);
+            return _observableOf(result200);
+            }));
+        } else if (status !== 200 && status !== 204) {
+            return blobToText(responseBlob).pipe(_observableMergeMap((_responseText: string) => {
+            return throwException("An unexpected server error occurred.", status, _responseText, _headers);
+            }));
+        }
+        return _observableOf(null as any);
+    }
+
+    /**
+     * @param selectedObjectId (optional) 
+     * @param selectedObjectTypeId (optional) 
+     * @param allFields (optional) 
+     * @param searchText (optional) 
+     * @param fieldTypeId (optional) 
+     * @param fieldStatusId (optional) 
+     * @param fieldLevelId (optional) 
+     * @param fieldStatusCode (optional) 
+     * @param fieldLevelCode (optional) 
+     * @param trackingNo (optional) 
+     * @param isStandard (optional) 
+     * @param createdByUserId (optional) 
+     * @param createdFrom (optional) 
+     * @param createdTo (optional) 
+     * @param groupBy (optional) 
+     * @param sorting (optional) 
+     * @param skipCount (optional) 
+     * @param maxResultCount (optional) 
+     * @return Success
+     */
+    getFields(selectedObjectId: number | null | undefined, selectedObjectTypeId: number | null | undefined, allFields: boolean | undefined, searchText: string | null | undefined, fieldTypeId: number | null | undefined, fieldStatusId: number | null | undefined, fieldLevelId: number | null | undefined, fieldStatusCode: string | null | undefined, fieldLevelCode: string | null | undefined, trackingNo: string | null | undefined, isStandard: boolean | null | undefined, createdByUserId: number | null | undefined, createdFrom: moment.Moment | null | undefined, createdTo: moment.Moment | null | undefined, groupBy: string | null | undefined, sorting: string | null | undefined, skipCount: number | undefined, maxResultCount: number | undefined): Observable<PagedResultDtoOfAppFieldListDto> {
+        let url_ = this.baseUrl + "/api/services/app/AppFieldManager/GetFields?";
+        if (selectedObjectId !== undefined && selectedObjectId !== null)
+            url_ += "SelectedObjectId=" + encodeURIComponent("" + selectedObjectId) + "&";
+        if (selectedObjectTypeId !== undefined && selectedObjectTypeId !== null)
+            url_ += "SelectedObjectTypeId=" + encodeURIComponent("" + selectedObjectTypeId) + "&";
+        if (allFields === null)
+            throw new Error("The parameter 'allFields' cannot be null.");
+        else if (allFields !== undefined)
+            url_ += "AllFields=" + encodeURIComponent("" + allFields) + "&";
+        if (searchText !== undefined && searchText !== null)
+            url_ += "SearchText=" + encodeURIComponent("" + searchText) + "&";
+        if (fieldTypeId !== undefined && fieldTypeId !== null)
+            url_ += "FieldTypeId=" + encodeURIComponent("" + fieldTypeId) + "&";
+        if (fieldStatusId !== undefined && fieldStatusId !== null)
+            url_ += "FieldStatusId=" + encodeURIComponent("" + fieldStatusId) + "&";
+        if (fieldLevelId !== undefined && fieldLevelId !== null)
+            url_ += "FieldLevelId=" + encodeURIComponent("" + fieldLevelId) + "&";
+        if (fieldStatusCode !== undefined && fieldStatusCode !== null)
+            url_ += "FieldStatusCode=" + encodeURIComponent("" + fieldStatusCode) + "&";
+        if (fieldLevelCode !== undefined && fieldLevelCode !== null)
+            url_ += "FieldLevelCode=" + encodeURIComponent("" + fieldLevelCode) + "&";
+        if (trackingNo !== undefined && trackingNo !== null)
+            url_ += "TrackingNo=" + encodeURIComponent("" + trackingNo) + "&";
+        if (isStandard !== undefined && isStandard !== null)
+            url_ += "IsStandard=" + encodeURIComponent("" + isStandard) + "&";
+        if (createdByUserId !== undefined && createdByUserId !== null)
+            url_ += "CreatedByUserId=" + encodeURIComponent("" + createdByUserId) + "&";
+        if (createdFrom !== undefined && createdFrom !== null)
+            url_ += "CreatedFrom=" + encodeURIComponent(createdFrom ? "" + createdFrom.toISOString() : "") + "&";
+        if (createdTo !== undefined && createdTo !== null)
+            url_ += "CreatedTo=" + encodeURIComponent(createdTo ? "" + createdTo.toISOString() : "") + "&";
+        if (groupBy !== undefined && groupBy !== null)
+            url_ += "GroupBy=" + encodeURIComponent("" + groupBy) + "&";
+        if (sorting !== undefined && sorting !== null)
+            url_ += "Sorting=" + encodeURIComponent("" + sorting) + "&";
+        if (skipCount === null)
+            throw new Error("The parameter 'skipCount' cannot be null.");
+        else if (skipCount !== undefined)
+            url_ += "SkipCount=" + encodeURIComponent("" + skipCount) + "&";
+        if (maxResultCount === null)
+            throw new Error("The parameter 'maxResultCount' cannot be null.");
+        else if (maxResultCount !== undefined)
+            url_ += "MaxResultCount=" + encodeURIComponent("" + maxResultCount) + "&";
+        url_ = url_.replace(/[?&]$/, "");
+
+        let options_ : any = {
+            observe: "response",
+            responseType: "blob",
+            headers: new HttpHeaders({
+                "Accept": "text/plain"
+            })
+        };
+
+        return this.http.request("get", url_, options_).pipe(_observableMergeMap((response_ : any) => {
+            return this.processGetFields(response_);
+        })).pipe(_observableCatch((response_: any) => {
+            if (response_ instanceof HttpResponseBase) {
+                try {
+                    return this.processGetFields(response_ as any);
+                } catch (e) {
+                    return _observableThrow(e) as any as Observable<PagedResultDtoOfAppFieldListDto>;
+                }
+            } else
+                return _observableThrow(response_) as any as Observable<PagedResultDtoOfAppFieldListDto>;
+        }));
+    }
+
+    protected processGetFields(response: HttpResponseBase): Observable<PagedResultDtoOfAppFieldListDto> {
+        const status = response.status;
+        const responseBlob =
+            response instanceof HttpResponse ? response.body :
+            (response as any).error instanceof Blob ? (response as any).error : undefined;
+
+        let _headers: any = {}; if (response.headers) { for (let key of response.headers.keys()) { _headers[key] = response.headers.get(key); }}
+        if (status === 200) {
+            return blobToText(responseBlob).pipe(_observableMergeMap((_responseText: string) => {
+            let result200: any = null;
+            let resultData200 = _responseText === "" ? null : JSON.parse(_responseText, this.jsonParseReviver);
+            result200 = PagedResultDtoOfAppFieldListDto.fromJS(resultData200);
+            return _observableOf(result200);
+            }));
+        } else if (status !== 200 && status !== 204) {
+            return blobToText(responseBlob).pipe(_observableMergeMap((_responseText: string) => {
+            return throwException("An unexpected server error occurred.", status, _responseText, _headers);
+            }));
+        }
+        return _observableOf(null as any);
+    }
+
+    /**
+     * @param fieldDefinitionKey (optional) 
+     * @param sycObjectId (optional) 
+     * @param sycEntityObjectTypeId (optional) 
+     * @return Success
+     */
+    getAppliedField(fieldDefinitionKey: string | undefined, sycObjectId: number | undefined, sycEntityObjectTypeId: number | null | undefined): Observable<AppFieldDto> {
+        let url_ = this.baseUrl + "/api/services/app/AppFieldManager/GetAppliedField?";
+        if (fieldDefinitionKey === null)
+            throw new Error("The parameter 'fieldDefinitionKey' cannot be null.");
+        else if (fieldDefinitionKey !== undefined)
+            url_ += "FieldDefinitionKey=" + encodeURIComponent("" + fieldDefinitionKey) + "&";
+        if (sycObjectId === null)
+            throw new Error("The parameter 'sycObjectId' cannot be null.");
+        else if (sycObjectId !== undefined)
+            url_ += "SycObjectId=" + encodeURIComponent("" + sycObjectId) + "&";
+        if (sycEntityObjectTypeId !== undefined && sycEntityObjectTypeId !== null)
+            url_ += "SycEntityObjectTypeId=" + encodeURIComponent("" + sycEntityObjectTypeId) + "&";
+        url_ = url_.replace(/[?&]$/, "");
+
+        let options_ : any = {
+            observe: "response",
+            responseType: "blob",
+            headers: new HttpHeaders({
+                "Accept": "text/plain"
+            })
+        };
+
+        return this.http.request("get", url_, options_).pipe(_observableMergeMap((response_ : any) => {
+            return this.processGetAppliedField(response_);
+        })).pipe(_observableCatch((response_: any) => {
+            if (response_ instanceof HttpResponseBase) {
+                try {
+                    return this.processGetAppliedField(response_ as any);
+                } catch (e) {
+                    return _observableThrow(e) as any as Observable<AppFieldDto>;
+                }
+            } else
+                return _observableThrow(response_) as any as Observable<AppFieldDto>;
+        }));
+    }
+
+    protected processGetAppliedField(response: HttpResponseBase): Observable<AppFieldDto> {
+        const status = response.status;
+        const responseBlob =
+            response instanceof HttpResponse ? response.body :
+            (response as any).error instanceof Blob ? (response as any).error : undefined;
+
+        let _headers: any = {}; if (response.headers) { for (let key of response.headers.keys()) { _headers[key] = response.headers.get(key); }}
+        if (status === 200) {
+            return blobToText(responseBlob).pipe(_observableMergeMap((_responseText: string) => {
+            let result200: any = null;
+            let resultData200 = _responseText === "" ? null : JSON.parse(_responseText, this.jsonParseReviver);
+            result200 = AppFieldDto.fromJS(resultData200);
+            return _observableOf(result200);
+            }));
+        } else if (status !== 200 && status !== 204) {
+            return blobToText(responseBlob).pipe(_observableMergeMap((_responseText: string) => {
+            return throwException("An unexpected server error occurred.", status, _responseText, _headers);
+            }));
+        }
+        return _observableOf(null as any);
+    }
+
+    /**
+     * @param body (optional) 
+     * @return Success
+     */
+    assignExistingField(body: AssignExistingFieldInput | undefined): Observable<FieldActionResultDto> {
+        let url_ = this.baseUrl + "/api/services/app/AppFieldManager/AssignExistingField";
+        url_ = url_.replace(/[?&]$/, "");
+
+        const content_ = JSON.stringify(body);
+
+        let options_ : any = {
+            body: content_,
+            observe: "response",
+            responseType: "blob",
+            headers: new HttpHeaders({
+                "Content-Type": "application/json-patch+json",
+                "Accept": "text/plain"
+            })
+        };
+
+        return this.http.request("post", url_, options_).pipe(_observableMergeMap((response_ : any) => {
+            return this.processAssignExistingField(response_);
+        })).pipe(_observableCatch((response_: any) => {
+            if (response_ instanceof HttpResponseBase) {
+                try {
+                    return this.processAssignExistingField(response_ as any);
+                } catch (e) {
+                    return _observableThrow(e) as any as Observable<FieldActionResultDto>;
+                }
+            } else
+                return _observableThrow(response_) as any as Observable<FieldActionResultDto>;
+        }));
+    }
+
+    protected processAssignExistingField(response: HttpResponseBase): Observable<FieldActionResultDto> {
+        const status = response.status;
+        const responseBlob =
+            response instanceof HttpResponse ? response.body :
+            (response as any).error instanceof Blob ? (response as any).error : undefined;
+
+        let _headers: any = {}; if (response.headers) { for (let key of response.headers.keys()) { _headers[key] = response.headers.get(key); }}
+        if (status === 200) {
+            return blobToText(responseBlob).pipe(_observableMergeMap((_responseText: string) => {
+            let result200: any = null;
+            let resultData200 = _responseText === "" ? null : JSON.parse(_responseText, this.jsonParseReviver);
+            result200 = FieldActionResultDto.fromJS(resultData200);
+            return _observableOf(result200);
+            }));
+        } else if (status !== 200 && status !== 204) {
+            return blobToText(responseBlob).pipe(_observableMergeMap((_responseText: string) => {
+            return throwException("An unexpected server error occurred.", status, _responseText, _headers);
+            }));
+        }
+        return _observableOf(null as any);
+    }
+
+    /**
+     * @param tableId (optional) 
+     * @param sycEntityObjectTypeId (optional) 
+     * @param searchText (optional) 
+     * @param sorting (optional) 
+     * @param skipCount (optional) 
+     * @param maxResultCount (optional) 
+     * @return Success
+     */
+    getUnlinkedFields(tableId: number | undefined, sycEntityObjectTypeId: number | null | undefined, searchText: string | null | undefined, sorting: string | null | undefined, skipCount: number | undefined, maxResultCount: number | undefined): Observable<PagedResultDtoOfAppFieldDto> {
+        let url_ = this.baseUrl + "/api/services/app/AppFieldManager/GetUnlinkedFields?";
+        if (tableId === null)
+            throw new Error("The parameter 'tableId' cannot be null.");
+        else if (tableId !== undefined)
+            url_ += "TableId=" + encodeURIComponent("" + tableId) + "&";
+        if (sycEntityObjectTypeId !== undefined && sycEntityObjectTypeId !== null)
+            url_ += "SycEntityObjectTypeId=" + encodeURIComponent("" + sycEntityObjectTypeId) + "&";
+        if (searchText !== undefined && searchText !== null)
+            url_ += "SearchText=" + encodeURIComponent("" + searchText) + "&";
+        if (sorting !== undefined && sorting !== null)
+            url_ += "Sorting=" + encodeURIComponent("" + sorting) + "&";
+        if (skipCount === null)
+            throw new Error("The parameter 'skipCount' cannot be null.");
+        else if (skipCount !== undefined)
+            url_ += "SkipCount=" + encodeURIComponent("" + skipCount) + "&";
+        if (maxResultCount === null)
+            throw new Error("The parameter 'maxResultCount' cannot be null.");
+        else if (maxResultCount !== undefined)
+            url_ += "MaxResultCount=" + encodeURIComponent("" + maxResultCount) + "&";
+        url_ = url_.replace(/[?&]$/, "");
+
+        let options_ : any = {
+            observe: "response",
+            responseType: "blob",
+            headers: new HttpHeaders({
+                "Accept": "text/plain"
+            })
+        };
+
+        return this.http.request("get", url_, options_).pipe(_observableMergeMap((response_ : any) => {
+            return this.processGetUnlinkedFields(response_);
+        })).pipe(_observableCatch((response_: any) => {
+            if (response_ instanceof HttpResponseBase) {
+                try {
+                    return this.processGetUnlinkedFields(response_ as any);
+                } catch (e) {
+                    return _observableThrow(e) as any as Observable<PagedResultDtoOfAppFieldDto>;
+                }
+            } else
+                return _observableThrow(response_) as any as Observable<PagedResultDtoOfAppFieldDto>;
+        }));
+    }
+
+    protected processGetUnlinkedFields(response: HttpResponseBase): Observable<PagedResultDtoOfAppFieldDto> {
+        const status = response.status;
+        const responseBlob =
+            response instanceof HttpResponse ? response.body :
+            (response as any).error instanceof Blob ? (response as any).error : undefined;
+
+        let _headers: any = {}; if (response.headers) { for (let key of response.headers.keys()) { _headers[key] = response.headers.get(key); }}
+        if (status === 200) {
+            return blobToText(responseBlob).pipe(_observableMergeMap((_responseText: string) => {
+            let result200: any = null;
+            let resultData200 = _responseText === "" ? null : JSON.parse(_responseText, this.jsonParseReviver);
+            result200 = PagedResultDtoOfAppFieldDto.fromJS(resultData200);
+            return _observableOf(result200);
+            }));
+        } else if (status !== 200 && status !== 204) {
+            return blobToText(responseBlob).pipe(_observableMergeMap((_responseText: string) => {
+            return throwException("An unexpected server error occurred.", status, _responseText, _headers);
+            }));
+        }
+        return _observableOf(null as any);
+    }
+
+    /**
+     * @param body (optional) 
+     * @return Success
+     */
+    linkExistingFields(body: LinkExistingFieldsInput | undefined): Observable<LinkExistingFieldsResultDto> {
+        let url_ = this.baseUrl + "/api/services/app/AppFieldManager/LinkExistingFields";
+        url_ = url_.replace(/[?&]$/, "");
+
+        const content_ = JSON.stringify(body);
+
+        let options_ : any = {
+            body: content_,
+            observe: "response",
+            responseType: "blob",
+            headers: new HttpHeaders({
+                "Content-Type": "application/json-patch+json",
+                "Accept": "text/plain"
+            })
+        };
+
+        return this.http.request("post", url_, options_).pipe(_observableMergeMap((response_ : any) => {
+            return this.processLinkExistingFields(response_);
+        })).pipe(_observableCatch((response_: any) => {
+            if (response_ instanceof HttpResponseBase) {
+                try {
+                    return this.processLinkExistingFields(response_ as any);
+                } catch (e) {
+                    return _observableThrow(e) as any as Observable<LinkExistingFieldsResultDto>;
+                }
+            } else
+                return _observableThrow(response_) as any as Observable<LinkExistingFieldsResultDto>;
+        }));
+    }
+
+    protected processLinkExistingFields(response: HttpResponseBase): Observable<LinkExistingFieldsResultDto> {
+        const status = response.status;
+        const responseBlob =
+            response instanceof HttpResponse ? response.body :
+            (response as any).error instanceof Blob ? (response as any).error : undefined;
+
+        let _headers: any = {}; if (response.headers) { for (let key of response.headers.keys()) { _headers[key] = response.headers.get(key); }}
+        if (status === 200) {
+            return blobToText(responseBlob).pipe(_observableMergeMap((_responseText: string) => {
+            let result200: any = null;
+            let resultData200 = _responseText === "" ? null : JSON.parse(_responseText, this.jsonParseReviver);
+            result200 = LinkExistingFieldsResultDto.fromJS(resultData200);
+            return _observableOf(result200);
+            }));
+        } else if (status !== 200 && status !== 204) {
+            return blobToText(responseBlob).pipe(_observableMergeMap((_responseText: string) => {
+            return throwException("An unexpected server error occurred.", status, _responseText, _headers);
+            }));
+        }
+        return _observableOf(null as any);
+    }
+
+    /**
+     * @param id (optional) 
+     * @return Success
+     */
+    getFieldForEdit(id: number | undefined): Observable<GetFieldForEditOutput> {
+        let url_ = this.baseUrl + "/api/services/app/AppFieldManager/GetFieldForEdit?";
+        if (id === null)
+            throw new Error("The parameter 'id' cannot be null.");
+        else if (id !== undefined)
+            url_ += "id=" + encodeURIComponent("" + id) + "&";
+        url_ = url_.replace(/[?&]$/, "");
+
+        let options_ : any = {
+            observe: "response",
+            responseType: "blob",
+            headers: new HttpHeaders({
+                "Accept": "text/plain"
+            })
+        };
+
+        return this.http.request("get", url_, options_).pipe(_observableMergeMap((response_ : any) => {
+            return this.processGetFieldForEdit(response_);
+        })).pipe(_observableCatch((response_: any) => {
+            if (response_ instanceof HttpResponseBase) {
+                try {
+                    return this.processGetFieldForEdit(response_ as any);
+                } catch (e) {
+                    return _observableThrow(e) as any as Observable<GetFieldForEditOutput>;
+                }
+            } else
+                return _observableThrow(response_) as any as Observable<GetFieldForEditOutput>;
+        }));
+    }
+
+    protected processGetFieldForEdit(response: HttpResponseBase): Observable<GetFieldForEditOutput> {
+        const status = response.status;
+        const responseBlob =
+            response instanceof HttpResponse ? response.body :
+            (response as any).error instanceof Blob ? (response as any).error : undefined;
+
+        let _headers: any = {}; if (response.headers) { for (let key of response.headers.keys()) { _headers[key] = response.headers.get(key); }}
+        if (status === 200) {
+            return blobToText(responseBlob).pipe(_observableMergeMap((_responseText: string) => {
+            let result200: any = null;
+            let resultData200 = _responseText === "" ? null : JSON.parse(_responseText, this.jsonParseReviver);
+            result200 = GetFieldForEditOutput.fromJS(resultData200);
+            return _observableOf(result200);
+            }));
+        } else if (status !== 200 && status !== 204) {
+            return blobToText(responseBlob).pipe(_observableMergeMap((_responseText: string) => {
+            return throwException("An unexpected server error occurred.", status, _responseText, _headers);
+            }));
+        }
+        return _observableOf(null as any);
+    }
+
+    /**
+     * @param appFieldId (optional) 
+     * @return Success
+     */
+    getFieldHistory(appFieldId: number | undefined): Observable<AppFieldHistoryDto[]> {
+        let url_ = this.baseUrl + "/api/services/app/AppFieldManager/GetFieldHistory?";
+        if (appFieldId === null)
+            throw new Error("The parameter 'appFieldId' cannot be null.");
+        else if (appFieldId !== undefined)
+            url_ += "appFieldId=" + encodeURIComponent("" + appFieldId) + "&";
+        url_ = url_.replace(/[?&]$/, "");
+
+        let options_ : any = {
+            observe: "response",
+            responseType: "blob",
+            headers: new HttpHeaders({
+                "Accept": "text/plain"
+            })
+        };
+
+        return this.http.request("get", url_, options_).pipe(_observableMergeMap((response_ : any) => {
+            return this.processGetFieldHistory(response_);
+        })).pipe(_observableCatch((response_: any) => {
+            if (response_ instanceof HttpResponseBase) {
+                try {
+                    return this.processGetFieldHistory(response_ as any);
+                } catch (e) {
+                    return _observableThrow(e) as any as Observable<AppFieldHistoryDto[]>;
+                }
+            } else
+                return _observableThrow(response_) as any as Observable<AppFieldHistoryDto[]>;
+        }));
+    }
+
+    protected processGetFieldHistory(response: HttpResponseBase): Observable<AppFieldHistoryDto[]> {
+        const status = response.status;
+        const responseBlob =
+            response instanceof HttpResponse ? response.body :
+            (response as any).error instanceof Blob ? (response as any).error : undefined;
+
+        let _headers: any = {}; if (response.headers) { for (let key of response.headers.keys()) { _headers[key] = response.headers.get(key); }}
+        if (status === 200) {
+            return blobToText(responseBlob).pipe(_observableMergeMap((_responseText: string) => {
+            let result200: any = null;
+            let resultData200 = _responseText === "" ? null : JSON.parse(_responseText, this.jsonParseReviver);
+            if (Array.isArray(resultData200)) {
+                result200 = [] as any;
+                for (let item of resultData200)
+                    result200!.push(AppFieldHistoryDto.fromJS(item));
+            }
+            else {
+                result200 = <any>null;
+            }
+            return _observableOf(result200);
+            }));
+        } else if (status !== 200 && status !== 204) {
+            return blobToText(responseBlob).pipe(_observableMergeMap((_responseText: string) => {
+            return throwException("An unexpected server error occurred.", status, _responseText, _headers);
+            }));
+        }
+        return _observableOf(null as any);
+    }
+
+    /**
+     * @param body (optional) 
+     * @return Success
+     */
+    restoreFieldRevision(body: RestoreFieldRevisionInput | undefined): Observable<AppFieldDto> {
+        let url_ = this.baseUrl + "/api/services/app/AppFieldManager/RestoreFieldRevision";
+        url_ = url_.replace(/[?&]$/, "");
+
+        const content_ = JSON.stringify(body);
+
+        let options_ : any = {
+            body: content_,
+            observe: "response",
+            responseType: "blob",
+            headers: new HttpHeaders({
+                "Content-Type": "application/json-patch+json",
+                "Accept": "text/plain"
+            })
+        };
+
+        return this.http.request("post", url_, options_).pipe(_observableMergeMap((response_ : any) => {
+            return this.processRestoreFieldRevision(response_);
+        })).pipe(_observableCatch((response_: any) => {
+            if (response_ instanceof HttpResponseBase) {
+                try {
+                    return this.processRestoreFieldRevision(response_ as any);
+                } catch (e) {
+                    return _observableThrow(e) as any as Observable<AppFieldDto>;
+                }
+            } else
+                return _observableThrow(response_) as any as Observable<AppFieldDto>;
+        }));
+    }
+
+    protected processRestoreFieldRevision(response: HttpResponseBase): Observable<AppFieldDto> {
+        const status = response.status;
+        const responseBlob =
+            response instanceof HttpResponse ? response.body :
+            (response as any).error instanceof Blob ? (response as any).error : undefined;
+
+        let _headers: any = {}; if (response.headers) { for (let key of response.headers.keys()) { _headers[key] = response.headers.get(key); }}
+        if (status === 200) {
+            return blobToText(responseBlob).pipe(_observableMergeMap((_responseText: string) => {
+            let result200: any = null;
+            let resultData200 = _responseText === "" ? null : JSON.parse(_responseText, this.jsonParseReviver);
+            result200 = AppFieldDto.fromJS(resultData200);
+            return _observableOf(result200);
+            }));
+        } else if (status !== 200 && status !== 204) {
+            return blobToText(responseBlob).pipe(_observableMergeMap((_responseText: string) => {
+            return throwException("An unexpected server error occurred.", status, _responseText, _headers);
+            }));
+        }
+        return _observableOf(null as any);
+    }
+
+    /**
+     * @param body (optional) 
+     * @return Success
+     */
+    createOrEditField(body: CreateOrEditFieldInput | undefined): Observable<AppFieldDto> {
+        let url_ = this.baseUrl + "/api/services/app/AppFieldManager/CreateOrEditField";
+        url_ = url_.replace(/[?&]$/, "");
+
+        const content_ = JSON.stringify(body);
+
+        let options_ : any = {
+            body: content_,
+            observe: "response",
+            responseType: "blob",
+            headers: new HttpHeaders({
+                "Content-Type": "application/json-patch+json",
+                "Accept": "text/plain"
+            })
+        };
+
+        return this.http.request("post", url_, options_).pipe(_observableMergeMap((response_ : any) => {
+            return this.processCreateOrEditField(response_);
+        })).pipe(_observableCatch((response_: any) => {
+            if (response_ instanceof HttpResponseBase) {
+                try {
+                    return this.processCreateOrEditField(response_ as any);
+                } catch (e) {
+                    return _observableThrow(e) as any as Observable<AppFieldDto>;
+                }
+            } else
+                return _observableThrow(response_) as any as Observable<AppFieldDto>;
+        }));
+    }
+
+    protected processCreateOrEditField(response: HttpResponseBase): Observable<AppFieldDto> {
+        const status = response.status;
+        const responseBlob =
+            response instanceof HttpResponse ? response.body :
+            (response as any).error instanceof Blob ? (response as any).error : undefined;
+
+        let _headers: any = {}; if (response.headers) { for (let key of response.headers.keys()) { _headers[key] = response.headers.get(key); }}
+        if (status === 200) {
+            return blobToText(responseBlob).pipe(_observableMergeMap((_responseText: string) => {
+            let result200: any = null;
+            let resultData200 = _responseText === "" ? null : JSON.parse(_responseText, this.jsonParseReviver);
+            result200 = AppFieldDto.fromJS(resultData200);
+            return _observableOf(result200);
+            }));
+        } else if (status !== 200 && status !== 204) {
+            return blobToText(responseBlob).pipe(_observableMergeMap((_responseText: string) => {
+            return throwException("An unexpected server error occurred.", status, _responseText, _headers);
+            }));
+        }
+        return _observableOf(null as any);
+    }
+
+    /**
+     * @param id (optional) 
+     * @return Success
+     */
+    deleteField(id: number | undefined): Observable<FieldActionResultDto> {
+        let url_ = this.baseUrl + "/api/services/app/AppFieldManager/DeleteField?";
+        if (id === null)
+            throw new Error("The parameter 'id' cannot be null.");
+        else if (id !== undefined)
+            url_ += "Id=" + encodeURIComponent("" + id) + "&";
+        url_ = url_.replace(/[?&]$/, "");
+
+        let options_ : any = {
+            observe: "response",
+            responseType: "blob",
+            headers: new HttpHeaders({
+                "Accept": "text/plain"
+            })
+        };
+
+        return this.http.request("delete", url_, options_).pipe(_observableMergeMap((response_ : any) => {
+            return this.processDeleteField(response_);
+        })).pipe(_observableCatch((response_: any) => {
+            if (response_ instanceof HttpResponseBase) {
+                try {
+                    return this.processDeleteField(response_ as any);
+                } catch (e) {
+                    return _observableThrow(e) as any as Observable<FieldActionResultDto>;
+                }
+            } else
+                return _observableThrow(response_) as any as Observable<FieldActionResultDto>;
+        }));
+    }
+
+    protected processDeleteField(response: HttpResponseBase): Observable<FieldActionResultDto> {
+        const status = response.status;
+        const responseBlob =
+            response instanceof HttpResponse ? response.body :
+            (response as any).error instanceof Blob ? (response as any).error : undefined;
+
+        let _headers: any = {}; if (response.headers) { for (let key of response.headers.keys()) { _headers[key] = response.headers.get(key); }}
+        if (status === 200) {
+            return blobToText(responseBlob).pipe(_observableMergeMap((_responseText: string) => {
+            let result200: any = null;
+            let resultData200 = _responseText === "" ? null : JSON.parse(_responseText, this.jsonParseReviver);
+            result200 = FieldActionResultDto.fromJS(resultData200);
+            return _observableOf(result200);
+            }));
+        } else if (status !== 200 && status !== 204) {
+            return blobToText(responseBlob).pipe(_observableMergeMap((_responseText: string) => {
+            return throwException("An unexpected server error occurred.", status, _responseText, _headers);
+            }));
+        }
+        return _observableOf(null as any);
+    }
+
+    /**
+     * @param body (optional) 
+     * @return Success
+     */
+    duplicateField(body: EntityDtoOfInt64 | undefined): Observable<AppFieldDto> {
+        let url_ = this.baseUrl + "/api/services/app/AppFieldManager/DuplicateField";
+        url_ = url_.replace(/[?&]$/, "");
+
+        const content_ = JSON.stringify(body);
+
+        let options_ : any = {
+            body: content_,
+            observe: "response",
+            responseType: "blob",
+            headers: new HttpHeaders({
+                "Content-Type": "application/json-patch+json",
+                "Accept": "text/plain"
+            })
+        };
+
+        return this.http.request("post", url_, options_).pipe(_observableMergeMap((response_ : any) => {
+            return this.processDuplicateField(response_);
+        })).pipe(_observableCatch((response_: any) => {
+            if (response_ instanceof HttpResponseBase) {
+                try {
+                    return this.processDuplicateField(response_ as any);
+                } catch (e) {
+                    return _observableThrow(e) as any as Observable<AppFieldDto>;
+                }
+            } else
+                return _observableThrow(response_) as any as Observable<AppFieldDto>;
+        }));
+    }
+
+    protected processDuplicateField(response: HttpResponseBase): Observable<AppFieldDto> {
+        const status = response.status;
+        const responseBlob =
+            response instanceof HttpResponse ? response.body :
+            (response as any).error instanceof Blob ? (response as any).error : undefined;
+
+        let _headers: any = {}; if (response.headers) { for (let key of response.headers.keys()) { _headers[key] = response.headers.get(key); }}
+        if (status === 200) {
+            return blobToText(responseBlob).pipe(_observableMergeMap((_responseText: string) => {
+            let result200: any = null;
+            let resultData200 = _responseText === "" ? null : JSON.parse(_responseText, this.jsonParseReviver);
+            result200 = AppFieldDto.fromJS(resultData200);
+            return _observableOf(result200);
+            }));
+        } else if (status !== 200 && status !== 204) {
+            return blobToText(responseBlob).pipe(_observableMergeMap((_responseText: string) => {
+            return throwException("An unexpected server error occurred.", status, _responseText, _headers);
+            }));
+        }
+        return _observableOf(null as any);
+    }
+
+    /**
+     * @param body (optional) 
+     * @return Success
+     */
+    hideField(body: EntityDtoOfInt64 | undefined): Observable<void> {
+        let url_ = this.baseUrl + "/api/services/app/AppFieldManager/HideField";
+        url_ = url_.replace(/[?&]$/, "");
+
+        const content_ = JSON.stringify(body);
+
+        let options_ : any = {
+            body: content_,
+            observe: "response",
+            responseType: "blob",
+            headers: new HttpHeaders({
+                "Content-Type": "application/json-patch+json",
+            })
+        };
+
+        return this.http.request("post", url_, options_).pipe(_observableMergeMap((response_ : any) => {
+            return this.processHideField(response_);
+        })).pipe(_observableCatch((response_: any) => {
+            if (response_ instanceof HttpResponseBase) {
+                try {
+                    return this.processHideField(response_ as any);
+                } catch (e) {
+                    return _observableThrow(e) as any as Observable<void>;
+                }
+            } else
+                return _observableThrow(response_) as any as Observable<void>;
+        }));
+    }
+
+    protected processHideField(response: HttpResponseBase): Observable<void> {
+        const status = response.status;
+        const responseBlob =
+            response instanceof HttpResponse ? response.body :
+            (response as any).error instanceof Blob ? (response as any).error : undefined;
+
+        let _headers: any = {}; if (response.headers) { for (let key of response.headers.keys()) { _headers[key] = response.headers.get(key); }}
+        if (status === 200) {
+            return blobToText(responseBlob).pipe(_observableMergeMap((_responseText: string) => {
+            return _observableOf(null as any);
+            }));
+        } else if (status !== 200 && status !== 204) {
+            return blobToText(responseBlob).pipe(_observableMergeMap((_responseText: string) => {
+            return throwException("An unexpected server error occurred.", status, _responseText, _headers);
+            }));
+        }
+        return _observableOf(null as any);
+    }
+
+    /**
+     * @param body (optional) 
+     * @return Success
+     */
+    syncFieldSnapshots(body: SyncFieldSnapshotsInput | undefined): Observable<FieldActionResultDto> {
+        let url_ = this.baseUrl + "/api/services/app/AppFieldManager/SyncFieldSnapshots";
+        url_ = url_.replace(/[?&]$/, "");
+
+        const content_ = JSON.stringify(body);
+
+        let options_ : any = {
+            body: content_,
+            observe: "response",
+            responseType: "blob",
+            headers: new HttpHeaders({
+                "Content-Type": "application/json-patch+json",
+                "Accept": "text/plain"
+            })
+        };
+
+        return this.http.request("post", url_, options_).pipe(_observableMergeMap((response_ : any) => {
+            return this.processSyncFieldSnapshots(response_);
+        })).pipe(_observableCatch((response_: any) => {
+            if (response_ instanceof HttpResponseBase) {
+                try {
+                    return this.processSyncFieldSnapshots(response_ as any);
+                } catch (e) {
+                    return _observableThrow(e) as any as Observable<FieldActionResultDto>;
+                }
+            } else
+                return _observableThrow(response_) as any as Observable<FieldActionResultDto>;
+        }));
+    }
+
+    protected processSyncFieldSnapshots(response: HttpResponseBase): Observable<FieldActionResultDto> {
+        const status = response.status;
+        const responseBlob =
+            response instanceof HttpResponse ? response.body :
+            (response as any).error instanceof Blob ? (response as any).error : undefined;
+
+        let _headers: any = {}; if (response.headers) { for (let key of response.headers.keys()) { _headers[key] = response.headers.get(key); }}
+        if (status === 200) {
+            return blobToText(responseBlob).pipe(_observableMergeMap((_responseText: string) => {
+            let result200: any = null;
+            let resultData200 = _responseText === "" ? null : JSON.parse(_responseText, this.jsonParseReviver);
+            result200 = FieldActionResultDto.fromJS(resultData200);
+            return _observableOf(result200);
+            }));
+        } else if (status !== 200 && status !== 204) {
+            return blobToText(responseBlob).pipe(_observableMergeMap((_responseText: string) => {
+            return throwException("An unexpected server error occurred.", status, _responseText, _headers);
+            }));
+        }
+        return _observableOf(null as any);
+    }
+
+    /**
+     * @param fieldTypeId (optional) 
+     * @return Success
+     */
+    getFieldTypeSettings(fieldTypeId: number | undefined): Observable<FieldSettingDefinitionDto[]> {
+        let url_ = this.baseUrl + "/api/services/app/AppFieldManager/GetFieldTypeSettings?";
+        if (fieldTypeId === null)
+            throw new Error("The parameter 'fieldTypeId' cannot be null.");
+        else if (fieldTypeId !== undefined)
+            url_ += "fieldTypeId=" + encodeURIComponent("" + fieldTypeId) + "&";
+        url_ = url_.replace(/[?&]$/, "");
+
+        let options_ : any = {
+            observe: "response",
+            responseType: "blob",
+            headers: new HttpHeaders({
+                "Accept": "text/plain"
+            })
+        };
+
+        return this.http.request("get", url_, options_).pipe(_observableMergeMap((response_ : any) => {
+            return this.processGetFieldTypeSettings(response_);
+        })).pipe(_observableCatch((response_: any) => {
+            if (response_ instanceof HttpResponseBase) {
+                try {
+                    return this.processGetFieldTypeSettings(response_ as any);
+                } catch (e) {
+                    return _observableThrow(e) as any as Observable<FieldSettingDefinitionDto[]>;
+                }
+            } else
+                return _observableThrow(response_) as any as Observable<FieldSettingDefinitionDto[]>;
+        }));
+    }
+
+    protected processGetFieldTypeSettings(response: HttpResponseBase): Observable<FieldSettingDefinitionDto[]> {
+        const status = response.status;
+        const responseBlob =
+            response instanceof HttpResponse ? response.body :
+            (response as any).error instanceof Blob ? (response as any).error : undefined;
+
+        let _headers: any = {}; if (response.headers) { for (let key of response.headers.keys()) { _headers[key] = response.headers.get(key); }}
+        if (status === 200) {
+            return blobToText(responseBlob).pipe(_observableMergeMap((_responseText: string) => {
+            let result200: any = null;
+            let resultData200 = _responseText === "" ? null : JSON.parse(_responseText, this.jsonParseReviver);
+            if (Array.isArray(resultData200)) {
+                result200 = [] as any;
+                for (let item of resultData200)
+                    result200!.push(FieldSettingDefinitionDto.fromJS(item));
+            }
+            else {
+                result200 = <any>null;
+            }
+            return _observableOf(result200);
+            }));
+        } else if (status !== 200 && status !== 204) {
+            return blobToText(responseBlob).pipe(_observableMergeMap((_responseText: string) => {
+            return throwException("An unexpected server error occurred.", status, _responseText, _headers);
+            }));
+        }
+        return _observableOf(null as any);
+    }
+
+    /**
+     * @param body (optional) 
+     * @return Success
+     */
+    saveFieldValidEntries(body: SaveFieldValidEntriesInput | undefined): Observable<string> {
+        let url_ = this.baseUrl + "/api/services/app/AppFieldManager/SaveFieldValidEntries";
+        url_ = url_.replace(/[?&]$/, "");
+
+        const content_ = JSON.stringify(body);
+
+        let options_ : any = {
+            body: content_,
+            observe: "response",
+            responseType: "blob",
+            headers: new HttpHeaders({
+                "Content-Type": "application/json-patch+json",
+                "Accept": "text/plain"
+            })
+        };
+
+        return this.http.request("post", url_, options_).pipe(_observableMergeMap((response_ : any) => {
+            return this.processSaveFieldValidEntries(response_);
+        })).pipe(_observableCatch((response_: any) => {
+            if (response_ instanceof HttpResponseBase) {
+                try {
+                    return this.processSaveFieldValidEntries(response_ as any);
+                } catch (e) {
+                    return _observableThrow(e) as any as Observable<string>;
+                }
+            } else
+                return _observableThrow(response_) as any as Observable<string>;
+        }));
+    }
+
+    protected processSaveFieldValidEntries(response: HttpResponseBase): Observable<string> {
+        const status = response.status;
+        const responseBlob =
+            response instanceof HttpResponse ? response.body :
+            (response as any).error instanceof Blob ? (response as any).error : undefined;
+
+        let _headers: any = {}; if (response.headers) { for (let key of response.headers.keys()) { _headers[key] = response.headers.get(key); }}
+        if (status === 200) {
+            return blobToText(responseBlob).pipe(_observableMergeMap((_responseText: string) => {
+            let result200: any = null;
+            let resultData200 = _responseText === "" ? null : JSON.parse(_responseText, this.jsonParseReviver);
+                result200 = resultData200 !== undefined ? resultData200 : <any>null;
+    
             return _observableOf(result200);
             }));
         } else if (status !== 200 && status !== 204) {
@@ -34090,6 +36101,137 @@ export class DemoUiComponentsServiceProxy {
 }
 
 @Injectable()
+export class DynamicQueryServiceProxy {
+    private http: HttpClient;
+    private baseUrl: string;
+    protected jsonParseReviver: ((key: string, value: any) => any) | undefined = undefined;
+
+    constructor(@Inject(HttpClient) http: HttpClient, @Optional() @Inject(API_BASE_URL) baseUrl?: string) {
+        this.http = http;
+        this.baseUrl = baseUrl !== undefined && baseUrl !== null ? baseUrl : "";
+    }
+
+    /**
+     * @param body (optional) 
+     * @return Success
+     */
+    query(body: DynamicQueryInput | undefined): Observable<DynamicQueryResult> {
+        let url_ = this.baseUrl + "/api/services/app/DynamicQuery/Query";
+        url_ = url_.replace(/[?&]$/, "");
+
+        const content_ = JSON.stringify(body);
+
+        let options_ : any = {
+            body: content_,
+            observe: "response",
+            responseType: "blob",
+            headers: new HttpHeaders({
+                "Content-Type": "application/json-patch+json",
+                "Accept": "text/plain"
+            })
+        };
+
+        return this.http.request("post", url_, options_).pipe(_observableMergeMap((response_ : any) => {
+            return this.processQuery(response_);
+        })).pipe(_observableCatch((response_: any) => {
+            if (response_ instanceof HttpResponseBase) {
+                try {
+                    return this.processQuery(response_ as any);
+                } catch (e) {
+                    return _observableThrow(e) as any as Observable<DynamicQueryResult>;
+                }
+            } else
+                return _observableThrow(response_) as any as Observable<DynamicQueryResult>;
+        }));
+    }
+
+    protected processQuery(response: HttpResponseBase): Observable<DynamicQueryResult> {
+        const status = response.status;
+        const responseBlob =
+            response instanceof HttpResponse ? response.body :
+            (response as any).error instanceof Blob ? (response as any).error : undefined;
+
+        let _headers: any = {}; if (response.headers) { for (let key of response.headers.keys()) { _headers[key] = response.headers.get(key); }}
+        if (status === 200) {
+            return blobToText(responseBlob).pipe(_observableMergeMap((_responseText: string) => {
+            let result200: any = null;
+            let resultData200 = _responseText === "" ? null : JSON.parse(_responseText, this.jsonParseReviver);
+            result200 = DynamicQueryResult.fromJS(resultData200);
+            return _observableOf(result200);
+            }));
+        } else if (status !== 200 && status !== 204) {
+            return blobToText(responseBlob).pipe(_observableMergeMap((_responseText: string) => {
+            return throwException("An unexpected server error occurred.", status, _responseText, _headers);
+            }));
+        }
+        return _observableOf(null as any);
+    }
+
+    /**
+     * @param tableName (optional) 
+     * @param fieldName (optional) 
+     * @param body (optional) 
+     * @return Success
+     */
+    tableHasField(tableName: string | null | undefined, fieldName: string | null | undefined, body: DbContext | undefined): Observable<boolean> {
+        let url_ = this.baseUrl + "/api/services/app/DynamicQuery/TableHasField?";
+        if (tableName !== undefined && tableName !== null)
+            url_ += "tableName=" + encodeURIComponent("" + tableName) + "&";
+        if (fieldName !== undefined && fieldName !== null)
+            url_ += "fieldName=" + encodeURIComponent("" + fieldName) + "&";
+        url_ = url_.replace(/[?&]$/, "");
+
+        const content_ = JSON.stringify(body);
+
+        let options_ : any = {
+            body: content_,
+            observe: "response",
+            responseType: "blob",
+            headers: new HttpHeaders({
+                "Content-Type": "application/json-patch+json",
+                "Accept": "text/plain"
+            })
+        };
+
+        return this.http.request("post", url_, options_).pipe(_observableMergeMap((response_ : any) => {
+            return this.processTableHasField(response_);
+        })).pipe(_observableCatch((response_: any) => {
+            if (response_ instanceof HttpResponseBase) {
+                try {
+                    return this.processTableHasField(response_ as any);
+                } catch (e) {
+                    return _observableThrow(e) as any as Observable<boolean>;
+                }
+            } else
+                return _observableThrow(response_) as any as Observable<boolean>;
+        }));
+    }
+
+    protected processTableHasField(response: HttpResponseBase): Observable<boolean> {
+        const status = response.status;
+        const responseBlob =
+            response instanceof HttpResponse ? response.body :
+            (response as any).error instanceof Blob ? (response as any).error : undefined;
+
+        let _headers: any = {}; if (response.headers) { for (let key of response.headers.keys()) { _headers[key] = response.headers.get(key); }}
+        if (status === 200) {
+            return blobToText(responseBlob).pipe(_observableMergeMap((_responseText: string) => {
+            let result200: any = null;
+            let resultData200 = _responseText === "" ? null : JSON.parse(_responseText, this.jsonParseReviver);
+                result200 = resultData200 !== undefined ? resultData200 : <any>null;
+    
+            return _observableOf(result200);
+            }));
+        } else if (status !== 200 && status !== 204) {
+            return blobToText(responseBlob).pipe(_observableMergeMap((_responseText: string) => {
+            return throwException("An unexpected server error occurred.", status, _responseText, _headers);
+            }));
+        }
+        return _observableOf(null as any);
+    }
+}
+
+@Injectable()
 export class EditionServiceProxy {
     private http: HttpClient;
     private baseUrl: string;
@@ -41647,6 +43789,100 @@ export class SessionServiceProxy {
 }
 
 @Injectable()
+export class SpreadsheetServiceProxy {
+    private http: HttpClient;
+    private baseUrl: string;
+    protected jsonParseReviver: ((key: string, value: any) => any) | undefined = undefined;
+
+    constructor(@Inject(HttpClient) http: HttpClient, @Optional() @Inject(API_BASE_URL) baseUrl?: string) {
+        this.http = http;
+        this.baseUrl = baseUrl !== undefined && baseUrl !== null ? baseUrl : "";
+    }
+
+    /**
+     * @param saveUrl (optional) 
+     * @param jSONData (optional) 
+     * @param saveType (optional) 
+     * @param fileName (optional) 
+     * @param fileContentType (optional) 
+     * @param allowCustomFormula (optional) 
+     * @param versionType (optional) 
+     * @param pdfLayoutSettings (optional) 
+     * @return Success
+     */
+    save(saveUrl: string | null | undefined, jSONData: string | null | undefined, saveType: SaveType | undefined, fileName: string | null | undefined, fileContentType: ContentType | undefined, allowCustomFormula: boolean | undefined, versionType: VersionType | undefined, pdfLayoutSettings: string | null | undefined): Observable<void> {
+        let url_ = this.baseUrl + "/api/Spreadsheet/Save";
+        url_ = url_.replace(/[?&]$/, "");
+
+        const content_ = new FormData();
+        if (saveUrl !== null && saveUrl !== undefined)
+            content_.append("SaveUrl", saveUrl.toString());
+        if (jSONData !== null && jSONData !== undefined)
+            content_.append("JSONData", jSONData.toString());
+        if (saveType === null || saveType === undefined)
+            throw new Error("The parameter 'saveType' cannot be null.");
+        else
+            content_.append("SaveType", saveType.toString());
+        if (fileName !== null && fileName !== undefined)
+            content_.append("FileName", fileName.toString());
+        if (fileContentType === null || fileContentType === undefined)
+            throw new Error("The parameter 'fileContentType' cannot be null.");
+        else
+            content_.append("FileContentType", fileContentType.toString());
+        if (allowCustomFormula === null || allowCustomFormula === undefined)
+            throw new Error("The parameter 'allowCustomFormula' cannot be null.");
+        else
+            content_.append("AllowCustomFormula", allowCustomFormula.toString());
+        if (versionType === null || versionType === undefined)
+            throw new Error("The parameter 'versionType' cannot be null.");
+        else
+            content_.append("VersionType", versionType.toString());
+        if (pdfLayoutSettings !== null && pdfLayoutSettings !== undefined)
+            content_.append("PdfLayoutSettings", pdfLayoutSettings.toString());
+
+        let options_ : any = {
+            body: content_,
+            observe: "response",
+            responseType: "blob",
+            headers: new HttpHeaders({
+            })
+        };
+
+        return this.http.request("post", url_, options_).pipe(_observableMergeMap((response_ : any) => {
+            return this.processSave(response_);
+        })).pipe(_observableCatch((response_: any) => {
+            if (response_ instanceof HttpResponseBase) {
+                try {
+                    return this.processSave(response_ as any);
+                } catch (e) {
+                    return _observableThrow(e) as any as Observable<void>;
+                }
+            } else
+                return _observableThrow(response_) as any as Observable<void>;
+        }));
+    }
+
+    protected processSave(response: HttpResponseBase): Observable<void> {
+        const status = response.status;
+        const responseBlob =
+            response instanceof HttpResponse ? response.body :
+            (response as any).error instanceof Blob ? (response as any).error : undefined;
+
+        let _headers: any = {}; if (response.headers) { for (let key of response.headers.keys()) { _headers[key] = response.headers.get(key); }}
+        if (status === 200) {
+            return blobToText(responseBlob).pipe(_observableMergeMap((_responseText: string) => {
+            return _observableOf(null as any);
+            }));
+        } else if (status !== 200 && status !== 204) {
+            return blobToText(responseBlob).pipe(_observableMergeMap((_responseText: string) => {
+            return throwException("An unexpected server error occurred.", status, _responseText, _headers);
+            }));
+        }
+        return _observableOf(null as any);
+    }
+}
+
+@Injectable()
 export class StripePaymentServiceProxy {
     private http: HttpClient;
     private baseUrl: string;
@@ -48359,12 +50595,16 @@ export class SycEntityObjectTypesServiceProxy {
      * @param id (optional) 
      * @return Success
      */
-    getAllWithExtraAttributes(id: number | undefined): Observable<GetAllEntityObjectTypeOutput[]> {
+    getAllWithExtraAttributes(id: number | undefined, source: ExtraAttributesSource): Observable<GetAllEntityObjectTypeOutput[]> {
         let url_ = this.baseUrl + "/api/services/app/SycEntityObjectTypes/GetAllWithExtraAttributes?";
         if (id === null)
             throw new Error("The parameter 'id' cannot be null.");
         else if (id !== undefined)
             url_ += "id=" + encodeURIComponent("" + id) + "&";
+        if (source === undefined || source === null)
+            throw new Error("The parameter 'source' must be defined and cannot be null.");
+        else
+            url_ += "source=" + encodeURIComponent("" + source) + "&";
         url_ = url_.replace(/[?&]$/, "");
 
         let options_ : any = {
@@ -59071,6 +61311,110 @@ export class SystemTablesServiceProxy {
         }
         return _observableOf(null as any);
     }
+
+    /**
+     * @return Success
+     */
+    getEntityObjectTypeDashboard(): Observable<number> {
+        let url_ = this.baseUrl + "/api/services/app/SystemTables/GetEntityObjectTypeDashboard";
+        url_ = url_.replace(/[?&]$/, "");
+
+        let options_ : any = {
+            observe: "response",
+            responseType: "blob",
+            headers: new HttpHeaders({
+                "Accept": "text/plain"
+            })
+        };
+
+        return this.http.request("get", url_, options_).pipe(_observableMergeMap((response_ : any) => {
+            return this.processGetEntityObjectTypeDashboard(response_);
+        })).pipe(_observableCatch((response_: any) => {
+            if (response_ instanceof HttpResponseBase) {
+                try {
+                    return this.processGetEntityObjectTypeDashboard(response_ as any);
+                } catch (e) {
+                    return _observableThrow(e) as any as Observable<number>;
+                }
+            } else
+                return _observableThrow(response_) as any as Observable<number>;
+        }));
+    }
+
+    protected processGetEntityObjectTypeDashboard(response: HttpResponseBase): Observable<number> {
+        const status = response.status;
+        const responseBlob =
+            response instanceof HttpResponse ? response.body :
+            (response as any).error instanceof Blob ? (response as any).error : undefined;
+
+        let _headers: any = {}; if (response.headers) { for (let key of response.headers.keys()) { _headers[key] = response.headers.get(key); }}
+        if (status === 200) {
+            return blobToText(responseBlob).pipe(_observableMergeMap((_responseText: string) => {
+            let result200: any = null;
+            let resultData200 = _responseText === "" ? null : JSON.parse(_responseText, this.jsonParseReviver);
+                result200 = resultData200 !== undefined ? resultData200 : <any>null;
+    
+            return _observableOf(result200);
+            }));
+        } else if (status !== 200 && status !== 204) {
+            return blobToText(responseBlob).pipe(_observableMergeMap((_responseText: string) => {
+            return throwException("An unexpected server error occurred.", status, _responseText, _headers);
+            }));
+        }
+        return _observableOf(null as any);
+    }
+
+    /**
+     * @return Success
+     */
+    getObjectDashboardId(): Observable<number> {
+        let url_ = this.baseUrl + "/api/services/app/SystemTables/GetObjectDashboardId";
+        url_ = url_.replace(/[?&]$/, "");
+
+        let options_ : any = {
+            observe: "response",
+            responseType: "blob",
+            headers: new HttpHeaders({
+                "Accept": "text/plain"
+            })
+        };
+
+        return this.http.request("get", url_, options_).pipe(_observableMergeMap((response_ : any) => {
+            return this.processGetObjectDashboardId(response_);
+        })).pipe(_observableCatch((response_: any) => {
+            if (response_ instanceof HttpResponseBase) {
+                try {
+                    return this.processGetObjectDashboardId(response_ as any);
+                } catch (e) {
+                    return _observableThrow(e) as any as Observable<number>;
+                }
+            } else
+                return _observableThrow(response_) as any as Observable<number>;
+        }));
+    }
+
+    protected processGetObjectDashboardId(response: HttpResponseBase): Observable<number> {
+        const status = response.status;
+        const responseBlob =
+            response instanceof HttpResponse ? response.body :
+            (response as any).error instanceof Blob ? (response as any).error : undefined;
+
+        let _headers: any = {}; if (response.headers) { for (let key of response.headers.keys()) { _headers[key] = response.headers.get(key); }}
+        if (status === 200) {
+            return blobToText(responseBlob).pipe(_observableMergeMap((_responseText: string) => {
+            let result200: any = null;
+            let resultData200 = _responseText === "" ? null : JSON.parse(_responseText, this.jsonParseReviver);
+                result200 = resultData200 !== undefined ? resultData200 : <any>null;
+    
+            return _observableOf(result200);
+            }));
+        } else if (status !== 200 && status !== 204) {
+            return blobToText(responseBlob).pipe(_observableMergeMap((_responseText: string) => {
+            return throwException("An unexpected server error occurred.", status, _responseText, _headers);
+            }));
+        }
+        return _observableOf(null as any);
+    }
 }
 
 @Injectable()
@@ -69323,6 +71667,8 @@ export class SydObject implements ISydObject {
     parentId!: number | undefined;
     parentFk!: SydObject;
     parentCode!: string | undefined;
+    baseEntityId!: number | undefined;
+    baseEntityFk!: SydObject;
     sydObjects!: SydObject[] | undefined;
     ssinIdentifierId!: number | undefined;
     ssinIdentifierCode!: string | undefined;
@@ -69364,6 +71710,8 @@ export class SydObject implements ISydObject {
             this.parentId = _data["parentId"];
             this.parentFk = _data["parentFk"] ? SydObject.fromJS(_data["parentFk"]) : <any>undefined;
             this.parentCode = _data["parentCode"];
+            this.baseEntityId = _data["baseEntityId"];
+            this.baseEntityFk = _data["baseEntityFk"] ? SydObject.fromJS(_data["baseEntityFk"]) : <any>undefined;
             if (Array.isArray(_data["sydObjects"])) {
                 this.sydObjects = [] as any;
                 for (let item of _data["sydObjects"])
@@ -69407,6 +71755,8 @@ export class SydObject implements ISydObject {
         data["parentId"] = this.parentId;
         data["parentFk"] = this.parentFk ? this.parentFk.toJSON() : <any>undefined;
         data["parentCode"] = this.parentCode;
+        data["baseEntityId"] = this.baseEntityId;
+        data["baseEntityFk"] = this.baseEntityFk ? this.baseEntityFk.toJSON() : <any>undefined;
         if (Array.isArray(this.sydObjects)) {
             data["sydObjects"] = [];
             for (let item of this.sydObjects)
@@ -69439,6 +71789,8 @@ export interface ISydObject {
     parentId: number | undefined;
     parentFk: SydObject;
     parentCode: string | undefined;
+    baseEntityId: number | undefined;
+    baseEntityFk: SydObject;
     sydObjects: SydObject[] | undefined;
     ssinIdentifierId: number | undefined;
     ssinIdentifierCode: string | undefined;
@@ -76232,6 +78584,992 @@ export interface ISelectItemDto {
     [key: string]: any;
 }
 
+export enum DashboardFilterType {
+    All = 0,
+    MyDashboards = 1,
+    SharedWithMe = 2,
+}
+
+export class UserInformationDto implements IUserInformationDto {
+    userImage!: string | undefined;
+    jobTitle!: string | undefined;
+    accountName!: string | undefined;
+    accountId!: number;
+    userName!: string | undefined;
+    id!: number;
+
+    [key: string]: any;
+
+    constructor(data?: IUserInformationDto) {
+        if (data) {
+            for (var property in data) {
+                if (data.hasOwnProperty(property))
+                    (<any>this)[property] = (<any>data)[property];
+            }
+        }
+    }
+
+    init(_data?: any) {
+        if (_data) {
+            for (var property in _data) {
+                if (_data.hasOwnProperty(property))
+                    this[property] = _data[property];
+            }
+            this.userImage = _data["userImage"];
+            this.jobTitle = _data["jobTitle"];
+            this.accountName = _data["accountName"];
+            this.accountId = _data["accountId"];
+            this.userName = _data["userName"];
+            this.id = _data["id"];
+        }
+    }
+
+    static fromJS(data: any): UserInformationDto {
+        data = typeof data === 'object' ? data : {};
+        let result = new UserInformationDto();
+        result.init(data);
+        return result;
+    }
+
+    toJSON(data?: any) {
+        data = typeof data === 'object' ? data : {};
+        for (var property in this) {
+            if (this.hasOwnProperty(property))
+                data[property] = this[property];
+        }
+        data["userImage"] = this.userImage;
+        data["jobTitle"] = this.jobTitle;
+        data["accountName"] = this.accountName;
+        data["accountId"] = this.accountId;
+        data["userName"] = this.userName;
+        data["id"] = this.id;
+        return data;
+    }
+}
+
+export interface IUserInformationDto {
+    userImage: string | undefined;
+    jobTitle: string | undefined;
+    accountName: string | undefined;
+    accountId: number;
+    userName: string | undefined;
+    id: number;
+
+    [key: string]: any;
+}
+
+export class GetDashboardForViewDto implements IGetDashboardForViewDto {
+    id!: number;
+    title!: string | undefined;
+    creatorUserName!: string | undefined;
+    creatorUserId!: number;
+    lastModificationDate!: moment.Moment | undefined;
+    lastViewDate!: moment.Moment | undefined;
+    sharedWithUsers!: UserInformationDto[] | undefined;
+    spreadsheet!: any | undefined;
+    spreadsheetFilePath!: string | undefined;
+    isEditable!: boolean;
+    isTheOwner!: boolean;
+    sharingLevel!: number;
+
+    [key: string]: any;
+
+    constructor(data?: IGetDashboardForViewDto) {
+        if (data) {
+            for (var property in data) {
+                if (data.hasOwnProperty(property))
+                    (<any>this)[property] = (<any>data)[property];
+            }
+        }
+    }
+
+    init(_data?: any) {
+        if (_data) {
+            for (var property in _data) {
+                if (_data.hasOwnProperty(property))
+                    this[property] = _data[property];
+            }
+            this.id = _data["id"];
+            this.title = _data["title"];
+            this.creatorUserName = _data["creatorUserName"];
+            this.creatorUserId = _data["creatorUserId"];
+            this.lastModificationDate = _data["lastModificationDate"] ? moment(_data["lastModificationDate"].toString()) : <any>undefined;
+            this.lastViewDate = _data["lastViewDate"] ? moment(_data["lastViewDate"].toString()) : <any>undefined;
+            if (Array.isArray(_data["sharedWithUsers"])) {
+                this.sharedWithUsers = [] as any;
+                for (let item of _data["sharedWithUsers"])
+                    this.sharedWithUsers!.push(UserInformationDto.fromJS(item));
+            }
+            this.spreadsheet = _data["spreadsheet"];
+            this.spreadsheetFilePath = _data["spreadsheetFilePath"];
+            this.isEditable = _data["isEditable"];
+            this.isTheOwner = _data["isTheOwner"];
+            this.sharingLevel = _data["sharingLevel"];
+        }
+    }
+
+    static fromJS(data: any): GetDashboardForViewDto {
+        data = typeof data === 'object' ? data : {};
+        let result = new GetDashboardForViewDto();
+        result.init(data);
+        return result;
+    }
+
+    toJSON(data?: any) {
+        data = typeof data === 'object' ? data : {};
+        for (var property in this) {
+            if (this.hasOwnProperty(property))
+                data[property] = this[property];
+        }
+        data["id"] = this.id;
+        data["title"] = this.title;
+        data["creatorUserName"] = this.creatorUserName;
+        data["creatorUserId"] = this.creatorUserId;
+        data["lastModificationDate"] = this.lastModificationDate ? this.lastModificationDate.toISOString() : <any>undefined;
+        data["lastViewDate"] = this.lastViewDate ? this.lastViewDate.toISOString() : <any>undefined;
+        if (Array.isArray(this.sharedWithUsers)) {
+            data["sharedWithUsers"] = [];
+            for (let item of this.sharedWithUsers)
+                data["sharedWithUsers"].push(item.toJSON());
+        }
+        data["spreadsheet"] = this.spreadsheet;
+        data["spreadsheetFilePath"] = this.spreadsheetFilePath;
+        data["isEditable"] = this.isEditable;
+        data["isTheOwner"] = this.isTheOwner;
+        data["sharingLevel"] = this.sharingLevel;
+        return data;
+    }
+}
+
+export interface IGetDashboardForViewDto {
+    id: number;
+    title: string | undefined;
+    creatorUserName: string | undefined;
+    creatorUserId: number;
+    lastModificationDate: moment.Moment | undefined;
+    lastViewDate: moment.Moment | undefined;
+    sharedWithUsers: UserInformationDto[] | undefined;
+    spreadsheet: any | undefined;
+    spreadsheetFilePath: string | undefined;
+    isEditable: boolean;
+    isTheOwner: boolean;
+    sharingLevel: number;
+
+    [key: string]: any;
+}
+
+export class PagedResultDtoOfGetDashboardForViewDto implements IPagedResultDtoOfGetDashboardForViewDto {
+    totalCount!: number;
+    items!: GetDashboardForViewDto[] | undefined;
+
+    [key: string]: any;
+
+    constructor(data?: IPagedResultDtoOfGetDashboardForViewDto) {
+        if (data) {
+            for (var property in data) {
+                if (data.hasOwnProperty(property))
+                    (<any>this)[property] = (<any>data)[property];
+            }
+        }
+    }
+
+    init(_data?: any) {
+        if (_data) {
+            for (var property in _data) {
+                if (_data.hasOwnProperty(property))
+                    this[property] = _data[property];
+            }
+            this.totalCount = _data["totalCount"];
+            if (Array.isArray(_data["items"])) {
+                this.items = [] as any;
+                for (let item of _data["items"])
+                    this.items!.push(GetDashboardForViewDto.fromJS(item));
+            }
+        }
+    }
+
+    static fromJS(data: any): PagedResultDtoOfGetDashboardForViewDto {
+        data = typeof data === 'object' ? data : {};
+        let result = new PagedResultDtoOfGetDashboardForViewDto();
+        result.init(data);
+        return result;
+    }
+
+    toJSON(data?: any) {
+        data = typeof data === 'object' ? data : {};
+        for (var property in this) {
+            if (this.hasOwnProperty(property))
+                data[property] = this[property];
+        }
+        data["totalCount"] = this.totalCount;
+        if (Array.isArray(this.items)) {
+            data["items"] = [];
+            for (let item of this.items)
+                data["items"].push(item.toJSON());
+        }
+        return data;
+    }
+}
+
+export interface IPagedResultDtoOfGetDashboardForViewDto {
+    totalCount: number;
+    items: GetDashboardForViewDto[] | undefined;
+
+    [key: string]: any;
+}
+
+export class CreateOrEditDashboard implements ICreateOrEditDashboard {
+    id!: number;
+    title!: string | undefined;
+    description!: string | undefined;
+
+    [key: string]: any;
+
+    constructor(data?: ICreateOrEditDashboard) {
+        if (data) {
+            for (var property in data) {
+                if (data.hasOwnProperty(property))
+                    (<any>this)[property] = (<any>data)[property];
+            }
+        }
+    }
+
+    init(_data?: any) {
+        if (_data) {
+            for (var property in _data) {
+                if (_data.hasOwnProperty(property))
+                    this[property] = _data[property];
+            }
+            this.id = _data["id"];
+            this.title = _data["title"];
+            this.description = _data["description"];
+        }
+    }
+
+    static fromJS(data: any): CreateOrEditDashboard {
+        data = typeof data === 'object' ? data : {};
+        let result = new CreateOrEditDashboard();
+        result.init(data);
+        return result;
+    }
+
+    toJSON(data?: any) {
+        data = typeof data === 'object' ? data : {};
+        for (var property in this) {
+            if (this.hasOwnProperty(property))
+                data[property] = this[property];
+        }
+        data["id"] = this.id;
+        data["title"] = this.title;
+        data["description"] = this.description;
+        return data;
+    }
+}
+
+export interface ICreateOrEditDashboard {
+    id: number;
+    title: string | undefined;
+    description: string | undefined;
+
+    [key: string]: any;
+}
+
+export class SharingUserInfo implements ISharingUserInfo {
+    canEdit!: boolean;
+    isOwner!: boolean;
+    userId!: number;
+    canView!: boolean;
+    userImage!: string | undefined;
+    jobTitle!: string | undefined;
+    accountName!: string | undefined;
+    accountId!: number;
+    userName!: string | undefined;
+    id!: number;
+
+    [key: string]: any;
+
+    constructor(data?: ISharingUserInfo) {
+        if (data) {
+            for (var property in data) {
+                if (data.hasOwnProperty(property))
+                    (<any>this)[property] = (<any>data)[property];
+            }
+        }
+    }
+
+    init(_data?: any) {
+        if (_data) {
+            for (var property in _data) {
+                if (_data.hasOwnProperty(property))
+                    this[property] = _data[property];
+            }
+            this.canEdit = _data["canEdit"];
+            this.isOwner = _data["isOwner"];
+            this.userId = _data["userId"];
+            this.canView = _data["canView"];
+            this.userImage = _data["userImage"];
+            this.jobTitle = _data["jobTitle"];
+            this.accountName = _data["accountName"];
+            this.accountId = _data["accountId"];
+            this.userName = _data["userName"];
+            this.id = _data["id"];
+        }
+    }
+
+    static fromJS(data: any): SharingUserInfo {
+        data = typeof data === 'object' ? data : {};
+        let result = new SharingUserInfo();
+        result.init(data);
+        return result;
+    }
+
+    toJSON(data?: any) {
+        data = typeof data === 'object' ? data : {};
+        for (var property in this) {
+            if (this.hasOwnProperty(property))
+                data[property] = this[property];
+        }
+        data["canEdit"] = this.canEdit;
+        data["isOwner"] = this.isOwner;
+        data["userId"] = this.userId;
+        data["canView"] = this.canView;
+        data["userImage"] = this.userImage;
+        data["jobTitle"] = this.jobTitle;
+        data["accountName"] = this.accountName;
+        data["accountId"] = this.accountId;
+        data["userName"] = this.userName;
+        data["id"] = this.id;
+        return data;
+    }
+}
+
+export interface ISharingUserInfo {
+    canEdit: boolean;
+    isOwner: boolean;
+    userId: number;
+    canView: boolean;
+    userImage: string | undefined;
+    jobTitle: string | undefined;
+    accountName: string | undefined;
+    accountId: number;
+    userName: string | undefined;
+    id: number;
+
+    [key: string]: any;
+}
+
+export class ShareWithUser implements IShareWithUser {
+    userId!: number;
+    canEdit!: boolean;
+
+    [key: string]: any;
+
+    constructor(data?: IShareWithUser) {
+        if (data) {
+            for (var property in data) {
+                if (data.hasOwnProperty(property))
+                    (<any>this)[property] = (<any>data)[property];
+            }
+        }
+    }
+
+    init(_data?: any) {
+        if (_data) {
+            for (var property in _data) {
+                if (_data.hasOwnProperty(property))
+                    this[property] = _data[property];
+            }
+            this.userId = _data["userId"];
+            this.canEdit = _data["canEdit"];
+        }
+    }
+
+    static fromJS(data: any): ShareWithUser {
+        data = typeof data === 'object' ? data : {};
+        let result = new ShareWithUser();
+        result.init(data);
+        return result;
+    }
+
+    toJSON(data?: any) {
+        data = typeof data === 'object' ? data : {};
+        for (var property in this) {
+            if (this.hasOwnProperty(property))
+                data[property] = this[property];
+        }
+        data["userId"] = this.userId;
+        data["canEdit"] = this.canEdit;
+        return data;
+    }
+}
+
+export interface IShareWithUser {
+    userId: number;
+    canEdit: boolean;
+
+    [key: string]: any;
+}
+
+export class ShareDashboardInfo implements IShareDashboardInfo {
+    dashboardId!: number;
+    sharingLevel!: number;
+    canEdit!: boolean;
+    usersList!: ShareWithUser[] | undefined;
+
+    [key: string]: any;
+
+    constructor(data?: IShareDashboardInfo) {
+        if (data) {
+            for (var property in data) {
+                if (data.hasOwnProperty(property))
+                    (<any>this)[property] = (<any>data)[property];
+            }
+        }
+    }
+
+    init(_data?: any) {
+        if (_data) {
+            for (var property in _data) {
+                if (_data.hasOwnProperty(property))
+                    this[property] = _data[property];
+            }
+            this.dashboardId = _data["dashboardId"];
+            this.sharingLevel = _data["sharingLevel"];
+            this.canEdit = _data["canEdit"];
+            if (Array.isArray(_data["usersList"])) {
+                this.usersList = [] as any;
+                for (let item of _data["usersList"])
+                    this.usersList!.push(ShareWithUser.fromJS(item));
+            }
+        }
+    }
+
+    static fromJS(data: any): ShareDashboardInfo {
+        data = typeof data === 'object' ? data : {};
+        let result = new ShareDashboardInfo();
+        result.init(data);
+        return result;
+    }
+
+    toJSON(data?: any) {
+        data = typeof data === 'object' ? data : {};
+        for (var property in this) {
+            if (this.hasOwnProperty(property))
+                data[property] = this[property];
+        }
+        data["dashboardId"] = this.dashboardId;
+        data["sharingLevel"] = this.sharingLevel;
+        data["canEdit"] = this.canEdit;
+        if (Array.isArray(this.usersList)) {
+            data["usersList"] = [];
+            for (let item of this.usersList)
+                data["usersList"].push(item.toJSON());
+        }
+        return data;
+    }
+}
+
+export interface IShareDashboardInfo {
+    dashboardId: number;
+    sharingLevel: number;
+    canEdit: boolean;
+    usersList: ShareWithUser[] | undefined;
+
+    [key: string]: any;
+}
+
+export class VisibleWhen implements IVisibleWhen {
+    extraAttributeId!: string | undefined;
+    operatorValue!: string | undefined;
+    value!: string | undefined;
+
+    [key: string]: any;
+
+    constructor(data?: IVisibleWhen) {
+        if (data) {
+            for (var property in data) {
+                if (data.hasOwnProperty(property))
+                    (<any>this)[property] = (<any>data)[property];
+            }
+        }
+    }
+
+    init(_data?: any) {
+        if (_data) {
+            for (var property in _data) {
+                if (_data.hasOwnProperty(property))
+                    this[property] = _data[property];
+            }
+            this.extraAttributeId = _data["extraAttributeId"];
+            this.operatorValue = _data["operatorValue"];
+            this.value = _data["value"];
+        }
+    }
+
+    static fromJS(data: any): VisibleWhen {
+        data = typeof data === 'object' ? data : {};
+        let result = new VisibleWhen();
+        result.init(data);
+        return result;
+    }
+
+    toJSON(data?: any) {
+        data = typeof data === 'object' ? data : {};
+        for (var property in this) {
+            if (this.hasOwnProperty(property))
+                data[property] = this[property];
+        }
+        data["extraAttributeId"] = this.extraAttributeId;
+        data["operatorValue"] = this.operatorValue;
+        data["value"] = this.value;
+        return data;
+    }
+}
+
+export interface IVisibleWhen {
+    extraAttributeId: string | undefined;
+    operatorValue: string | undefined;
+    value: string | undefined;
+
+    [key: string]: any;
+}
+
+export class Relation implements IRelation {
+    targetName!: string | undefined;
+    sourceField!: string | undefined;
+    targetField!: string | undefined;
+
+    [key: string]: any;
+
+    constructor(data?: IRelation) {
+        if (data) {
+            for (var property in data) {
+                if (data.hasOwnProperty(property))
+                    (<any>this)[property] = (<any>data)[property];
+            }
+        }
+    }
+
+    init(_data?: any) {
+        if (_data) {
+            for (var property in _data) {
+                if (_data.hasOwnProperty(property))
+                    this[property] = _data[property];
+            }
+            this.targetName = _data["targetName"];
+            this.sourceField = _data["sourceField"];
+            this.targetField = _data["targetField"];
+        }
+    }
+
+    static fromJS(data: any): Relation {
+        data = typeof data === 'object' ? data : {};
+        let result = new Relation();
+        result.init(data);
+        return result;
+    }
+
+    toJSON(data?: any) {
+        data = typeof data === 'object' ? data : {};
+        for (var property in this) {
+            if (this.hasOwnProperty(property))
+                data[property] = this[property];
+        }
+        data["targetName"] = this.targetName;
+        data["sourceField"] = this.sourceField;
+        data["targetField"] = this.targetField;
+        return data;
+    }
+}
+
+export interface IRelation {
+    targetName: string | undefined;
+    sourceField: string | undefined;
+    targetField: string | undefined;
+
+    [key: string]: any;
+}
+
+export class RelatedWhen implements IRelatedWhen {
+    relation!: Relation[] | undefined;
+
+    [key: string]: any;
+
+    constructor(data?: IRelatedWhen) {
+        if (data) {
+            for (var property in data) {
+                if (data.hasOwnProperty(property))
+                    (<any>this)[property] = (<any>data)[property];
+            }
+        }
+    }
+
+    init(_data?: any) {
+        if (_data) {
+            for (var property in _data) {
+                if (_data.hasOwnProperty(property))
+                    this[property] = _data[property];
+            }
+            if (Array.isArray(_data["relation"])) {
+                this.relation = [] as any;
+                for (let item of _data["relation"])
+                    this.relation!.push(Relation.fromJS(item));
+            }
+        }
+    }
+
+    static fromJS(data: any): RelatedWhen {
+        data = typeof data === 'object' ? data : {};
+        let result = new RelatedWhen();
+        result.init(data);
+        return result;
+    }
+
+    toJSON(data?: any) {
+        data = typeof data === 'object' ? data : {};
+        for (var property in this) {
+            if (this.hasOwnProperty(property))
+                data[property] = this[property];
+        }
+        if (Array.isArray(this.relation)) {
+            data["relation"] = [];
+            for (let item of this.relation)
+                data["relation"].push(item.toJSON());
+        }
+        return data;
+    }
+}
+
+export interface IRelatedWhen {
+    relation: Relation[] | undefined;
+
+    [key: string]: any;
+}
+
+export class DataSource implements IDataSource {
+    service!: string | undefined;
+    api!: string | undefined;
+    parameter!: string | undefined;
+    valueParameter!: string | undefined;
+
+    [key: string]: any;
+
+    constructor(data?: IDataSource) {
+        if (data) {
+            for (var property in data) {
+                if (data.hasOwnProperty(property))
+                    (<any>this)[property] = (<any>data)[property];
+            }
+        }
+    }
+
+    init(_data?: any) {
+        if (_data) {
+            for (var property in _data) {
+                if (_data.hasOwnProperty(property))
+                    this[property] = _data[property];
+            }
+            this.service = _data["service"];
+            this.api = _data["api"];
+            this.parameter = _data["parameter"];
+            this.valueParameter = _data["valueParameter"];
+        }
+    }
+
+    static fromJS(data: any): DataSource {
+        data = typeof data === 'object' ? data : {};
+        let result = new DataSource();
+        result.init(data);
+        return result;
+    }
+
+    toJSON(data?: any) {
+        data = typeof data === 'object' ? data : {};
+        for (var property in this) {
+            if (this.hasOwnProperty(property))
+                data[property] = this[property];
+        }
+        data["service"] = this.service;
+        data["api"] = this.api;
+        data["parameter"] = this.parameter;
+        data["valueParameter"] = this.valueParameter;
+        return data;
+    }
+}
+
+export interface IDataSource {
+    service: string | undefined;
+    api: string | undefined;
+    parameter: string | undefined;
+    valueParameter: string | undefined;
+
+    [key: string]: any;
+}
+
+export class ExtraAttribute implements IExtraAttribute {
+    attributeId!: number;
+    code!: string | undefined;
+    name!: string | undefined;
+    description!: string | undefined;
+    dataType!: string | undefined;
+    width!: string | undefined;
+    decimals!: number;
+    defaultValue!: string | undefined;
+    usage!: string | undefined;
+    isLookup!: boolean;
+    entityObjectTypeCode!: string | undefined;
+    acceptMultipleValues!: boolean;
+    validEntries!: string | undefined;
+    isVariation!: boolean;
+    isAdvancedSearch!: boolean;
+    allowAddNew!: boolean;
+    visibleWhen!: VisibleWhen;
+    relatedWhen!: RelatedWhen;
+    dataSource!: DataSource;
+
+    [key: string]: any;
+
+    constructor(data?: IExtraAttribute) {
+        if (data) {
+            for (var property in data) {
+                if (data.hasOwnProperty(property))
+                    (<any>this)[property] = (<any>data)[property];
+            }
+        }
+    }
+
+    init(_data?: any) {
+        if (_data) {
+            for (var property in _data) {
+                if (_data.hasOwnProperty(property))
+                    this[property] = _data[property];
+            }
+            this.attributeId = _data["attributeId"];
+            this.code = _data["code"];
+            this.name = _data["name"];
+            this.description = _data["description"];
+            this.dataType = _data["dataType"];
+            this.width = _data["width"];
+            this.decimals = _data["decimals"];
+            this.defaultValue = _data["defaultValue"];
+            this.usage = _data["usage"];
+            this.isLookup = _data["isLookup"];
+            this.entityObjectTypeCode = _data["entityObjectTypeCode"];
+            this.acceptMultipleValues = _data["acceptMultipleValues"];
+            this.validEntries = _data["validEntries"];
+            this.isVariation = _data["isVariation"];
+            this.isAdvancedSearch = _data["isAdvancedSearch"];
+            this.allowAddNew = _data["allowAddNew"];
+            this.visibleWhen = _data["visibleWhen"] ? VisibleWhen.fromJS(_data["visibleWhen"]) : <any>undefined;
+            this.relatedWhen = _data["relatedWhen"] ? RelatedWhen.fromJS(_data["relatedWhen"]) : <any>undefined;
+            this.dataSource = _data["dataSource"] ? DataSource.fromJS(_data["dataSource"]) : <any>undefined;
+        }
+    }
+
+    static fromJS(data: any): ExtraAttribute {
+        data = typeof data === 'object' ? data : {};
+        let result = new ExtraAttribute();
+        result.init(data);
+        return result;
+    }
+
+    toJSON(data?: any) {
+        data = typeof data === 'object' ? data : {};
+        for (var property in this) {
+            if (this.hasOwnProperty(property))
+                data[property] = this[property];
+        }
+        data["attributeId"] = this.attributeId;
+        data["code"] = this.code;
+        data["name"] = this.name;
+        data["description"] = this.description;
+        data["dataType"] = this.dataType;
+        data["width"] = this.width;
+        data["decimals"] = this.decimals;
+        data["defaultValue"] = this.defaultValue;
+        data["usage"] = this.usage;
+        data["isLookup"] = this.isLookup;
+        data["entityObjectTypeCode"] = this.entityObjectTypeCode;
+        data["acceptMultipleValues"] = this.acceptMultipleValues;
+        data["validEntries"] = this.validEntries;
+        data["isVariation"] = this.isVariation;
+        data["isAdvancedSearch"] = this.isAdvancedSearch;
+        data["allowAddNew"] = this.allowAddNew;
+        data["visibleWhen"] = this.visibleWhen ? this.visibleWhen.toJSON() : <any>undefined;
+        data["relatedWhen"] = this.relatedWhen ? this.relatedWhen.toJSON() : <any>undefined;
+        data["dataSource"] = this.dataSource ? this.dataSource.toJSON() : <any>undefined;
+        return data;
+    }
+}
+
+export interface IExtraAttribute {
+    attributeId: number;
+    code: string | undefined;
+    name: string | undefined;
+    description: string | undefined;
+    dataType: string | undefined;
+    width: string | undefined;
+    decimals: number;
+    defaultValue: string | undefined;
+    usage: string | undefined;
+    isLookup: boolean;
+    entityObjectTypeCode: string | undefined;
+    acceptMultipleValues: boolean;
+    validEntries: string | undefined;
+    isVariation: boolean;
+    isAdvancedSearch: boolean;
+    allowAddNew: boolean;
+    visibleWhen: VisibleWhen;
+    relatedWhen: RelatedWhen;
+    dataSource: DataSource;
+
+    [key: string]: any;
+}
+
+export class DynamicCondition implements IDynamicCondition {
+    field!: string | undefined;
+    operator!: string | undefined;
+    value!: string | undefined;
+    value2!: string | undefined;
+    andWithList!: DynamicCondition[] | undefined;
+    orWithList!: DynamicCondition[] | undefined;
+
+    [key: string]: any;
+
+    constructor(data?: IDynamicCondition) {
+        if (data) {
+            for (var property in data) {
+                if (data.hasOwnProperty(property))
+                    (<any>this)[property] = (<any>data)[property];
+            }
+        }
+    }
+
+    init(_data?: any) {
+        if (_data) {
+            for (var property in _data) {
+                if (_data.hasOwnProperty(property))
+                    this[property] = _data[property];
+            }
+            this.field = _data["field"];
+            this.operator = _data["operator"];
+            this.value = _data["value"];
+            this.value2 = _data["value2"];
+            if (Array.isArray(_data["andWithList"])) {
+                this.andWithList = [] as any;
+                for (let item of _data["andWithList"])
+                    this.andWithList!.push(DynamicCondition.fromJS(item));
+            }
+            if (Array.isArray(_data["orWithList"])) {
+                this.orWithList = [] as any;
+                for (let item of _data["orWithList"])
+                    this.orWithList!.push(DynamicCondition.fromJS(item));
+            }
+        }
+    }
+
+    static fromJS(data: any): DynamicCondition {
+        data = typeof data === 'object' ? data : {};
+        let result = new DynamicCondition();
+        result.init(data);
+        return result;
+    }
+
+    toJSON(data?: any) {
+        data = typeof data === 'object' ? data : {};
+        for (var property in this) {
+            if (this.hasOwnProperty(property))
+                data[property] = this[property];
+        }
+        data["field"] = this.field;
+        data["operator"] = this.operator;
+        data["value"] = this.value;
+        data["value2"] = this.value2;
+        if (Array.isArray(this.andWithList)) {
+            data["andWithList"] = [];
+            for (let item of this.andWithList)
+                data["andWithList"].push(item.toJSON());
+        }
+        if (Array.isArray(this.orWithList)) {
+            data["orWithList"] = [];
+            for (let item of this.orWithList)
+                data["orWithList"].push(item.toJSON());
+        }
+        return data;
+    }
+}
+
+export interface IDynamicCondition {
+    field: string | undefined;
+    operator: string | undefined;
+    value: string | undefined;
+    value2: string | undefined;
+    andWithList: DynamicCondition[] | undefined;
+    orWithList: DynamicCondition[] | undefined;
+
+    [key: string]: any;
+}
+
+export class DynamicQueryResult implements IDynamicQueryResult {
+    totalCount!: number;
+    items!: { [key: string]: any; }[] | undefined;
+
+    [key: string]: any;
+
+    constructor(data?: IDynamicQueryResult) {
+        if (data) {
+            for (var property in data) {
+                if (data.hasOwnProperty(property))
+                    (<any>this)[property] = (<any>data)[property];
+            }
+        }
+    }
+
+    init(_data?: any) {
+        if (_data) {
+            for (var property in _data) {
+                if (_data.hasOwnProperty(property))
+                    this[property] = _data[property];
+            }
+            this.totalCount = _data["totalCount"];
+            if (Array.isArray(_data["items"])) {
+                this.items = [] as any;
+                for (let item of _data["items"])
+                    this.items!.push(item);
+            }
+        }
+    }
+
+    static fromJS(data: any): DynamicQueryResult {
+        data = typeof data === 'object' ? data : {};
+        let result = new DynamicQueryResult();
+        result.init(data);
+        return result;
+    }
+
+    toJSON(data?: any) {
+        data = typeof data === 'object' ? data : {};
+        for (var property in this) {
+            if (this.hasOwnProperty(property))
+                data[property] = this[property];
+        }
+        data["totalCount"] = this.totalCount;
+        if (Array.isArray(this.items)) {
+            data["items"] = [];
+            for (let item of this.items)
+                data["items"].push(item);
+        }
+        return data;
+    }
+}
+
+export interface IDynamicQueryResult {
+    totalCount: number;
+    items: { [key: string]: any; }[] | undefined;
+
+    [key: string]: any;
+}
+
 export class AppEntityAddressDto implements IAppEntityAddressDto {
     entitytId!: number;
     addressTypeId!: number;
@@ -78629,74 +81967,6 @@ export interface ITopPostDto {
     [key: string]: any;
 }
 
-export class UserInformationDto implements IUserInformationDto {
-    userImage!: string | undefined;
-    jobTitle!: string | undefined;
-    accountName!: string | undefined;
-    accountId!: number;
-    userName!: string | undefined;
-    id!: number;
-
-    [key: string]: any;
-
-    constructor(data?: IUserInformationDto) {
-        if (data) {
-            for (var property in data) {
-                if (data.hasOwnProperty(property))
-                    (<any>this)[property] = (<any>data)[property];
-            }
-        }
-    }
-
-    init(_data?: any) {
-        if (_data) {
-            for (var property in _data) {
-                if (_data.hasOwnProperty(property))
-                    this[property] = _data[property];
-            }
-            this.userImage = _data["userImage"];
-            this.jobTitle = _data["jobTitle"];
-            this.accountName = _data["accountName"];
-            this.accountId = _data["accountId"];
-            this.userName = _data["userName"];
-            this.id = _data["id"];
-        }
-    }
-
-    static fromJS(data: any): UserInformationDto {
-        data = typeof data === 'object' ? data : {};
-        let result = new UserInformationDto();
-        result.init(data);
-        return result;
-    }
-
-    toJSON(data?: any) {
-        data = typeof data === 'object' ? data : {};
-        for (var property in this) {
-            if (this.hasOwnProperty(property))
-                data[property] = this[property];
-        }
-        data["userImage"] = this.userImage;
-        data["jobTitle"] = this.jobTitle;
-        data["accountName"] = this.accountName;
-        data["accountId"] = this.accountId;
-        data["userName"] = this.userName;
-        data["id"] = this.id;
-        return data;
-    }
-}
-
-export interface IUserInformationDto {
-    userImage: string | undefined;
-    jobTitle: string | undefined;
-    accountName: string | undefined;
-    accountId: number;
-    userName: string | undefined;
-    id: number;
-
-    [key: string]: any;
-}
-
 export class TopCompany implements ITopCompany {
     accountId!: number;
     tenantId!: number;
@@ -80086,6 +83356,1981 @@ export interface ISycEntityObjectStatusLookupTableDto {
     [key: string]: any;
 }
 
+export class FieldManagerPermissionDto implements IFieldManagerPermissionDto {
+    canViewPage!: boolean;
+    canCreateField!: boolean;
+    canEditField!: boolean;
+    canDeleteField!: boolean;
+    canDuplicateField!: boolean;
+    canRestoreRevision!: boolean;
+    canAddExistingField!: boolean;
+    isHost!: boolean;
+    isTenant!: boolean;
+
+    [key: string]: any;
+
+    constructor(data?: IFieldManagerPermissionDto) {
+        if (data) {
+            for (var property in data) {
+                if (data.hasOwnProperty(property))
+                    (<any>this)[property] = (<any>data)[property];
+            }
+        }
+    }
+
+    init(_data?: any) {
+        if (_data) {
+            for (var property in _data) {
+                if (_data.hasOwnProperty(property))
+                    this[property] = _data[property];
+            }
+            this.canViewPage = _data["canViewPage"];
+            this.canCreateField = _data["canCreateField"];
+            this.canEditField = _data["canEditField"];
+            this.canDeleteField = _data["canDeleteField"];
+            this.canDuplicateField = _data["canDuplicateField"];
+            this.canRestoreRevision = _data["canRestoreRevision"];
+            this.canAddExistingField = _data["canAddExistingField"];
+            this.isHost = _data["isHost"];
+            this.isTenant = _data["isTenant"];
+        }
+    }
+
+    static fromJS(data: any): FieldManagerPermissionDto {
+        data = typeof data === 'object' ? data : {};
+        let result = new FieldManagerPermissionDto();
+        result.init(data);
+        return result;
+    }
+
+    toJSON(data?: any) {
+        data = typeof data === 'object' ? data : {};
+        for (var property in this) {
+            if (this.hasOwnProperty(property))
+                data[property] = this[property];
+        }
+        data["canViewPage"] = this.canViewPage;
+        data["canCreateField"] = this.canCreateField;
+        data["canEditField"] = this.canEditField;
+        data["canDeleteField"] = this.canDeleteField;
+        data["canDuplicateField"] = this.canDuplicateField;
+        data["canRestoreRevision"] = this.canRestoreRevision;
+        data["canAddExistingField"] = this.canAddExistingField;
+        data["isHost"] = this.isHost;
+        data["isTenant"] = this.isTenant;
+        return data;
+    }
+}
+
+export interface IFieldManagerPermissionDto {
+    canViewPage: boolean;
+    canCreateField: boolean;
+    canEditField: boolean;
+    canDeleteField: boolean;
+    canDuplicateField: boolean;
+    canRestoreRevision: boolean;
+    canAddExistingField: boolean;
+    isHost: boolean;
+    isTenant: boolean;
+
+    [key: string]: any;
+}
+
+export class ObjectTypeTreeNodeDto implements IObjectTypeTreeNodeDto {
+    id!: number;
+    parentId!: number | undefined;
+    key!: string | undefined;
+    parentKey!: string | undefined;
+    code!: string | undefined;
+    name!: string | undefined;
+    nodeType!: string | undefined;
+    sycObjectId!: number;
+    children!: ObjectTypeTreeNodeDto[] | undefined;
+
+    [key: string]: any;
+
+    constructor(data?: IObjectTypeTreeNodeDto) {
+        if (data) {
+            for (var property in data) {
+                if (data.hasOwnProperty(property))
+                    (<any>this)[property] = (<any>data)[property];
+            }
+        }
+    }
+
+    init(_data?: any) {
+        if (_data) {
+            for (var property in _data) {
+                if (_data.hasOwnProperty(property))
+                    this[property] = _data[property];
+            }
+            this.id = _data["id"];
+            this.parentId = _data["parentId"];
+            this.key = _data["key"];
+            this.parentKey = _data["parentKey"];
+            this.code = _data["code"];
+            this.name = _data["name"];
+            this.nodeType = _data["nodeType"];
+            this.sycObjectId = _data["sycObjectId"];
+            if (Array.isArray(_data["children"])) {
+                this.children = [] as any;
+                for (let item of _data["children"])
+                    this.children!.push(ObjectTypeTreeNodeDto.fromJS(item));
+            }
+        }
+    }
+
+    static fromJS(data: any): ObjectTypeTreeNodeDto {
+        data = typeof data === 'object' ? data : {};
+        let result = new ObjectTypeTreeNodeDto();
+        result.init(data);
+        return result;
+    }
+
+    toJSON(data?: any) {
+        data = typeof data === 'object' ? data : {};
+        for (var property in this) {
+            if (this.hasOwnProperty(property))
+                data[property] = this[property];
+        }
+        data["id"] = this.id;
+        data["parentId"] = this.parentId;
+        data["key"] = this.key;
+        data["parentKey"] = this.parentKey;
+        data["code"] = this.code;
+        data["name"] = this.name;
+        data["nodeType"] = this.nodeType;
+        data["sycObjectId"] = this.sycObjectId;
+        if (Array.isArray(this.children)) {
+            data["children"] = [];
+            for (let item of this.children)
+                data["children"].push(item.toJSON());
+        }
+        return data;
+    }
+}
+
+export interface IObjectTypeTreeNodeDto {
+    id: number;
+    parentId: number | undefined;
+    key: string | undefined;
+    parentKey: string | undefined;
+    code: string | undefined;
+    name: string | undefined;
+    nodeType: string | undefined;
+    sycObjectId: number;
+    children: ObjectTypeTreeNodeDto[] | undefined;
+
+    [key: string]: any;
+}
+
+export class FieldLookupDto implements IFieldLookupDto {
+    id!: number | undefined;
+    code!: string | undefined;
+    name!: string | undefined;
+
+    [key: string]: any;
+
+    constructor(data?: IFieldLookupDto) {
+        if (data) {
+            for (var property in data) {
+                if (data.hasOwnProperty(property))
+                    (<any>this)[property] = (<any>data)[property];
+            }
+        }
+    }
+
+    init(_data?: any) {
+        if (_data) {
+            for (var property in _data) {
+                if (_data.hasOwnProperty(property))
+                    this[property] = _data[property];
+            }
+            this.id = _data["id"];
+            this.code = _data["code"];
+            this.name = _data["name"];
+        }
+    }
+
+    static fromJS(data: any): FieldLookupDto {
+        data = typeof data === 'object' ? data : {};
+        let result = new FieldLookupDto();
+        result.init(data);
+        return result;
+    }
+
+    toJSON(data?: any) {
+        data = typeof data === 'object' ? data : {};
+        for (var property in this) {
+            if (this.hasOwnProperty(property))
+                data[property] = this[property];
+        }
+        data["id"] = this.id;
+        data["code"] = this.code;
+        data["name"] = this.name;
+        return data;
+    }
+}
+
+export interface IFieldLookupDto {
+    id: number | undefined;
+    code: string | undefined;
+    name: string | undefined;
+
+    [key: string]: any;
+}
+
+export class FieldCreateOrEditMetadataDto implements IFieldCreateOrEditMetadataDto {
+    fieldTypes!: FieldLookupDto[] | undefined;
+    widgetTypes!: FieldLookupDto[] | undefined;
+    fieldLevels!: FieldLookupDto[] | undefined;
+    fieldStatuses!: FieldLookupDto[] | undefined;
+    entities!: FieldLookupDto[] | undefined;
+
+    [key: string]: any;
+
+    constructor(data?: IFieldCreateOrEditMetadataDto) {
+        if (data) {
+            for (var property in data) {
+                if (data.hasOwnProperty(property))
+                    (<any>this)[property] = (<any>data)[property];
+            }
+        }
+    }
+
+    init(_data?: any) {
+        if (_data) {
+            for (var property in _data) {
+                if (_data.hasOwnProperty(property))
+                    this[property] = _data[property];
+            }
+            if (Array.isArray(_data["fieldTypes"])) {
+                this.fieldTypes = [] as any;
+                for (let item of _data["fieldTypes"])
+                    this.fieldTypes!.push(FieldLookupDto.fromJS(item));
+            }
+            if (Array.isArray(_data["widgetTypes"])) {
+                this.widgetTypes = [] as any;
+                for (let item of _data["widgetTypes"])
+                    this.widgetTypes!.push(FieldLookupDto.fromJS(item));
+            }
+            if (Array.isArray(_data["fieldLevels"])) {
+                this.fieldLevels = [] as any;
+                for (let item of _data["fieldLevels"])
+                    this.fieldLevels!.push(FieldLookupDto.fromJS(item));
+            }
+            if (Array.isArray(_data["fieldStatuses"])) {
+                this.fieldStatuses = [] as any;
+                for (let item of _data["fieldStatuses"])
+                    this.fieldStatuses!.push(FieldLookupDto.fromJS(item));
+            }
+            if (Array.isArray(_data["entities"])) {
+                this.entities = [] as any;
+                for (let item of _data["entities"])
+                    this.entities!.push(FieldLookupDto.fromJS(item));
+            }
+        }
+    }
+
+    static fromJS(data: any): FieldCreateOrEditMetadataDto {
+        data = typeof data === 'object' ? data : {};
+        let result = new FieldCreateOrEditMetadataDto();
+        result.init(data);
+        return result;
+    }
+
+    toJSON(data?: any) {
+        data = typeof data === 'object' ? data : {};
+        for (var property in this) {
+            if (this.hasOwnProperty(property))
+                data[property] = this[property];
+        }
+        if (Array.isArray(this.fieldTypes)) {
+            data["fieldTypes"] = [];
+            for (let item of this.fieldTypes)
+                data["fieldTypes"].push(item.toJSON());
+        }
+        if (Array.isArray(this.widgetTypes)) {
+            data["widgetTypes"] = [];
+            for (let item of this.widgetTypes)
+                data["widgetTypes"].push(item.toJSON());
+        }
+        if (Array.isArray(this.fieldLevels)) {
+            data["fieldLevels"] = [];
+            for (let item of this.fieldLevels)
+                data["fieldLevels"].push(item.toJSON());
+        }
+        if (Array.isArray(this.fieldStatuses)) {
+            data["fieldStatuses"] = [];
+            for (let item of this.fieldStatuses)
+                data["fieldStatuses"].push(item.toJSON());
+        }
+        if (Array.isArray(this.entities)) {
+            data["entities"] = [];
+            for (let item of this.entities)
+                data["entities"].push(item.toJSON());
+        }
+        return data;
+    }
+}
+
+export interface IFieldCreateOrEditMetadataDto {
+    fieldTypes: FieldLookupDto[] | undefined;
+    widgetTypes: FieldLookupDto[] | undefined;
+    fieldLevels: FieldLookupDto[] | undefined;
+    fieldStatuses: FieldLookupDto[] | undefined;
+    entities: FieldLookupDto[] | undefined;
+
+    [key: string]: any;
+}
+
+export class PreviewFieldCodeInput implements IPreviewFieldCodeInput {
+    fieldTypeId!: number;
+
+    [key: string]: any;
+
+    constructor(data?: IPreviewFieldCodeInput) {
+        if (data) {
+            for (var property in data) {
+                if (data.hasOwnProperty(property))
+                    (<any>this)[property] = (<any>data)[property];
+            }
+        }
+    }
+
+    init(_data?: any) {
+        if (_data) {
+            for (var property in _data) {
+                if (_data.hasOwnProperty(property))
+                    this[property] = _data[property];
+            }
+            this.fieldTypeId = _data["fieldTypeId"];
+        }
+    }
+
+    static fromJS(data: any): PreviewFieldCodeInput {
+        data = typeof data === 'object' ? data : {};
+        let result = new PreviewFieldCodeInput();
+        result.init(data);
+        return result;
+    }
+
+    toJSON(data?: any) {
+        data = typeof data === 'object' ? data : {};
+        for (var property in this) {
+            if (this.hasOwnProperty(property))
+                data[property] = this[property];
+        }
+        data["fieldTypeId"] = this.fieldTypeId;
+        return data;
+    }
+}
+
+export interface IPreviewFieldCodeInput {
+    fieldTypeId: number;
+
+    [key: string]: any;
+}
+
+export class FieldCodePreviewDto implements IFieldCodePreviewDto {
+    sequence!: string | undefined;
+
+    [key: string]: any;
+
+    constructor(data?: IFieldCodePreviewDto) {
+        if (data) {
+            for (var property in data) {
+                if (data.hasOwnProperty(property))
+                    (<any>this)[property] = (<any>data)[property];
+            }
+        }
+    }
+
+    init(_data?: any) {
+        if (_data) {
+            for (var property in _data) {
+                if (_data.hasOwnProperty(property))
+                    this[property] = _data[property];
+            }
+            this.sequence = _data["sequence"];
+        }
+    }
+
+    static fromJS(data: any): FieldCodePreviewDto {
+        data = typeof data === 'object' ? data : {};
+        let result = new FieldCodePreviewDto();
+        result.init(data);
+        return result;
+    }
+
+    toJSON(data?: any) {
+        data = typeof data === 'object' ? data : {};
+        for (var property in this) {
+            if (this.hasOwnProperty(property))
+                data[property] = this[property];
+        }
+        data["sequence"] = this.sequence;
+        return data;
+    }
+}
+
+export interface IFieldCodePreviewDto {
+    sequence: string | undefined;
+
+    [key: string]: any;
+}
+
+export class FieldSettingValueDto implements IFieldSettingValueDto {
+    settingFieldId!: number;
+    value!: string | undefined;
+    settingFieldCode!: string | undefined;
+    settingFieldName!: string | undefined;
+
+    [key: string]: any;
+
+    constructor(data?: IFieldSettingValueDto) {
+        if (data) {
+            for (var property in data) {
+                if (data.hasOwnProperty(property))
+                    (<any>this)[property] = (<any>data)[property];
+            }
+        }
+    }
+
+    init(_data?: any) {
+        if (_data) {
+            for (var property in _data) {
+                if (_data.hasOwnProperty(property))
+                    this[property] = _data[property];
+            }
+            this.settingFieldId = _data["settingFieldId"];
+            this.value = _data["value"];
+            this.settingFieldCode = _data["settingFieldCode"];
+            this.settingFieldName = _data["settingFieldName"];
+        }
+    }
+
+    static fromJS(data: any): FieldSettingValueDto {
+        data = typeof data === 'object' ? data : {};
+        let result = new FieldSettingValueDto();
+        result.init(data);
+        return result;
+    }
+
+    toJSON(data?: any) {
+        data = typeof data === 'object' ? data : {};
+        for (var property in this) {
+            if (this.hasOwnProperty(property))
+                data[property] = this[property];
+        }
+        data["settingFieldId"] = this.settingFieldId;
+        data["value"] = this.value;
+        data["settingFieldCode"] = this.settingFieldCode;
+        data["settingFieldName"] = this.settingFieldName;
+        return data;
+    }
+}
+
+export interface IFieldSettingValueDto {
+    settingFieldId: number;
+    value: string | undefined;
+    settingFieldCode: string | undefined;
+    settingFieldName: string | undefined;
+
+    [key: string]: any;
+}
+
+export class AppFieldListDto implements IAppFieldListDto {
+    id!: number;
+    fieldDefinitionKey!: string;
+    fieldCode!: string | undefined;
+    fieldName!: string | undefined;
+    description!: string | undefined;
+    fieldTypeName!: string | undefined;
+    widgetTypeName!: string | undefined;
+    fieldLevelName!: string | undefined;
+    statusName!: string | undefined;
+    revisionNo!: string | undefined;
+    trackingNo!: string | undefined;
+    standardOrCustom!: string | undefined;
+    isStandard!: boolean;
+    isCustom!: boolean;
+    isExtraField!: boolean;
+    isHidden!: boolean;
+    canEdit!: boolean;
+    canDelete!: boolean;
+    canHide!: boolean;
+    sycObjectId!: number | undefined;
+    entitySycObjectId!: number | undefined;
+    creatorUserId!: number | undefined;
+    creatorUserName!: string | undefined;
+    creationTime!: moment.Moment;
+    tables!: string[] | undefined;
+    settingValues!: FieldSettingValueDto[] | undefined;
+
+    [key: string]: any;
+
+    constructor(data?: IAppFieldListDto) {
+        if (data) {
+            for (var property in data) {
+                if (data.hasOwnProperty(property))
+                    (<any>this)[property] = (<any>data)[property];
+            }
+        }
+    }
+
+    init(_data?: any) {
+        if (_data) {
+            for (var property in _data) {
+                if (_data.hasOwnProperty(property))
+                    this[property] = _data[property];
+            }
+            this.id = _data["id"];
+            this.fieldDefinitionKey = _data["fieldDefinitionKey"];
+            this.fieldCode = _data["fieldCode"];
+            this.fieldName = _data["fieldName"];
+            this.description = _data["description"];
+            this.fieldTypeName = _data["fieldTypeName"];
+            this.widgetTypeName = _data["widgetTypeName"];
+            this.fieldLevelName = _data["fieldLevelName"];
+            this.statusName = _data["statusName"];
+            this.revisionNo = _data["revisionNo"];
+            this.trackingNo = _data["trackingNo"];
+            this.standardOrCustom = _data["standardOrCustom"];
+            this.isStandard = _data["isStandard"];
+            this.isCustom = _data["isCustom"];
+            this.isExtraField = _data["isExtraField"];
+            this.isHidden = _data["isHidden"];
+            this.canEdit = _data["canEdit"];
+            this.canDelete = _data["canDelete"];
+            this.canHide = _data["canHide"];
+            this.sycObjectId = _data["sycObjectId"];
+            this.entitySycObjectId = _data["entitySycObjectId"];
+            this.creatorUserId = _data["creatorUserId"];
+            this.creatorUserName = _data["creatorUserName"];
+            this.creationTime = _data["creationTime"] ? moment(_data["creationTime"].toString()) : <any>undefined;
+            if (Array.isArray(_data["tables"])) {
+                this.tables = [] as any;
+                for (let item of _data["tables"])
+                    this.tables!.push(item);
+            }
+            if (Array.isArray(_data["settingValues"])) {
+                this.settingValues = [] as any;
+                for (let item of _data["settingValues"])
+                    this.settingValues!.push(FieldSettingValueDto.fromJS(item));
+            }
+        }
+    }
+
+    static fromJS(data: any): AppFieldListDto {
+        data = typeof data === 'object' ? data : {};
+        let result = new AppFieldListDto();
+        result.init(data);
+        return result;
+    }
+
+    toJSON(data?: any) {
+        data = typeof data === 'object' ? data : {};
+        for (var property in this) {
+            if (this.hasOwnProperty(property))
+                data[property] = this[property];
+        }
+        data["id"] = this.id;
+        data["fieldDefinitionKey"] = this.fieldDefinitionKey;
+        data["fieldCode"] = this.fieldCode;
+        data["fieldName"] = this.fieldName;
+        data["description"] = this.description;
+        data["fieldTypeName"] = this.fieldTypeName;
+        data["widgetTypeName"] = this.widgetTypeName;
+        data["fieldLevelName"] = this.fieldLevelName;
+        data["statusName"] = this.statusName;
+        data["revisionNo"] = this.revisionNo;
+        data["trackingNo"] = this.trackingNo;
+        data["standardOrCustom"] = this.standardOrCustom;
+        data["isStandard"] = this.isStandard;
+        data["isCustom"] = this.isCustom;
+        data["isExtraField"] = this.isExtraField;
+        data["isHidden"] = this.isHidden;
+        data["canEdit"] = this.canEdit;
+        data["canDelete"] = this.canDelete;
+        data["canHide"] = this.canHide;
+        data["sycObjectId"] = this.sycObjectId;
+        data["entitySycObjectId"] = this.entitySycObjectId;
+        data["creatorUserId"] = this.creatorUserId;
+        data["creatorUserName"] = this.creatorUserName;
+        data["creationTime"] = this.creationTime ? this.creationTime.toISOString() : <any>undefined;
+        if (Array.isArray(this.tables)) {
+            data["tables"] = [];
+            for (let item of this.tables)
+                data["tables"].push(item);
+        }
+        if (Array.isArray(this.settingValues)) {
+            data["settingValues"] = [];
+            for (let item of this.settingValues)
+                data["settingValues"].push(item.toJSON());
+        }
+        return data;
+    }
+}
+
+export interface IAppFieldListDto {
+    id: number;
+    fieldDefinitionKey: string;
+    fieldCode: string | undefined;
+    fieldName: string | undefined;
+    description: string | undefined;
+    fieldTypeName: string | undefined;
+    widgetTypeName: string | undefined;
+    fieldLevelName: string | undefined;
+    statusName: string | undefined;
+    revisionNo: string | undefined;
+    trackingNo: string | undefined;
+    standardOrCustom: string | undefined;
+    isStandard: boolean;
+    isCustom: boolean;
+    isExtraField: boolean;
+    isHidden: boolean;
+    canEdit: boolean;
+    canDelete: boolean;
+    canHide: boolean;
+    sycObjectId: number | undefined;
+    entitySycObjectId: number | undefined;
+    creatorUserId: number | undefined;
+    creatorUserName: string | undefined;
+    creationTime: moment.Moment;
+    tables: string[] | undefined;
+    settingValues: FieldSettingValueDto[] | undefined;
+
+    [key: string]: any;
+}
+
+export class PagedResultDtoOfAppFieldListDto implements IPagedResultDtoOfAppFieldListDto {
+    totalCount!: number;
+    items!: AppFieldListDto[] | undefined;
+
+    [key: string]: any;
+
+    constructor(data?: IPagedResultDtoOfAppFieldListDto) {
+        if (data) {
+            for (var property in data) {
+                if (data.hasOwnProperty(property))
+                    (<any>this)[property] = (<any>data)[property];
+            }
+        }
+    }
+
+    init(_data?: any) {
+        if (_data) {
+            for (var property in _data) {
+                if (_data.hasOwnProperty(property))
+                    this[property] = _data[property];
+            }
+            this.totalCount = _data["totalCount"];
+            if (Array.isArray(_data["items"])) {
+                this.items = [] as any;
+                for (let item of _data["items"])
+                    this.items!.push(AppFieldListDto.fromJS(item));
+            }
+        }
+    }
+
+    static fromJS(data: any): PagedResultDtoOfAppFieldListDto {
+        data = typeof data === 'object' ? data : {};
+        let result = new PagedResultDtoOfAppFieldListDto();
+        result.init(data);
+        return result;
+    }
+
+    toJSON(data?: any) {
+        data = typeof data === 'object' ? data : {};
+        for (var property in this) {
+            if (this.hasOwnProperty(property))
+                data[property] = this[property];
+        }
+        data["totalCount"] = this.totalCount;
+        if (Array.isArray(this.items)) {
+            data["items"] = [];
+            for (let item of this.items)
+                data["items"].push(item.toJSON());
+        }
+        return data;
+    }
+}
+
+export interface IPagedResultDtoOfAppFieldListDto {
+    totalCount: number;
+    items: AppFieldListDto[] | undefined;
+
+    [key: string]: any;
+}
+
+export class FieldRevisionErrorDto implements IFieldRevisionErrorDto {
+    code!: number;
+    message!: string | undefined;
+    conflictingRevisionNo!: string | undefined;
+    expectedNewRevisionNo!: string | undefined;
+    currentFieldId!: number;
+    revisionAlreadyExists!: boolean;
+
+    [key: string]: any;
+
+    constructor(data?: IFieldRevisionErrorDto) {
+        if (data) {
+            for (var property in data) {
+                if (data.hasOwnProperty(property))
+                    (<any>this)[property] = (<any>data)[property];
+            }
+        }
+    }
+
+    init(_data?: any) {
+        if (_data) {
+            for (var property in _data) {
+                if (_data.hasOwnProperty(property))
+                    this[property] = _data[property];
+            }
+            this.code = _data["code"];
+            this.message = _data["message"];
+            this.conflictingRevisionNo = _data["conflictingRevisionNo"];
+            this.expectedNewRevisionNo = _data["expectedNewRevisionNo"];
+            this.currentFieldId = _data["currentFieldId"];
+            this.revisionAlreadyExists = _data["revisionAlreadyExists"];
+        }
+    }
+
+    static fromJS(data: any): FieldRevisionErrorDto {
+        data = typeof data === 'object' ? data : {};
+        let result = new FieldRevisionErrorDto();
+        result.init(data);
+        return result;
+    }
+
+    toJSON(data?: any) {
+        data = typeof data === 'object' ? data : {};
+        for (var property in this) {
+            if (this.hasOwnProperty(property))
+                data[property] = this[property];
+        }
+        data["code"] = this.code;
+        data["message"] = this.message;
+        data["conflictingRevisionNo"] = this.conflictingRevisionNo;
+        data["expectedNewRevisionNo"] = this.expectedNewRevisionNo;
+        data["currentFieldId"] = this.currentFieldId;
+        data["revisionAlreadyExists"] = this.revisionAlreadyExists;
+        return data;
+    }
+}
+
+export interface IFieldRevisionErrorDto {
+    code: number;
+    message: string | undefined;
+    conflictingRevisionNo: string | undefined;
+    expectedNewRevisionNo: string | undefined;
+    currentFieldId: number;
+    revisionAlreadyExists: boolean;
+
+    [key: string]: any;
+}
+
+export class AppFieldDto implements IAppFieldDto {
+    error!: FieldRevisionErrorDto;
+    fieldDefinitionKey!: string;
+    tenantId!: number | undefined;
+    sourceFieldId!: number | undefined;
+    currentRevisionNo!: string | undefined;
+    nextRevisionNo!: string | undefined;
+    isStandard!: boolean;
+    isCustom!: boolean;
+    isHidden!: boolean;
+    creationTime!: moment.Moment;
+    creatorUserId!: number | undefined;
+    creatorUserName!: string | undefined;
+    lastModificationTime!: moment.Moment | undefined;
+    lastModifierUserId!: number | undefined;
+    isDeleted!: boolean;
+    deleterUserId!: number | undefined;
+    deletionTime!: moment.Moment | undefined;
+    id!: number | undefined;
+    expectedCurrentRevisionNo!: string | undefined;
+    sycObjectId!: number | undefined;
+    entitySycObjectId!: number | undefined;
+    selectedObjectTypeId!: number | undefined;
+    fieldTypeId!: number;
+    widgetTypeId!: number | undefined;
+    fieldLevelId!: number | undefined;
+    fieldStatusId!: number | undefined;
+    fieldCode!: string | undefined;
+    fieldName!: string;
+    description!: string | undefined;
+    fieldLevelCode!: string | undefined;
+    fieldStatusCode!: string | undefined;
+    trackingNo!: string | undefined;
+    isExtraField!: boolean;
+    allowNull!: boolean;
+    length!: number | undefined;
+    decimals!: number | undefined;
+    defaultValue!: string | undefined;
+    dateFormat!: string | undefined;
+    timeFormat!: string | undefined;
+    allowMultiSelect!: boolean;
+    validEntries!: string | undefined;
+    required!: boolean;
+    visible!: boolean;
+    editable!: boolean;
+    extraAttributes!: string | undefined;
+    settingValues!: FieldSettingValueDto[] | undefined;
+
+    [key: string]: any;
+
+    constructor(data?: IAppFieldDto) {
+        if (data) {
+            for (var property in data) {
+                if (data.hasOwnProperty(property))
+                    (<any>this)[property] = (<any>data)[property];
+            }
+        }
+    }
+
+    init(_data?: any) {
+        if (_data) {
+            for (var property in _data) {
+                if (_data.hasOwnProperty(property))
+                    this[property] = _data[property];
+            }
+            this.error = _data["error"] ? FieldRevisionErrorDto.fromJS(_data["error"]) : <any>undefined;
+            this.fieldDefinitionKey = _data["fieldDefinitionKey"];
+            this.tenantId = _data["tenantId"];
+            this.sourceFieldId = _data["sourceFieldId"];
+            this.currentRevisionNo = _data["currentRevisionNo"];
+            this.nextRevisionNo = _data["nextRevisionNo"];
+            this.isStandard = _data["isStandard"];
+            this.isCustom = _data["isCustom"];
+            this.isHidden = _data["isHidden"];
+            this.creationTime = _data["creationTime"] ? moment(_data["creationTime"].toString()) : <any>undefined;
+            this.creatorUserId = _data["creatorUserId"];
+            this.creatorUserName = _data["creatorUserName"];
+            this.lastModificationTime = _data["lastModificationTime"] ? moment(_data["lastModificationTime"].toString()) : <any>undefined;
+            this.lastModifierUserId = _data["lastModifierUserId"];
+            this.isDeleted = _data["isDeleted"];
+            this.deleterUserId = _data["deleterUserId"];
+            this.deletionTime = _data["deletionTime"] ? moment(_data["deletionTime"].toString()) : <any>undefined;
+            this.id = _data["id"];
+            this.expectedCurrentRevisionNo = _data["expectedCurrentRevisionNo"];
+            this.sycObjectId = _data["sycObjectId"];
+            this.entitySycObjectId = _data["entitySycObjectId"];
+            this.selectedObjectTypeId = _data["selectedObjectTypeId"];
+            this.fieldTypeId = _data["fieldTypeId"];
+            this.widgetTypeId = _data["widgetTypeId"];
+            this.fieldLevelId = _data["fieldLevelId"];
+            this.fieldStatusId = _data["fieldStatusId"];
+            this.fieldCode = _data["fieldCode"];
+            this.fieldName = _data["fieldName"];
+            this.description = _data["description"];
+            this.fieldLevelCode = _data["fieldLevelCode"];
+            this.fieldStatusCode = _data["fieldStatusCode"];
+            this.trackingNo = _data["trackingNo"];
+            this.isExtraField = _data["isExtraField"];
+            this.allowNull = _data["allowNull"];
+            this.length = _data["length"];
+            this.decimals = _data["decimals"];
+            this.defaultValue = _data["defaultValue"];
+            this.dateFormat = _data["dateFormat"];
+            this.timeFormat = _data["timeFormat"];
+            this.allowMultiSelect = _data["allowMultiSelect"];
+            this.validEntries = _data["validEntries"];
+            this.required = _data["required"];
+            this.visible = _data["visible"];
+            this.editable = _data["editable"];
+            this.extraAttributes = _data["extraAttributes"];
+            if (Array.isArray(_data["settingValues"])) {
+                this.settingValues = [] as any;
+                for (let item of _data["settingValues"])
+                    this.settingValues!.push(FieldSettingValueDto.fromJS(item));
+            }
+        }
+    }
+
+    static fromJS(data: any): AppFieldDto {
+        data = typeof data === 'object' ? data : {};
+        let result = new AppFieldDto();
+        result.init(data);
+        return result;
+    }
+
+    toJSON(data?: any) {
+        data = typeof data === 'object' ? data : {};
+        for (var property in this) {
+            if (this.hasOwnProperty(property))
+                data[property] = this[property];
+        }
+        data["error"] = this.error ? this.error.toJSON() : <any>undefined;
+        data["fieldDefinitionKey"] = this.fieldDefinitionKey;
+        data["tenantId"] = this.tenantId;
+        data["sourceFieldId"] = this.sourceFieldId;
+        data["currentRevisionNo"] = this.currentRevisionNo;
+        data["nextRevisionNo"] = this.nextRevisionNo;
+        data["isStandard"] = this.isStandard;
+        data["isCustom"] = this.isCustom;
+        data["isHidden"] = this.isHidden;
+        data["creationTime"] = this.creationTime ? this.creationTime.toISOString() : <any>undefined;
+        data["creatorUserId"] = this.creatorUserId;
+        data["creatorUserName"] = this.creatorUserName;
+        data["lastModificationTime"] = this.lastModificationTime ? this.lastModificationTime.toISOString() : <any>undefined;
+        data["lastModifierUserId"] = this.lastModifierUserId;
+        data["isDeleted"] = this.isDeleted;
+        data["deleterUserId"] = this.deleterUserId;
+        data["deletionTime"] = this.deletionTime ? this.deletionTime.toISOString() : <any>undefined;
+        data["id"] = this.id;
+        data["expectedCurrentRevisionNo"] = this.expectedCurrentRevisionNo;
+        data["sycObjectId"] = this.sycObjectId;
+        data["entitySycObjectId"] = this.entitySycObjectId;
+        data["selectedObjectTypeId"] = this.selectedObjectTypeId;
+        data["fieldTypeId"] = this.fieldTypeId;
+        data["widgetTypeId"] = this.widgetTypeId;
+        data["fieldLevelId"] = this.fieldLevelId;
+        data["fieldStatusId"] = this.fieldStatusId;
+        data["fieldCode"] = this.fieldCode;
+        data["fieldName"] = this.fieldName;
+        data["description"] = this.description;
+        data["fieldLevelCode"] = this.fieldLevelCode;
+        data["fieldStatusCode"] = this.fieldStatusCode;
+        data["trackingNo"] = this.trackingNo;
+        data["isExtraField"] = this.isExtraField;
+        data["allowNull"] = this.allowNull;
+        data["length"] = this.length;
+        data["decimals"] = this.decimals;
+        data["defaultValue"] = this.defaultValue;
+        data["dateFormat"] = this.dateFormat;
+        data["timeFormat"] = this.timeFormat;
+        data["allowMultiSelect"] = this.allowMultiSelect;
+        data["validEntries"] = this.validEntries;
+        data["required"] = this.required;
+        data["visible"] = this.visible;
+        data["editable"] = this.editable;
+        data["extraAttributes"] = this.extraAttributes;
+        if (Array.isArray(this.settingValues)) {
+            data["settingValues"] = [];
+            for (let item of this.settingValues)
+                data["settingValues"].push(item.toJSON());
+        }
+        return data;
+    }
+}
+
+export interface IAppFieldDto {
+    error: FieldRevisionErrorDto;
+    fieldDefinitionKey: string;
+    tenantId: number | undefined;
+    sourceFieldId: number | undefined;
+    currentRevisionNo: string | undefined;
+    nextRevisionNo: string | undefined;
+    isStandard: boolean;
+    isCustom: boolean;
+    isHidden: boolean;
+    creationTime: moment.Moment;
+    creatorUserId: number | undefined;
+    creatorUserName: string | undefined;
+    lastModificationTime: moment.Moment | undefined;
+    lastModifierUserId: number | undefined;
+    isDeleted: boolean;
+    deleterUserId: number | undefined;
+    deletionTime: moment.Moment | undefined;
+    id: number | undefined;
+    expectedCurrentRevisionNo: string | undefined;
+    sycObjectId: number | undefined;
+    entitySycObjectId: number | undefined;
+    selectedObjectTypeId: number | undefined;
+    fieldTypeId: number;
+    widgetTypeId: number | undefined;
+    fieldLevelId: number | undefined;
+    fieldStatusId: number | undefined;
+    fieldCode: string | undefined;
+    fieldName: string;
+    description: string | undefined;
+    fieldLevelCode: string | undefined;
+    fieldStatusCode: string | undefined;
+    trackingNo: string | undefined;
+    isExtraField: boolean;
+    allowNull: boolean;
+    length: number | undefined;
+    decimals: number | undefined;
+    defaultValue: string | undefined;
+    dateFormat: string | undefined;
+    timeFormat: string | undefined;
+    allowMultiSelect: boolean;
+    validEntries: string | undefined;
+    required: boolean;
+    visible: boolean;
+    editable: boolean;
+    extraAttributes: string | undefined;
+    settingValues: FieldSettingValueDto[] | undefined;
+
+    [key: string]: any;
+}
+
+export class AssignExistingFieldInput implements IAssignExistingFieldInput {
+    appFieldId!: number;
+    sycObjectId!: number;
+    sycEntityObjectTypeId!: number | undefined;
+
+    [key: string]: any;
+
+    constructor(data?: IAssignExistingFieldInput) {
+        if (data) {
+            for (var property in data) {
+                if (data.hasOwnProperty(property))
+                    (<any>this)[property] = (<any>data)[property];
+            }
+        }
+    }
+
+    init(_data?: any) {
+        if (_data) {
+            for (var property in _data) {
+                if (_data.hasOwnProperty(property))
+                    this[property] = _data[property];
+            }
+            this.appFieldId = _data["appFieldId"];
+            this.sycObjectId = _data["sycObjectId"];
+            this.sycEntityObjectTypeId = _data["sycEntityObjectTypeId"];
+        }
+    }
+
+    static fromJS(data: any): AssignExistingFieldInput {
+        data = typeof data === 'object' ? data : {};
+        let result = new AssignExistingFieldInput();
+        result.init(data);
+        return result;
+    }
+
+    toJSON(data?: any) {
+        data = typeof data === 'object' ? data : {};
+        for (var property in this) {
+            if (this.hasOwnProperty(property))
+                data[property] = this[property];
+        }
+        data["appFieldId"] = this.appFieldId;
+        data["sycObjectId"] = this.sycObjectId;
+        data["sycEntityObjectTypeId"] = this.sycEntityObjectTypeId;
+        return data;
+    }
+}
+
+export interface IAssignExistingFieldInput {
+    appFieldId: number;
+    sycObjectId: number;
+    sycEntityObjectTypeId: number | undefined;
+
+    [key: string]: any;
+}
+
+export class FieldActionResultDto implements IFieldActionResultDto {
+    success!: boolean;
+    message!: string | undefined;
+
+    [key: string]: any;
+
+    constructor(data?: IFieldActionResultDto) {
+        if (data) {
+            for (var property in data) {
+                if (data.hasOwnProperty(property))
+                    (<any>this)[property] = (<any>data)[property];
+            }
+        }
+    }
+
+    init(_data?: any) {
+        if (_data) {
+            for (var property in _data) {
+                if (_data.hasOwnProperty(property))
+                    this[property] = _data[property];
+            }
+            this.success = _data["success"];
+            this.message = _data["message"];
+        }
+    }
+
+    static fromJS(data: any): FieldActionResultDto {
+        data = typeof data === 'object' ? data : {};
+        let result = new FieldActionResultDto();
+        result.init(data);
+        return result;
+    }
+
+    toJSON(data?: any) {
+        data = typeof data === 'object' ? data : {};
+        for (var property in this) {
+            if (this.hasOwnProperty(property))
+                data[property] = this[property];
+        }
+        data["success"] = this.success;
+        data["message"] = this.message;
+        return data;
+    }
+}
+
+export interface IFieldActionResultDto {
+    success: boolean;
+    message: string | undefined;
+
+    [key: string]: any;
+}
+
+export class PagedResultDtoOfAppFieldDto implements IPagedResultDtoOfAppFieldDto {
+    totalCount!: number;
+    items!: AppFieldDto[] | undefined;
+
+    [key: string]: any;
+
+    constructor(data?: IPagedResultDtoOfAppFieldDto) {
+        if (data) {
+            for (var property in data) {
+                if (data.hasOwnProperty(property))
+                    (<any>this)[property] = (<any>data)[property];
+            }
+        }
+    }
+
+    init(_data?: any) {
+        if (_data) {
+            for (var property in _data) {
+                if (_data.hasOwnProperty(property))
+                    this[property] = _data[property];
+            }
+            this.totalCount = _data["totalCount"];
+            if (Array.isArray(_data["items"])) {
+                this.items = [] as any;
+                for (let item of _data["items"])
+                    this.items!.push(AppFieldDto.fromJS(item));
+            }
+        }
+    }
+
+    static fromJS(data: any): PagedResultDtoOfAppFieldDto {
+        data = typeof data === 'object' ? data : {};
+        let result = new PagedResultDtoOfAppFieldDto();
+        result.init(data);
+        return result;
+    }
+
+    toJSON(data?: any) {
+        data = typeof data === 'object' ? data : {};
+        for (var property in this) {
+            if (this.hasOwnProperty(property))
+                data[property] = this[property];
+        }
+        data["totalCount"] = this.totalCount;
+        if (Array.isArray(this.items)) {
+            data["items"] = [];
+            for (let item of this.items)
+                data["items"].push(item.toJSON());
+        }
+        return data;
+    }
+}
+
+export interface IPagedResultDtoOfAppFieldDto {
+    totalCount: number;
+    items: AppFieldDto[] | undefined;
+
+    [key: string]: any;
+}
+
+export class LinkExistingFieldsInput implements ILinkExistingFieldsInput {
+    tableId!: number;
+    sycEntityObjectTypeId!: number | undefined;
+    appFieldIds!: number[];
+
+    [key: string]: any;
+
+    constructor(data?: ILinkExistingFieldsInput) {
+        if (data) {
+            for (var property in data) {
+                if (data.hasOwnProperty(property))
+                    (<any>this)[property] = (<any>data)[property];
+            }
+        }
+        if (!data) {
+            this.appFieldIds = [];
+        }
+    }
+
+    init(_data?: any) {
+        if (_data) {
+            for (var property in _data) {
+                if (_data.hasOwnProperty(property))
+                    this[property] = _data[property];
+            }
+            this.tableId = _data["tableId"];
+            this.sycEntityObjectTypeId = _data["sycEntityObjectTypeId"];
+            if (Array.isArray(_data["appFieldIds"])) {
+                this.appFieldIds = [] as any;
+                for (let item of _data["appFieldIds"])
+                    this.appFieldIds!.push(item);
+            }
+        }
+    }
+
+    static fromJS(data: any): LinkExistingFieldsInput {
+        data = typeof data === 'object' ? data : {};
+        let result = new LinkExistingFieldsInput();
+        result.init(data);
+        return result;
+    }
+
+    toJSON(data?: any) {
+        data = typeof data === 'object' ? data : {};
+        for (var property in this) {
+            if (this.hasOwnProperty(property))
+                data[property] = this[property];
+        }
+        data["tableId"] = this.tableId;
+        data["sycEntityObjectTypeId"] = this.sycEntityObjectTypeId;
+        if (Array.isArray(this.appFieldIds)) {
+            data["appFieldIds"] = [];
+            for (let item of this.appFieldIds)
+                data["appFieldIds"].push(item);
+        }
+        return data;
+    }
+}
+
+export interface ILinkExistingFieldsInput {
+    tableId: number;
+    sycEntityObjectTypeId: number | undefined;
+    appFieldIds: number[];
+
+    [key: string]: any;
+}
+
+export class LinkExistingFieldsResultDto implements ILinkExistingFieldsResultDto {
+    linkedCount!: number;
+    alreadyLinkedCount!: number;
+
+    [key: string]: any;
+
+    constructor(data?: ILinkExistingFieldsResultDto) {
+        if (data) {
+            for (var property in data) {
+                if (data.hasOwnProperty(property))
+                    (<any>this)[property] = (<any>data)[property];
+            }
+        }
+    }
+
+    init(_data?: any) {
+        if (_data) {
+            for (var property in _data) {
+                if (_data.hasOwnProperty(property))
+                    this[property] = _data[property];
+            }
+            this.linkedCount = _data["linkedCount"];
+            this.alreadyLinkedCount = _data["alreadyLinkedCount"];
+        }
+    }
+
+    static fromJS(data: any): LinkExistingFieldsResultDto {
+        data = typeof data === 'object' ? data : {};
+        let result = new LinkExistingFieldsResultDto();
+        result.init(data);
+        return result;
+    }
+
+    toJSON(data?: any) {
+        data = typeof data === 'object' ? data : {};
+        for (var property in this) {
+            if (this.hasOwnProperty(property))
+                data[property] = this[property];
+        }
+        data["linkedCount"] = this.linkedCount;
+        data["alreadyLinkedCount"] = this.alreadyLinkedCount;
+        return data;
+    }
+}
+
+export interface ILinkExistingFieldsResultDto {
+    linkedCount: number;
+    alreadyLinkedCount: number;
+
+    [key: string]: any;
+}
+
+export class FieldEditPermissionDto implements IFieldEditPermissionDto {
+    canEditCoreInfo!: boolean;
+    canEditAttributes!: boolean;
+    canDelete!: boolean;
+    canHide!: boolean;
+    isTenantCustomCopyRequired!: boolean;
+
+    [key: string]: any;
+
+    constructor(data?: IFieldEditPermissionDto) {
+        if (data) {
+            for (var property in data) {
+                if (data.hasOwnProperty(property))
+                    (<any>this)[property] = (<any>data)[property];
+            }
+        }
+    }
+
+    init(_data?: any) {
+        if (_data) {
+            for (var property in _data) {
+                if (_data.hasOwnProperty(property))
+                    this[property] = _data[property];
+            }
+            this.canEditCoreInfo = _data["canEditCoreInfo"];
+            this.canEditAttributes = _data["canEditAttributes"];
+            this.canDelete = _data["canDelete"];
+            this.canHide = _data["canHide"];
+            this.isTenantCustomCopyRequired = _data["isTenantCustomCopyRequired"];
+        }
+    }
+
+    static fromJS(data: any): FieldEditPermissionDto {
+        data = typeof data === 'object' ? data : {};
+        let result = new FieldEditPermissionDto();
+        result.init(data);
+        return result;
+    }
+
+    toJSON(data?: any) {
+        data = typeof data === 'object' ? data : {};
+        for (var property in this) {
+            if (this.hasOwnProperty(property))
+                data[property] = this[property];
+        }
+        data["canEditCoreInfo"] = this.canEditCoreInfo;
+        data["canEditAttributes"] = this.canEditAttributes;
+        data["canDelete"] = this.canDelete;
+        data["canHide"] = this.canHide;
+        data["isTenantCustomCopyRequired"] = this.isTenantCustomCopyRequired;
+        return data;
+    }
+}
+
+export interface IFieldEditPermissionDto {
+    canEditCoreInfo: boolean;
+    canEditAttributes: boolean;
+    canDelete: boolean;
+    canHide: boolean;
+    isTenantCustomCopyRequired: boolean;
+
+    [key: string]: any;
+}
+
+export class GetFieldForEditOutput implements IGetFieldForEditOutput {
+    field!: AppFieldDto;
+    permissions!: FieldEditPermissionDto;
+
+    [key: string]: any;
+
+    constructor(data?: IGetFieldForEditOutput) {
+        if (data) {
+            for (var property in data) {
+                if (data.hasOwnProperty(property))
+                    (<any>this)[property] = (<any>data)[property];
+            }
+        }
+    }
+
+    init(_data?: any) {
+        if (_data) {
+            for (var property in _data) {
+                if (_data.hasOwnProperty(property))
+                    this[property] = _data[property];
+            }
+            this.field = _data["field"] ? AppFieldDto.fromJS(_data["field"]) : <any>undefined;
+            this.permissions = _data["permissions"] ? FieldEditPermissionDto.fromJS(_data["permissions"]) : <any>undefined;
+        }
+    }
+
+    static fromJS(data: any): GetFieldForEditOutput {
+        data = typeof data === 'object' ? data : {};
+        let result = new GetFieldForEditOutput();
+        result.init(data);
+        return result;
+    }
+
+    toJSON(data?: any) {
+        data = typeof data === 'object' ? data : {};
+        for (var property in this) {
+            if (this.hasOwnProperty(property))
+                data[property] = this[property];
+        }
+        data["field"] = this.field ? this.field.toJSON() : <any>undefined;
+        data["permissions"] = this.permissions ? this.permissions.toJSON() : <any>undefined;
+        return data;
+    }
+}
+
+export interface IGetFieldForEditOutput {
+    field: AppFieldDto;
+    permissions: FieldEditPermissionDto;
+
+    [key: string]: any;
+}
+
+export class AppFieldHistoryDto implements IAppFieldHistoryDto {
+    id!: number;
+    appFieldId!: number;
+    fieldDefinitionKey!: string;
+    revisionNo!: string | undefined;
+    changeType!: string | undefined;
+    field!: AppFieldDto;
+    changedAt!: moment.Moment;
+    changedBy!: number | undefined;
+    changedByName!: string | undefined;
+    restoredFromRevisionNo!: string | undefined;
+
+    [key: string]: any;
+
+    constructor(data?: IAppFieldHistoryDto) {
+        if (data) {
+            for (var property in data) {
+                if (data.hasOwnProperty(property))
+                    (<any>this)[property] = (<any>data)[property];
+            }
+        }
+    }
+
+    init(_data?: any) {
+        if (_data) {
+            for (var property in _data) {
+                if (_data.hasOwnProperty(property))
+                    this[property] = _data[property];
+            }
+            this.id = _data["id"];
+            this.appFieldId = _data["appFieldId"];
+            this.fieldDefinitionKey = _data["fieldDefinitionKey"];
+            this.revisionNo = _data["revisionNo"];
+            this.changeType = _data["changeType"];
+            this.field = _data["field"] ? AppFieldDto.fromJS(_data["field"]) : <any>undefined;
+            this.changedAt = _data["changedAt"] ? moment(_data["changedAt"].toString()) : <any>undefined;
+            this.changedBy = _data["changedBy"];
+            this.changedByName = _data["changedByName"];
+            this.restoredFromRevisionNo = _data["restoredFromRevisionNo"];
+        }
+    }
+
+    static fromJS(data: any): AppFieldHistoryDto {
+        data = typeof data === 'object' ? data : {};
+        let result = new AppFieldHistoryDto();
+        result.init(data);
+        return result;
+    }
+
+    toJSON(data?: any) {
+        data = typeof data === 'object' ? data : {};
+        for (var property in this) {
+            if (this.hasOwnProperty(property))
+                data[property] = this[property];
+        }
+        data["id"] = this.id;
+        data["appFieldId"] = this.appFieldId;
+        data["fieldDefinitionKey"] = this.fieldDefinitionKey;
+        data["revisionNo"] = this.revisionNo;
+        data["changeType"] = this.changeType;
+        data["field"] = this.field ? this.field.toJSON() : <any>undefined;
+        data["changedAt"] = this.changedAt ? this.changedAt.toISOString() : <any>undefined;
+        data["changedBy"] = this.changedBy;
+        data["changedByName"] = this.changedByName;
+        data["restoredFromRevisionNo"] = this.restoredFromRevisionNo;
+        return data;
+    }
+}
+
+export interface IAppFieldHistoryDto {
+    id: number;
+    appFieldId: number;
+    fieldDefinitionKey: string;
+    revisionNo: string | undefined;
+    changeType: string | undefined;
+    field: AppFieldDto;
+    changedAt: moment.Moment;
+    changedBy: number | undefined;
+    changedByName: string | undefined;
+    restoredFromRevisionNo: string | undefined;
+
+    [key: string]: any;
+}
+
+export class RestoreFieldRevisionInput implements IRestoreFieldRevisionInput {
+    appFieldId!: number;
+    historyId!: number;
+    expectedCurrentRevisionNo!: string;
+
+    [key: string]: any;
+
+    constructor(data?: IRestoreFieldRevisionInput) {
+        if (data) {
+            for (var property in data) {
+                if (data.hasOwnProperty(property))
+                    (<any>this)[property] = (<any>data)[property];
+            }
+        }
+    }
+
+    init(_data?: any) {
+        if (_data) {
+            for (var property in _data) {
+                if (_data.hasOwnProperty(property))
+                    this[property] = _data[property];
+            }
+            this.appFieldId = _data["appFieldId"];
+            this.historyId = _data["historyId"];
+            this.expectedCurrentRevisionNo = _data["expectedCurrentRevisionNo"];
+        }
+    }
+
+    static fromJS(data: any): RestoreFieldRevisionInput {
+        data = typeof data === 'object' ? data : {};
+        let result = new RestoreFieldRevisionInput();
+        result.init(data);
+        return result;
+    }
+
+    toJSON(data?: any) {
+        data = typeof data === 'object' ? data : {};
+        for (var property in this) {
+            if (this.hasOwnProperty(property))
+                data[property] = this[property];
+        }
+        data["appFieldId"] = this.appFieldId;
+        data["historyId"] = this.historyId;
+        data["expectedCurrentRevisionNo"] = this.expectedCurrentRevisionNo;
+        return data;
+    }
+}
+
+export interface IRestoreFieldRevisionInput {
+    appFieldId: number;
+    historyId: number;
+    expectedCurrentRevisionNo: string;
+
+    [key: string]: any;
+}
+
+export class CreateOrEditFieldInput implements ICreateOrEditFieldInput {
+    id!: number | undefined;
+    expectedCurrentRevisionNo!: string | undefined;
+    sycObjectId!: number | undefined;
+    entitySycObjectId!: number | undefined;
+    selectedObjectTypeId!: number | undefined;
+    fieldTypeId!: number;
+    widgetTypeId!: number | undefined;
+    fieldLevelId!: number | undefined;
+    fieldStatusId!: number | undefined;
+    fieldCode!: string | undefined;
+    fieldName!: string;
+    description!: string | undefined;
+    fieldLevelCode!: string | undefined;
+    fieldStatusCode!: string | undefined;
+    trackingNo!: string | undefined;
+    isExtraField!: boolean;
+    allowNull!: boolean;
+    length!: number | undefined;
+    decimals!: number | undefined;
+    defaultValue!: string | undefined;
+    dateFormat!: string | undefined;
+    timeFormat!: string | undefined;
+    allowMultiSelect!: boolean;
+    validEntries!: string | undefined;
+    required!: boolean;
+    visible!: boolean;
+    editable!: boolean;
+    extraAttributes!: string | undefined;
+    settingValues!: FieldSettingValueDto[] | undefined;
+
+    [key: string]: any;
+
+    constructor(data?: ICreateOrEditFieldInput) {
+        if (data) {
+            for (var property in data) {
+                if (data.hasOwnProperty(property))
+                    (<any>this)[property] = (<any>data)[property];
+            }
+        }
+    }
+
+    init(_data?: any) {
+        if (_data) {
+            for (var property in _data) {
+                if (_data.hasOwnProperty(property))
+                    this[property] = _data[property];
+            }
+            this.id = _data["id"];
+            this.expectedCurrentRevisionNo = _data["expectedCurrentRevisionNo"];
+            this.sycObjectId = _data["sycObjectId"];
+            this.entitySycObjectId = _data["entitySycObjectId"];
+            this.selectedObjectTypeId = _data["selectedObjectTypeId"];
+            this.fieldTypeId = _data["fieldTypeId"];
+            this.widgetTypeId = _data["widgetTypeId"];
+            this.fieldLevelId = _data["fieldLevelId"];
+            this.fieldStatusId = _data["fieldStatusId"];
+            this.fieldCode = _data["fieldCode"];
+            this.fieldName = _data["fieldName"];
+            this.description = _data["description"];
+            this.fieldLevelCode = _data["fieldLevelCode"];
+            this.fieldStatusCode = _data["fieldStatusCode"];
+            this.trackingNo = _data["trackingNo"];
+            this.isExtraField = _data["isExtraField"];
+            this.allowNull = _data["allowNull"];
+            this.length = _data["length"];
+            this.decimals = _data["decimals"];
+            this.defaultValue = _data["defaultValue"];
+            this.dateFormat = _data["dateFormat"];
+            this.timeFormat = _data["timeFormat"];
+            this.allowMultiSelect = _data["allowMultiSelect"];
+            this.validEntries = _data["validEntries"];
+            this.required = _data["required"];
+            this.visible = _data["visible"];
+            this.editable = _data["editable"];
+            this.extraAttributes = _data["extraAttributes"];
+            if (Array.isArray(_data["settingValues"])) {
+                this.settingValues = [] as any;
+                for (let item of _data["settingValues"])
+                    this.settingValues!.push(FieldSettingValueDto.fromJS(item));
+            }
+        }
+    }
+
+    static fromJS(data: any): CreateOrEditFieldInput {
+        data = typeof data === 'object' ? data : {};
+        let result = new CreateOrEditFieldInput();
+        result.init(data);
+        return result;
+    }
+
+    toJSON(data?: any) {
+        data = typeof data === 'object' ? data : {};
+        for (var property in this) {
+            if (this.hasOwnProperty(property))
+                data[property] = this[property];
+        }
+        data["id"] = this.id;
+        data["expectedCurrentRevisionNo"] = this.expectedCurrentRevisionNo;
+        data["sycObjectId"] = this.sycObjectId;
+        data["entitySycObjectId"] = this.entitySycObjectId;
+        data["selectedObjectTypeId"] = this.selectedObjectTypeId;
+        data["fieldTypeId"] = this.fieldTypeId;
+        data["widgetTypeId"] = this.widgetTypeId;
+        data["fieldLevelId"] = this.fieldLevelId;
+        data["fieldStatusId"] = this.fieldStatusId;
+        data["fieldCode"] = this.fieldCode;
+        data["fieldName"] = this.fieldName;
+        data["description"] = this.description;
+        data["fieldLevelCode"] = this.fieldLevelCode;
+        data["fieldStatusCode"] = this.fieldStatusCode;
+        data["trackingNo"] = this.trackingNo;
+        data["isExtraField"] = this.isExtraField;
+        data["allowNull"] = this.allowNull;
+        data["length"] = this.length;
+        data["decimals"] = this.decimals;
+        data["defaultValue"] = this.defaultValue;
+        data["dateFormat"] = this.dateFormat;
+        data["timeFormat"] = this.timeFormat;
+        data["allowMultiSelect"] = this.allowMultiSelect;
+        data["validEntries"] = this.validEntries;
+        data["required"] = this.required;
+        data["visible"] = this.visible;
+        data["editable"] = this.editable;
+        data["extraAttributes"] = this.extraAttributes;
+        if (Array.isArray(this.settingValues)) {
+            data["settingValues"] = [];
+            for (let item of this.settingValues)
+                data["settingValues"].push(item.toJSON());
+        }
+        return data;
+    }
+}
+
+export interface ICreateOrEditFieldInput {
+    id: number | undefined;
+    expectedCurrentRevisionNo: string | undefined;
+    sycObjectId: number | undefined;
+    entitySycObjectId: number | undefined;
+    selectedObjectTypeId: number | undefined;
+    fieldTypeId: number;
+    widgetTypeId: number | undefined;
+    fieldLevelId: number | undefined;
+    fieldStatusId: number | undefined;
+    fieldCode: string | undefined;
+    fieldName: string;
+    description: string | undefined;
+    fieldLevelCode: string | undefined;
+    fieldStatusCode: string | undefined;
+    trackingNo: string | undefined;
+    isExtraField: boolean;
+    allowNull: boolean;
+    length: number | undefined;
+    decimals: number | undefined;
+    defaultValue: string | undefined;
+    dateFormat: string | undefined;
+    timeFormat: string | undefined;
+    allowMultiSelect: boolean;
+    validEntries: string | undefined;
+    required: boolean;
+    visible: boolean;
+    editable: boolean;
+    extraAttributes: string | undefined;
+    settingValues: FieldSettingValueDto[] | undefined;
+
+    [key: string]: any;
+}
+
+export class EntityDtoOfInt64 implements IEntityDtoOfInt64 {
+    id!: number;
+
+    [key: string]: any;
+
+    constructor(data?: IEntityDtoOfInt64) {
+        if (data) {
+            for (var property in data) {
+                if (data.hasOwnProperty(property))
+                    (<any>this)[property] = (<any>data)[property];
+            }
+        }
+    }
+
+    init(_data?: any) {
+        if (_data) {
+            for (var property in _data) {
+                if (_data.hasOwnProperty(property))
+                    this[property] = _data[property];
+            }
+            this.id = _data["id"];
+        }
+    }
+
+    static fromJS(data: any): EntityDtoOfInt64 {
+        data = typeof data === 'object' ? data : {};
+        let result = new EntityDtoOfInt64();
+        result.init(data);
+        return result;
+    }
+
+    toJSON(data?: any) {
+        data = typeof data === 'object' ? data : {};
+        for (var property in this) {
+            if (this.hasOwnProperty(property))
+                data[property] = this[property];
+        }
+        data["id"] = this.id;
+        return data;
+    }
+}
+
+export interface IEntityDtoOfInt64 {
+    id: number;
+
+    [key: string]: any;
+}
+
+export class SyncFieldSnapshotsInput implements ISyncFieldSnapshotsInput {
+    appFieldId!: number;
+    sycObjectId!: number | undefined;
+    sycEntityObjectTypeId!: number | undefined;
+
+    [key: string]: any;
+
+    constructor(data?: ISyncFieldSnapshotsInput) {
+        if (data) {
+            for (var property in data) {
+                if (data.hasOwnProperty(property))
+                    (<any>this)[property] = (<any>data)[property];
+            }
+        }
+    }
+
+    init(_data?: any) {
+        if (_data) {
+            for (var property in _data) {
+                if (_data.hasOwnProperty(property))
+                    this[property] = _data[property];
+            }
+            this.appFieldId = _data["appFieldId"];
+            this.sycObjectId = _data["sycObjectId"];
+            this.sycEntityObjectTypeId = _data["sycEntityObjectTypeId"];
+        }
+    }
+
+    static fromJS(data: any): SyncFieldSnapshotsInput {
+        data = typeof data === 'object' ? data : {};
+        let result = new SyncFieldSnapshotsInput();
+        result.init(data);
+        return result;
+    }
+
+    toJSON(data?: any) {
+        data = typeof data === 'object' ? data : {};
+        for (var property in this) {
+            if (this.hasOwnProperty(property))
+                data[property] = this[property];
+        }
+        data["appFieldId"] = this.appFieldId;
+        data["sycObjectId"] = this.sycObjectId;
+        data["sycEntityObjectTypeId"] = this.sycEntityObjectTypeId;
+        return data;
+    }
+}
+
+export interface ISyncFieldSnapshotsInput {
+    appFieldId: number;
+    sycObjectId: number | undefined;
+    sycEntityObjectTypeId: number | undefined;
+
+    [key: string]: any;
+}
+
+export class FieldSettingDefinitionDto implements IFieldSettingDefinitionDto {
+    settingFieldId!: number;
+    fieldCode!: string | undefined;
+    fieldName!: string | undefined;
+    valueTypeId!: number;
+    valueTypeCode!: string | undefined;
+    dataType!: string | undefined;
+    defaultValue!: string | undefined;
+    required!: boolean;
+    allowMultiSelect!: boolean;
+    validEntries!: string | undefined;
+    options!: string[] | undefined;
+
+    [key: string]: any;
+
+    constructor(data?: IFieldSettingDefinitionDto) {
+        if (data) {
+            for (var property in data) {
+                if (data.hasOwnProperty(property))
+                    (<any>this)[property] = (<any>data)[property];
+            }
+        }
+    }
+
+    init(_data?: any) {
+        if (_data) {
+            for (var property in _data) {
+                if (_data.hasOwnProperty(property))
+                    this[property] = _data[property];
+            }
+            this.settingFieldId = _data["settingFieldId"];
+            this.fieldCode = _data["fieldCode"];
+            this.fieldName = _data["fieldName"];
+            this.valueTypeId = _data["valueTypeId"];
+            this.valueTypeCode = _data["valueTypeCode"];
+            this.dataType = _data["dataType"];
+            this.defaultValue = _data["defaultValue"];
+            this.required = _data["required"];
+            this.allowMultiSelect = _data["allowMultiSelect"];
+            this.validEntries = _data["validEntries"];
+            if (Array.isArray(_data["options"])) {
+                this.options = [] as any;
+                for (let item of _data["options"])
+                    this.options!.push(item);
+            }
+        }
+    }
+
+    static fromJS(data: any): FieldSettingDefinitionDto {
+        data = typeof data === 'object' ? data : {};
+        let result = new FieldSettingDefinitionDto();
+        result.init(data);
+        return result;
+    }
+
+    toJSON(data?: any) {
+        data = typeof data === 'object' ? data : {};
+        for (var property in this) {
+            if (this.hasOwnProperty(property))
+                data[property] = this[property];
+        }
+        data["settingFieldId"] = this.settingFieldId;
+        data["fieldCode"] = this.fieldCode;
+        data["fieldName"] = this.fieldName;
+        data["valueTypeId"] = this.valueTypeId;
+        data["valueTypeCode"] = this.valueTypeCode;
+        data["dataType"] = this.dataType;
+        data["defaultValue"] = this.defaultValue;
+        data["required"] = this.required;
+        data["allowMultiSelect"] = this.allowMultiSelect;
+        data["validEntries"] = this.validEntries;
+        if (Array.isArray(this.options)) {
+            data["options"] = [];
+            for (let item of this.options)
+                data["options"].push(item);
+        }
+        return data;
+    }
+}
+
+export interface IFieldSettingDefinitionDto {
+    settingFieldId: number;
+    fieldCode: string | undefined;
+    fieldName: string | undefined;
+    valueTypeId: number;
+    valueTypeCode: string | undefined;
+    dataType: string | undefined;
+    defaultValue: string | undefined;
+    required: boolean;
+    allowMultiSelect: boolean;
+    validEntries: string | undefined;
+    options: string[] | undefined;
+
+    [key: string]: any;
+}
+
+export class SaveFieldValidEntriesInput implements ISaveFieldValidEntriesInput {
+    settingFieldId!: number;
+    validEntries!: string | undefined;
+
+    [key: string]: any;
+
+    constructor(data?: ISaveFieldValidEntriesInput) {
+        if (data) {
+            for (var property in data) {
+                if (data.hasOwnProperty(property))
+                    (<any>this)[property] = (<any>data)[property];
+            }
+        }
+    }
+
+    init(_data?: any) {
+        if (_data) {
+            for (var property in _data) {
+                if (_data.hasOwnProperty(property))
+                    this[property] = _data[property];
+            }
+            this.settingFieldId = _data["settingFieldId"];
+            this.validEntries = _data["validEntries"];
+        }
+    }
+
+    static fromJS(data: any): SaveFieldValidEntriesInput {
+        data = typeof data === 'object' ? data : {};
+        let result = new SaveFieldValidEntriesInput();
+        result.init(data);
+        return result;
+    }
+
+    toJSON(data?: any) {
+        data = typeof data === 'object' ? data : {};
+        for (var property in this) {
+            if (this.hasOwnProperty(property))
+                data[property] = this[property];
+        }
+        data["settingFieldId"] = this.settingFieldId;
+        data["validEntries"] = this.validEntries;
+        return data;
+    }
+}
+
+export interface ISaveFieldValidEntriesInput {
+    settingFieldId: number;
+    validEntries: string | undefined;
+
+    [key: string]: any;
+}
+
 export enum ItemsFilterTypesEnum {
     MyItems = 0,
     MyListing = 1,
@@ -81448,350 +86693,6 @@ export enum RecommandedOrAdditional {
     RECOMMENDED = 0,
     ADDITIONAL = 1,
     CHARGES = 2,
-}
-
-export class VisibleWhen implements IVisibleWhen {
-    extraAttributeId!: string | undefined;
-    operatorValue!: string | undefined;
-    value!: string | undefined;
-
-    [key: string]: any;
-
-    constructor(data?: IVisibleWhen) {
-        if (data) {
-            for (var property in data) {
-                if (data.hasOwnProperty(property))
-                    (<any>this)[property] = (<any>data)[property];
-            }
-        }
-    }
-
-    init(_data?: any) {
-        if (_data) {
-            for (var property in _data) {
-                if (_data.hasOwnProperty(property))
-                    this[property] = _data[property];
-            }
-            this.extraAttributeId = _data["extraAttributeId"];
-            this.operatorValue = _data["operatorValue"];
-            this.value = _data["value"];
-        }
-    }
-
-    static fromJS(data: any): VisibleWhen {
-        data = typeof data === 'object' ? data : {};
-        let result = new VisibleWhen();
-        result.init(data);
-        return result;
-    }
-
-    toJSON(data?: any) {
-        data = typeof data === 'object' ? data : {};
-        for (var property in this) {
-            if (this.hasOwnProperty(property))
-                data[property] = this[property];
-        }
-        data["extraAttributeId"] = this.extraAttributeId;
-        data["operatorValue"] = this.operatorValue;
-        data["value"] = this.value;
-        return data;
-    }
-}
-
-export interface IVisibleWhen {
-    extraAttributeId: string | undefined;
-    operatorValue: string | undefined;
-    value: string | undefined;
-
-    [key: string]: any;
-}
-
-export class Relation implements IRelation {
-    targetName!: string | undefined;
-    sourceField!: string | undefined;
-    targetField!: string | undefined;
-
-    [key: string]: any;
-
-    constructor(data?: IRelation) {
-        if (data) {
-            for (var property in data) {
-                if (data.hasOwnProperty(property))
-                    (<any>this)[property] = (<any>data)[property];
-            }
-        }
-    }
-
-    init(_data?: any) {
-        if (_data) {
-            for (var property in _data) {
-                if (_data.hasOwnProperty(property))
-                    this[property] = _data[property];
-            }
-            this.targetName = _data["targetName"];
-            this.sourceField = _data["sourceField"];
-            this.targetField = _data["targetField"];
-        }
-    }
-
-    static fromJS(data: any): Relation {
-        data = typeof data === 'object' ? data : {};
-        let result = new Relation();
-        result.init(data);
-        return result;
-    }
-
-    toJSON(data?: any) {
-        data = typeof data === 'object' ? data : {};
-        for (var property in this) {
-            if (this.hasOwnProperty(property))
-                data[property] = this[property];
-        }
-        data["targetName"] = this.targetName;
-        data["sourceField"] = this.sourceField;
-        data["targetField"] = this.targetField;
-        return data;
-    }
-}
-
-export interface IRelation {
-    targetName: string | undefined;
-    sourceField: string | undefined;
-    targetField: string | undefined;
-
-    [key: string]: any;
-}
-
-export class RelatedWhen implements IRelatedWhen {
-    relation!: Relation[] | undefined;
-
-    [key: string]: any;
-
-    constructor(data?: IRelatedWhen) {
-        if (data) {
-            for (var property in data) {
-                if (data.hasOwnProperty(property))
-                    (<any>this)[property] = (<any>data)[property];
-            }
-        }
-    }
-
-    init(_data?: any) {
-        if (_data) {
-            for (var property in _data) {
-                if (_data.hasOwnProperty(property))
-                    this[property] = _data[property];
-            }
-            if (Array.isArray(_data["relation"])) {
-                this.relation = [] as any;
-                for (let item of _data["relation"])
-                    this.relation!.push(Relation.fromJS(item));
-            }
-        }
-    }
-
-    static fromJS(data: any): RelatedWhen {
-        data = typeof data === 'object' ? data : {};
-        let result = new RelatedWhen();
-        result.init(data);
-        return result;
-    }
-
-    toJSON(data?: any) {
-        data = typeof data === 'object' ? data : {};
-        for (var property in this) {
-            if (this.hasOwnProperty(property))
-                data[property] = this[property];
-        }
-        if (Array.isArray(this.relation)) {
-            data["relation"] = [];
-            for (let item of this.relation)
-                data["relation"].push(item.toJSON());
-        }
-        return data;
-    }
-}
-
-export interface IRelatedWhen {
-    relation: Relation[] | undefined;
-
-    [key: string]: any;
-}
-
-export class DataSource implements IDataSource {
-    service!: string | undefined;
-    api!: string | undefined;
-    parameter!: string | undefined;
-
-    [key: string]: any;
-
-    constructor(data?: IDataSource) {
-        if (data) {
-            for (var property in data) {
-                if (data.hasOwnProperty(property))
-                    (<any>this)[property] = (<any>data)[property];
-            }
-        }
-    }
-
-    init(_data?: any) {
-        if (_data) {
-            for (var property in _data) {
-                if (_data.hasOwnProperty(property))
-                    this[property] = _data[property];
-            }
-            this.service = _data["service"];
-            this.api = _data["api"];
-            this.parameter = _data["parameter"];
-        }
-    }
-
-    static fromJS(data: any): DataSource {
-        data = typeof data === 'object' ? data : {};
-        let result = new DataSource();
-        result.init(data);
-        return result;
-    }
-
-    toJSON(data?: any) {
-        data = typeof data === 'object' ? data : {};
-        for (var property in this) {
-            if (this.hasOwnProperty(property))
-                data[property] = this[property];
-        }
-        data["service"] = this.service;
-        data["api"] = this.api;
-        data["parameter"] = this.parameter;
-        return data;
-    }
-}
-
-export interface IDataSource {
-    service: string | undefined;
-    api: string | undefined;
-    parameter: string | undefined;
-
-    [key: string]: any;
-}
-
-export class ExtraAttribute implements IExtraAttribute {
-    attributeId!: number;
-    code!: string | undefined;
-    name!: string | undefined;
-    description!: string | undefined;
-    dataType!: string | undefined;
-    width!: string | undefined;
-    decimals!: number;
-    defaultValue!: string | undefined;
-    usage!: string | undefined;
-    isLookup!: boolean;
-    entityObjectTypeCode!: string | undefined;
-    acceptMultipleValues!: boolean;
-    validEntries!: string | undefined;
-    isVariation!: boolean;
-    isAdvancedSearch!: boolean;
-    allowAddNew!: boolean;
-    visibleWhen!: VisibleWhen;
-    relatedWhen!: RelatedWhen;
-    dataSource!: DataSource;
-
-    [key: string]: any;
-
-    constructor(data?: IExtraAttribute) {
-        if (data) {
-            for (var property in data) {
-                if (data.hasOwnProperty(property))
-                    (<any>this)[property] = (<any>data)[property];
-            }
-        }
-    }
-
-    init(_data?: any) {
-        if (_data) {
-            for (var property in _data) {
-                if (_data.hasOwnProperty(property))
-                    this[property] = _data[property];
-            }
-            this.attributeId = _data["attributeId"];
-            this.code = _data["code"];
-            this.name = _data["name"];
-            this.description = _data["description"];
-            this.dataType = _data["dataType"];
-            this.width = _data["width"];
-            this.decimals = _data["decimals"];
-            this.defaultValue = _data["defaultValue"];
-            this.usage = _data["usage"];
-            this.isLookup = _data["isLookup"];
-            this.entityObjectTypeCode = _data["entityObjectTypeCode"];
-            this.acceptMultipleValues = _data["acceptMultipleValues"];
-            this.validEntries = _data["validEntries"];
-            this.isVariation = _data["isVariation"];
-            this.isAdvancedSearch = _data["isAdvancedSearch"];
-            this.allowAddNew = _data["allowAddNew"];
-            this.visibleWhen = _data["visibleWhen"] ? VisibleWhen.fromJS(_data["visibleWhen"]) : <any>undefined;
-            this.relatedWhen = _data["relatedWhen"] ? RelatedWhen.fromJS(_data["relatedWhen"]) : <any>undefined;
-            this.dataSource = _data["dataSource"] ? DataSource.fromJS(_data["dataSource"]) : <any>undefined;
-        }
-    }
-
-    static fromJS(data: any): ExtraAttribute {
-        data = typeof data === 'object' ? data : {};
-        let result = new ExtraAttribute();
-        result.init(data);
-        return result;
-    }
-
-    toJSON(data?: any) {
-        data = typeof data === 'object' ? data : {};
-        for (var property in this) {
-            if (this.hasOwnProperty(property))
-                data[property] = this[property];
-        }
-        data["attributeId"] = this.attributeId;
-        data["code"] = this.code;
-        data["name"] = this.name;
-        data["description"] = this.description;
-        data["dataType"] = this.dataType;
-        data["width"] = this.width;
-        data["decimals"] = this.decimals;
-        data["defaultValue"] = this.defaultValue;
-        data["usage"] = this.usage;
-        data["isLookup"] = this.isLookup;
-        data["entityObjectTypeCode"] = this.entityObjectTypeCode;
-        data["acceptMultipleValues"] = this.acceptMultipleValues;
-        data["validEntries"] = this.validEntries;
-        data["isVariation"] = this.isVariation;
-        data["isAdvancedSearch"] = this.isAdvancedSearch;
-        data["allowAddNew"] = this.allowAddNew;
-        data["visibleWhen"] = this.visibleWhen ? this.visibleWhen.toJSON() : <any>undefined;
-        data["relatedWhen"] = this.relatedWhen ? this.relatedWhen.toJSON() : <any>undefined;
-        data["dataSource"] = this.dataSource ? this.dataSource.toJSON() : <any>undefined;
-        return data;
-    }
-}
-
-export interface IExtraAttribute {
-    attributeId: number;
-    code: string | undefined;
-    name: string | undefined;
-    description: string | undefined;
-    dataType: string | undefined;
-    width: string | undefined;
-    decimals: number;
-    defaultValue: string | undefined;
-    usage: string | undefined;
-    isLookup: boolean;
-    entityObjectTypeCode: string | undefined;
-    acceptMultipleValues: boolean;
-    validEntries: string | undefined;
-    isVariation: boolean;
-    isAdvancedSearch: boolean;
-    allowAddNew: boolean;
-    visibleWhen: VisibleWhen;
-    relatedWhen: RelatedWhen;
-    dataSource: DataSource;
-
-    [key: string]: any;
 }
 
 export class AppItemForViewDto implements IAppItemForViewDto {
@@ -83410,54 +88311,6 @@ export interface ISharingItemOptions {
     sharingLevel: number;
     message: string | undefined;
     itemSharing: ItemSharingDto[] | undefined;
-
-    [key: string]: any;
-}
-
-export class EntityDtoOfInt64 implements IEntityDtoOfInt64 {
-    id!: number;
-
-    [key: string]: any;
-
-    constructor(data?: IEntityDtoOfInt64) {
-        if (data) {
-            for (var property in data) {
-                if (data.hasOwnProperty(property))
-                    (<any>this)[property] = (<any>data)[property];
-            }
-        }
-    }
-
-    init(_data?: any) {
-        if (_data) {
-            for (var property in _data) {
-                if (_data.hasOwnProperty(property))
-                    this[property] = _data[property];
-            }
-            this.id = _data["id"];
-        }
-    }
-
-    static fromJS(data: any): EntityDtoOfInt64 {
-        data = typeof data === 'object' ? data : {};
-        let result = new EntityDtoOfInt64();
-        result.init(data);
-        return result;
-    }
-
-    toJSON(data?: any) {
-        data = typeof data === 'object' ? data : {};
-        for (var property in this) {
-            if (this.hasOwnProperty(property))
-                data[property] = this[property];
-        }
-        data["id"] = this.id;
-        return data;
-    }
-}
-
-export interface IEntityDtoOfInt64 {
-    id: number;
 
     [key: string]: any;
 }
@@ -100407,6 +105260,708 @@ export interface IStringOutput {
     [key: string]: any;
 }
 
+export class DynamicQueryInput implements IDynamicQueryInput {
+    tenantId!: number;
+    tableName!: string | undefined;
+    fields!: string[] | undefined;
+    conditions!: DynamicCondition[] | undefined;
+    lastUpdateDate!: moment.Moment | undefined;
+    applyAnyOfConditions!: boolean;
+    sorting!: string | undefined;
+    skipCount!: number;
+    maxResultCount!: number;
+
+    [key: string]: any;
+
+    constructor(data?: IDynamicQueryInput) {
+        if (data) {
+            for (var property in data) {
+                if (data.hasOwnProperty(property))
+                    (<any>this)[property] = (<any>data)[property];
+            }
+        }
+    }
+
+    init(_data?: any) {
+        if (_data) {
+            for (var property in _data) {
+                if (_data.hasOwnProperty(property))
+                    this[property] = _data[property];
+            }
+            this.tenantId = _data["tenantId"];
+            this.tableName = _data["tableName"];
+            if (Array.isArray(_data["fields"])) {
+                this.fields = [] as any;
+                for (let item of _data["fields"])
+                    this.fields!.push(item);
+            }
+            if (Array.isArray(_data["conditions"])) {
+                this.conditions = [] as any;
+                for (let item of _data["conditions"])
+                    this.conditions!.push(DynamicCondition.fromJS(item));
+            }
+            this.lastUpdateDate = _data["lastUpdateDate"] ? moment(_data["lastUpdateDate"].toString()) : <any>undefined;
+            this.applyAnyOfConditions = _data["applyAnyOfConditions"];
+            this.sorting = _data["sorting"];
+            this.skipCount = _data["skipCount"];
+            this.maxResultCount = _data["maxResultCount"];
+        }
+    }
+
+    static fromJS(data: any): DynamicQueryInput {
+        data = typeof data === 'object' ? data : {};
+        let result = new DynamicQueryInput();
+        result.init(data);
+        return result;
+    }
+
+    toJSON(data?: any) {
+        data = typeof data === 'object' ? data : {};
+        for (var property in this) {
+            if (this.hasOwnProperty(property))
+                data[property] = this[property];
+        }
+        data["tenantId"] = this.tenantId;
+        data["tableName"] = this.tableName;
+        if (Array.isArray(this.fields)) {
+            data["fields"] = [];
+            for (let item of this.fields)
+                data["fields"].push(item);
+        }
+        if (Array.isArray(this.conditions)) {
+            data["conditions"] = [];
+            for (let item of this.conditions)
+                data["conditions"].push(item.toJSON());
+        }
+        data["lastUpdateDate"] = this.lastUpdateDate ? this.lastUpdateDate.toISOString() : <any>undefined;
+        data["applyAnyOfConditions"] = this.applyAnyOfConditions;
+        data["sorting"] = this.sorting;
+        data["skipCount"] = this.skipCount;
+        data["maxResultCount"] = this.maxResultCount;
+        return data;
+    }
+}
+
+export interface IDynamicQueryInput {
+    tenantId: number;
+    tableName: string | undefined;
+    fields: string[] | undefined;
+    conditions: DynamicCondition[] | undefined;
+    lastUpdateDate: moment.Moment | undefined;
+    applyAnyOfConditions: boolean;
+    sorting: string | undefined;
+    skipCount: number;
+    maxResultCount: number;
+
+    [key: string]: any;
+}
+
+export class IDbContextTransaction implements IIDbContextTransaction {
+    readonly transactionId!: string;
+    readonly supportsSavepoints!: boolean;
+
+    [key: string]: any;
+
+    constructor(data?: IIDbContextTransaction) {
+        if (data) {
+            for (var property in data) {
+                if (data.hasOwnProperty(property))
+                    (<any>this)[property] = (<any>data)[property];
+            }
+        }
+    }
+
+    init(_data?: any) {
+        if (_data) {
+            for (var property in _data) {
+                if (_data.hasOwnProperty(property))
+                    this[property] = _data[property];
+            }
+            (<any>this).transactionId = _data["transactionId"];
+            (<any>this).supportsSavepoints = _data["supportsSavepoints"];
+        }
+    }
+
+    static fromJS(data: any): IDbContextTransaction {
+        data = typeof data === 'object' ? data : {};
+        let result = new IDbContextTransaction();
+        result.init(data);
+        return result;
+    }
+
+    toJSON(data?: any) {
+        data = typeof data === 'object' ? data : {};
+        for (var property in this) {
+            if (this.hasOwnProperty(property))
+                data[property] = this[property];
+        }
+        data["transactionId"] = this.transactionId;
+        data["supportsSavepoints"] = this.supportsSavepoints;
+        return data;
+    }
+}
+
+export interface IIDbContextTransaction {
+    transactionId: string;
+    supportsSavepoints: boolean;
+
+    [key: string]: any;
+}
+
+export enum AutoTransactionBehavior {
+    WhenNeeded = 0,
+    Always = 1,
+    Never = 2,
+}
+
+export class DatabaseFacade implements IDatabaseFacade {
+    currentTransaction!: IDbContextTransaction;
+    autoTransactionsEnabled!: boolean;
+    autoTransactionBehavior!: AutoTransactionBehavior;
+    autoSavepointsEnabled!: boolean;
+    readonly providerName!: string | undefined;
+
+    [key: string]: any;
+
+    constructor(data?: IDatabaseFacade) {
+        if (data) {
+            for (var property in data) {
+                if (data.hasOwnProperty(property))
+                    (<any>this)[property] = (<any>data)[property];
+            }
+        }
+    }
+
+    init(_data?: any) {
+        if (_data) {
+            for (var property in _data) {
+                if (_data.hasOwnProperty(property))
+                    this[property] = _data[property];
+            }
+            this.currentTransaction = _data["currentTransaction"] ? IDbContextTransaction.fromJS(_data["currentTransaction"]) : <any>undefined;
+            this.autoTransactionsEnabled = _data["autoTransactionsEnabled"];
+            this.autoTransactionBehavior = _data["autoTransactionBehavior"];
+            this.autoSavepointsEnabled = _data["autoSavepointsEnabled"];
+            (<any>this).providerName = _data["providerName"];
+        }
+    }
+
+    static fromJS(data: any): DatabaseFacade {
+        data = typeof data === 'object' ? data : {};
+        let result = new DatabaseFacade();
+        result.init(data);
+        return result;
+    }
+
+    toJSON(data?: any) {
+        data = typeof data === 'object' ? data : {};
+        for (var property in this) {
+            if (this.hasOwnProperty(property))
+                data[property] = this[property];
+        }
+        data["currentTransaction"] = this.currentTransaction ? this.currentTransaction.toJSON() : <any>undefined;
+        data["autoTransactionsEnabled"] = this.autoTransactionsEnabled;
+        data["autoTransactionBehavior"] = this.autoTransactionBehavior;
+        data["autoSavepointsEnabled"] = this.autoSavepointsEnabled;
+        data["providerName"] = this.providerName;
+        return data;
+    }
+}
+
+export interface IDatabaseFacade {
+    currentTransaction: IDbContextTransaction;
+    autoTransactionsEnabled: boolean;
+    autoTransactionBehavior: AutoTransactionBehavior;
+    autoSavepointsEnabled: boolean;
+    providerName: string | undefined;
+
+    [key: string]: any;
+}
+
+export enum QueryTrackingBehavior {
+    TrackAll = 0,
+    NoTracking = 1,
+    NoTrackingWithIdentityResolution = 2,
+}
+
+export enum CascadeTiming {
+    Immediate = 0,
+    OnSaveChanges = 1,
+    Never = 2,
+}
+
+export class DebugView implements IDebugView {
+    readonly longView!: string | undefined;
+    readonly shortView!: string | undefined;
+
+    [key: string]: any;
+
+    constructor(data?: IDebugView) {
+        if (data) {
+            for (var property in data) {
+                if (data.hasOwnProperty(property))
+                    (<any>this)[property] = (<any>data)[property];
+            }
+        }
+    }
+
+    init(_data?: any) {
+        if (_data) {
+            for (var property in _data) {
+                if (_data.hasOwnProperty(property))
+                    this[property] = _data[property];
+            }
+            (<any>this).longView = _data["longView"];
+            (<any>this).shortView = _data["shortView"];
+        }
+    }
+
+    static fromJS(data: any): DebugView {
+        data = typeof data === 'object' ? data : {};
+        let result = new DebugView();
+        result.init(data);
+        return result;
+    }
+
+    toJSON(data?: any) {
+        data = typeof data === 'object' ? data : {};
+        for (var property in this) {
+            if (this.hasOwnProperty(property))
+                data[property] = this[property];
+        }
+        data["longView"] = this.longView;
+        data["shortView"] = this.shortView;
+        return data;
+    }
+}
+
+export interface IDebugView {
+    longView: string | undefined;
+    shortView: string | undefined;
+
+    [key: string]: any;
+}
+
+export class ChangeTracker implements IChangeTracker {
+    autoDetectChangesEnabled!: boolean;
+    lazyLoadingEnabled!: boolean;
+    queryTrackingBehavior!: QueryTrackingBehavior;
+    deleteOrphansTiming!: CascadeTiming;
+    cascadeDeleteTiming!: CascadeTiming;
+    context!: DbContext;
+    debugView!: DebugView;
+
+    [key: string]: any;
+
+    constructor(data?: IChangeTracker) {
+        if (data) {
+            for (var property in data) {
+                if (data.hasOwnProperty(property))
+                    (<any>this)[property] = (<any>data)[property];
+            }
+        }
+    }
+
+    init(_data?: any) {
+        if (_data) {
+            for (var property in _data) {
+                if (_data.hasOwnProperty(property))
+                    this[property] = _data[property];
+            }
+            this.autoDetectChangesEnabled = _data["autoDetectChangesEnabled"];
+            this.lazyLoadingEnabled = _data["lazyLoadingEnabled"];
+            this.queryTrackingBehavior = _data["queryTrackingBehavior"];
+            this.deleteOrphansTiming = _data["deleteOrphansTiming"];
+            this.cascadeDeleteTiming = _data["cascadeDeleteTiming"];
+            this.context = _data["context"] ? DbContext.fromJS(_data["context"]) : <any>undefined;
+            this.debugView = _data["debugView"] ? DebugView.fromJS(_data["debugView"]) : <any>undefined;
+        }
+    }
+
+    static fromJS(data: any): ChangeTracker {
+        data = typeof data === 'object' ? data : {};
+        let result = new ChangeTracker();
+        result.init(data);
+        return result;
+    }
+
+    toJSON(data?: any) {
+        data = typeof data === 'object' ? data : {};
+        for (var property in this) {
+            if (this.hasOwnProperty(property))
+                data[property] = this[property];
+        }
+        data["autoDetectChangesEnabled"] = this.autoDetectChangesEnabled;
+        data["lazyLoadingEnabled"] = this.lazyLoadingEnabled;
+        data["queryTrackingBehavior"] = this.queryTrackingBehavior;
+        data["deleteOrphansTiming"] = this.deleteOrphansTiming;
+        data["cascadeDeleteTiming"] = this.cascadeDeleteTiming;
+        data["context"] = this.context ? this.context.toJSON() : <any>undefined;
+        data["debugView"] = this.debugView ? this.debugView.toJSON() : <any>undefined;
+        return data;
+    }
+}
+
+export interface IChangeTracker {
+    autoDetectChangesEnabled: boolean;
+    lazyLoadingEnabled: boolean;
+    queryTrackingBehavior: QueryTrackingBehavior;
+    deleteOrphansTiming: CascadeTiming;
+    cascadeDeleteTiming: CascadeTiming;
+    context: DbContext;
+    debugView: DebugView;
+
+    [key: string]: any;
+}
+
+export class ITypeMappingSource implements IITypeMappingSource {
+
+    [key: string]: any;
+
+    constructor(data?: IITypeMappingSource) {
+        if (data) {
+            for (var property in data) {
+                if (data.hasOwnProperty(property))
+                    (<any>this)[property] = (<any>data)[property];
+            }
+        }
+    }
+
+    init(_data?: any) {
+        if (_data) {
+            for (var property in _data) {
+                if (_data.hasOwnProperty(property))
+                    this[property] = _data[property];
+            }
+        }
+    }
+
+    static fromJS(data: any): ITypeMappingSource {
+        data = typeof data === 'object' ? data : {};
+        let result = new ITypeMappingSource();
+        result.init(data);
+        return result;
+    }
+
+    toJSON(data?: any) {
+        data = typeof data === 'object' ? data : {};
+        for (var property in this) {
+            if (this.hasOwnProperty(property))
+                data[property] = this[property];
+        }
+        return data;
+    }
+}
+
+export interface IITypeMappingSource {
+
+    [key: string]: any;
+}
+
+export class IConstructorBindingFactory implements IIConstructorBindingFactory {
+
+    [key: string]: any;
+
+    constructor(data?: IIConstructorBindingFactory) {
+        if (data) {
+            for (var property in data) {
+                if (data.hasOwnProperty(property))
+                    (<any>this)[property] = (<any>data)[property];
+            }
+        }
+    }
+
+    init(_data?: any) {
+        if (_data) {
+            for (var property in _data) {
+                if (_data.hasOwnProperty(property))
+                    this[property] = _data[property];
+            }
+        }
+    }
+
+    static fromJS(data: any): IConstructorBindingFactory {
+        data = typeof data === 'object' ? data : {};
+        let result = new IConstructorBindingFactory();
+        result.init(data);
+        return result;
+    }
+
+    toJSON(data?: any) {
+        data = typeof data === 'object' ? data : {};
+        for (var property in this) {
+            if (this.hasOwnProperty(property))
+                data[property] = this[property];
+        }
+        return data;
+    }
+}
+
+export interface IIConstructorBindingFactory {
+
+    [key: string]: any;
+}
+
+export class IParameterBindingFactories implements IIParameterBindingFactories {
+
+    [key: string]: any;
+
+    constructor(data?: IIParameterBindingFactories) {
+        if (data) {
+            for (var property in data) {
+                if (data.hasOwnProperty(property))
+                    (<any>this)[property] = (<any>data)[property];
+            }
+        }
+    }
+
+    init(_data?: any) {
+        if (_data) {
+            for (var property in _data) {
+                if (_data.hasOwnProperty(property))
+                    this[property] = _data[property];
+            }
+        }
+    }
+
+    static fromJS(data: any): IParameterBindingFactories {
+        data = typeof data === 'object' ? data : {};
+        let result = new IParameterBindingFactories();
+        result.init(data);
+        return result;
+    }
+
+    toJSON(data?: any) {
+        data = typeof data === 'object' ? data : {};
+        for (var property in this) {
+            if (this.hasOwnProperty(property))
+                data[property] = this[property];
+        }
+        return data;
+    }
+}
+
+export interface IIParameterBindingFactories {
+
+    [key: string]: any;
+}
+
+export class RuntimeModelDependencies implements IRuntimeModelDependencies {
+    typeMappingSource!: ITypeMappingSource;
+    constructorBindingFactory!: IConstructorBindingFactory;
+    parameterBindingFactories!: IParameterBindingFactories;
+
+    [key: string]: any;
+
+    constructor(data?: IRuntimeModelDependencies) {
+        if (data) {
+            for (var property in data) {
+                if (data.hasOwnProperty(property))
+                    (<any>this)[property] = (<any>data)[property];
+            }
+        }
+    }
+
+    init(_data?: any) {
+        if (_data) {
+            for (var property in _data) {
+                if (_data.hasOwnProperty(property))
+                    this[property] = _data[property];
+            }
+            this.typeMappingSource = _data["typeMappingSource"] ? ITypeMappingSource.fromJS(_data["typeMappingSource"]) : <any>undefined;
+            this.constructorBindingFactory = _data["constructorBindingFactory"] ? IConstructorBindingFactory.fromJS(_data["constructorBindingFactory"]) : <any>undefined;
+            this.parameterBindingFactories = _data["parameterBindingFactories"] ? IParameterBindingFactories.fromJS(_data["parameterBindingFactories"]) : <any>undefined;
+        }
+    }
+
+    static fromJS(data: any): RuntimeModelDependencies {
+        data = typeof data === 'object' ? data : {};
+        let result = new RuntimeModelDependencies();
+        result.init(data);
+        return result;
+    }
+
+    toJSON(data?: any) {
+        data = typeof data === 'object' ? data : {};
+        for (var property in this) {
+            if (this.hasOwnProperty(property))
+                data[property] = this[property];
+        }
+        data["typeMappingSource"] = this.typeMappingSource ? this.typeMappingSource.toJSON() : <any>undefined;
+        data["constructorBindingFactory"] = this.constructorBindingFactory ? this.constructorBindingFactory.toJSON() : <any>undefined;
+        data["parameterBindingFactories"] = this.parameterBindingFactories ? this.parameterBindingFactories.toJSON() : <any>undefined;
+        return data;
+    }
+}
+
+export interface IRuntimeModelDependencies {
+    typeMappingSource: ITypeMappingSource;
+    constructorBindingFactory: IConstructorBindingFactory;
+    parameterBindingFactories: IParameterBindingFactories;
+
+    [key: string]: any;
+}
+
+export class IModel implements IIModel {
+    modelDependencies!: RuntimeModelDependencies;
+
+    [key: string]: any;
+
+    constructor(data?: IIModel) {
+        if (data) {
+            for (var property in data) {
+                if (data.hasOwnProperty(property))
+                    (<any>this)[property] = (<any>data)[property];
+            }
+        }
+    }
+
+    init(_data?: any) {
+        if (_data) {
+            for (var property in _data) {
+                if (_data.hasOwnProperty(property))
+                    this[property] = _data[property];
+            }
+            this.modelDependencies = _data["modelDependencies"] ? RuntimeModelDependencies.fromJS(_data["modelDependencies"]) : <any>undefined;
+        }
+    }
+
+    static fromJS(data: any): IModel {
+        data = typeof data === 'object' ? data : {};
+        let result = new IModel();
+        result.init(data);
+        return result;
+    }
+
+    toJSON(data?: any) {
+        data = typeof data === 'object' ? data : {};
+        for (var property in this) {
+            if (this.hasOwnProperty(property))
+                data[property] = this[property];
+        }
+        data["modelDependencies"] = this.modelDependencies ? this.modelDependencies.toJSON() : <any>undefined;
+        return data;
+    }
+}
+
+export interface IIModel {
+    modelDependencies: RuntimeModelDependencies;
+
+    [key: string]: any;
+}
+
+export class DbContextId implements IDbContextId {
+    readonly instanceId!: string;
+    lease!: number;
+
+    [key: string]: any;
+
+    constructor(data?: IDbContextId) {
+        if (data) {
+            for (var property in data) {
+                if (data.hasOwnProperty(property))
+                    (<any>this)[property] = (<any>data)[property];
+            }
+        }
+    }
+
+    init(_data?: any) {
+        if (_data) {
+            for (var property in _data) {
+                if (_data.hasOwnProperty(property))
+                    this[property] = _data[property];
+            }
+            (<any>this).instanceId = _data["instanceId"];
+            this.lease = _data["lease"];
+        }
+    }
+
+    static fromJS(data: any): DbContextId {
+        data = typeof data === 'object' ? data : {};
+        let result = new DbContextId();
+        result.init(data);
+        return result;
+    }
+
+    toJSON(data?: any) {
+        data = typeof data === 'object' ? data : {};
+        for (var property in this) {
+            if (this.hasOwnProperty(property))
+                data[property] = this[property];
+        }
+        data["instanceId"] = this.instanceId;
+        data["lease"] = this.lease;
+        return data;
+    }
+}
+
+export interface IDbContextId {
+    instanceId: string;
+    lease: number;
+
+    [key: string]: any;
+}
+
+export class DbContext implements IDbContext {
+    database!: DatabaseFacade;
+    changeTracker!: ChangeTracker;
+    model!: IModel;
+    contextId!: DbContextId;
+
+    [key: string]: any;
+
+    constructor(data?: IDbContext) {
+        if (data) {
+            for (var property in data) {
+                if (data.hasOwnProperty(property))
+                    (<any>this)[property] = (<any>data)[property];
+            }
+        }
+    }
+
+    init(_data?: any) {
+        if (_data) {
+            for (var property in _data) {
+                if (_data.hasOwnProperty(property))
+                    this[property] = _data[property];
+            }
+            this.database = _data["database"] ? DatabaseFacade.fromJS(_data["database"]) : <any>undefined;
+            this.changeTracker = _data["changeTracker"] ? ChangeTracker.fromJS(_data["changeTracker"]) : <any>undefined;
+            this.model = _data["model"] ? IModel.fromJS(_data["model"]) : <any>undefined;
+            this.contextId = _data["contextId"] ? DbContextId.fromJS(_data["contextId"]) : <any>undefined;
+        }
+    }
+
+    static fromJS(data: any): DbContext {
+        data = typeof data === 'object' ? data : {};
+        let result = new DbContext();
+        result.init(data);
+        return result;
+    }
+
+    toJSON(data?: any) {
+        data = typeof data === 'object' ? data : {};
+        for (var property in this) {
+            if (this.hasOwnProperty(property))
+                data[property] = this[property];
+        }
+        data["database"] = this.database ? this.database.toJSON() : <any>undefined;
+        data["changeTracker"] = this.changeTracker ? this.changeTracker.toJSON() : <any>undefined;
+        data["model"] = this.model ? this.model.toJSON() : <any>undefined;
+        data["contextId"] = this.contextId ? this.contextId.toJSON() : <any>undefined;
+        return data;
+    }
+}
+
+export interface IDbContext {
+    database: DatabaseFacade;
+    changeTracker: ChangeTracker;
+    model: IModel;
+    contextId: DbContextId;
+
+    [key: string]: any;
+}
+
 export class EditionListDto implements IEditionListDto {
     name!: string | undefined;
     displayName!: string | undefined;
@@ -108938,6 +114493,34 @@ export interface IUpdateUserSignInTokenOutput {
     [key: string]: any;
 }
 
+export enum SaveType {
+    Xlsx = 0,
+    Xls = 1,
+    Csv = 2,
+    Pdf = 3,
+}
+
+export enum ContentType {
+    Excel97 = 0,
+    Excel2000 = 1,
+    Excel2007 = 2,
+    Excel2010 = 3,
+    Excel2013 = 4,
+    Excel2016 = 5,
+    Xlsx = 6,
+    CSV = 7,
+    PDF = 8,
+}
+
+export enum VersionType {
+    Excel97to2003 = 0,
+    Excel2007 = 1,
+    Excel2010 = 2,
+    Excel2013 = 3,
+    Excel2016 = 4,
+    Xlsx = 5,
+}
+
 export class StripeConfigurationDto implements IStripeConfigurationDto {
     publishableKey!: string | undefined;
 
@@ -112028,6 +117611,11 @@ export interface ISycEntityObjectStatusSydObjectLookupTableDto {
     displayName: string | undefined;
 
     [key: string]: any;
+}
+
+export enum ExtraAttributesSource {
+    Xml = 0,
+    AppFields = 1,
 }
 
 export class ItemExtraAttributes implements IItemExtraAttributes {

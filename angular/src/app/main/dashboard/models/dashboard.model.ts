@@ -1,0 +1,236 @@
+export interface SpreadsheetEntityColumnDefinition {
+    key: string;
+    label: string;
+    type: 'string' | 'number' | 'date' | 'boolean';
+    defaultSelected?: boolean;
+}
+
+export interface SpreadsheetEntityFilterDefinition {
+    key: string;
+    label: string;
+    type: 'string' | 'number' | 'date' | 'boolean' | 'statusLookup';
+}
+
+export interface SpreadsheetEntityDefinition {
+    sourceKey: string;
+    displayName: string;
+    icon?: string;
+    columns: SpreadsheetEntityColumnDefinition[];
+    filters: SpreadsheetEntityFilterDefinition[];
+}
+
+export interface SpreadsheetFilters {
+    search?: string;
+    codeFilter?: string;
+    mainFilterTypeId?: number;
+    minCreateDateFilter?: any;
+    maxCreateDateFilter?: any;
+    minCompleteDateFilter?: any;
+    maxCompleteDateFilter?: any;
+    sellerNameFilter?: string;
+    buyerNameFilter?: string;
+    statusFilter?: number;
+    referenceNumberFilter?: string;
+    sorting?: string;
+}
+
+export interface SpreadsheetDataSource {
+    type: string;
+    sourceKey?: string;
+    mode: 'any' | 'all';
+    selectedIds?: number[];
+    columns?: string[];
+    filters?: SpreadsheetFilters | Record<string, any>;
+}
+
+export interface SpreadsheetSheetDataSource {
+    sheetId?: number;
+    sheetName: string;
+    sheetRecordIds:any[]
+    source: SpreadsheetDataSource;
+}
+
+export interface SavedSpreadsheet {
+    id: number;
+    name: string;
+    createdDate: string;
+    updatedDate?: string;
+    recordCount: number;
+    workbookJson: any;
+    sheetDataSources?: SpreadsheetSheetDataSource[];
+    sheetAnalyses?: SavedSheetAnalysis[];
+    dashboardWidgets?: DashboardWidgetMetadata[];
+    lastRefreshDate?:string;
+    refreshedBy?:string
+}
+
+export interface DashboardWidgetMetadata {
+    id: number;
+    dashboardSheetName: string;
+    chartId?: string;
+    chartTitle?: string;
+    chartType?: string;
+    sourceType: 'DIRECT' | 'PIVOT';
+    sourceSheetId?: number;
+    sourceSheetName: string;
+    sourceRange?: string;
+    analysisId?: number;
+    dashboardDataRange?: string;
+}
+
+export interface SavedSheetAnalysis {
+    id?: number;
+    sheetName: string;
+    sourceSheetId?: number;
+    dashboardWidgetId?: number;
+    dashboardChartId?: string;
+    dashboardDataRange?: string;
+sourceSheetName?: string;
+    pivot: {
+        rows: any[];
+        columns: any[];
+        values: any[];
+        filters: any[];
+        filterSettings?: any[];
+        sortSettings?: any[];
+    };
+
+    chart: {
+        type: string;
+        title: string;
+        enableMultipleAxis?: boolean;
+    };
+}
+
+
+
+
+
+export type ShareAccess = 'View' | 'Edit';
+
+export interface DashboardSharedUser {
+    id?: number;
+    name: string;
+    access: ShareAccess;
+}
+
+export type DashboardShareMode =
+    'all' |
+    'specific' |
+    'confirm' |
+    'private';
+
+
+
+
+
+
+export interface SpreadsheetDataBatch {
+    table: string;
+    fields: string[];
+    selectedColumns: any[];
+    conditions: any[];
+    rows: any[];
+    loaded: number;
+    total: number;
+    isFirstBatch: boolean;
+    isLastBatch: boolean;
+}
+
+
+
+export interface FilterBuilderCondition {
+    field: string;
+    operator: string;
+    value: any;
+}
+
+export interface FilterBuilderRule {
+    field: string;
+    operator: string;
+    value: any;
+}
+
+export interface FilterBuilderField {
+    name: string;
+    label: string;
+    dataType: string;
+    options?: Array<{
+        label: string;
+        value: any;
+    }>;
+    acceptMultipleValues?: boolean;
+    isLookup?: boolean;
+validEntries?: string;
+dataSource?: {
+    service: string;
+    api: string;
+    parameter: string;
+    valueField?: string;
+};
+paginationSetting?: {
+    list?: Array<{
+        label: string;
+        value: any;
+    }>;
+};
+
+entityObjectTypeCode?: string | null;
+
+
+}
+
+export interface FilterBuilderCondition {
+    field: string;
+    operator: string;
+    value: any;
+}
+
+export interface FilterBuilderRule extends FilterBuilderCondition {}
+
+export type FilterMatchMode = 'all' | 'any';
+
+
+export interface FilterBuilderRule extends FilterBuilderCondition {
+    datePeriod?: string;
+    dateRange?: Date[];
+}
+
+
+export type ChartAggregation =
+    'None' | 'Sum' | 'Count' | 'Average' | 'Min' | 'Max';
+
+
+
+
+    export interface FilterConditionGroup {
+    type: 'group';
+    matchMode: 'all' | 'any';
+    children: FilterConditionNode[];
+}
+
+export interface FilterConditionRule {
+    type: 'rule';
+    field: string;
+    operator: string;
+    value: any;
+    datePeriod?: string;
+    dateRange?: Date[];
+}
+
+export type FilterConditionNode =
+    | FilterConditionGroup
+    | FilterConditionRule;
+
+
+
+    
+   export type SelectOption = { label: string; value: any };
+    
+   export interface LookupState {
+        items: SelectOption[];
+        totalCount: number;
+        isLoading: boolean;
+        isLoaded: boolean;
+    }
+    

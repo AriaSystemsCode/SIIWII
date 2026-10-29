@@ -27,6 +27,9 @@ using onetouch.SycIdentifierDefinitions;
 using Abp.Localization;
 using onetouch.Localization;
 using System.Globalization;
+using System.Text.Json;
+using onetouch.AppFields;
+using ItemExtraAttribute = onetouch.AppItems.Dtos.ExtraAttribute;
 
 namespace onetouch.SystemObjects
 {
@@ -42,11 +45,15 @@ namespace onetouch.SystemObjects
         private readonly IApplicationLanguageManager _lookup_ApplicationLanguages;
         //private readonly ILanguageAppService _languageAppService;
         private readonly Helper _helper;
+        private readonly IRepository<AppField, long> _appFieldRepository;
+        private readonly IRepository<AppTableField, long> _appTableFieldRepository;
 
         public SycEntityObjectTypesAppService(IRepository<SycEntityObjectType, long> sycEntityObjectTypeRepository, ISycEntityObjectTypesExcelExporter sycEntityObjectTypesExcelExporter, IRepository<SydObject, long> lookup_sydObjectRepository, IRepository<SycEntityObjectType, long> lookup_sycEntityObjectTypeRepository, Helper helper,
             IRepository<SycIdentifierDefinition, long> lookup_SycIdentifierDefinitionRepository
             , IRepository<ApplicationLanguageText, long> lookup_ApplicationLanguageText
             , IApplicationLanguageManager lookup_ApplicationLanguages
+            , IRepository<AppField, long> appFieldRepository
+            , IRepository<AppTableField, long> appTableFieldRepository
             //, ILanguageAppService languageAppService
             )
         {
@@ -59,6 +66,8 @@ namespace onetouch.SystemObjects
             _lookup_ApplicationLanguages = lookup_ApplicationLanguages;
             //_languageAppService = _languageAppService;
             _helper = helper;
+            _appFieldRepository = appFieldRepository;
+            _appTableFieldRepository = appTableFieldRepository;
         }
         public async Task<string> GetDefaultLanguage()
         {
@@ -68,9 +77,14 @@ namespace onetouch.SystemObjects
             if (defaultLanguage != null) { name = defaultLanguage.Name; }
             return name;
         }
-        public async Task<List<GetAllEntityObjectTypeOutput>> GetAllWithExtraAttributes(long id)
+        public async Task<List<GetAllEntityObjectTypeOutput>> GetAllWithExtraAttributes(long id,
+            ExtraAttributesSource source = ExtraAttributesSource.Xml)
         {
+            if (!Enum.IsDefined(typeof(ExtraAttributesSource), source))
+                throw new UserFriendlyException("Select a valid extra-attribute source.");
             var list = await _lookup_sycEntityObjectTypeRepository.GetAll().Where(x => x.TenantId == null && (x.Id == id || id == 0)).ToListAsync();
+            if (source == ExtraAttributesSource.AppFields)
+                return await GetAllWithAppFieldAttributes(list);
             //           .Select(sycEntityObjectType => new GetAllEntityObjectTypeOutput
             //           {
             //               Id = sycEntityObjectType.Id,
@@ -106,6 +120,148 @@ namespace onetouch.SystemObjects
             }
 
             return newList;
+        }
+
+        private async Task<List<GetAllEntityObjectTypeOutput>> GetAllWithAppFieldAttributes(
+            List<SycEntityObjectType> types)
+        {
+            var result = types.Select(type => new GetAllEntityObjectTypeOutput
+            {
+                Id = type.Id,
+                Code = type.Code,
+                Name = type.Name,
+                ExtraAttributes = new ItemExtraAttributes { ExtraAttributes = new List<ItemExtraAttribute>() }
+            }).ToList();
+            if (types.Count == 0) return result;
+
+            using (UnitOfWorkManager.Current.DisableFilter(AbpDataFilters.MayHaveTenant))
+            {
+                var tenantId = AbpSession.TenantId;
+                var objects = await _lookup_sydObjectRepository.GetAll().Where(x => !x.IsDeleted)
+                    .Select(x => new { x.Id, x.Code, x.BaseEntityId }).AsNoTracking().ToListAsync();
+                var baseIds = objects.ToDictionary(x => x.Id, x => x.BaseEntityId);
+                var fieldObjectId = objects.Where(x => x.Code == "FIELD")
+                    .Select(x => (long?)x.Id).FirstOrDefault();
+                var chains = types.Select(x => x.ObjectId).Distinct()
+                    .ToDictionary(id => id, id => GetBaseEntityChain(id, baseIds));
+                var objectIds = chains.Values.SelectMany(x => x).Distinct().ToList();
+                var assignments = await _appTableFieldRepository.GetAll()
+                    .Include(x => x.SettingValues)
+                    .Where(x => objectIds.Contains(x.SycObjectId) &&
+                        (x.TenantId == null || x.TenantId == tenantId))
+                    .AsNoTracking().ToListAsync();
+
+                var suppressedHostKeys = new HashSet<Guid>();
+                if (tenantId.HasValue)
+                {
+                    using (UnitOfWorkManager.Current.DisableFilter(AbpDataFilters.SoftDelete))
+                    {
+                        var sourceIds = await _appFieldRepository.GetAll()
+                            .Where(x => x.TenantId == tenantId && x.SourceFieldId.HasValue)
+                            .Select(x => x.SourceFieldId.Value).Distinct().ToListAsync();
+                        var keys = await _appFieldRepository.GetAll()
+                            .Where(x => sourceIds.Contains(x.Id))
+                            .Select(x => x.FieldDefinitionKey).ToListAsync();
+                        suppressedHostKeys = keys.ToHashSet();
+                    }
+                }
+
+                for (var i = 0; i < types.Count; i++)
+                {
+                    var type = types[i];
+                    var chain = chains[type.ObjectId];
+                    var applied = assignments.Where(x => !suppressedHostKeys.Contains(x.FieldDefinitionKey) &&
+                        ((x.SycObjectId == type.ObjectId &&
+                            (x.SycEntityObjectTypeId == null || x.SycEntityObjectTypeId == type.Id)) ||
+                         (x.SycObjectId != type.ObjectId && chain.Contains(x.SycObjectId) &&
+                            x.SycEntityObjectTypeId == null)))
+                        .OrderBy(x => chain.IndexOf(x.SycObjectId))
+                        .ThenByDescending(x => tenantId.HasValue && x.TenantId == tenantId)
+                        .ThenByDescending(x => x.SycEntityObjectTypeId.HasValue)
+                        .GroupBy(x => x.FieldDefinitionKey)
+                        .Select(x => x.First())
+                        .ToList();
+                    foreach (var assignment in applied)
+                    {
+                        var isFieldManagerSetting = type.ObjectId == fieldObjectId &&
+                            assignment.Usage?.StartsWith("FieldManager.", StringComparison.OrdinalIgnoreCase) == true;
+                        if (assignment.IsHidden || (!assignment.IsExtraField && !isFieldManagerSetting)) continue;
+                        result[i].ExtraAttributes.ExtraAttributes.Add(ToExtraAttribute(assignment));
+                    }
+                }
+                return result;
+            }
+        }
+
+        private static List<long> GetBaseEntityChain(long objectId, Dictionary<long, long?> baseIds)
+        {
+            var chain = new List<long>();
+            var seen = new HashSet<long>();
+            var current = (long?)objectId;
+            while (current.HasValue && seen.Add(current.Value) && baseIds.ContainsKey(current.Value))
+            {
+                chain.Add(current.Value);
+                current = baseIds[current.Value];
+            }
+            return chain;
+        }
+
+        private static ItemExtraAttribute ToExtraAttribute(AppTableField assignment)
+        {
+            var attribute = new ItemExtraAttribute();
+            var settings = assignment.SettingValues.GroupBy(x => x.SettingFieldName, StringComparer.OrdinalIgnoreCase)
+                .ToDictionary(x => x.Key, x => x.First(), StringComparer.OrdinalIgnoreCase);
+            attribute.AttributeId = assignment.SourceAttributeId.GetValueOrDefault() > 0
+                ? assignment.SourceAttributeId.Value : assignment.SourceAppFieldId;
+            attribute.Code = assignment.FieldCode;
+            attribute.Name = assignment.FieldName;
+            attribute.Description = assignment.Description;
+            attribute.DataType = assignment.SourceDataType ?? FieldDataType(assignment.FieldCode);
+            attribute.Width = settings.TryGetValue("Length", out var length)
+                ? (TryWholeSettingNumber(length.Value, out var width)
+                    ? width.ToString(CultureInfo.InvariantCulture) : length.Value)
+                : assignment.Length?.ToString(CultureInfo.InvariantCulture);
+            attribute.Decimals = settings.TryGetValue("Decimals", out var decimals)
+                ? (TryWholeSettingNumber(decimals.Value, out var count)
+                    ? count : 0) : assignment.Decimals ?? 0;
+            attribute.DefaultValue = settings.TryGetValue("DefaultValue", out var defaultValue)
+                ? defaultValue.Value : assignment.DefaultValue;
+            attribute.ValidEntries = assignment.ValidEntries;
+            attribute.Usage = assignment.Usage;
+            attribute.IsLookup = assignment.IsLookup ?? false;
+            attribute.EntityObjectTypeCode = assignment.EntityObjectTypeCode;
+            attribute.AcceptMultipleValues = (assignment.AcceptMultipleValues ?? false) ||
+                (settings.TryGetValue("AllowMultiSelect", out var multiSelect)
+                    ? bool.TryParse(multiSelect.Value, out var multiple) && multiple : assignment.AllowMultiSelect);
+            attribute.IsVariation = assignment.IsVariation ?? false;
+            attribute.IsAdvancedSearch = assignment.IsAdvancedSearch ?? false;
+            attribute.AllowAddNew = assignment.AllowAddNew ?? false;
+            return attribute;
+        }
+
+        private static bool TryWholeSettingNumber(string text, out int value)
+        {
+            value = 0;
+            if (!decimal.TryParse(text, NumberStyles.Number, CultureInfo.InvariantCulture, out var number) ||
+                number != decimal.Truncate(number) || number < int.MinValue || number > int.MaxValue)
+                return false;
+            value = (int)number;
+            return true;
+        }
+
+        private static string FieldDataType(string fieldCode)
+        {
+            var prefix = fieldCode?.Length >= 2 ? fieldCode.Substring(0, 2) : null;
+            switch (prefix)
+            {
+                case "BO": return "boolean";
+                case "DP": return "Datetime";
+                case "IN":
+                case "IC": return "Numeric";
+                case "LI": return "dropDownList";
+                case "SD": return "dropDownList";
+                default: return "string";
+            }
         }
 
         public async Task<List<GetAllEntityObjectTypeOutput>> GetAllWithExtraAttributesByCode(string code, string objectCode="")

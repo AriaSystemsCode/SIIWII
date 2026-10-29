@@ -2,7 +2,7 @@ import { Component, Injector, Input, OnChanges, OnInit } from '@angular/core';
 import { FormArray, FormControl, FormGroup } from '@angular/forms';
 import { FilterMetaData } from '@app/shared/filters-shared/models/FilterMetaData.model';
 import { AppComponentBase } from '@shared/common/app-component-base';
-import {  AppEntitiesServiceProxy, AppSizeScaleServiceProxy, ExtraAttribute, GetAllEntityObjectTypeOutput,  GetAppSizeScaleForViewDto,  ItemsFilterTypesEnum,  LookupLabelDto,  PagedResultDtoOfLookupLabelDto,  SycEntityObjectCategoriesServiceProxy, SycEntityObjectClassificationsServiceProxy, SycEntityObjectTypesServiceProxy, TreeNodeOfGetSycEntityObjectCategoryForViewDto, TreeNodeOfGetSycEntityObjectClassificationForViewDto, TreeNodeOfGetSycEntityObjectTypeForViewDto } from '@shared/service-proxies/service-proxies';
+import {  AppEntitiesServiceProxy, AppSizeScaleServiceProxy, ExtraAttribute, ExtraAttributesSource, GetAllEntityObjectTypeOutput,  GetAppSizeScaleForViewDto,  ItemsFilterTypesEnum,  LookupLabelDto,  PagedResultDtoOfLookupLabelDto,  SycEntityObjectCategoriesServiceProxy, SycEntityObjectClassificationsServiceProxy, SycEntityObjectTypesServiceProxy, TreeNodeOfGetSycEntityObjectCategoryForViewDto, TreeNodeOfGetSycEntityObjectClassificationForViewDto, TreeNodeOfGetSycEntityObjectTypeForViewDto } from '@shared/service-proxies/service-proxies';
 import { SelectItem } from 'primeng/api';
 import { finalize } from 'rxjs/operators';
 import { ExtraAttributeDataService } from '../../app-item-shared/services/extra-attribute-data.service';
@@ -92,7 +92,8 @@ export class AppItemsFiltersComponent extends AppComponentBase implements OnInit
     }
 
     getItemTypeData(id:number){
-        this._sycEntityObjectTypesServiceProxy.getAllWithExtraAttributes(id)
+                    let source: ExtraAttributesSource=0;
+        this._sycEntityObjectTypesServiceProxy.getAllWithExtraAttributes(id,source)
         .subscribe((res)=>{
             this.removeExtraAttributesCtrl()
             if(!res[0]) return

@@ -11,7 +11,7 @@ import { IAjaxResponse, TokenService } from '@node_modules/abp-ng2-module';
 import { DynamicApiDispatcherService } from '@shared/dynamicApiDispatcherService ';
 import Swal from 'sweetalert2';
 import { finalize, map  } from 'rxjs/operators';
-import { forkJoin ,of} from 'rxjs';
+import { forkJoin, Observable, of } from 'rxjs';
 
 
 
@@ -23,19 +23,20 @@ import { forkJoin ,of} from 'rxjs';
   animations: [appModuleAnimation()]
 })
 export class dynamicInputs extends AppComponentBase implements OnInit, OnChanges {
-  @Input("extraAttributeObject") extraAttributeObject;
-  @Input("entityType") entityType;
-  @Input("entityObjectTypeId") entityObjectTypeId;
+  @Input("extraAttributeObject") extraAttributeObject: any;
+  @Input("entityType") entityType: any;
+  @Input("entityObjectTypeId") entityObjectTypeId: any;
   @Output() extraDataChanged = new EventEmitter<any[]>();
   @Output() extraDataCleared = new EventEmitter<number>(); // send attributeId
   selectedExtraData: any[] = [];
   @Input() appTransactionsForViewDto: any;
   @Input() fromSetting: boolean = false;
+  @Input() singleColumn: boolean = false;
   @Input() dynamicInputsForViewDto: any;
   originalValuesMap = new Map<number, any>();
 
 
-  sycAttachmentCategoryImage: SycAttachmentCategoryDto;
+  sycAttachmentCategoryImage!: SycAttachmentCategoryDto;
   @Input() defaultBooleanValue: boolean | string = 'true'; // parent can override
   warningMsg: string = "";
   isInitializing = true;
@@ -61,7 +62,6 @@ export class dynamicInputs extends AppComponentBase implements OnInit, OnChanges
  onAnyInputChange() {
   //if (this.isInitializing) return;
   //this.formTouched = true;
-
   const updatedDataMap = new Map<number, any>();
 
   // Preserve existing values
@@ -79,12 +79,14 @@ export class dynamicInputs extends AppComponentBase implements OnInit, OnChanges
         continue;
       }
 
-    let formattedValue =
-  attr.selectedValues == null ||
-  attr.selectedValues === '' ||
-  (Array.isArray(attr.selectedValues) && attr.selectedValues.length === 0)
-    ? attr.defaultValue
-    : attr.selectedValues;
+    const isChips = !!attr.dataType?.toLowerCase().includes('chips');
+    let formattedValue = isChips
+      ? this.normalizeChipValues(attr.selectedValues)
+      : attr.selectedValues == null ||
+        attr.selectedValues === '' ||
+        (Array.isArray(attr.selectedValues) && attr.selectedValues.length === 0)
+          ? attr.defaultValue
+          : attr.selectedValues;
 
 attr.selectedValues = formattedValue;
 
@@ -112,7 +114,7 @@ attr.selectedValues = formattedValue;
       }
 
     //  Handle Numeric / Boolean / Color
-      if (['Numeric', 'boolean', 'Boolean', 'bit', 'color'].includes(attr.dataType)) {
+      if (['Numeric', 'boolean', 'Boolean', 'bit', 'color'].indexOf(attr.dataType) !== -1) {
         if (formattedValue === null || formattedValue === undefined || formattedValue === '') {
           formattedValue = '';
         }
@@ -123,7 +125,7 @@ attr.selectedValues = formattedValue;
 
       let finalValue;
 
-      if (attr.acceptMultipleValues && Array.isArray(formattedValue)) {
+      if ((attr.acceptMultipleValues || isChips) && Array.isArray(formattedValue)) {
         finalValue = formattedValue.length ? formattedValue : [];
       } else if (!attr.acceptMultipleValues && (formattedValue === undefined || formattedValue === null || formattedValue === '')) {
         finalValue = '';
@@ -137,7 +139,7 @@ attr.selectedValues = formattedValue;
         attributeId: attr.attributeId,
         value: finalValue,
         isLookup: attr.isLookup === true,
-        acceptMultipleValues: attr.acceptMultipleValues === true
+        acceptMultipleValues: attr.acceptMultipleValues === true || isChips
       };
 
       updatedDataMap.set(attr.attributeId, updatedValue);
@@ -150,8 +152,30 @@ attr.selectedValues = formattedValue;
   }
 }
 
-onDropdownChange(extraAttr: any) {
+onChipsChange(values: any, extraAttr: any): void {
+  extraAttr.selectedValues = this.normalizeChipValues(values);
+  this.onAnyInputChange();
+}
 
+addChipFromInput(host: HTMLElement, extraAttr: any): void {
+  const input = host.querySelector('input') as HTMLInputElement;
+  const value = input?.value?.trim();
+  if (!value) return;
+  const current = this.normalizeChipValues(extraAttr.selectedValues);
+  if (current.indexOf(value) === -1) {
+    this.onChipsChange([...current, value], extraAttr);
+  }
+  input.value = '';
+}
+
+private normalizeChipValues(values: any): string[] {
+  const entries = Array.isArray(values) ? values : values == null || values === '' ? [] : [values];
+  return entries
+    .map(value => String(value).trim())
+    .filter(value => value.length > 0);
+}
+
+onDropdownChange(extraAttr: any) {
   this.onAnyInputChange(); // update normal data
 
   const updatedDataMap = new Map<number, any>();
@@ -166,10 +190,11 @@ handleRelatedWhen(attr: any, finalValue: any, updatedDataMap: Map<number, any>) 
 
   if (!attr.relatedWhen?.relation?.length) return;
 
-  const calls = attr.relatedWhen.relation.map(relation => {
+  const calls: Observable<any>[] = attr.relatedWhen.relation
+    .map((relation: any): Observable<any> | null => {
 
     const targetAttr = this.extraAttributeObject.value.extraAttributes
-      .find(x => x.name === relation.targetName || x.code === relation.targetName);
+      .find((x: any) => x.name === relation.targetName || x.code === relation.targetName);
 
     if (!targetAttr) return null;
 
@@ -185,14 +210,15 @@ handleRelatedWhen(attr: any, finalValue: any, updatedDataMap: Map<number, any>) 
       .pipe(
         map((result: any) => {
           const newValue = result.extraDataAttributes
-            .find(x => x.extraAttrName === relation.targetName)
+            .find((x: any) => x.extraAttrName === relation.targetName)
             ?.selectedValues?.[0]?.value || 0;
 
           return { targetAttr, relation, newValue };
         })
       );
 
-  }).filter(x => x !== null);
+  })
+    .filter((call: Observable<any> | null): call is Observable<any> => call !== null);
 
   if (calls.length) {
     forkJoin(calls).subscribe((results: any[]) => {
@@ -257,7 +283,7 @@ reset(extraAttr: any): void {
 }
 
 
-  themes = [];
+  themes: any[] = [];
   selectedTheme: any;
 
   // set thems  ?
@@ -278,188 +304,87 @@ reset(extraAttr: any): void {
 
 
 
-//  fillSelectedValuesFromDto() {
-//   if (!this.extraAttributeObject?.value?.extraAttributes || !this.dynamicInputsForViewDto?.extraDataAttributes) {
-//     return;
-//   }
+ fillSelectedValuesFromDto() {
+  if (!this.extraAttributeObject?.value?.extraAttributes || !this.dynamicInputsForViewDto?.extraDataAttributes) {
+    return;
+  }
+  const dtoData = this.dynamicInputsForViewDto.extraDataAttributes;
 
-//   const dtoData = this.dynamicInputsForViewDto.extraDataAttributes;
+  const allAttributes = [
+    ...(this.extraAttributeObject.value.extraAttributes || []),
+    ...(this.extraAttributeObject.value.filteredExtraAttributes || [])
+  ];
 
-//   const allAttributes = [
-//     ...(this.extraAttributeObject.value.extraAttributes || []),
-//     ...(this.extraAttributeObject.value.filteredExtraAttributes || [])
-//   ];
+  for (const attr of allAttributes) {
+    const matchedDto = dtoData.find(
+      (d: any) => d.extraAttributeId === attr.attributeId
+    );
 
-//   for (const attr of allAttributes) {
-//     const matchedDto = dtoData.find(
-//       d => d.extraAttributeId === attr.attributeId
-//     );
+    if (matchedDto && matchedDto.selectedValues?.length) {
+      let dtoValue =  matchedDto.selectedValues[matchedDto.selectedValues.length - 1].value;
+      if ((attr.dataType?.toLowerCase() === 'boolean' || attr.dataType?.toLowerCase() === 'bit') && !attr.validEntries?.trim()) {
+        dtoValue =  this.normalizeBooleanValue(dtoValue);
+      }
+      if (attr.isLookup) {
+        const matchedOption =  attr.paginationSetting?.list?.find(
+            (opt: any) => opt.label === dtoValue || opt.value === dtoValue
+          );
 
-//     if (matchedDto && matchedDto.selectedValues?.length) {
-//       let dtoValue =  matchedDto.selectedValues[matchedDto.selectedValues.length - 1].value;
-//       if ((attr.dataType?.toLowerCase() === 'boolean' || attr.dataType?.toLowerCase() === 'bit') && !attr.validEntries?.trim()) {
-//         dtoValue =  this.normalizeBooleanValue(dtoValue);
-//       }
-//       if (attr.isLookup) {
-//         const matchedOption =  attr.paginationSetting?.list?.find(
-//             opt => opt.label === dtoValue || opt.value === dtoValue
-//           );
-
-//         if (matchedOption) {
-//           attr.selectedValues = matchedOption.value;
-
-//         } else {
-
-//           const manualOption = {
-//             value: dtoValue,
-//             label: dtoValue,
-//             code: null,
-//             isHostRecord: false,
-//             stockAvailability: null,
-//             image: null,
-//             hexaCode: null
-//           };
-
-//           if (attr.paginationSetting?.list) {
-//             attr.paginationSetting.list.push(manualOption);
-//           }
-
-//           attr.selectedValues =  manualOption.value;
-//         }
-
-//       } else if (attr.dataType === 'Datetime' && typeof dtoValue === 'string') {
-//         attr.selectedValues =  new Date(dtoValue);
-//       } else {
-//         attr.selectedValues = dtoValue;
-//       }
-
-//       this.originalValuesMap.set(
-//         attr.attributeId,
-//         attr.selectedValues
-//       );
-//     }
-
-
-//     else {
-
-//       if (
-//         (attr.dataType?.toLowerCase() === 'boolean' ||  attr.dataType?.toLowerCase() === 'bit') && !attr.validEntries?.trim()
-//       ) {
-
-//         attr.selectedValues =   this.normalizeBooleanValue(attr.defaultValue);
-
-//       } else {
-//         attr.selectedValues = attr.defaultValue;
-//       }
-
-//       this.originalValuesMap.set(
-//         attr.attributeId,
-//         attr.selectedValues
-//       );
-//     }
-//   }
-// }
-fillSelectedValuesFromDto(): void {
-
-    const attributeObject = this.extraAttributeObject?.value;
-    const dtoData = this.dynamicInputsForViewDto?.extraDataAttributes;
-
-    if (!attributeObject || !Array.isArray(dtoData)) {
-        return;
-    }
-
-    const allAttributes = [
-        ...(attributeObject.extraAttributes || []),
-        ...(attributeObject.filteredExtraAttributes || [])
-    ];
-
-    const processed = new Set<number>();
-
-    for (const attr of allAttributes) {
-
-        const attributeId = Number(attr.attributeId);
-
-        if (processed.has(attributeId)) {
-            continue;
-        }
-
-        processed.add(attributeId);
-
-        const matchedDto = dtoData.find(
-            d => Number(d.extraAttributeId) === attributeId
-        );
-
-        const savedValues = matchedDto?.selectedValues || [];
-
-        let value = savedValues.length
-            ? savedValues[savedValues.length - 1].value
-            : attr.defaultValue;
-
-        const dataType = String(attr.dataType || '').toLowerCase();
-
-        if (
-            (dataType === 'boolean' || dataType === 'bit') &&
-            !attr.validEntries?.trim()
-        ) {
-            value = this.normalizeBooleanValue(value);
-        }
-
-        if (attr.isLookup) {
-
-            const matchedOption = attr.paginationSetting?.list?.find(
-                option =>
-                    String(option.value) === String(value) ||
-                    String(option.label) === String(value)
-            );
-
-            attr.selectedValues = matchedOption
-                ? matchedOption.value
-                : value;
-
-        } else if (dataType === 'datetime') {
-
-            const date = value ? new Date(value) : null;
-
-            attr.selectedValues =
-                date && !isNaN(date.getTime())
-                    ? date
-                    : null;
-
-        } else if (
-            dataType === 'dropdownlist' ||
-            dataType === 'searchabledropdown'
-        ) {
-
-            attr.selectedValues =
-                value !== null &&
-                value !== undefined &&
-                value !== ''
-                    ? String(value)
-                    : null;
+        if (matchedOption) {
+          attr.selectedValues = matchedOption.value;
 
         } else {
 
-            attr.selectedValues = value;
+          const manualOption = {
+            value: dtoValue,
+            label: dtoValue,
+            code: null,
+            isHostRecord: false,
+            stockAvailability: null,
+            image: null,
+            hexaCode: null
+          };
+
+          if (attr.paginationSetting?.list) {
+            attr.paginationSetting.list.push(manualOption);
+          }
+
+          attr.selectedValues =  manualOption.value;
         }
 
-        this.originalValuesMap.set(
-            attributeId,
-            attr.selectedValues
-        );
+      } else if (attr.dataType === 'Datetime' && typeof dtoValue === 'string') {
+        attr.selectedValues =  new Date(dtoValue);
+      } else {
+        attr.selectedValues = dtoValue;
+      }
 
-        // Load dynamic options immediately for an existing selection.
-        if (
-            attr.dataSource &&
-            (dataType === 'dropdownlist' ||
-             dataType === 'searchabledropdown') &&
-            attr.selectedValues !== null &&
-            attr.selectedValues !== undefined &&
-            attr.selectedValues !== ''
-        ) {
-            this.onDropdownClick(attr);
-        }
+      this.originalValuesMap.set(
+        attr.attributeId,
+        attr.selectedValues
+      );
     }
+
+
+    else {
+
+      if (
+        (attr.dataType?.toLowerCase() === 'boolean' ||  attr.dataType?.toLowerCase() === 'bit') && !attr.validEntries?.trim()
+      ) {
+
+        attr.selectedValues =   this.normalizeBooleanValue(attr.defaultValue);
+
+      } else {
+        attr.selectedValues = attr.defaultValue;
+      }
+
+      this.originalValuesMap.set(
+        attr.attributeId,
+        attr.selectedValues
+      );
+    }
+  }
 }
+
 
   clearExtraAttr(attr: any) {
     if (attr.acceptMultipleValues) {
@@ -470,7 +395,7 @@ fillSelectedValuesFromDto(): void {
 
     //  Also clear original source value 
     const matchedAttr = this.extraAttributeObject?.value?.extraAttributes?.find(
-      a => a.attributeId === attr.attributeId
+      (a: any) => a.attributeId === attr.attributeId
     );
     if (matchedAttr) {
       matchedAttr.selectedValues = attr.selectedValues;
@@ -524,7 +449,7 @@ fillSelectedValuesFromDto(): void {
         extraAttr.selectedValues.push(value);
       }
     } else {
-      extraAttr.selectedValues = extraAttr.selectedValues.filter(val => val !== value);
+      extraAttr.selectedValues = extraAttr.selectedValues.filter((val: any) => val !== value);
     }
     this.onAnyInputChange(); // emit changes
   }
@@ -537,7 +462,7 @@ fillSelectedValuesFromDto(): void {
         return;
       } */
       const allowedTypes = ['image/jpeg', 'image/png', 'image/gif'];
-      if (!allowedTypes.includes(file.type)) {
+      if (allowedTypes.indexOf(file.type) === -1) {
         //alert('Only JPG, PNG, or GIF files are allowed.');
         Swal.fire(
           " ",
@@ -559,8 +484,8 @@ fillSelectedValuesFromDto(): void {
     }
   }
 
-  attachmentsUploader: FileUploader;
-  onUploadFile(file) {
+  attachmentsUploader!: FileUploader;
+  onUploadFile(file: File) {
     this.attachmentsUploader = this.createUploader(
       '/Attachment/UploadFiles',
       result => {
@@ -599,7 +524,7 @@ fillSelectedValuesFromDto(): void {
           success(ajaxResponse.result);
         }
       } else {
-        this.message.error(ajaxResponse.error.message);
+        this.message.error(ajaxResponse.error?.message || this.l('UploadFailed'));
       }
     };
 
@@ -612,111 +537,47 @@ fillSelectedValuesFromDto(): void {
   getSafeString = (str: string) => str.replace(/\s+/g, '_');
   extraAttrOptions = new Map<string, { items: any[], totalCount: number, isLoading: boolean }>();
 
-  // getDropdownOptions(extraAttr: any) {
-  //   if (extraAttr?.validEntries && !extraAttr?.dataSource) {
-  //   return extraAttr.validEntries.split('|').map(v => ({
-  //     label: v.trim(),
-  //     value: v.trim()
-  //   }));
+  private validEntriesCache = new Map<string, any[]>();
 
-  // }
-  
-  // return this.extraAttrOptions.get(extraAttr.id)?.items || [];
-  // }
-  
-  // onDropdownClick(extraAttr: any) {
-  //   if (extraAttr?.validEntries && !extraAttr?.dataSource) 
-  //   return;
-
-  // const data = this.extraAttrOptions.get(extraAttr.id);
-
-  // if (!data || data.items.length === 0) 
-  //   this.loadNextItems(extraAttr);
-
-  // }
-
-  // onLoadMoreClick(event: Event, extraAttr: any) {
-  //   event.stopPropagation();
-  //   this.loadNextItems(extraAttr);
-  // }
-  // loadNextItems(extraAttr: any) {
-  //   let data = this.extraAttrOptions.get(extraAttr.id);
-  //   if (!data) {
-  //     data = { items: [], totalCount: 0, isLoading: false };
-  //     this.extraAttrOptions.set(extraAttr.id, data);
-  //   }
-
-  //   if (data.isLoading) return;
-
-  //   const skipCount = data.items.length;
-  //   const maxResultCount = 10;
-
-  //   data.isLoading = true;
-
-  //   this.callDynamicAPI(extraAttr, skipCount, maxResultCount);
-  // }
-
-
-  getDropdownOptions(extraAttr: any): any[] {
-
+  getDropdownOptions(extraAttr: any) {
     if (extraAttr?.validEntries && !extraAttr?.dataSource) {
-        return extraAttr.validEntries.split('|').map(value => ({
-            label: value.trim(),
-            value: value.trim()
-        }));
+      // Stable array reference; a new one per change detection resets the dropdown
+      const cached = this.validEntriesCache.get(extraAttr.validEntries);
+      if (cached) return cached;
+      const options: any[] = extraAttr.validEntries.split('|').map((v: string) => ({
+        label: v.trim(),
+        value: v.trim()
+      }));
+      this.validEntriesCache.set(extraAttr.validEntries, options);
+      return options;
     }
+  
+  return this.extraAttrOptions.get(extraAttr.id)?.items || [];
+  }
+  
+  onDropdownClick(extraAttr: any) {
+    if (extraAttr?.validEntries && !extraAttr?.dataSource) 
+    return;
 
-    return this.extraAttrOptions.get(
-        this.getDropdownKey(extraAttr)
-    )?.items || [];
-}
+  const data = this.extraAttrOptions.get(extraAttr.id);
 
-onDropdownClick(extraAttr: any): void {
+  if (!data || data.items.length === 0) 
+    this.loadNextItems(extraAttr);
 
-    if (extraAttr?.validEntries && !extraAttr?.dataSource) {
-        return;
-    }
+  }
 
-    const key = this.getDropdownKey(extraAttr);
-    const data = this.extraAttrOptions.get(key);
-
-    if (!data || data.items.length === 0) {
-        this.loadNextItems(extraAttr);
-    }
-}
-
-onLoadMoreClick(event: Event, extraAttr: any): void {
+  onLoadMoreClick(event: Event, extraAttr: any) {
     event.stopPropagation();
     this.loadNextItems(extraAttr);
-}
-
-loadNextItems(extraAttr: any): void {
-
-    const key = this.getDropdownKey(extraAttr);
-
-    let data = this.extraAttrOptions.get(key);
-
+  }
+  loadNextItems(extraAttr: any) {
+    let data = this.extraAttrOptions.get(extraAttr.id);
     if (!data) {
-        data = {
-            items: [],
-            totalCount: 0,
-            isLoading: false
-        };
-
-        this.extraAttrOptions.set(key, data);
+      data = { items: [], totalCount: 0, isLoading: false };
+      this.extraAttrOptions.set(extraAttr.id, data);
     }
 
-    if (data.isLoading) {
-        return;
-    }
-
-    if (
-        data.items.length > 0 &&
-        data.totalCount > 0 &&
-        data.items.length >= data.totalCount
-    ) {
-        return;
-    }
+    if (data.isLoading) return;
 
     const skipCount = data.items.length;
     const maxResultCount = 10;
@@ -724,201 +585,57 @@ loadNextItems(extraAttr: any): void {
     data.isLoading = true;
 
     this.callDynamicAPI(extraAttr, skipCount, maxResultCount);
-}
+  }
 
-private restoreDropdownSelection(
-    extraAttr: any,
-    options: any[]
-): void {
+ callDynamicAPI(extraAttr: any, skipCount: number = 0, maxResultCount: number = 10) {
+  if (extraAttr?.validEntries && extraAttr.validEntries.includes('|')) {
+    const items = extraAttr.validEntries.split('|').map((val: string) => ({
+      label: val.trim(),
+      value: val.trim()
+    }));
 
-    const savedValue = extraAttr.selectedValues;
+    this.extraAttrOptions.set(extraAttr.id, {
+      items: items,
+      totalCount: items.length,
+      isLoading: false
+    });
+    return;
+  }
 
-    if (
-        savedValue === null ||
-        savedValue === undefined ||
-        savedValue === ''
-    ) {
-        return;
-    }
-
-    const matchedOption = options.find(option =>
-        String(option.value) === String(savedValue)
-    );
-
-    if (matchedOption) {
-        extraAttr.selectedValues = matchedOption.value;
-    }
-}
-//  callDynamicAPI(extraAttr: any, skipCount: number = 0, maxResultCount: number = 10) {
-//   if (extraAttr?.validEntries && extraAttr.validEntries.includes('|')) {
-//     const items = extraAttr.validEntries.split('|').map(val => ({
-//       label: val.trim(),
-//       value: val.trim()
-//     }));
-
-//     this.extraAttrOptions.set(extraAttr.id, {
-//       items: items,
-//       totalCount: items.length,
-//       isLoading: false
-//     });
-//     return;
-//   }
-
-//   if (extraAttr?.dataSource) {
-//     const serviceName = extraAttr.dataSource.service + "ServiceProxy";
-//     const apiMethod = extraAttr.dataSource.api;
-//     const resultField = extraAttr.dataSource.parameter;
-
-//   this.dynamicApi.dispatch(serviceName, apiMethod, {
-//     skipCount,
-//     maxResultCount
-// }).subscribe({
-//     next: (result: any) => {
-//         if (!result || !Array.isArray(result.items)) {
-//             console.error('Invalid dynamic API response:', {
-//                 serviceName,
-//                 apiMethod,
-//                 result
-//             });
-
-//             const data = this.extraAttrOptions.get(extraAttr.id);
-//             if (data) {
-//                 data.isLoading = false;
-//             }
-
-//             return;
-//         }
-
-//         const dropdownItems = result.items.map(item => ({
-//             label: this.getByPath(item, resultField.trim()),
-//             value: item.account?.id
-//         }));
-
-//         const existing =
-//             this.extraAttrOptions.get(extraAttr.id)?.items || [];
-
-//         this.extraAttrOptions.set(extraAttr.id, {
-//             items: skipCount > 0
-//                 ? [...existing, ...dropdownItems]
-//                 : dropdownItems,
-//             totalCount: result.totalCount ?? dropdownItems.length,
-//             isLoading: false
-//         });
-//     },
-  
-// });
-//   }
-// }
-
-callDynamicAPI(
-    extraAttr: any,
-    skipCount: number = 0,
-    maxResultCount: number = 10
-): void {
-
-    const key = this.getDropdownKey(extraAttr);
-
-    if (extraAttr?.validEntries && !extraAttr?.dataSource) {
-
-        const items = extraAttr.validEntries
-            .split('|')
-            .map(value => ({
-                label: value.trim(),
-                value: value.trim()
-            }));
-
-        this.extraAttrOptions.set(key, {
-            items,
-            totalCount: items.length,
-            isLoading: false
-        });
-
-        this.restoreDropdownSelection(extraAttr, items);
-        return;
-    }
-
-    if (!extraAttr?.dataSource) {
-        return;
-    }
-
-    const serviceName =
-        extraAttr.dataSource.service + 'ServiceProxy';
-
+  if (extraAttr?.dataSource) {
+    const serviceName = extraAttr.dataSource.service + "ServiceProxy";
     const apiMethod = extraAttr.dataSource.api;
     const resultField = extraAttr.dataSource.parameter;
 
-    this.dynamicApi.dispatch(
-        serviceName,
-        apiMethod,
-        {
-            skipCount,
-            maxResultCount
-        }
-    ).subscribe({
+    this.dynamicApi.dispatch(serviceName, apiMethod, {
+      skipCount: skipCount,
+      maxResultCount: maxResultCount
+    }).subscribe((result: any) => {
+      const dropdownItems = result.items.map((item: any) => ({
+        label: this.getByPath(item, resultField.trim()),
+        value: item.account.id
+      }));
 
-        next: (result: any) => {
+      const existing = this.extraAttrOptions.get(extraAttr.id)?.items || [];
+      const combinedItems = skipCount > 0 ? [...existing, ...dropdownItems] : dropdownItems;
 
-            const currentData = this.extraAttrOptions.get(key);
-
-            if (!result || !Array.isArray(result.items)) {
-                console.error('Invalid dynamic API response:', result);
-
-                if (currentData) {
-                    currentData.isLoading = false;
-                }
-
-                return;
-            }
-
-            const dropdownItems = result.items.map(item => {
-
-                const rawValue = item.account?.id ?? item.id;
-
-                return {
-                    label: this.getByPath(
-                        item,
-                        resultField.trim()
-                    ),
-                    value: rawValue == null
-                        ? null
-                        : String(rawValue)
-                };
-            });
-
-            const existing = currentData?.items || [];
-
-            const allItems = skipCount > 0
-                ? [...existing, ...dropdownItems]
-                : dropdownItems;
-
-            this.extraAttrOptions.set(key, {
-                items: allItems,
-                totalCount: result.totalCount ?? allItems.length,
-                isLoading: false
-            });
-
-            this.restoreDropdownSelection(extraAttr, allItems);
-        },
-
-        error: error => {
-
-            console.error('Dynamic dropdown API error:', error);
-
-            const currentData = this.extraAttrOptions.get(key);
-
-            if (currentData) {
-                currentData.isLoading = false;
-            }
-        }
+      this.extraAttrOptions.set(extraAttr.id, {
+        items: combinedItems,
+        totalCount: result.totalCount,
+        isLoading: false
+      });
     });
+  }
 }
+
+
   getByPath(obj: any, path: string) {
     return path.split('.').reduce((o, p) => o?.[p], obj);
   }
 
   getExtraAttr(attributeId: number, nameIncludes: string) {
     return this.extraAttributeObject.value.extraAttributes
-      .find(x => x?.attributeId === attributeId || x?.name?.includes(nameIncludes));
+      .find((x: any) => x?.attributeId === attributeId || x?.name?.includes(nameIncludes));
   }
 
 
@@ -949,7 +666,7 @@ callDynamicAPI(
   if (!extraAttr.visibleWhen) return true;
 
   const parentAttr = this.extraAttributeObject.value.extraAttributes
-    .find(x => x.attributeId == extraAttr.visibleWhen.extraAttributeId);
+    .find((x: any) => x.attributeId == extraAttr.visibleWhen.extraAttributeId);
 
   if (!parentAttr) return false;
 
@@ -978,7 +695,5 @@ private normalizeBooleanValue(value: any): string {
   return value;
 }
 
-private getDropdownKey(extraAttr: any): string {
-    return String(extraAttr.attributeId ?? extraAttr.id);
-}
+
 }

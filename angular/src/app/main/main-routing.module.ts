@@ -77,6 +77,14 @@ import { DashboardComponent } from "./dashboard/dashboard.component";
                         data: { preload: true },
                     },
                     {
+                        path: "fieldManager",
+                        loadChildren: () =>
+                            import("./fieldManager/field-manager.module").then(
+                                (m) => m.FieldManagerModule
+                            ),
+                        data: { preload: true },
+                    },
+                    {
                         path: "Messages",
                         loadChildren: () =>
                             import("./Messages/messages.module").then(
@@ -166,12 +174,16 @@ import { DashboardComponent } from "./dashboard/dashboard.component";
                     },
 
                     
-                 
-                    {
-                        path: "dashboard",
-                        component: DashboardComponent,
-                        data: { permission: "Pages.Tenant.Dashboard" },
+                      {
+                        path: 'dashboards',
+                        loadChildren: () => import('./dashboard/dashboard.module').then(m => m.DashboardModule),
+                        data: { preload: true }
                     },
+                    // {
+                    //     path: "dashboard",
+                    //     component: DashboardComponent,
+                    //     data: { permission: "Pages.Tenant.Dashboard" },
+                    // },
                     //Esraa [Start]
                     // { path: 'Messages', component: MessagesComponent },
                     //Esraa [End]

@@ -2471,7 +2471,6 @@ let index = this.activeAttachmentOption.attachmentSrcs?.length ? this.activeAtta
     }
 
     getAttachRealIndex(i: number): number {
-        debugger;
         const src = this.activeAttachmentOption.attachmentSrcs[i];
         let index = this.activeAttachmentOption.entityAttachments.findIndex(y => y?.url === src);
       

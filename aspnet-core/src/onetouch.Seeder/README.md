@@ -1,18 +1,82 @@
 # Deployment database seeding
 
-The web process no longer seeds databases during startup or connection resolution.
+The web process does not seed databases during startup or connection resolution.
 Publish and run this console application from the SAME release as the backend.
 It reuses the existing seed helper; translation generation is not changed.
 
 ## Release contract
 
 `SeedRelease.RequiredVersion` in `Program.cs` is the version-controlled required
-seed snapshot (initial version 1). Increment it whenever the existing cumulative
-seed routines or their assets change. It is not an arbitrary command-line value.
+seed snapshot (version 13 promotes DropdownOptions to String--Chips). Increment it whenever
+the cumulative seed routines or their assets change. It is not an arbitrary
+command-line value.
 Each database records successful snapshots in `dbo.__OneTouchSeedHistory`.
 This is a cumulative snapshot runner, not an ordered migration engine: a database
 at version 1 moving to 3 executes release 3's complete existing seed helper once.
 Future non-cumulative data transformations require explicit ordered steps instead.
+
+Version 2 runs the idempotent AppEntity, transaction header, and transaction
+detail Field Manager scripts after schema migrations. A database whose AppFields
+rows were cleared after the older one-time EF migration will be refilled when
+this seeder applies version 2 or later. The existing Migrator and installer also call the
+same host seed method directly.
+
+Version 3 also seeds six Field Manager setting definitions for String--Textbox
+(AllowNull, Length, DefaultValue, Required, Visible, Editable) and six applied
+snapshots scoped to that type. The script is idempotent, so databases moving
+directly from an older seed version can run the cumulative host seed safely.
+
+Version 4 adds Date--Date picker settings (AllowNull, DateFormat, DefaultValue,
+Required, Visible) and five applied snapshots scoped to that type. The current
+seed gives each type its own definitions: DateFormat is a string setting,
+DefaultValue is a date setting, and the Boolean settings are independent of
+String--Textbox. Existing shared assignments are remapped when reseeded.
+
+Version 5 adds the `inputmask` and `NoOfDecmials` XML attributes, the input mask
+AppFields definition and Date picker snapshot, and uses SycEntityObjectTypes
+IDs for `EntitySycObjectId` in new field definitions. The associated EF migration
+remaps existing definitions and snapshots before the cumulative seed runs.
+
+Version 6 replaces Date--Date picker XML with AllowNull, DateFormat,
+DefaultValue, Required, and Visible. The host seed no longer adds `inputmask`
+to that XML or seeds a new input-mask AppFields definition. Existing AppFields
+definitions and table snapshots are not removed by this seed.
+Version 6 also assigns setting definitions directly to their owning
+`SycEntityObjectTypes` rows, including separate Boolean definitions for the
+Date picker and String--Textbox.
+
+Version 7 seeds independent definitions, applied snapshots, history rows and
+type XML for Numeric input (6 settings), Currency (6), Dropdown (5), and
+Checkbox (3). The Numeric input XML replaces the old `NoOfDecmials` code with
+`Decimals`, preserving its attribute ID when possible. Existing matching
+snapshots retain their applied revision and values.
+
+Version 8 follows the `DetachOrdinaryFieldDefinitions` schema migration.
+Ordinary `AppFields` definitions have no `SycObjectId` or
+`EntitySycObjectId`; `AppTableFields.SycObjectId` still identifies the assigned
+data object. The six Field type setting groups retain their definition owner.
+
+Version 9 follows `20261016150000_DynamicFieldSettings`. It creates the
+setting-option and setting-value tables and backfills current fields, history,
+and table assignments from the legacy typed columns. Apply the schema migration
+before running the seeder; the cumulative seed reruns the idempotent backfill
+after all type-owned setting definitions are present.
+
+Version 10 adds three common DateFormat choices and maps matching current
+Date picker setting values to those options. The option seed is idempotent.
+
+Version 11 follows `20261016170000_UseFieldSettingOptionsOnly`. It enables
+multiple selections for the List--Dropdown `DropdownOptions` setting. The
+matching option choices and selections live in `AppFieldsOptions` and the
+setting-value tables; the separate dropdown-option tables have been removed.
+
+Version 12 adds the String--Chips and String--dropDownList field types and
+their setting definitions, and assigns DateFormat the dropDownList type.
+Databases already marked version 11 must apply this snapshot to receive them.
+
+Version 13 changes the List--Dropdown `DropdownOptions` setting's value type
+from List--Dropdown to String--Chips. It keeps the setting ID and code, records
+a new revision, and updates its applied Field Manager snapshot.
 
 Existing `Clients.IsSeeded` values are ignored and left untouched. Do not mark old
 databases version 1 merely because that flag is True: run the new seed baseline.
@@ -51,7 +115,7 @@ Exit codes: **0** all selected databases match this release, **1** failure,
 A newer database is not accepted by check and is refused by apply (no downgrade).
 The SQL principal needs permission to see/read the history table for check mode.
 
-All rows of `dbo.Clients` are included; the current implementation assumes no
+Unless `--default-only` is selected, all rows of `dbo.Clients` are included; the current implementation assumes no
 active-client column. Blank/invalid connections fail the job rather than silently
 skipping a client. Default and client databases are deduplicated by server/catalog;
 server case is normalized but catalog case is preserved for case-sensitive SQL instances.
@@ -98,6 +162,19 @@ dotnet <published-seeder.dll> --config <effective-settings.json> --client-url <e
 If other clients share that database, take all of them offline as well. The explicit
 maintenance confirmation is an operator assertion, not automatic access control.
 
+To run only `ConnectionStrings.Default`, use `--default-only --expected-database
+onetouchDevDb3`. The runner compares the actual default catalog to that exact
+name and does not query or seed any registered client. The Seeder project also
+includes Visual Studio launch profiles named `onetouchDevDb3 - check` and
+`onetouchDevDb3 - apply`. Select the apply profile explicitly to seed from
+Visual Studio. Those profiles use paths relative to the Seeder project folder;
+confirm that the Web Host config points to the intended server before applying.
+For a local SQL Server on the developer's computer, use `Local onetouchDevDb3 -
+check` or `Local onetouchDevDb3 - apply` instead. These profiles override only
+`ConnectionStrings.Default` with integrated authentication to `localhost` and
+do not query the client registry. Relative paths are resolved from the current
+working directory first, then the Seeder project folder for Visual Studio runs.
+
 ## Concurrency, failures and retry
 
 Databases are processed sequentially. A session-owned SQL application lock prevents
@@ -114,7 +191,8 @@ after failure. Pooling is disabled on the lock-owning connection, so closing it
 releases the lock. The principal needs table creation, seed write and application
 lock permissions. A long transaction can require substantial transaction-log space.
 
-Status/timing and exception type/SQL error number go to stdout/stderr for pipeline
+Status/timing, exception type/SQL error number, and the first application stack
+location go to stdout/stderr for pipeline
 capture. Raw exception messages are suppressed because they may expose credentials
 or customer data. Inspect SQL diagnostics securely when deeper investigation is
 required. Do not blindly retry a deterministic data/schema failure.

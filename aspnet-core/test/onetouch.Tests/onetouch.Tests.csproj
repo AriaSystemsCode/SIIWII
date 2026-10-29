@@ -23,7 +23,7 @@
     <ProjectReference Include="..\onetouch.Test.Base\onetouch.Test.Base.csproj" />
   </ItemGroup>
   <ItemGroup>
-    <PackageReference Include="Abp" Version="5.7.0" />
+    <PackageReference Include="Abp" Version="8.0.0" />
     <PackageReference Include="DevExpress.Xpo" Version="21.1.4" />
     <PackageReference Include="Microsoft.NET.Test.Sdk" Version="16.5.0" />
     <PackageReference Include="xunit.runner.visualstudio" Version="2.4.1">

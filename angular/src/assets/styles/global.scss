@@ -34,6 +34,19 @@
 @import "./components/p-multi-select.scss";
 @import "./components/p-dialog";
 
+
+@import '@syncfusion/ej2-base/styles/material.css';
+@import '@syncfusion/ej2-buttons/styles/material.css';
+@import '@syncfusion/ej2-dropdowns/styles/material.css';
+@import '@syncfusion/ej2-grids/styles/material.css';
+@import '@syncfusion/ej2-inputs/styles/material.css';
+@import '@syncfusion/ej2-lists/styles/material.css';
+@import '@syncfusion/ej2-navigations/styles/material.css';
+@import '@syncfusion/ej2-popups/styles/material.css';
+@import '@syncfusion/ej2-splitbuttons/styles/material.css';
+@import '@syncfusion/ej2-pivotview/styles/material.css';
+
+
 .hint {
     font-size: 0.8rem;
     color: $grey-5;
@@ -961,6 +974,16 @@ body p-paginator .p-paginator .p-paginator-element, body p-paginator .p-paginato
 }
 
 
+
+.kt-header {
+        background-color: transparent !important;
+    
+    }
+
+
+    .btn.btn-link:focus, .btn.btn-link:hover, .btn.btn-link.active, a.btn.btn-label:focus, a.btn.btn-label:hover, a.btn.btn-label.active, button.btn.btn-label:focus, button.btn.btn-label:hover, button.btn.btn-label.active, input.btn.btn-label:focus, input.btn.btn-label:hover, input.btn.btn-label.active{
+        background-color:  #f7f2f6 !important;
+    }
 .modal .modal-content .modal-header .modal-title {
     padding: 10px;
 }
@@ -1027,5 +1050,74 @@ body .roles-multiselect .p-multiselect-trigger {
 @media (min-width: 1025px) {
     html[dir="rtl"] .mt-ar{
         margin-top: 85px !important;
+    }}
+.field-manager-icon {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 40px;
+    height: 40px;
+    border-radius: 8px;
+    box-sizing: border-box;
+    position: relative;
+}
+
+.field-manager-icon::before {
+    content: "";
+    width: 28px;
+    height: 28px;
+    display: block;
+    background-image: url('/assets/icons/field-manager.svg');
+    background-repeat: no-repeat;
+    background-position: center;
+    background-size: contain;
+}
+
+
+
+
+.clear-data-confirm-dialog {
+
+    .p-dialog-header {
+        padding: 1.25rem 1.5rem;
+        border-bottom: 1px solid #edf0f4;
+
+        .p-dialog-title {
+            font-size: 17px;
+            font-weight: 600;
+            color: #252b37;
+        }
+    }
+
+    .p-dialog-content {
+        padding: 1.5rem;
+        display: flex;
+        align-items: flex-start;
+        gap: 14px;
+        line-height: 1.6;
+        color: #555;
+        font-size: 14px;
+
+        .p-confirm-dialog-icon {
+            color: #e67e22;
+            font-size: 25px;
+        }
+    }
+
+    .p-dialog-footer {
+        padding: 1rem 1.5rem;
+        border-top: 1px solid #edf0f4;
+
+        button {
+            border-radius: 7px;
+            font-weight: 500;
+            padding: 9px 18px;
+        }
+    }
+
+    .p-button-transparent {
+        background: transparent !important;
+    border: 1px solid gainsboro !important;
+    color:#4A0D4A !important;
     }
 }
