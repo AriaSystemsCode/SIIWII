@@ -4,8 +4,8 @@
             <form *ngIf="active" #sysObjectTypeForm="ngForm" novalidate (ngSubmit)="save()" autocomplete="off">
                 <div class="modal-header">
                     <h4 class="modal-title">
-                        <span *ngIf="sysObjectType.id">{{l("EditObjectType")}}</span>
-                        <span *ngIf="!sysObjectType.id">{{l("CreateNewObjectType")}}</span>
+                        <span *ngIf="sysObjectType.id">{{"EditObjectType" | localize}}</span>
+                        <span *ngIf="!sysObjectType.id">{{"CreateNewObjectType" | localize}}</span>
                     </h4>
                     <button type="button" class="close" (click)="close()" aria-label="Close" [disabled]="saving">
                         <span aria-hidden="true">&times;</span>
@@ -15,9 +15,9 @@
                  
 
 					<div class="form-group m-form__group">
-						<label for="SysObjectTypeName">{{l("Parent")}}</label>
+						<label for="SysObjectTypeName">{{"Parent" |localize}}</label>
 						<select name="sysObjectType.parentId" [(ngModel)]="sysObjectType.parentId" class="form-control" >
-							<option value="">{{l("Please Select")}}</option>
+							<option value="">{{"PleaseSelect" | localize}}</option>
 							<option *ngFor="let item of allSysObjectTypes" value="{{item.id}}">{{item.displayName}}</option>
 						</select>
 					</div>

@@ -29,6 +29,14 @@ export class EditionsComponent extends AppComponentBase {
         super(injector);
     }
 
+
+    isArabic = false;
+
+ngOnInit(): void {
+    const lang = abp.utils.getCookieValue('Abp.Localization.CultureName');
+    this.isArabic = lang === 'ar' || lang === 'ar-EG';
+}
+
     getEditions(): void {
         this.primengTableHelper.showLoadingIndicator();
         this._editionService.getEditions()

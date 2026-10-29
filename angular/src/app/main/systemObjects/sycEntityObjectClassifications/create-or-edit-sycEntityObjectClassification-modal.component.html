@@ -5,7 +5,7 @@
                 <div class="modal-header">
                     <h4 class="modal-title">
                         <span *ngIf="sycEntityObjectClassification.id">{{l("EditEntityObjectClassification")}}</span>
-                        <span *ngIf="!sycEntityObjectClassification.id">{{l("CreateNewEntityObjectClassification")}}</span>
+                        <span *ngIf="!sycEntityObjectClassification.id">{{"CreateNewEntityObjectClassification" | localize}}</span>
                     </h4>
                     <button type="button" class="close" (click)="close()" aria-label="Close" [disabled]="saving">
                         <span aria-hidden="true">&times;</span>

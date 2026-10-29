@@ -15,7 +15,7 @@
             <div class="kt-subheader__wrapper">
 				<button (click)="exportToExcel()" class="btn btn-outline-success"><i class="fa fa-file-excel"></i> {{l("ExportToExcel")}}</button>
                 <button *ngIf="isGranted('Pages.SysObjectTypes.Create')" (click)="createSysObjectType()" 
-			class="btn btn-primary blue"><i class="fa fa-plus"></i> {{l("CreateNewObjectType")}}</button>
+			class="btn btn-primary blue"><i class="fa fa-plus"></i> {{"CreateNewObjectType" | localize}}</button>
             </div>
         </div>
       </div>

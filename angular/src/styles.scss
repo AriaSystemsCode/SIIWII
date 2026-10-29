@@ -715,3 +715,47 @@ html[dir="rtl"] .p-carousel .p-carousel-next .pi {
         margin: 2px 15px !important;
 
 }
+
+
+
+.edition-actions-menu {
+    min-width: 220px;
+    max-width: min(300px, calc(100vw - 24px));
+    max-height: 280px;
+    overflow-y: auto;
+    overflow-x: hidden;
+    z-index: 1100 !important;
+    border-radius: 8px;
+    padding: 6px 0;
+    background: #fff;
+    box-shadow: 0 6px 20px rgba(0, 0, 0, 0.15);
+
+    li {
+        list-style: none;
+
+        a {
+            display: block;
+            padding: 10px 14px;
+            font-size: 13px;
+            text-decoration: none;
+            white-space: normal;
+            overflow-wrap: anywhere;
+            color: #333;
+
+            &:hover {
+                background: #f5f0f7;
+                color: #4a0d4a;
+            }
+        }
+    }
+
+    &.edition-menu-ar {
+        direction: rtl;
+        text-align: right;
+    }
+
+    &.edition-menu-en {
+        direction: ltr;
+        text-align: left;
+    }
+}

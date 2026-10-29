@@ -30,7 +30,7 @@
                         <p-accordion class="lookups-accordion lookups-accordion--legacy">
                             <p-accordionTab header="Phone Types" [selected]="true" (click)="tabChanged(tabs[0])" styleClass="lookups-accordion__tab">
                                 <span class="kt-subheader__desc according_desc according_desc-17">
-                                    {{l("CreatenewEntityObjectType")}}
+                                    {{"CreatenewEntityObjectType" | localize}}
                                 </span>
                                 <div class="kt-subheader__toolbar accordion-toolbar accordion-toolbar--legacy">
                                     <div class="kt-subheader__wrapper" *ngIf="currTab && currTab.id == tabs[0].id ">
@@ -216,7 +216,7 @@
                             <div class="kt-portlet kt-portlet--mobile">
                                 <div class="kt-portlet__body body-according accordion-body">
                                     <span class="kt-subheader__desc according_desc according_desc-{{item.id}}">
-                                        {{l("CreatenewEntityObjectType")}}
+                                        {{"CreatenewEntityObjectType" |localize}}
                                     </span>
                                     <div class="kt-subheader__toolbar accordion-toolbar">
                                         <div class="kt-subheader__wrapper" *ngIf="currTab && currTab.id == item.id ">
