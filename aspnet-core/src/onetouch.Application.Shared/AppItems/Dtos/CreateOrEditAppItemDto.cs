@@ -406,6 +406,8 @@ namespace onetouch.AppItems.Dtos
 
         public IList<ItemSharingDto> ItemSharing { get; set; }
 
+        public virtual long NumberOfSubscribers { get; set; }
+
     }
     //mmt33-2
     public class SharingItemOptions

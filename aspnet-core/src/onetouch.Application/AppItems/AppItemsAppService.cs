@@ -3347,7 +3347,8 @@ namespace onetouch.AppItems
                 return false;
 
             var marketplaceItem = await _appMarketplaceItem.GetAll().AsNoTracking()
-                .Where(x => x.Code == sourceItem.SSIN || (x.ManufacturerCode == sourceItem.Code && x.TenantOwner == sourceItem.TenantId))
+                .Where(x => x.SSIN == sourceItem.SSIN || x.Code == sourceItem.SSIN ||
+                    (x.ManufacturerCode == sourceItem.Code && x.TenantOwner == sourceItem.TenantId))
                 .Select(x => new { x.Id, x.Code })
                 .FirstOrDefaultAsync();
 
@@ -3365,7 +3366,7 @@ namespace onetouch.AppItems
             }
 
             var marketplaceItems = await _appMarketplaceItem.GetAll()
-                .Where(x => ssins.Contains(x.Code))
+                .Where(x => ssins.Contains(x.Code) || ssins.Contains(x.SSIN))
                 .ToListAsync();
 
             foreach (var item in marketplaceItems)
@@ -3517,7 +3518,8 @@ namespace onetouch.AppItems
                     //MD
                     var marketplaceItems = await _appMarketplaceItem.GetAll().Include(x => x.ParentFkList).ThenInclude(x => x.ItemPricesFkList)
                         .Include(a => a.ItemSizeScaleHeadersFkList).ThenInclude(a => a.AppItemSizeScalesDetails)
-                        .Where(x => x.Code == appItem.SSIN || (x.ManufacturerCode == appItem.Code && x.TenantOwner == appItem.TenantId)).ToListAsync();
+                        .Where(x => x.SSIN == appItem.SSIN || x.Code == appItem.SSIN ||
+                            (x.ManufacturerCode == appItem.Code && x.TenantOwner == appItem.TenantId)).ToListAsync();
                     if (marketplaceItems != null && marketplaceItems.Count > 1)
                     {
                         foreach (var markItem in marketplaceItems.Where(z => z.Code != z.SSIN).ToList())
@@ -3528,7 +3530,8 @@ namespace onetouch.AppItems
 
                         var marketplaceItemsList = await _appMarketplaceItem.GetAll().Include(x => x.ParentFkList).ThenInclude(x => x.ItemPricesFkList)
                        .Include(a => a.ItemSizeScaleHeadersFkList).ThenInclude(a => a.AppItemSizeScalesDetails)
-                       .Where(x => x.Code == appItem.SSIN || (x.ManufacturerCode == appItem.Code && x.TenantOwner == appItem.TenantId)).ToListAsync();
+                       .Where(x => x.SSIN == appItem.SSIN || x.Code == appItem.SSIN ||
+                           (x.ManufacturerCode == appItem.Code && x.TenantOwner == appItem.TenantId)).ToListAsync();
                         if (marketplaceItemsList != null && marketplaceItemsList.Count > 1)
                         {
                             int cntt = 0;
@@ -3548,7 +3551,8 @@ namespace onetouch.AppItems
                     //MD
                     AppMarketplaceItems.AppMarketplaceItems marketplaceItem = await _appMarketplaceItem.GetAll().Include(x => x.ParentFkList).ThenInclude(x => x.ItemPricesFkList)
                         .Include(a => a.ItemSizeScaleHeadersFkList).ThenInclude(a => a.AppItemSizeScalesDetails)
-                        .Where(x => x.Code == appItem.SSIN || (x.ManufacturerCode == appItem.Code && x.TenantOwner == appItem.TenantId)).FirstOrDefaultAsync();
+                        .Where(x => x.SSIN == appItem.SSIN || x.Code == appItem.SSIN ||
+                            (x.ManufacturerCode == appItem.Code && x.TenantOwner == appItem.TenantId)).FirstOrDefaultAsync();
 
                     if (marketplaceItem == null || marketplaceItem.Id == 0)
                     {
@@ -3604,7 +3608,7 @@ namespace onetouch.AppItems
                     .Include(x => x.EntityExtraData).ThenInclude(x => x.AttributeValueFk)
                     //Mariam
                     .Include(x => x.ParentFkList).Include(x => x.EntityAttachments).ThenInclude(x => x.AttachmentFk)
-                            .Where(x => x.Code == appItem.SSIN).FirstOrDefaultAsync();
+                            .Where(x => x.SSIN == appItem.SSIN || x.Code == appItem.SSIN).FirstOrDefaultAsync();
                         if (marketplaceItem != null && marketplaceItem.Id != 0 && marketplaceItemObject != null)
                         {
 
@@ -3780,18 +3784,11 @@ namespace onetouch.AppItems
                     if (!input.SyncProduct)
                     {
                         marketplaceItem.ItemSharingFkList = new List<AppMarketplaceItemSharings>();
-                        foreach (var sharingDto in input.ItemSharing)
+                        foreach (var sharingDto in input.ItemSharing ?? new List<ItemSharingDto>())
                         {
-                            AppMarketplaceItemSharings sharing;
-                            if (sharingDto.Id == 0)
-                            {
-                                sharing = ObjectMapper.Map<AppMarketplaceItemSharings>(sharingDto);
-                            }
-                            else
-                            {
-                                sharing = await _appMarketplaceItemSharing.FirstOrDefaultAsync((long)sharingDto.Id);
-                                ObjectMapper.Map(sharingDto, sharing);
-                            }
+                            // Existing rows were deleted above, so DTO IDs are stale.
+                            var sharing = ObjectMapper.Map<AppMarketplaceItemSharings>(sharingDto);
+                            sharing.Id = 0;
                             marketplaceItem.ItemSharingFkList.Add(sharing);
                         }
                     }
@@ -3942,7 +3939,7 @@ namespace onetouch.AppItems
                         if (publishedEntityId != 0)
                             publishChild = await _appMarketplaceItem.GetAll().Include(x => x.EntityAttachments).ThenInclude(z => z.AttachmentFk)
                                 .Include(z => z.EntityExtraData).Include(z => z.ItemPricesFkList)
-                                .Where(x => x.Code == marketplaceCode).FirstOrDefaultAsync();
+                                .Where(x => x.SSIN == marketplaceCode || x.Code == marketplaceCode).FirstOrDefaultAsync();
                         long publishId = 0;
                         if (publishChild == null)
                             publishChild = new AppMarketplaceItems.AppMarketplaceItems();
@@ -4245,11 +4242,17 @@ namespace onetouch.AppItems
                         SharingLevel = item.SharingLevel,
                         ItemSharing = ObjectMapper.Map<List<ItemSharingDto>>(item.ItemSharingFkList),
                     };
+                    options.NumberOfSubscribers = await _appEntityRepository.CountAsync(a =>
+                        a.Code == item.SSIN &&
+                        a.TenantId != null &&
+                        a.TenantId != a.TenantOwner);
 
                     foreach (var itemSharing in options.ItemSharing)
                     {
-                        var tenantId = item.ItemSharingFkList.FirstOrDefault(x => x.UserFk != null && x.SharedUserId == itemSharing.SharedUserId).UserFk.TenantId;
-                        itemSharing.SharedUserTenantName = TenantManager.Tenants.FirstOrDefault(x => x.Id == tenantId).TenancyName;
+                        var user = item.ItemSharingFkList.FirstOrDefault(x => x.UserFk != null && x.SharedUserId == itemSharing.SharedUserId)?.UserFk;
+                        if (user?.TenantId != null)
+                            itemSharing.SharedUserTenantName = TenantManager.Tenants
+                                .FirstOrDefault(x => x.Id == user.TenantId)?.TenancyName;
                     }
                     return options;
                 }
