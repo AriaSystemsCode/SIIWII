@@ -27,12 +27,13 @@ import {
 
 import { finalize } from 'rxjs/operators';
 import { AppConsts } from '@shared/AppConsts';
-
+import { MessageService } from 'primeng/api';
 
 @Component({
     selector: 'app-dashboard-share',
     templateUrl: './dashboard-share.component.html',
-    styleUrls: ['./dashboard-share.component.scss']
+    styleUrls: ['./dashboard-share.component.scss'],
+      providers: [MessageService]
 })
 export class DashboardShareComponent
     extends AppComponentBase
@@ -75,9 +76,20 @@ export class DashboardShareComponent
     defaultAvatar = 'assets/common/images/default-profile-picture.png';
 
     
+    pendingRemoval: {
+    userId: number;
+    userName: string;
+    canView: boolean;
+    canEdit: boolean;
+} | null = null;
+
+private removalTimer: ReturnType<typeof setTimeout> | null = null;
+
+
     constructor(
         injector: Injector,
         private dashboardService: AppDashboardServiceProxy,
+         private messageService: MessageService,
         private cdr: ChangeDetectorRef
     ) {
         super(injector);
@@ -248,25 +260,132 @@ export class DashboardShareComponent
         this.refreshSharedUsers();
     }
 
-    removeUser(user: SharingUserInfo): void {
-        if (user.isOwner) {
-            return;
-        }
-        const workingUser =
-            this.tenantUsers.find(
-                item =>
-                    item.userId ===
-                    user.userId
+  removeUser(user: SharingUserInfo): void {
+    if (user.isOwner || this.isSaving || !this.dashboardId) {
+        return;
+    }
+
+    // Finish any previous pending removal first.
+    if (this.pendingRemoval) {
+        this.commitPendingRemoval();
+    }
+
+    const workingUser = this.tenantUsers.find(
+        item => item.userId === user.userId
+    );
+
+    if (!workingUser) {
+        return;
+    }
+
+    // Save original permissions for Undo.
+    this.pendingRemoval = {
+        userId: workingUser.userId,
+        userName: workingUser.userName || '',
+        canView: !!workingUser.canView,
+        canEdit: !!workingUser.canEdit
+    };
+
+    // Immediately remove from the UI.
+    workingUser.canView = false;
+    workingUser.canEdit = false;
+
+    this.refreshSharedUsers();
+
+    // Display Undo toast for 4 seconds.
+    this.messageService.clear('removeAccess');
+
+    this.messageService.add({
+        key: 'removeAccess',
+        severity: 'info',
+        summary: this.l('AccessRemoved'),
+        detail: `Removed access for user '${workingUser.userName || ''}'`,
+        life: 4000,
+        closable: false
+    });
+
+    this.removalTimer = setTimeout(() => {
+        this.commitPendingRemoval();
+    }, 4000);
+
+    this.cdr.detectChanges();
+}
+
+undoRemoveUser(): void {
+    if (!this.pendingRemoval) {
+        return;
+    }
+
+    if (this.removalTimer) {
+        clearTimeout(this.removalTimer);
+        this.removalTimer = null;
+    }
+
+    const pending = this.pendingRemoval;
+
+    const user = this.tenantUsers.find(
+        item => item.userId === pending.userId
+    );
+
+    if (user) {
+        user.canView = pending.canView;
+        user.canEdit = pending.canEdit;
+    }
+
+    this.pendingRemoval = null;
+
+    this.refreshSharedUsers();
+
+    this.messageService.clear('removeAccess');
+
+    this.cdr.detectChanges();
+}
+
+private commitPendingRemoval(): void {
+    if (!this.pendingRemoval || !this.dashboardId) {
+        return;
+    }
+
+    if (this.removalTimer) {
+        clearTimeout(this.removalTimer);
+        this.removalTimer = null;
+    }
+
+    const pending = this.pendingRemoval;
+    this.pendingRemoval = null;
+
+    const body = this.buildShareDashboardBody();
+
+    this.dashboardService.shareDashboard(body).subscribe({
+        next: () => {
+            this.originalTenantUsers =
+                this.cloneUsers(this.tenantUsers);
+
+            this.saved.emit(true);
+        },
+        error: error => {
+            console.error('Failed to remove dashboard access:', error);
+
+            // Restore permissions if saving failed.
+            const user = this.tenantUsers.find(
+                item => item.userId === pending.userId
             );
 
+            if (user) {
+                user.canView = pending.canView;
+                user.canEdit = pending.canEdit;
+            }
 
-        if (!workingUser) {
-            return;
+            this.refreshSharedUsers();
+
+            this.notify.error(
+                this.l('FailedToRemoveAccess')
+            );
+
+            this.cdr.detectChanges();
         }
-        workingUser.canView = false;
-        workingUser.canEdit = false;
-        this.refreshSharedUsers();
-    }
+    });
+}
 
     selectAll(): void {
         this.mode = 'all';
@@ -440,6 +559,9 @@ export class DashboardShareComponent
     }
 
     closeDialog(): void {
+        if (this.pendingRemoval) {
+    this.commitPendingRemoval();
+}
         this.tenantUsers = this.cloneUsers(this.originalTenantUsers);
         this.refreshSharedUsers();
         this.selectedSearchUser = null;
@@ -473,4 +595,11 @@ export class DashboardShareComponent
             ].charAt(0)
         ).toUpperCase();
     }
+
+    ngOnDestroy(): void {
+    if (this.removalTimer) {
+        clearTimeout(this.removalTimer);
+        this.removalTimer = null;
+    }
+}
 }

@@ -407,3 +407,34 @@
     </ng-container>
 
 </p-dialog>
+
+
+
+<p-toast
+    key="removeAccess"
+    position="bottom-right"
+    [baseZIndex]="12000">
+
+    <ng-template pTemplate="message" let-message>
+
+        <div class="d-flex align-items-center justify-content-between w-100"
+             style="gap: 16px;">
+
+            <span>
+                {{ message.detail }}
+            </span>
+
+            <button
+                type="button"
+                class="btn btn-link p-0 font-weight-bold"
+                (click)="undoRemoveUser()">
+
+                {{ 'Undo' | localize }}
+
+            </button>
+
+        </div>
+
+    </ng-template>
+
+</p-toast>
