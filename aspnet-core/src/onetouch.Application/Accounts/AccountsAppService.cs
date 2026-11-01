@@ -2252,7 +2252,7 @@ namespace onetouch.Accounts
             //I40[End]
 
 
-            if (tenant != null && contact != null && contact.AccountInfo.AccountTypeId==null)
+            if (tenant != null && contact != null && (contact.AccountInfo.AccountTypeId==null || contact.AccountInfo.AccountTypeId == 0))
             {
                 var types = _appEntitiesAppService.GetAllAccountTypesForTableDropdown().Result.ToList();
                 var Edition1 = _appConfiguration[$"Editions:" + tenant.EditionId.ToString()];
