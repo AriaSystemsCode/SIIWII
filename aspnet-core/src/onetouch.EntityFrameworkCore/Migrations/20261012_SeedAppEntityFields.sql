@@ -106,10 +106,10 @@ DECLARE @requiredTypes table (Code nvarchar(50) PRIMARY KEY, Name nvarchar(250) 
 INSERT @requiredTypes (Code, Name) VALUES
     (N'ST', N'String--Textbox'), (N'IN', N'Integer--Numeric input'),
     (N'IC', N'Integer--Currency'), (N'DP', N'Date--Date picker'),
-    (N'LD', N'List--Dropdown'), (N'BOOLEAN', N'Boolean--Checkbox');
+    (N'LD', N'String--Dropdown'), (N'BOOLEAN', N'Boolean--Checkbox');
 IF EXISTS (SELECT 1 FROM @requiredTypes s JOIN dbo.SycEntityObjectTypes t
     ON t.Code = s.Code OR t.Name = s.Name
-    WHERE NOT (t.Code = s.Code AND t.Name = s.Name AND t.ObjectId = @fieldObjectId
+    WHERE NOT (t.Code = s.Code AND (t.Name = s.Name OR (s.Code = N'LD' AND t.Name = N'List--Dropdown')) AND t.ObjectId = @fieldObjectId
         AND t.ObjectCode = N'FIELD' AND t.ParentId = @fieldRootId
         AND t.ParentCode = N'FIELD' AND t.TenantId IS NULL AND t.IsDeleted = 0))
     THROW 51116, 'A conflicting Field data type exists.', 1;

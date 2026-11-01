@@ -51,18 +51,18 @@ BEGIN TRY
     INSERT #OwnerTypes (TypeCode, TypeName) VALUES
         (N'IN', N'Integer--Numeric input'),
         (N'IC', N'Integer--Currency'),
-        (N'LD', N'List--Dropdown'),
+        (N'LD', N'String--Dropdown'),
         (N'BOOLEAN', N'Boolean--Checkbox');
 
     UPDATE o SET TypeId = t.Id
     FROM #OwnerTypes AS o
     JOIN dbo.SycEntityObjectTypes AS t ON t.ObjectId = @fieldObjectId
         AND t.ParentId = @fieldRootId AND t.Code = o.TypeCode
-        AND t.Name = o.TypeName AND t.IsDeleted = 0;
+        AND (t.Name = o.TypeName OR (o.TypeCode = N'LD' AND t.Name = N'List--Dropdown')) AND t.IsDeleted = 0;
     IF EXISTS (SELECT 1 FROM #OwnerTypes WHERE TypeId IS NULL)
        OR EXISTS (SELECT 1 FROM #OwnerTypes o JOIN dbo.SycEntityObjectTypes t
           ON t.ObjectId = @fieldObjectId AND t.ParentId = @fieldRootId
-         AND t.Code = o.TypeCode AND t.Name = o.TypeName AND t.IsDeleted = 0
+         AND t.Code = o.TypeCode AND (t.Name = o.TypeName OR (o.TypeCode = N'LD' AND t.Name = N'List--Dropdown')) AND t.IsDeleted = 0
           GROUP BY o.TypeCode HAVING COUNT(*) <> 1)
         THROW 51403, 'A required Field Manager field type is missing or duplicated.', 1;
 
@@ -103,7 +103,7 @@ BEGIN TRY
         (N'LD', 2, N'AllowMultiSelect', N'Multi-Select', N'BOOLEAN', N'boolean', N'AdvancedInformation', N'false', 0, 1),
         -- The later cumulative seed promotes this setting to String--Chips,
         -- which does not exist yet when this migration first runs.
-        (N'LD', 3, N'DropdownOptions', N'Dropdown Options', N'LD', N'dropDownList', N'AdvancedInformation', NULL, 1, 0),
+        (N'LD', 3, N'DropdownOptions', N'Dropdown Options', N'LD', N'chips', N'AdvancedInformation', NULL, 1, 0),
         (N'LD', 4, N'Required', N'Required', N'BOOLEAN', N'boolean', N'AdvancedInformation', N'false', 0, 1),
         (N'LD', 5, N'Visible', N'Visible', N'BOOLEAN', N'boolean', N'ExtraAttributes', N'true', 0, 1),
         (N'BOOLEAN', 1, N'DefaultValue', N'Default Value', N'BOOLEAN', N'boolean', N'AdvancedInformation', N'false', 1, 0),

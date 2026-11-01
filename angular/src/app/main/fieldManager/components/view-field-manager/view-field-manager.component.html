@@ -24,11 +24,12 @@
                             type="button" class="btn history-action" (click)="restoreRevision()">
                             <i class="fa fa-undo"></i> Restore Revision
                         </button>
-                        <button *ngIf="viewState === 'details' && !isViewingHistoryRevision" type="button"
-                            class="btn  history-action" (click)="goToHistory()">
-                            <i class="fa fa-history"></i> Revision Log
+                        <button *ngIf="viewState === 'details' && !isViewingHistoryRevision && canCreateRevision" type="button"
+                            class="btn history-action sync-action" [disabled]="!canSync"
+                            [attr.title]="canSync ? null : 'Sync is not available for this field'" (click)="syncField()">
+                            <i class="fa fa-sync"></i> Sync
                         </button>
-                           <button *ngIf="viewState === 'details' && !isViewingHistoryRevision" type="button"
+                           <button *ngIf="viewState === 'details' && !isViewingHistoryRevision && canCreateRevision" type="button"
                             class="btn  revision-primary" (click)="createNewRevision()">
                             <i class="fa fa-plus"></i>{{ 'CreateNewRevision' | localize }}
                         </button>
@@ -38,6 +39,7 @@
                 <ng-container *ngIf="viewState === 'history'">
                     <app-field-revision-history
                         [revisions]="revisions"
+                        [currentRevisionNo]="currentItem?.currentRevisionNo"
                         (revisionSelected)="openRevision($event)">
                     </app-field-revision-history>
                 </ng-container>
@@ -49,10 +51,14 @@
                             <!-- <p>{{ selectedRevision?.status === 'Previous' ? 'Read-only historical revision' : 'Current field configuration' }}</p> -->
                         </div>
                         <div class="revision-identity">
+                            
                             <span class="revision-number">Revision #{{ revisionLabel }}</span>
-                            <span class="status-badge badge-current">
+                            <button *ngIf="!isViewingHistoryRevision" type="button" class="btn history-action" (click)="goToHistory()">
+                                <i class="fa fa-history"></i> Revision Log
+                            </button>
+                           <!--  <span class="status-badge badge-current">
                                 <i class="fa fa-1x fa-check"></i> Current
-                            </span>
+                            </span> -->
                         </div>
                     </div>
 
@@ -65,24 +71,29 @@
                             <div class="detail-item detail-wide"><span>Description</span><strong>{{ item.description || '—' }}</strong></div>
                             <div class="detail-item"><span>Field Level</span><strong>{{ item.fieldLevelCode || '—' }}</strong></div>
                             <div class="detail-item"><span>Status</span><strong>{{ item.fieldStatusCode || '—' }}</strong></div>
-                            <div class="detail-item"><span>Tracking #</span><strong>{{ item.trackingNo || '—' }}</strong></div>
+                            <div class="detail-item"><span>Reference #</span><strong>{{ item.trackingNo || '—' }}</strong></div>
                             <div class="detail-item"><span>Field Type</span><strong>{{ fieldTypeName(item.fieldTypeId) || '—' }}</strong></div>
                         </div>
                     </section>
 
-                    - 
-                                     //i51_BE-FE-Handle Extra Data in the View and Create/Edit/view modals 
-                    <section class="field-card advanced-card">
-                        <div class="card-section-heading"><div><h3>Advanced Information</h3></div></div>
-                        <div class="detail-grid advanced-grid">
-                            <div class="detail-item"><span>Allow Null</span><strong>{{ item.allowNull ? 'Yes' : 'No' }}</strong></div>
-                            <div class="detail-item"><span>Length</span><strong>{{ item.length || '—' }}</strong></div>
-                            <div class="detail-item"><span>Allow Multi Select</span><strong>{{ item.allowMultiSelect ? 'Yes' : 'No' }}</strong></div>
-                            <div class="detail-item"><span>Decimals</span><strong>{{ item.decimals }}</strong></div>
-                            <div class="detail-item"><span>Default Value</span><strong>{{ item.defaultValue || '—' }}</strong></div>
-                            <div class="detail-item"><span>Date Format</span><strong>{{ item.dateFormat || '—' }}</strong></div>
-                        </div>
-                    </section>
+                    
+                    <ng-container *ngFor="let group of settingGroups">
+                        <section class="usage-group" *ngIf="hasSettingsValue(group.settings)">
+                            <button type="button" class="usage-toggle" (click)="toggleUsage(group.usage)"
+                                    [attr.aria-expanded]="!isUsageCollapsed(group.usage)">
+                                    <span class="usage-title">{{ usageTitle(group.usage) }}</span>
+                                    <i class="fa" [ngClass]="isUsageCollapsed(group.usage) ? 'fa-chevron-down' : 'fa-chevron-up'"></i>
+                            </button>
+                            <div class="usage-content" [hidden]="isUsageCollapsed(group.usage)">
+                                <div class="detail-grid advanced-grid">
+                                    <div class="detail-item" *ngFor="let setting of group.settings">
+                                        <span>{{ setting.settingFieldName | localize }}</span>
+                                        <strong>{{ setting.value || '—' }}</strong>
+                                    </div>
+                                </div>
+                            </div>
+                        </section>
+                    </ng-container>
                 </ng-container>
 
             </div>
