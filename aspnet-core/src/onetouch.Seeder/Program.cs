@@ -177,10 +177,9 @@ public static class Program
 
 public static class SeedRelease
 {
-    // Increment only when the cumulative seed snapshot changes. Version 13
-    // promotes DropdownOptions to the String--Chips value type.
+    // Increment when the cumulative seed snapshot changes. Version 19 adds AppEntity lookup settings and legacy XML metadata.
     // This is not an EF schema version.
-    public const int RequiredVersion = 13;
+    public const int RequiredVersion = 19;
 }
 
 public sealed record Target(string Label, string ConnectionString, string Identity)
@@ -260,3 +259,4 @@ public sealed class SeederOptionsException : ArgumentException
 {
     public SeederOptionsException(string message) : base(message) { }
 }
+
