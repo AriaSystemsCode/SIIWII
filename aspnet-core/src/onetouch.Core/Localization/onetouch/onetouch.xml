@@ -1,4 +1,4 @@
-﻿<?xml version="1.0" encoding="utf-8" ?>
+<?xml version="1.0" encoding="utf-8" ?>
 <localizationDictionary culture="en">
 	<texts>
 	<text name="Signature">Signature</text>
@@ -3297,5 +3297,9 @@ Please select one of the available linesheet templates
 
 
 		
-  </texts>  
+  		<text name="OptionsList"> Options List </text>
+		<text name="FieldsAddedSuccessfully"> Fields Added Successfully </text>
+		<text name="EnterReferenceNumber">Enter Reference Number </text>
+	</texts>  
 </localizationDictionary>
+

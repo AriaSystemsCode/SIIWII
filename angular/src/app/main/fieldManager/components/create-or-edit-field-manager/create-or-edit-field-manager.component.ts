@@ -2,11 +2,11 @@ import { Component, EventEmitter, Injector, OnInit, Output, ViewChild } from '@a
 import { ActivatedRoute, Router } from '@angular/router';
 import { ModalDirective } from 'ngx-bootstrap/modal';
 import { AppComponentBase } from '@shared/common/app-component-base';
-import { FieldManagerService } from '../../field-manager.service';
+import { FieldManagerService, getFieldUsageTitle } from '../../field-manager.service';
 import { ExtraAttributeDataService } from '@app/main/app-items/app-item-shared/services/extra-attribute-data.service';
 import Swal from 'sweetalert2';
 import * as moment from 'moment';
-import { AppFieldDto, CreateOrEditFieldInput, ExtraAttribute, ExtraAttributesSource, FieldCreateOrEditMetadataDto, FieldLookupDto, SycEntityObjectTypesServiceProxy } from '@shared/service-proxies/service-proxies';
+import { AppEntityExtraDataDto, AppFieldDto, CreateOrEditFieldInput, ExtraAttribute, ExtraAttributesSource, FieldCreateOrEditMetadataDto, FieldLookupDto, FieldSettingValueDto, SycEntityObjectTypesServiceProxy } from '@shared/service-proxies/service-proxies';
 
 @Component({
     selector: 'app-create-or-edit-field-manager',
@@ -31,11 +31,13 @@ export class CreateOrEditFieldManagerComponent extends AppComponentBase implemen
     fieldTypeSettings: ExtraAttribute[] = [];
     dynamicInputsForViewDto: any;
     dynamicSettingsObject: any = { value: { extraAttributes: [], filteredExtraAttributes: [], header: 'AdvancedInformation' } };
+    settingGroups: { usage: string, extraAttributeObject: any }[] = [];
     selectedObjectTypeId: number | null = null;
     entityParentId: number | null = null;
     private codePreviewRequest = 0;
     private previewTimer: ReturnType<typeof setTimeout> | null = null;
     private initialFormState = '';
+    private closeWithoutConfirmation = false;
     private extraAttributes: { [key: string]: any } = {};
     private expectedCurrentRevisionNo?: string;
     private isRevisionEdit = false;
@@ -69,6 +71,7 @@ export class CreateOrEditFieldManagerComponent extends AppComponentBase implemen
 
     show(id?: number, fromExisting = false, _tableName?: string, entityId?: number | null,
         objectTypeId?: number | null, entityParentId?: number | null): void {
+        this.closeWithoutConfirmation = false;
         this.activeTab = 'field-info';
         this.expectedCurrentRevisionNo = undefined;
         this.isRevisionEdit = false;
@@ -99,7 +102,8 @@ export class CreateOrEditFieldManagerComponent extends AppComponentBase implemen
         this.modal.show();
     }
 
-    showRevision(field: AppFieldDto, expectedCurrentRevisionNo?: string): void {
+    showRevision(field: AppFieldDto, expectedCurrentRevisionNo?: string, showModal = true): void {
+        this.closeWithoutConfirmation = !showModal;
         this.activeTab = 'field-info';
         this.isEdit = true;
         this.isRevisionEdit = true;
@@ -120,7 +124,7 @@ export class CreateOrEditFieldManagerComponent extends AppComponentBase implemen
         if (this.item.fieldTypeId) this.loadFieldTypeSettings(this.item.fieldTypeId);
         this.active = true;
         this.initialFormState = this.getFormState();
-        this.modal.show();
+        if (showModal) this.modal.show();
     }
 
     selectTab(tab: 'field-info', event: Event): void {
@@ -129,11 +133,7 @@ export class CreateOrEditFieldManagerComponent extends AppComponentBase implemen
     }
 
     save(): void {
-        debugger
-         //i51_BE-FE- Extra Data  saving ???
-         //i51 Whem chips !!
-        //i51-BE-Define the expected behavior when two users attempt to create a new revision at the same time. If one user saves a revision number that has already been used by another user, the system should notify the second user and ask whether they want to continue with a different revision number or cancel the operation.
-        this.dropdownOptions = this.dropdownOptions
+         this.dropdownOptions = this.dropdownOptions
             .filter(option => option.option.trim().length > 0 || option.value.trim().length > 0)
             .map(option => ({
                 option: option.option.trim(),
@@ -181,8 +181,35 @@ export class CreateOrEditFieldManagerComponent extends AppComponentBase implemen
         });
 
         input.fieldCode = this.item.fieldCode;
+        this.saveField(input);
+    }
+
+    private saveField(input: CreateOrEditFieldInput): void {
         this.fieldManagerService.createField(input).subscribe({
             next: savedField => {
+                const saveError = savedField.error;
+                if (saveError?.revisionAlreadyExists) {
+                    Swal.fire({
+                        title: '',
+                        text: `Revision ${saveError.conflictingRevisionNo} has already been saved. Do you want to create revision ${saveError.expectedNewRevisionNo}?`,
+                        icon: 'info',
+                        showCancelButton: true,
+                        confirmButtonText: 'Create revision',
+                        cancelButtonText: 'Cancel',
+                        allowOutsideClick: false,
+                        allowEscapeKey: false
+                    }).then(result => {
+                        if (!result.isConfirmed || !saveError.expectedNewRevisionNo) return;
+                        input.expectedCurrentRevisionNo = saveError.conflictingRevisionNo;
+                        this.saveField(input);
+                    });
+                    return;
+                }
+                if (saveError) {
+                    this.notify.error(saveError.message || 'Could not save the field.');
+                    return;
+                }
+
                 const revision = this.isEdit ? savedField.currentRevisionNo : undefined;
                 this.notify.success(revision
                     ? `Revision #${revision} saved successfully.`
@@ -201,7 +228,8 @@ export class CreateOrEditFieldManagerComponent extends AppComponentBase implemen
     }
 
     close(): void {
-        if (this.getFormState() === this.initialFormState) {
+        if (this.closeWithoutConfirmation || this.getFormState() === this.initialFormState) {
+            this.closeWithoutConfirmation = false;
             this.active = false;
             this.modal.hide();
             this.closed.emit();
@@ -217,13 +245,6 @@ export class CreateOrEditFieldManagerComponent extends AppComponentBase implemen
                             allowOutsideClick: false,
                             allowEscapeKey: false,
                             backdrop: true,
-                            customClass: {
-                                popup: "popup-class",
-                                icon: "icon-class",
-                                content: "content-class",
-                                actions: "actions-class",
-                                confirmButton: "confirm-button-class2",
-                            },
                     }).then((result) => {
                         if (result.isConfirmed) {
                             this.active = false;
@@ -268,7 +289,7 @@ export class CreateOrEditFieldManagerComponent extends AppComponentBase implemen
                 .subscribe({ next: sequence => {
                     if (request !== this.codePreviewRequest) return;
                     const typeCode = this.selectedFieldType?.code || '';
-                    this.item.fieldCode = `${typeCode.substring(0, 2)}${level.substring(0, 1)}${name.substring(0, 4)}${sequence}`;
+                    this.item.fieldCode = `${typeCode.substring(0, 2).toUpperCase()}${level.substring(0, 1).toUpperCase()}${name.substring(0, 4).toUpperCase()}${sequence}`;
                 } });
         }, 250);
     }
@@ -306,18 +327,87 @@ export class CreateOrEditFieldManagerComponent extends AppComponentBase implemen
         this.generateCode();
     }
 
+    private collapsedUsages = new Set<string>();
+
+    isUsageCollapsed(usage: string): boolean {
+        return this.collapsedUsages.has(usage);
+    }
+
+    toggleUsage(usage: string): void {
+        if (!this.collapsedUsages.delete(usage)) this.collapsedUsages.add(usage);
+    }
+
+    usageTitle(usage: string): string {
+        const fieldType = this.selectedFieldType?.name || '';
+        const [dataType = '', widgetName = ''] = fieldType.split('--').map(part => part.trim());
+        const dynamicTitle = getFieldUsageTitle(usage, dataType, widgetName);
+        if (dynamicTitle) return dynamicTitle;
+        const key = (usage || '').split('.').pop() || '';
+        const localized = this.l(key);
+        return localized && localized !== key ? localized : key.replace(/([a-z])([A-Z])/g, '$1 $2');
+    }
+
     onDynamicSettingsChanged(values: any[]): void {
-        const incomingValues = values || [];
-        const incomingAttributeIds = new Set(incomingValues.map(value => value.attributeId));
-        const existingValues = (this.item.settingValues || []).filter(value =>
-            !incomingAttributeIds.has(value.settingFieldId)
+        const currentAttributeIds = new Set(
+            (this.dynamicSettingsObject.value.extraAttributes as ExtraAttribute[]).map(setting => setting.attributeId)
         );
-        const updatedValues = this.fieldManagerService.mapExtraAttributeValuesToSettings(
-            incomingValues,
-            this.fieldTypeSettings,
-            this.dynamicSettingsObject.value.filteredExtraAttributes
+        const incomingValues = (values || []).filter(value => currentAttributeIds.has(value.attributeId));
+        const incomingAttributeIds = new Set(incomingValues.map(value => value.attributeId));
+        // Drop values left over from a previous field type.
+        const existingValues = (this.item.settingValues || []).filter(value =>
+            !incomingAttributeIds.has(value.settingFieldId) && currentAttributeIds.has(value.settingFieldId)
         );
 
+        const updatedRows = incomingValues.reduce((result: AppEntityExtraDataDto[], value: any) => {
+            // Use the attributes currently rendered; fieldTypeSettings can lag behind a superseded request.
+            const definition = (this.dynamicSettingsObject.value.extraAttributes as ExtraAttribute[])
+                .find(setting => setting.attributeId === value.attributeId)
+                ?? this.fieldTypeSettings.find(setting => setting.attributeId === value.attributeId);
+            const isChips = (definition?.dataType || '').toLowerCase() === 'chips';
+            const selectedValues: any[] = value.acceptMultipleValues || isChips
+                ? (Array.isArray(value.value) ? value.value : [])
+                : [value.value];
+            const attribute = this.dynamicSettingsObject.value.filteredExtraAttributes
+                .find((item: any) => item.attributeId === value.attributeId);
+
+            const rows = selectedValues
+                .filter(selectedValue => selectedValue !== undefined && selectedValue !== null && selectedValue !== '')
+                .map(selectedValue => {
+                const row = new AppEntityExtraDataDto();
+                row.attributeId = value.attributeId;
+                row.attributeCode = definition?.code;
+                const selectedOption = value.isLookup
+                    ? attribute?.paginationSetting?.list?.find((option: any) =>
+                        String(option.value) === String(typeof selectedValue === 'object' ? selectedValue.value : selectedValue) ||
+                        option.code === (typeof selectedValue === 'object' ? selectedValue.code : selectedValue)
+                    )
+                    : undefined;
+                if (selectedOption) {
+                    row.attributeValueId = selectedOption.value;
+                    row.attributeValueFkCode = selectedOption.code;
+                    row.attributeValueFkName = selectedOption.label;
+                    return row;
+                }
+                const normalizedValue = typeof selectedValue === 'object' ? selectedValue.value : selectedValue;
+                const typeCode = (definition?.dataType || '').toLowerCase();
+                row.attributeValue = normalizedValue == null ? undefined :
+                    typeCode.includes('date') || typeCode.includes('time')
+                        ? (moment as any)(normalizedValue).toISOString()
+                        : String(normalizedValue);
+                return row;
+            });
+            if (isChips && rows.length > 1) {
+                rows[0].attributeValue = rows.map(row => row.attributeValue).join('|');
+                return result.concat(rows[0]);
+            }
+            return result.concat(rows);
+        }, []);
+
+        const updatedValues = this.fieldManagerService.toSettingValues(updatedRows);
+        updatedValues.forEach(settingValue => {
+            settingValue.settingFieldName = this.fieldTypeSettings
+                .find(setting => setting.attributeId === settingValue.settingFieldId)?.name;
+        });
         this.item.settingValues = [...existingValues, ...updatedValues];
     }
 
@@ -391,6 +481,12 @@ export class CreateOrEditFieldManagerComponent extends AppComponentBase implemen
                 })
                 .filter(value => value !== undefined && value !== null);
             const isChips = dataType === 'chips';
+            if (isChips) {
+                const flattened: any[] = [];
+                savedSelections.forEach(value =>
+                    flattened.push(...(typeof value === 'string' ? value.split('|').filter(Boolean) : [value])));
+                savedSelections.splice(0, savedSelections.length, ...flattened);
+            }
             const defaultSelections = isChips && typeof setting.defaultValue === 'string'
                 ? setting.defaultValue.split('|').map(value => value.trim()).filter(Boolean)
                 : setting.defaultValue;
@@ -418,6 +514,19 @@ export class CreateOrEditFieldManagerComponent extends AppComponentBase implemen
                 header: 'AdvancedInformation'
             }
         };
+
+        // Stable object references per usage so dynamicInputs does not re-run ngOnChanges every cycle.
+        const groups = new Map<string, any[]>();
+        attributes.forEach(attribute => {
+            const usage = (attribute as any).usage || 'UNSPECIFIED';
+            groups.set(usage, [...(groups.get(usage) || []), attribute]);
+        });
+        this.settingGroups = Array.from(groups.entries()).map(([usage, filtered]) => ({
+            usage,
+            extraAttributeObject: {
+                value: { extraAttributes: attributes, filteredExtraAttributes: filtered, header: usage }
+            }
+        }));
     }
 
     private loadFieldTypeSettingLookups(settings: ExtraAttribute[], request: number): void {

@@ -15,8 +15,11 @@
                     <td>{{ revision.changedByName || '-' }}</td>
                     <td>{{ revision.changedAt | date:'MM/dd/yyyy h:mm a' }}</td>
                     <td class="actions-column">
+                        <span *ngIf="isCurrent(revision)" class="status-badge badge-current">
+                            <i class="fa fa-1x fa-check"></i> Current
+                        </span>
                         <button type="button" class="details-button" (click)="selectRevision(revision)">
-                            Details <i class="fa fa-arrow-right"></i>
+                            View <i class="fa fa-arrow-right"></i>
                         </button>
                     </td>
                 </tr>
