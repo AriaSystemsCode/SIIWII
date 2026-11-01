@@ -29,6 +29,7 @@ export class AppitemslistCatalogueReportComponent extends AppComponentBase imple
     reportUrl: string
     accounts: GetAccountForDropdownDto[] = []
     itemListId: number
+    isMarketplaceList = false
     @Output() cancel : EventEmitter<any> =  new EventEmitter()
     invokeAction = '/DXXRDV'
 
@@ -60,6 +61,7 @@ export class AppitemslistCatalogueReportComponent extends AppComponentBase imple
               this.currentLang = abp.utils.getCookieValue('Abp.Localization.CultureName')
         this.currentLang == 'ar' || this.currentLang == 'ar-EG'  ? this.isArabic = true : this.isArabic = false
         this.itemListId = this._activatedRoute.snapshot?.params['listId']
+        this.isMarketplaceList = this._activatedRoute.snapshot?.queryParamMap.get('isMarketplaceList') === 'true'
         const sessionKey = this.sessionKey
         
         if(sessionKey) {//products case

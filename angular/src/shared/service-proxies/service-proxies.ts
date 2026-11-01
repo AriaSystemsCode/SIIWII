@@ -19319,12 +19319,16 @@ export class AppItemsListsServiceProxy {
      * @param id (optional) 
      * @return Success
      */
-    getAppItemsListForView(id: number | undefined): Observable<GetAppItemsListForEditOutput> {
+    getAppItemsListForView(id: number | undefined, isMarketplaceList: boolean | undefined): Observable<GetAppItemsListForEditOutput> {
         let url_ = this.baseUrl + "/api/services/app/AppItemsLists/GetAppItemsListForView?";
         if (id === null)
             throw new Error("The parameter 'id' cannot be null.");
         else if (id !== undefined)
             url_ += "id=" + encodeURIComponent("" + id) + "&";
+        if (isMarketplaceList === null)
+            throw new Error("The parameter 'isMarketplaceList' cannot be null.");
+        else if (isMarketplaceList !== undefined)
+            url_ += "isMarketplaceList=" + encodeURIComponent("" + isMarketplaceList) + "&";
         url_ = url_.replace(/[?&]$/, "");
 
         let options_ : any = {
@@ -83276,6 +83280,7 @@ export class PublishItemOptions implements IPublishItemOptions {
     sharingLevel!: number;
     message!: string | undefined;
     itemSharing!: ItemSharingDto[] | undefined;
+    numberOfSubscribers!: number;
 
     [key: string]: any;
 
@@ -83298,6 +83303,7 @@ export class PublishItemOptions implements IPublishItemOptions {
             this.itemListId = _data["itemListId"];
             this.sharingLevel = _data["sharingLevel"];
             this.message = _data["message"];
+            this.numberOfSubscribers = _data["numberOfSubscribers"];
             if (Array.isArray(_data["itemSharing"])) {
                 this.itemSharing = [] as any;
                 for (let item of _data["itemSharing"])
@@ -83323,6 +83329,7 @@ export class PublishItemOptions implements IPublishItemOptions {
         data["itemListId"] = this.itemListId;
         data["sharingLevel"] = this.sharingLevel;
         data["message"] = this.message;
+        data["numberOfSubscribers"] = this.numberOfSubscribers;
         if (Array.isArray(this.itemSharing)) {
             data["itemSharing"] = [];
             for (let item of this.itemSharing)
@@ -83338,6 +83345,7 @@ export interface IPublishItemOptions {
     sharingLevel: number;
     message: string | undefined;
     itemSharing: ItemSharingDto[] | undefined;
+    numberOfSubscribers: number;
 
     [key: string]: any;
 }

@@ -1,8 +1,8 @@
 import { Injectable, Injector } from '@angular/core';
 import { AppComponentBase } from '@shared/common/app-component-base';
 import { AppItemsListsServiceProxy, EntityDtoOfInt64, PublishItemOptions } from '@shared/service-proxies/service-proxies';
-import { finalize } from 'rxjs/operators';
 import { PublishService } from '../../app-item-shared/services/publish.service';
+import { PublishAppItemListingService } from '../../app-item-shared/services/publish-app-item-listing.service';
 
 @Injectable()
 export class AppitemListPublishService extends AppComponentBase {
@@ -10,7 +10,8 @@ export class AppitemListPublishService extends AppComponentBase {
     constructor(
         private injector:Injector,
         private _appItemsListsServiceProxy: AppItemsListsServiceProxy,
-        private _publishService: PublishService
+        private _publishService: PublishService,
+        private _publishAppItemListingService: PublishAppItemListingService
     ) {
         super(injector)
     }
@@ -20,25 +21,21 @@ export class AppitemListPublishService extends AppComponentBase {
     }
 
     async openSharingModal(alreadyPublished:boolean,AppItemListId:number,successCallBack:Function) {
-        let publishItemOptions: PublishItemOptions
+        let publishItemOptions: PublishItemOptions = new PublishItemOptions();
         if (alreadyPublished) { // get the saved data if it is already published
-            publishItemOptions = await this.getListingShareData(AppItemListId)
+            publishItemOptions = await this.getListingShareData(AppItemListId) || publishItemOptions;
         }
 
+        const shareService = this._publishAppItemListingService;
+        shareService.screen = 2;
+        shareService.productId = AppItemListId;
+        shareService.sharingStatus = publishItemOptions?.sharingLevel ??
+            (alreadyPublished ? 1 : 0);
+        shareService.itemSharing = publishItemOptions?.itemSharing || [];
+        shareService.subscribersNumber = publishItemOptions?.numberOfSubscribers || 0;
+
         this._publishService.openSharingModal(publishItemOptions)
-        .subscribe((_publishItemOptions) => {
-            _publishItemOptions.itemListId = AppItemListId
-            this.showMainSpinner()
-            this.publish(_publishItemOptions)
-            .pipe(
-                finalize(()=>{
-                    this.hideMainSpinner()
-                })
-            )
-            .subscribe((res)=>{
-                successCallBack()
-            })
-        })
+        .subscribe(() => successCallBack())
     }
 
     publish(publishItemOptions: PublishItemOptions) {
