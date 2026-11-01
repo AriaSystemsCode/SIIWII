@@ -1,0 +1,98 @@
+<div bsModal #fieldManagerViewModal="bs-modal" [config]="{ backdrop: 'static' }" class="modal fade" tabindex="-1" role="dialog"
+    aria-labelledby="fieldManagerViewModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-xl modal-dialog-centered revision-dialog" role="document">
+        <div class="modal-content revision-workspace" *ngIf="item">
+            <div class="modal-header revision-modal-header">
+                <div>
+                    <span class="eyebrow">FIELD MANAGER</span>
+                    <h5 class="modal-title" id="fieldManagerViewModalLabel">{{ viewState === 'history' ? ('RevisionHistory' | localize) : ('FieldDetailedView' | localize) }}</h5>
+                </div>
+                <button type="button" class="close" aria-label="Close" (click)="close()"><span aria-hidden="true">&times;</span></button>
+            </div>
+
+            <div class="modal-body revision-modal-body">
+                <div class="revision-toolbar">
+                    <button *ngIf="viewState === 'history'" type="button" class="back-link" (click)="backToFieldDetails()">
+                        <i class="fa fa-arrow-left"></i><span>Back to Field Details</span>
+                    </button>
+                    <button *ngIf="viewState === 'details' && isViewingHistoryRevision" type="button" class="back-link" (click)="backToHistory()">
+                        <i class="fa fa-arrow-left"></i><span>Back to Revision History</span>
+                    </button>
+
+                    <div class="revision-toolbar-actions">
+                        <button *ngIf="viewState === 'details' && isViewingHistoryRevision && canRestoreRevision"
+                            type="button" class="btn history-action" (click)="restoreRevision()">
+                            <i class="fa fa-undo"></i> Restore Revision
+                        </button>
+                        <button *ngIf="viewState === 'details' && !isViewingHistoryRevision" type="button"
+                            class="btn  history-action" (click)="goToHistory()">
+                            <i class="fa fa-history"></i> Revision Log
+                        </button>
+                           <button *ngIf="viewState === 'details' && !isViewingHistoryRevision" type="button"
+                            class="btn  revision-primary" (click)="createNewRevision()">
+                            <i class="fa fa-plus"></i>{{ 'CreateNewRevision' | localize }}
+                        </button>
+                    </div>
+                </div>
+
+                <ng-container *ngIf="viewState === 'history'">
+                    <app-field-revision-history
+                        [revisions]="revisions"
+                        (revisionSelected)="openRevision($event)">
+                    </app-field-revision-history>
+                </ng-container>
+
+                <ng-container *ngIf="viewState === 'details'">
+                    <div class="page-heading detail-heading">
+                        <div>
+                            <h2>Field Information</h2>
+                            <!-- <p>{{ selectedRevision?.status === 'Previous' ? 'Read-only historical revision' : 'Current field configuration' }}</p> -->
+                        </div>
+                        <div class="revision-identity">
+                            <span class="revision-number">Revision #{{ revisionLabel }}</span>
+                            <span class="status-badge badge-current">
+                                <i class="fa fa-1x fa-check"></i> Current
+                            </span>
+                        </div>
+                    </div>
+
+                    <section class="field-card">
+                        <div class="card-section-heading"><div><h3>{{ 'StandardInformation' | localize }}</h3></div>
+                            <span class="readonly-note" *ngIf="isViewingHistoryRevision"><i class="fa fa-lock"></i> Read only</span></div>
+                        <div class="detail-grid">
+                            <div class="detail-item"><span>Field Code</span><strong>{{ item.fieldCode || '—' }}</strong></div>
+                            <div class="detail-item"><span>Field Name</span><strong>{{ item.fieldName || '—' }}</strong></div>
+                            <div class="detail-item detail-wide"><span>Description</span><strong>{{ item.description || '—' }}</strong></div>
+                            <div class="detail-item"><span>Field Level</span><strong>{{ item.fieldLevelCode || '—' }}</strong></div>
+                            <div class="detail-item"><span>Status</span><strong>{{ item.fieldStatusCode || '—' }}</strong></div>
+                            <div class="detail-item"><span>Tracking #</span><strong>{{ item.trackingNo || '—' }}</strong></div>
+                            <div class="detail-item"><span>Field Type</span><strong>{{ fieldTypeName(item.fieldTypeId) || '—' }}</strong></div>
+                        </div>
+                    </section>
+
+                    - 
+                                     //i51_BE-FE-Handle Extra Data in the View and Create/Edit/view modals 
+                    <section class="field-card advanced-card">
+                        <div class="card-section-heading"><div><h3>Advanced Information</h3></div></div>
+                        <div class="detail-grid advanced-grid">
+                            <div class="detail-item"><span>Allow Null</span><strong>{{ item.allowNull ? 'Yes' : 'No' }}</strong></div>
+                            <div class="detail-item"><span>Length</span><strong>{{ item.length || '—' }}</strong></div>
+                            <div class="detail-item"><span>Allow Multi Select</span><strong>{{ item.allowMultiSelect ? 'Yes' : 'No' }}</strong></div>
+                            <div class="detail-item"><span>Decimals</span><strong>{{ item.decimals }}</strong></div>
+                            <div class="detail-item"><span>Default Value</span><strong>{{ item.defaultValue || '—' }}</strong></div>
+                            <div class="detail-item"><span>Date Format</span><strong>{{ item.dateFormat || '—' }}</strong></div>
+                        </div>
+                    </section>
+                </ng-container>
+
+            </div>
+            <!-- <div class="modal-footer revision-modal-footer">
+                <span class="footer-hint" *ngIf="viewState === 'history'">Select a revision to view its field details.</span>
+                <button type="button" class="btn btn-light cancel-button" (click)="close()">Close</button>
+            </div> -->
+        </div>
+    </div>
+</div>
+<app-create-or-edit-field-manager #revisionEditor
+    (saved)="onRevisionEditorSaved($event)"
+    (closed)="onRevisionEditorClosed()"></app-create-or-edit-field-manager>

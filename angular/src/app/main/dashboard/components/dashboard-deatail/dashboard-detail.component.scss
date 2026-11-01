@@ -1,0 +1,621 @@
+/* =========================================================
+   PAGE
+   ========================================================= */
+
+.dashboard-detail-page {
+    width: 100%;
+    min-height: 100vh;
+    background: linear-gradient(180deg, #f6f7fb 0%, #eef1f7 100%);
+    .rout-c{
+        padding-left: 0px !important;
+        padding-right: 0px !important;
+    }
+}
+
+
+// @media (min-width: 1025px) {
+// .dashboard-detail-page{
+//     margin-top: -45px;
+// }
+// }
+/* =========================================================
+   HEADER
+   ========================================================= */
+
+.dash-topbar {
+    // position: sticky;
+    // top: 0;
+    // z-index: 5;
+
+    width: 100%;
+    padding: 14px 22px;
+
+    background: rgba(255, 255, 255, 0.95);
+    backdrop-filter: blur(6px);
+    border-bottom: 1px solid #e9edf3;
+    box-shadow: 0 2px 10px rgba(16, 24, 40, 0.05);
+}
+
+.dashboard-topbar-content {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) auto minmax(0, 1fr);
+    align-items: center;
+    gap: 16px;
+
+    width: 100%;
+}
+
+.dashboard-header-info {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    min-width: 0;
+}
+
+.dash-icon {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex: 0 0 auto;
+
+    width: 42px;
+    height: 42px;
+    border-radius: 12px;
+
+    background: #f3eaf6;
+    color: #4a0d4a;
+
+    i {
+        font-size: 18px;
+    }
+}
+
+.dash-title {
+    min-width: 0;
+    max-width: 540px;
+    margin: 0;
+
+    color: #111827;
+    font-size: 20px;
+    font-weight: 700;
+    line-height: 1.4;
+    text-align: center;
+}
+
+.dash-meta {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+
+    margin: 0;
+    padding: 5px 10px;
+    border-radius: 999px;
+
+    background: #f1f5f9;
+    color: #64748b;
+    font-size: 12px;
+    line-height: 1.4;
+
+    i {
+        font-size: 12px;
+    }
+
+    b {
+        color: #334155;
+        font-weight: 600;
+    }
+}
+
+/* =========================================================
+   ACTIONS
+   ========================================================= */
+
+.dashboard-actions {
+    display: flex;
+    align-items: center;
+    justify-content: flex-end;
+    gap: 10px;
+    min-width: 0;
+    flex-shrink: 0;
+}
+
+:host ::ng-deep .dashboard-actions .p-button {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+
+    min-height: 40px;
+    padding: 0 16px;
+    gap: 8px;
+
+    border-radius: 10px;
+    font-size: 13px;
+    font-weight: 600;
+    white-space: nowrap;
+
+    transition:
+        background-color 0.2s ease,
+        border-color 0.2s ease,
+        box-shadow 0.2s ease,
+        transform 0.15s ease;
+
+    &:hover:not(:disabled) {
+        transform: translateY(-1px);
+    }
+
+    &:disabled {
+        opacity: 0.55;
+        cursor: not-allowed;
+    }
+
+    .p-button-icon {
+        font-size: 14px;
+    }
+
+    .p-button-label {
+        font-weight: 600;
+    }
+}
+
+/* Refresh button */
+
+:host ::ng-deep .dashboard-refresh-btn {
+    background: #ffffff;
+    color: #4a0d4a;
+    border: 1px solid #d9c3da;
+
+    &:hover:not(:disabled) {
+        background: #f8f0f8;
+        border-color: #4a0d4a;
+        color: #4a0d4a;
+    }
+}
+
+/* Export PDF button */
+
+:host ::ng-deep .dashboard-export-btn {
+    background: #4a0d4a;
+    color: #ffffff;
+    border: 1px solid #4a0d4a;
+    box-shadow: 0 4px 12px rgba(74, 13, 74, 0.25);
+
+    &:hover:not(:disabled) {
+        background: #3a0a3a;
+        border-color: #3a0a3a;
+        box-shadow: 0 6px 16px rgba(74, 13, 74, 0.32);
+    }
+}
+
+/* =========================================================
+   DASHBOARD CARD
+   ========================================================= */
+
+.dashboard-view-container {
+    position: relative;
+
+    width: 100%;
+    height: calc(100vh - 65px);
+    min-height: 500px;
+
+    overflow: hidden;
+
+    background: #ffffff;
+    border: 1px solid #e9edf3;
+    // border-radius: 16px;
+    box-shadow: 0 6px 24px rgba(16, 24, 40, 0.06);
+}
+
+/* =========================================================
+   VISIBLE DASHBOARD SPREADSHEET
+   ========================================================= */
+
+.dashboard-sheet-viewer {
+    position: relative;
+    display: block;
+
+    width: 100%;
+    height: 100%;
+    min-height: 0;
+
+    overflow: hidden;
+    background: #ffffff;
+
+    ejs-spreadsheet {
+        display: block;
+        width: 100%;
+        height: 100%;
+    }
+}
+
+/*
+   The normal viewer keeps a fixed height and Syncfusion handles
+   scrolling internally. PDF export uses a separate Spreadsheet.
+*/
+
+:host ::ng-deep .dashboard-sheet-viewer .e-spreadsheet {
+    width: 100% !important;
+    height: 100% !important;
+
+    border: none !important;
+    background: #ffffff;
+}
+
+:host ::ng-deep .dashboard-sheet-viewer .e-sheet-panel {
+    position: relative;
+    background: #ffffff;
+}
+
+/* Hide toolbars */
+
+:host ::ng-deep .dashboard-sheet-viewer .e-ribbon,
+:host ::ng-deep .dashboard-sheet-viewer .e-formula-bar-panel,
+:host ::ng-deep .dashboard-sheet-viewer .e-sheet-tab-panel {
+    display: none !important;
+}
+
+/* Hide row / column headers */
+
+:host ::ng-deep .dashboard-sheet-viewer .e-header-panel,
+:host ::ng-deep .dashboard-sheet-viewer .e-column-header,
+:host ::ng-deep .dashboard-sheet-viewer .e-row-header {
+    display: none !important;
+}
+
+/* Cell presentation */
+
+:host ::ng-deep
+.dashboard-sheet-viewer.has-charts
+.e-spreadsheet
+.e-sheet-panel:not(.e-rtl)
+.e-cell {
+    border: none !important;
+}
+
+/* Charts */
+
+:host ::ng-deep .dashboard-sheet-viewer .e-chart,
+:host ::ng-deep .dashboard-sheet-viewer .e-chart svg {
+    max-width: none !important;
+    max-height: none !important;
+}
+
+:host ::ng-deep .dashboard-sheet-viewer {
+    .e-chart-series,
+    .e-series,
+    .e-point {
+        cursor: pointer;
+    }
+}
+
+/* =========================================================
+   LOADING / ERROR
+   ========================================================= */
+
+.dashboard-state {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+
+    width: 100%;
+    height: 100%;
+    min-height: 400px;
+    padding: 20px;
+}
+
+.state-card {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 6px;
+
+    max-width: 420px;
+    padding: 32px 36px;
+
+    text-align: center;
+    background: #fafbfd;
+    border: 1px dashed #dbe2ec;
+    border-radius: 14px;
+
+    i {
+        margin-bottom: 6px;
+        font-size: 30px;
+        color: #4a0d4a;
+    }
+
+    h4 {
+        margin: 0;
+        font-size: 16px;
+        font-weight: 700;
+        color: #1f2937;
+    }
+
+    p {
+        margin: 0;
+        font-size: 13px;
+        color: #64748b;
+    }
+}
+
+.dashboard-error .state-card {
+    background: #fff5f5;
+    border-color: #f5c2c7;
+
+    i {
+        color: #dc3545;
+    }
+
+    h4 {
+        color: #b02a37;
+    }
+}
+
+/* =========================================================
+   BUSY OVERLAY (refresh / PDF export)
+   ========================================================= */
+
+.dashboard-busy-overlay {
+    position: absolute;
+    inset: 0;
+    z-index: 10;
+
+    display: flex;
+    align-items: flex-start;
+    justify-content: center;
+    padding-top: 18px;
+
+    background: rgba(255, 255, 255, 0.55);
+    backdrop-filter: blur(1px);
+}
+
+.busy-pill {
+    display: inline-flex;
+    align-items: center;
+    gap: 10px;
+
+    padding: 10px 18px;
+    border-radius: 999px;
+
+    background: #ffffff;
+    color: #4a0d4a;
+    font-size: 13px;
+    font-weight: 600;
+    box-shadow: 0 6px 20px rgba(16, 24, 40, 0.15);
+
+    i {
+        font-size: 16px;
+    }
+}
+
+/* =========================================================
+   TEMPORARY PDF EXPORT SPREADSHEET
+   ========================================================= */
+
+/*
+   Created only while exporting. Keep it in the DOM and off-screen.
+   Do not use display:none or visibility:hidden, because they
+   prevent reliable canvas capture.
+*/
+
+.dashboard-pdf-export {
+    position: fixed;
+    top: 0;
+    left: -100000px;
+    z-index: -1;
+
+    display: block;
+    margin: 0;
+    padding: 0;
+
+    overflow: hidden;
+    pointer-events: none;
+    background: #ffffff;
+    box-sizing: border-box;
+
+    ejs-spreadsheet {
+        display: block;
+        width: 100%;
+        height: 100%;
+        background: #ffffff;
+    }
+}
+
+/* The PDF spreadsheet uses its own pixel width and height */
+
+:host ::ng-deep .dashboard-pdf-export .e-spreadsheet {
+    border: none !important;
+    background: #ffffff;
+}
+
+:host ::ng-deep .dashboard-pdf-export .e-ribbon,
+:host ::ng-deep .dashboard-pdf-export .e-formula-bar-panel,
+:host ::ng-deep .dashboard-pdf-export .e-sheet-tab-panel {
+    display: none !important;
+}
+
+:host ::ng-deep .dashboard-pdf-export .e-chart,
+:host ::ng-deep .dashboard-pdf-export .e-chart svg {
+    max-width: none !important;
+    max-height: none !important;
+}
+
+/* =========================================================
+   RESPONSIVE: TABLET
+   ========================================================= */
+
+@media (max-width: 991px) {
+
+    .dash-topbar {
+        padding: 12px 16px;
+    }
+
+    .dashboard-page-body {
+        padding: 10px 12px 16px;
+    }
+
+    .dashboard-topbar-content {
+        grid-template-columns: 1fr auto;
+        gap: 10px 12px;
+    }
+
+    .dashboard-header-info {
+        grid-column: 1;
+        grid-row: 2;
+    }
+
+    .dash-title {
+        grid-column: 1;
+        grid-row: 1;
+
+        max-width: 100%;
+        font-size: 18px;
+        text-align: left;
+    }
+
+    .dashboard-actions {
+        grid-column: 2;
+        grid-row: 1 / 3;
+        gap: 8px;
+    }
+
+    .dashboard-view-container {
+        height: calc(100vh - 165px);
+        min-height: 450px;
+    }
+
+    :host ::ng-deep .dashboard-actions .p-button {
+        font-size: 12px;
+    }
+}
+
+/* =========================================================
+   RESPONSIVE: MOBILE
+   ========================================================= */
+
+@media (max-width: 575px) {
+
+    .dash-topbar {
+        padding: 12px;
+    }
+
+    .dashboard-page-body {
+        padding: 8px 8px 12px;
+    }
+
+    .dashboard-topbar-content {
+        display: flex;
+        flex-direction: column;
+        align-items: stretch;
+        gap: 10px;
+    }
+
+    .dash-title {
+        order: 1;
+
+        width: 100%;
+        max-width: 100%;
+        font-size: 17px;
+        text-align: center;
+    }
+
+    .dashboard-header-info {
+        order: 2;
+        justify-content: center;
+    }
+
+    .dash-icon {
+        display: none;
+    }
+
+    .dash-meta {
+        justify-content: center;
+        font-size: 11px;
+    }
+
+    .dashboard-actions {
+        order: 3;
+
+        width: 100%;
+        justify-content: center;
+        gap: 8px;
+    }
+
+    :host ::ng-deep .dashboard-actions .p-button {
+        min-height: 38px;
+        font-size: 12px;
+    }
+
+    /* icon-only refresh button so both buttons fit */
+    :host ::ng-deep .dashboard-refresh-btn {
+        width: 38px;
+        min-width: 38px;
+        padding: 0;
+
+        .p-button-label {
+            display: none;
+        }
+    }
+
+    :host ::ng-deep .dashboard-export-btn {
+        padding: 0 14px;
+    }
+
+    .dashboard-view-container {
+        height: calc(100vh - 225px);
+        min-height: 400px;
+        border-radius: 12px;
+    }
+
+    .dashboard-state {
+        min-height: 300px;
+        padding: 16px;
+    }
+
+    .state-card {
+        padding: 24px 20px;
+    }
+}
+
+
+
+/* mobile: no sideways scrolling in the dashboard, charts are stacked */
+@media (max-width: 768px) {
+    :host ::ng-deep .dashboard-sheet-viewer .e-sheet-content {
+        overflow-x: hidden !important;
+    }
+}
+
+/* PDF renderer: no scrollbars in the capture */
+:host ::ng-deep .dashboard-pdf-export .e-scrollbar {
+    display: none !important;
+}
+
+
+.dashboard-not-found {
+    min-height: 65vh;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    text-align: center;
+    padding: 32px 20px;
+
+    i {
+        font-size: 54px;
+        color: #9ca3af;
+        margin-bottom: 20px;
+    }
+
+    h3 {
+        font-size: 24px;
+        font-weight: 600;
+        color: #374151;
+        margin-bottom: 10px;
+    }
+
+    p {
+        font-size: 14px;
+        color: #6b7280;
+        max-width: 420px;
+        line-height: 1.7;
+    }
+}

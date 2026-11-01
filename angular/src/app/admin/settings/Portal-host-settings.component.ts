@@ -9,7 +9,7 @@ import { SelectItem } from '@node_modules/primeng/api';
 import { appModuleAnimation } from '@shared/animations/routerTransition';
 import { AppConsts } from '@shared/AppConsts';
 import { AppComponentBase } from '@shared/common/app-component-base';
-import { ComboboxItemDto, CommonLookupServiceProxy, SettingScopes, HostSettingsEditDto, HostSettingsServiceProxy, SendTestEmailInput, GetAllEntityObjectTypeOutput, LookupLabelDto, AppEntityExtraDataDto, SycEntityObjectTypesServiceProxy, SystemTablesServiceProxy, AppEntitiesServiceProxy, GetAppEntityForEditOutput, AppEntityAttachmentDto, AttachmentsCategories, AppEntityDto } from '@shared/service-proxies/service-proxies';
+import { ComboboxItemDto, CommonLookupServiceProxy, SettingScopes, HostSettingsEditDto, HostSettingsServiceProxy, SendTestEmailInput, GetAllEntityObjectTypeOutput, LookupLabelDto, AppEntityExtraDataDto, SycEntityObjectTypesServiceProxy, SystemTablesServiceProxy, AppEntitiesServiceProxy, GetAppEntityForEditOutput, AppEntityAttachmentDto, AttachmentsCategories, AppEntityDto, ExtraAttributesSource } from '@shared/service-proxies/service-proxies';
 import { finalize } from 'rxjs/operators';
 import { forkJoin, Observable } from 'rxjs';
 import { dynamicInputs } from '@shared/components/dynamicInputs/dynamicInputs.component';
@@ -298,7 +298,8 @@ export class PortalHostSettingsComponent extends AppComponentBase implements OnI
 
     getAppItemTypeExtraAttributesById() {
         this._systemTablesServiceProxy.getEntityObjectTypeHostId().pipe(finalize(() => {
-            this._sycEntityObjectTypesServiceProxy.getAllWithExtraAttributes(this.entityObjectTypeHostId)
+            let source: ExtraAttributesSource=0;
+            this._sycEntityObjectTypesServiceProxy.getAllWithExtraAttributes(this.entityObjectTypeHostId, source)
                 .subscribe((res) => {
                     if (res?.length > 0) {
                         this.allAttributes = res[0]?.extraAttributes.extraAttributes;

@@ -6,7 +6,7 @@ import { EExtraAttributeUsage } from '@app/main/app-items/appItems/models/extra-
 import { SelectItem } from '@node_modules/primeng/api';
 import { finalize } from 'rxjs/operators';
 import { AppComponentBase } from '@shared/common/app-component-base';
-import { AppEntitiesServiceProxy, AppEntityDto, AppEntityExtraDataDto, ConnectionInfo, GetAppEntityForEditOutput, LookupLabelDto, SycEntityObjectTypesServiceProxy } from '@shared/service-proxies/service-proxies';
+import { AppEntitiesServiceProxy, AppEntityDto, AppEntityExtraDataDto, ConnectionInfo, ExtraAttributesSource, GetAppEntityForEditOutput, LookupLabelDto, SycEntityObjectTypesServiceProxy } from '@shared/service-proxies/service-proxies';
 import { dynamicInputs } from '@shared/components/dynamicInputs/dynamicInputs.component';
 @Component({
   selector: 'app-relationship-settings',
@@ -76,8 +76,9 @@ private getSelectedRelationshipCode(): string {
   getAppItemTypeExtraAttributesById() {
      const relationshipCode = this.getSelectedRelationshipCode();
    this._sycEntityObjectTypesServiceProxy.getAllWithExtraAttributesByCode(relationshipCode, 'MARKETPLACECONTACTRELATIONSHIP').pipe(finalize(() => {
+                  let source: ExtraAttributesSource=0;
       this._sycEntityObjectTypesServiceProxy.getAllWithExtraAttributes(
-        this.entityObjectTypeId)
+        this.entityObjectTypeId,source)
         .subscribe((res) => {
           if (res?.length > 0) {
             this.allAttributes = res[0]?.extraAttributes.extraAttributes;

@@ -20,6 +20,7 @@ export class AppNavigationService {
             new AppMenuItem('Dashboard', 'Pages.Administration.Host.Dashboard', 'flaticon-line-graph', '/app/admin/hostDashboard'),
             new AppMenuItem('My Transactions', 'Pages.AppSiiwiiTransactions', 'flaticon-more', '/app/main/transactions/appTransactions/MyTransactions'),
             new AppMenuItem('My Connections', 'Pages.Accounts', 'flaticon-more', '/app/main/accounts'),
+                 new AppMenuItem('Dashboards', 'Pages.Tenant.Dashboard', 'pi pi-chart-bar', '/app/main/dashboards/my-dashboards'),
         ]);
     
      
@@ -75,7 +76,13 @@ export class AppNavigationService {
                 new AppMenuItem('Lookups', 'Pages.AppEntities', 'flaticon-more', '/app/main/lookups'),
             );
         // }
-  
+
+       
+
+        adminMenu.items.push(
+            new AppMenuItem('FieldManager', '', 'field-manager-icon', '/app/main/fieldManager'),
+        );
+
         adminMenu.items.push(
             new AppMenuItem('BillingLog', '', 'flaticon-interface-8', '', [], [
                 new AppMenuItem('AppTenantPlans', 'Pages.Administration.AppTenantPlans', 'flaticon-more', '/app/admin/appTenantPlans/appTenantPlans'),
@@ -122,7 +129,7 @@ export class AppNavigationService {
     }
     
 
-    checkChildMenuItemPermission(menuItem): boolean {
+    checkChildMenuItemPermission(menuItem: AppMenuItem): boolean {
 
         for (let i = 0; i < menuItem.items.length; i++) {
             let subMenuItem = menuItem.items[i];

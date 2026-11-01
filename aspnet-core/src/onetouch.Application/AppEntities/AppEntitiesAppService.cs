@@ -2757,7 +2757,7 @@ namespace onetouch.AppEntities
             }
 
         }
-        private async Task<UserInformationDto> GetUserInformation(long userId)
+        public async Task<UserInformationDto> GetUserInformation(long userId)
         {
             var user = await UserManager.GetUserByIdAsync(userId);
             if (user == null)

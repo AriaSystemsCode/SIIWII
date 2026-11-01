@@ -1,0 +1,44 @@
+:host {
+    display: block;
+}
+
+.revision-table-card {
+    overflow: hidden;
+    border: 1px solid #e4eaf3;
+    border-radius: 12px;
+    background: #fff;
+    box-shadow: 0 3px 12px rgba(32, 55, 90, .035);
+}
+
+.revision-table-scroll { overflow-x: auto; }
+.revision-table { width: 100%; border-collapse: collapse; min-width: 680px; }
+.revision-table th {
+    height: 46px;
+    padding: 0 18px;
+    background: #f5f8fc;
+    color: #66758d;
+    font-size: 10px;
+    font-weight: 800;
+    letter-spacing: .04em;
+    text-align: left;
+    text-transform: uppercase;
+}
+.revision-table td { height: 55px; padding: 9px 18px; border-top: 1px solid #edf1f6; color: #52617a; font-size: 12px; }
+.revision-table tbody tr:hover { background: #fbfcff; }
+.revision-table .revision-number { color: #253650; font-weight: 700; }
+.revision-table .actions-column { width: 112px; text-align: right; }
+.details-button {
+    display: inline-flex;
+    align-items: center;
+    gap: 7px;
+    padding: 6px 10px;
+    border: 1px solid #d9c5d9;
+    border-radius: 6px;
+    background: #fff;
+    color: #4a0d4a;
+    font-size: 11px;
+    font-weight: 700;
+}
+.details-button:hover { border-color: #4a0d4a; background: #f7f1f7; color: #4a0d4a; }
+.details-button i { font-size: 9px; }
+.empty-history { height: 90px !important; text-align: center; }

@@ -1,73 +1,102 @@
-import { Injectable } from "@angular/core";
-import { AccountsServiceProxy, AppItemsServiceProxy, MarketplaceAccountsServiceProxy } from "./service-proxies/service-proxies";
+import { Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
-import { AppConsts } from '@shared/AppConsts';
 import { map } from 'rxjs/operators';
 
-@Injectable({ providedIn: 'root' })
+import {
+    AccountsServiceProxy,
+    AppItemsServiceProxy,
+    MarketplaceAccountsServiceProxy
+} from './service-proxies/service-proxies';
+
+import { AppConsts } from '@shared/AppConsts';
+
+@Injectable()
 export class DynamicApiDispatcherService {
 
- constructor(
-    private accountsServiceProxy: AccountsServiceProxy,
-    private appItemsServiceProxy: AppItemsServiceProxy,
-    private marketplaceAccountsServiceProxy: MarketplaceAccountsServiceProxy,
-      private http: HttpClient
-) {}
+    constructor(
+        private accountsServiceProxy: AccountsServiceProxy,
+        private appItemsServiceProxy: AppItemsServiceProxy,
+        private marketplaceAccountsServiceProxy: MarketplaceAccountsServiceProxy,
+        private http: HttpClient
+    ) {}
 
- 
-dispatch(serviceName: string, methodName: string, values: any = {}) {
- if (
-    serviceName === 'AccountsServiceProxy' &&
-    methodName === 'getAccountBranches'
-) {
-    return this.http.get<any>(
-        `${AppConsts.remoteServiceBaseUrl}/api/services/app/Accounts/GetAccountBranches`
-    ).pipe(
-        map(response =>
-            response?.__abp === true
-                ? response.result
-                : response
-        )
-    );
-}
+    dispatch(
+        serviceName: string,
+        methodName: string,
+        values: any = {}
+    ): any {
 
-  let selectedService = (this as any)[serviceName];
+        // Special handling for account branches
+        if (
+            serviceName === 'AccountsServiceProxy' &&
+            methodName === 'getAccountBranches'
+        ) {
+            return this.http.get<any>(
+                `${AppConsts.remoteServiceBaseUrl}/api/services/app/Accounts/GetAccountBranches`
+            ).pipe(
+                map(response => response?.result ?? response)
+            );
+        }
 
-  if (!selectedService) {
-    selectedService = (this as any)[serviceName.charAt(0).toLowerCase() + serviceName.slice(1)];
-  }
+        const normalizedServiceName =
+            serviceName.endsWith('ServiceProxy')
+                ? serviceName
+                : `${serviceName}ServiceProxy`;
 
-  if (!selectedService) {
-    throw new Error(`Service '${serviceName}' not found`);
-  }
+        const serviceMap: Record<string, any> = {
+            AccountsServiceProxy: this.accountsServiceProxy,
+            AppItemsServiceProxy: this.appItemsServiceProxy,
+            MarketplaceAccountsServiceProxy:
+                this.marketplaceAccountsServiceProxy
+        };
 
-  const selectedMethod = selectedService[methodName];
+        const selectedService =
+            serviceMap[normalizedServiceName];
 
-  if (typeof selectedMethod !== "function") {
-    throw new Error(`Method '${methodName}' not found in service '${serviceName}'`);
-  }
+        if (!selectedService) {
+            throw new Error(
+                `Service '${normalizedServiceName}' not found`
+            );
+        }
 
-  const paramNames = this.getParameterNames(selectedMethod);
+        const selectedMethod =
+            selectedService[methodName];
 
-  const args = new Array(paramNames.length).fill(undefined);
+        if (typeof selectedMethod !== 'function') {
+            throw new Error(
+                `Method '${methodName}' not found in '${normalizedServiceName}'`
+            );
+        }
 
-  paramNames.forEach((p, i) => {
-    if (values.hasOwnProperty(p)) {
-      args[i] = values[p];
+        const paramNames =
+            this.getParameterNames(selectedMethod);
+
+        const args = paramNames.map(param =>
+            Object.prototype.hasOwnProperty.call(values, param)
+                ? values[param]
+                : undefined
+        );
+
+        return selectedMethod.apply(
+            selectedService,
+            args
+        );
     }
-  });
 
-  return selectedMethod.apply(selectedService, args);
-}
+    private getParameterNames(func: Function): string[] {
+        const fnStr = func
+            .toString()
+            .replace(/\/\*[\s\S]*?\*\/|\/\/.*$/gm, '');
 
+        const match = fnStr.match(/\(([^)]*)\)/);
 
+        if (!match) {
+            return [];
+        }
 
-  getParameterNames(func: Function): string[] {
-    const fnStr = func.toString().replace(/\/\/.*$|\/\*[\s\S]*?\*\//mg, ''); // remove comments
-    const result = fnStr.slice(fnStr.indexOf('(') + 1, fnStr.indexOf(')')).match(/([^\s,]+)/g);
-    return result === null ? [] : result;
-  }
-  private normalize(name: string) {
-    return name.charAt(0).toLowerCase() + name.slice(1);
-  }
+        return match[1]
+            .split(',')
+            .map(param => param.trim().split('=')[0].trim())
+            .filter(Boolean);
+    }
 }

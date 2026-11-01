@@ -163,7 +163,7 @@ namespace onetouch.Web.Startup
 
         public override void PreInitialize()
         {
-            Configuration.Modules.AbpWebCommon().MultiTenancy.DomainFormat = _appConfiguration["App:ServerRootAddress"] ?? "https://localhost:44337/";
+            Configuration.Modules.AbpWebCommon().MultiTenancy.DomainFormat = _appConfiguration["App:ServerRootAddress"] ?? "https://localhost:44310/";
             Configuration.Modules.AspNetZero().LicenseCode = _appConfiguration["AbpZeroLicenseCode"];
 
 
@@ -174,6 +174,8 @@ namespace onetouch.Web.Startup
 
         public override void Initialize()
         {
+            IocManager.Register<SpreadsheetController>(
+        DependencyLifeStyle.Transient);
             IocManager.RegisterAssemblyByConvention(typeof(onetouchWebHostModule).GetAssembly());
             //IocManager.Register(typeof(WebDocumentViewerController), DependencyLifeStyle.Transient);
             //IocManager.Register(typeof(QueryBuilderController), DependencyLifeStyle.Transient);

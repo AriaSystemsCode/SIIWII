@@ -29,6 +29,7 @@ import {
     AppItemsServiceProxy,
     CreateOrEditAppItemDto,
     CurrencyInfoDto,
+    ExtraAttributesSource,
     GetAllEntityObjectTypeOutput,
     GetSycAttachmentCategoryForViewDto,
     IAppItemPriceInfo,
@@ -454,8 +455,9 @@ export class CreateOrEditAppItemComponent
     }
 
     getAppItemTypeExtraAttributesById(id: number) {
+                    let source: ExtraAttributesSource=0;
         if (!id) return;
-        return this._sycEntityObjectTypesServiceProxy.getAllWithExtraAttributes(id);
+        return this._sycEntityObjectTypesServiceProxy.getAllWithExtraAttributes(id,source);
     }
 
     getAppItemTypeExtraAttributesByIdFun(id) {

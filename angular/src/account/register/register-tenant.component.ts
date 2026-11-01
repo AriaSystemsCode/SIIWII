@@ -168,7 +168,6 @@ showPasswordRepeat = false;
     }
 
     // changeAccountType($event){
-    //     debugger ;
     //      let indx= this.accountTypes.findIndex(x=>x.value == $event.value );
 
     //      if(indx>=0)

@@ -449,7 +449,7 @@ namespace onetouch.Accounts
                                   ))
 
                             .WhereIf(input.FilterType >= 3 && input.FilterType != 6,
-                              x => (x.TenantId == AbpSession.TenantId && !x.IsProfileData && x.ParentId == null &&
+                              x => (x.TenantId == AbpSession.TenantId && !x.IsProfileData && //x.ParentId == null &&
                                 _appMarketplaceContactRepository.GetAll().AsNoTracking().Any(z => z.SSIN == x.SSIN && z.TenantOwner == x.TenantId) 
                                 && //&& z.SharingLevel == 1
                                 _appContactRelationshipInfoRepository.GetAll().AsNoTracking().Any(

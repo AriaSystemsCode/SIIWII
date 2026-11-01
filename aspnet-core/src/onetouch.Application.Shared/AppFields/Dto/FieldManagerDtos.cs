@@ -1,0 +1,288 @@
+using System;
+using System.Collections.Generic;
+using System.ComponentModel.DataAnnotations;
+using Abp.Application.Services.Dto;
+
+namespace onetouch.AppFields.Dto
+{
+    public class PreviewFieldCodeInput
+    {
+        [Range(1, long.MaxValue)] public long FieldTypeId { get; set; }
+    }
+
+    public class FieldCodePreviewDto
+    {
+        public string Sequence { get; set; }
+    }
+
+    public class CreateOrEditFieldInput
+    {
+        public long? Id { get; set; }
+        [StringLength(10)] public string ExpectedCurrentRevisionNo { get; set; }
+        public long? SycObjectId { get; set; }
+        public long? EntitySycObjectId { get; set; }
+        public long? SelectedObjectTypeId { get; set; }
+        public long FieldTypeId { get; set; }
+        public long? WidgetTypeId { get; set; }
+        public long? FieldLevelId { get; set; }
+        public long? FieldStatusId { get; set; }
+        [StringLength(11)] public string FieldCode { get; set; }
+        [Required, StringLength(250)] public string FieldName { get; set; }
+        [StringLength(2000)] public string Description { get; set; }
+        [StringLength(32)] public string FieldLevelCode { get; set; }
+        [StringLength(32)] public string FieldStatusCode { get; set; }
+        [StringLength(100)] public string TrackingNo { get; set; }
+        public bool IsExtraField { get; set; }
+        public bool AllowNull { get; set; }
+        public int? Length { get; set; }
+        public int? Decimals { get; set; }
+        [StringLength(2000)] public string DefaultValue { get; set; }
+        [StringLength(100)] public string DateFormat { get; set; }
+        [StringLength(100)] public string TimeFormat { get; set; }
+        public bool AllowMultiSelect { get; set; }
+        public string ValidEntries { get; set; }
+        public bool Required { get; set; }
+        public bool Visible { get; set; } = true;
+        public bool Editable { get; set; } = true;
+        public string ExtraAttributes { get; set; }
+        // Null keeps existing settings on edit; an empty list clears them.
+        public List<FieldSettingValueDto> SettingValues { get; set; }
+    }
+
+    public class FieldSettingValueDto
+    {
+        public long SettingFieldId { get; set; }
+        [StringLength(2000)] public string Value { get; set; }
+        // Copied names are populated for applied fields and historical revisions.
+        public string SettingFieldCode { get; set; }
+        public string SettingFieldName { get; set; }
+    }
+
+    public class FieldSettingDefinitionDto
+    {
+        public long SettingFieldId { get; set; }
+        public string FieldCode { get; set; }
+        public string FieldName { get; set; }
+        public long ValueTypeId { get; set; }
+        public string ValueTypeCode { get; set; }
+        public string DataType { get; set; }
+        public string DefaultValue { get; set; }
+        public bool Required { get; set; }
+        public bool AllowMultiSelect { get; set; }
+        public string ValidEntries { get; set; }
+        public List<string> Options { get; set; } = new List<string>();
+    }
+
+    public class SaveFieldValidEntriesInput
+    {
+        [Range(1, long.MaxValue)]
+        public long SettingFieldId { get; set; }
+        public string ValidEntries { get; set; }
+    }
+
+    public class GetFieldsInput : PagedAndSortedResultRequestDto
+    {
+        public long? SelectedObjectId { get; set; }
+        public long? SelectedObjectTypeId { get; set; }
+        public bool AllFields { get; set; } = true;
+        public string SearchText { get; set; }
+        public long? FieldTypeId { get; set; }
+        public long? FieldStatusId { get; set; }
+        public long? FieldLevelId { get; set; }
+        public string FieldStatusCode { get; set; }
+        public string FieldLevelCode { get; set; }
+        public string TrackingNo { get; set; }
+        public bool? IsStandard { get; set; }
+        public long? CreatedByUserId { get; set; }
+        public DateTime? CreatedFrom { get; set; }
+        public DateTime? CreatedTo { get; set; }
+        public string GroupBy { get; set; }
+    }
+
+    public class AssignExistingFieldInput
+    {
+        [Range(1, long.MaxValue)] public long AppFieldId { get; set; }
+        [Range(1, long.MaxValue)] public long SycObjectId { get; set; }
+        public long? SycEntityObjectTypeId { get; set; }
+    }
+
+    public class GetUnlinkedFieldsInput : PagedAndSortedResultRequestDto
+    {
+        [Range(1, long.MaxValue)] public long TableId { get; set; }
+        public long? SycEntityObjectTypeId { get; set; }
+        public string SearchText { get; set; }
+    }
+
+    public class LinkExistingFieldsInput
+    {
+        [Range(1, long.MaxValue)] public long TableId { get; set; }
+        public long? SycEntityObjectTypeId { get; set; }
+        [Required, MinLength(1)] public List<long> AppFieldIds { get; set; }
+    }
+
+    public class LinkExistingFieldsResultDto
+    {
+        public int LinkedCount { get; set; }
+        public int AlreadyLinkedCount { get; set; }
+    }
+
+    public class SyncFieldSnapshotsInput
+    {
+        [Range(1, long.MaxValue)] public long AppFieldId { get; set; }
+        public long? SycObjectId { get; set; }
+        public long? SycEntityObjectTypeId { get; set; }
+    }
+
+    public class GetAppliedFieldInput
+    {
+        public Guid FieldDefinitionKey { get; set; }
+        [Range(1, long.MaxValue)] public long SycObjectId { get; set; }
+        public long? SycEntityObjectTypeId { get; set; }
+    }
+
+    public class AppFieldDto : CreateOrEditFieldInput
+    {
+        // Populated only when CreateOrEditField rejects a revision without saving.
+        public FieldRevisionErrorDto Error { get; set; }
+        public Guid FieldDefinitionKey { get; set; }
+        public int? TenantId { get; set; }
+        public long? SourceFieldId { get; set; }
+        public string CurrentRevisionNo { get; set; }
+        public string NextRevisionNo { get; set; }
+        public bool IsStandard { get; set; }
+        public bool IsCustom { get; set; }
+        public bool IsHidden { get; set; }
+        public DateTime CreationTime { get; set; }
+        public long? CreatorUserId { get; set; }
+        public string CreatorUserName { get; set; }
+        public DateTime? LastModificationTime { get; set; }
+        public long? LastModifierUserId { get; set; }
+        public bool IsDeleted { get; set; }
+        public long? DeleterUserId { get; set; }
+        public DateTime? DeletionTime { get; set; }
+    }
+
+    public class FieldRevisionErrorDto
+    {
+        public int Code { get; set; }
+        public string Message { get; set; }
+        public string ConflictingRevisionNo { get; set; }
+        public string ExpectedNewRevisionNo { get; set; }
+        public long CurrentFieldId { get; set; }
+        public bool RevisionAlreadyExists { get; set; }
+    }
+
+    public class AppFieldListDto
+    {
+        public long Id { get; set; }
+        public Guid FieldDefinitionKey { get; set; }
+        public string FieldCode { get; set; }
+        public string FieldName { get; set; }
+        public string Description { get; set; }
+        public string FieldTypeName { get; set; }
+        public string WidgetTypeName { get; set; }
+        public string FieldLevelName { get; set; }
+        public string StatusName { get; set; }
+        public string RevisionNo { get; set; }
+        public string TrackingNo { get; set; }
+        public string StandardOrCustom { get; set; }
+        public bool IsStandard { get; set; }
+        public bool IsCustom { get; set; }
+        public bool IsExtraField { get; set; }
+        public bool IsHidden { get; set; }
+        public bool CanEdit { get; set; }
+        public bool CanDelete { get; set; }
+        public bool CanHide { get; set; }
+        public long? SycObjectId { get; set; }
+        public long? EntitySycObjectId { get; set; }
+        public long? CreatorUserId { get; set; }
+        public string CreatorUserName { get; set; }
+        public DateTime CreationTime { get; set; }
+        public List<string> Tables { get; set; } = new List<string>();
+        public List<FieldSettingValueDto> SettingValues { get; set; } = new List<FieldSettingValueDto>();
+    }
+
+    public class FieldEditPermissionDto
+    {
+        public bool CanEditCoreInfo { get; set; }
+        public bool CanEditAttributes { get; set; }
+        public bool CanDelete { get; set; }
+        public bool CanHide { get; set; }
+        public bool IsTenantCustomCopyRequired { get; set; }
+    }
+
+    public class GetFieldForEditOutput
+    {
+        public AppFieldDto Field { get; set; }
+        public FieldEditPermissionDto Permissions { get; set; }
+    }
+
+    public class AppFieldHistoryDto
+    {
+        public long Id { get; set; }
+        public long AppFieldId { get; set; }
+        public Guid FieldDefinitionKey { get; set; }
+        public string RevisionNo { get; set; }
+        public string ChangeType { get; set; }
+        public AppFieldDto Field { get; set; }
+        public DateTime ChangedAt { get; set; }
+        public long? ChangedBy { get; set; }
+        public string ChangedByName { get; set; }
+        public string RestoredFromRevisionNo { get; set; }
+    }
+
+    public class RestoreFieldRevisionInput
+    {
+        [Range(1, long.MaxValue)] public long AppFieldId { get; set; }
+        [Range(1, long.MaxValue)] public long HistoryId { get; set; }
+        [Required, StringLength(10)] public string ExpectedCurrentRevisionNo { get; set; }
+    }
+
+    public class FieldManagerPermissionDto
+    {
+        public bool CanViewPage { get; set; }
+        public bool CanCreateField { get; set; }
+        public bool CanEditField { get; set; }
+        public bool CanDeleteField { get; set; }
+        public bool CanDuplicateField { get; set; }
+        public bool CanRestoreRevision { get; set; }
+        public bool CanAddExistingField { get; set; }
+        public bool IsHost { get; set; }
+        public bool IsTenant { get; set; }
+    }
+
+    public class ObjectTypeTreeNodeDto
+    {
+        public long Id { get; set; }
+        public long? ParentId { get; set; }
+        public string Key { get; set; }
+        public string ParentKey { get; set; }
+        public string Code { get; set; }
+        public string Name { get; set; }
+        public string NodeType { get; set; }
+        public long SycObjectId { get; set; }
+        public List<ObjectTypeTreeNodeDto> Children { get; set; } = new List<ObjectTypeTreeNodeDto>();
+    }
+
+    public class FieldActionResultDto
+    {
+        public bool Success { get; set; }
+        public string Message { get; set; }
+    }
+
+    public class FieldLookupDto
+    {
+        public long? Id { get; set; }
+        public string Code { get; set; }
+        public string Name { get; set; }
+    }
+
+    public class FieldCreateOrEditMetadataDto
+    {
+        public List<FieldLookupDto> FieldTypes { get; set; }
+        public List<FieldLookupDto> WidgetTypes { get; set; }
+        public List<FieldLookupDto> FieldLevels { get; set; }
+        public List<FieldLookupDto> FieldStatuses { get; set; }
+        public List<FieldLookupDto> Entities { get; set; }
+    }
+}
