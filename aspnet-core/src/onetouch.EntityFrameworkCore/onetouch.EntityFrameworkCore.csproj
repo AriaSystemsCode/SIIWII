@@ -1,4 +1,4 @@
-﻿<Project Sdk="Microsoft.NET.Sdk">
+<Project Sdk="Microsoft.NET.Sdk">
   <Import Project="..\..\common.props"></Import>
   <PropertyGroup Label="Globals">
     <SccProjectName>SAK</SccProjectName>
@@ -58,6 +58,13 @@
     <EmbeddedResource Include="Migrations\20261018_SeedSingleValueFieldSettings.sql" LogicalName="onetouch.Migrations.Seed.20261018_SeedSingleValueFieldSettings.sql" />
     <EmbeddedResource Include="Migrations\20261019_SeedStringChipsSettings.sql" LogicalName="onetouch.Migrations.Seed.20261019_SeedStringChipsSettings.sql" />
     <EmbeddedResource Include="Migrations\20261021_PromoteDropdownOptionsToChips.sql" LogicalName="onetouch.Migrations.Seed.20261021_PromoteDropdownOptionsToChips.sql" />
+    <EmbeddedResource Include="Migrations\20261021_SeedHeaderFieldSettings.sql" LogicalName="onetouch.Migrations.Seed.20261021_SeedHeaderFieldSettings.sql" />
+    <EmbeddedResource Include="Migrations\20261025_FixOptionsListChipsDataType.sql" LogicalName="onetouch.Migrations.Seed.20261025_FixOptionsListChipsDataType.sql" />
+    <EmbeddedResource Include="Migrations\20261027_FixDropdownOptionsChipsDataType.sql" LogicalName="onetouch.Migrations.Seed.20261027_FixDropdownOptionsChipsDataType.sql" />
+    <EmbeddedResource Include="Migrations\20261028_ConsolidateStringDropdown.sql" LogicalName="onetouch.Migrations.Seed.20261028_ConsolidateStringDropdown.sql" />
+    <EmbeddedResource Include="Migrations\20261028_MoveFieldSettingSections.sql" LogicalName="onetouch.Migrations.Seed.20261028_MoveFieldSettingSections.sql" />
+    <EmbeddedResource Include="Migrations\20261101_SeedAppEntityLookupSettings.sql" LogicalName="onetouch.Migrations.Seed.20261101_SeedAppEntityLookupSettings.sql" />
     <EmbeddedResource Include="Migrations\20261020_SeedStringDropdownDateFormat.sql" LogicalName="onetouch.Migrations.Seed.20261020_SeedStringDropdownDateFormat.sql" />
   </ItemGroup>
 </Project>
+
