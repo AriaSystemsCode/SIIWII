@@ -73,7 +73,7 @@ namespace onetouch.Migrations.Seed.Host
                 "20261016_SeedRemainingFieldTypeSettings.sql",
                 "20261018_SeedSingleValueFieldSettings.sql",
                 "20261019_SeedStringChipsSettings.sql",
-                "20261021_PromoteDropdownOptionsToChips.sql"
+                "20261021_PromoteDropdownOptionsToChips.sql",
                 "20261021_PromoteDropdownOptionsToChips.sql",
                 "20261021_SeedHeaderFieldSettings.sql",
                 "20261025_FixOptionsListChipsDataType.sql",
