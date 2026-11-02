@@ -429,8 +429,8 @@ export class BrowseFieldManagerComponent extends AppComponentBase implements OnI
             text: this.l('AreYouSureYouWantToDeleteThisField?'),
             icon: 'info',
             showCancelButton: true,
-            confirmButtonText: 'Ok',
-            cancelButtonText: 'Cancel',
+            confirmButtonText: 'Yes',
+            cancelButtonText: 'No',
             allowOutsideClick: false,
             allowEscapeKey: false,
             backdrop: true
