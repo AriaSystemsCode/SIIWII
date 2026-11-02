@@ -331,6 +331,7 @@ export class DashboardBrowseComponent
             .getAll(
                 this.filterText || null,
                 this.selectedDashboardFilter.value,
+                Intl.DateTimeFormat().resolvedOptions().timeZone,
                 this.sorting || null,
                 0,
                 1
@@ -536,6 +537,7 @@ export class DashboardBrowseComponent
             .getAll(
                 this.filterText || null,
                 this.selectedDashboardFilter.value,
+                Intl.DateTimeFormat().resolvedOptions().timeZone,
                 this.sorting || null,
                 this.skipCount || 0,
                 validMaxResultCount
