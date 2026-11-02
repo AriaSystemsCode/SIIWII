@@ -1,4 +1,4 @@
-﻿<?xml version="1.0" encoding="utf-8" ?>
+<?xml version="1.0" encoding="utf-8" ?>
 <localizationDictionary culture="en">
 	<texts>
 	<text name="Signature">Signature</text>
@@ -3083,13 +3083,6 @@ Please select one of the available linesheet templates
 		<text name="ExtraAttributes">Extra Attributes</text>
 		<text name="Visible">Visible</text>
 		<text name="Editable">Editable</text>
-		<text name="IsLookup">Is Lookup</text>
-		<text name="EntityObjectTypeCode">Entity Object Type Code</text>
-		<text name="ValidEntries">Valid Entries</text>
-		<text name="DataSourceService">Data Source Service</text>
-		<text name="DataSourceApi">Data Source API</text>
-		<text name="DataSourceParameter">Data Source Parameter</text>
-		<text name="DataSourceValueParameter">Data Source Value Parameter</text>
 		<text name="AllFields">All fields</text>
 		<text name="ByEntity">By Entity</text>
 		<text name="SelectEntityToViewFields">Select an entity to view its fields</text>
@@ -3310,3 +3303,4 @@ Please select one of the available linesheet templates
 	
 	</texts>  
 </localizationDictionary>
+

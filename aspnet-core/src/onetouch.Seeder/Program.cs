@@ -177,10 +177,9 @@ public static class Program
 
 public static class SeedRelease
 {
-    // Increment when the cumulative seed snapshot changes. Version 18
-    // moves Field Manager settings to their revised display sections.
+    // Increment when the cumulative seed snapshot changes. Version 19 adds AppEntity lookup settings and legacy XML metadata.
     // This is not an EF schema version.
-    public const int RequiredVersion = 18;
+    public const int RequiredVersion = 19;
 }
 
 public sealed record Target(string Label, string ConnectionString, string Identity)
@@ -260,3 +259,5 @@ public sealed class SeederOptionsException : ArgumentException
 {
     public SeederOptionsException(string message) : base(message) { }
 }
+
+
