@@ -1140,6 +1140,7 @@ namespace onetouch.AppFields
 
             switch (field.FieldLevelCode)
             {
+                case "System":
                 case "Application":
                     return !AbpSession.TenantId.HasValue && !field.TenantId.HasValue;
                 case "Tenant":

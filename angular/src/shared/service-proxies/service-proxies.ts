@@ -4018,7 +4018,7 @@ export class AccountsServiceProxy {
      * @param parentId (optional) 
      * @return Success
      */
-    getAccountBranches(parentId: number | null | undefined): Observable<GetAccountForViewDto[]> {
+    getAccountBranches(parentId: number | null | undefined): Observable<PagedResultDtoOfGetAccountForViewDto> {
         let url_ = this.baseUrl + "/api/services/app/Accounts/GetAccountBranches?";
         if (parentId !== undefined && parentId !== null)
             url_ += "parentId=" + encodeURIComponent("" + parentId) + "&";
@@ -4039,14 +4039,14 @@ export class AccountsServiceProxy {
                 try {
                     return this.processGetAccountBranches(response_ as any);
                 } catch (e) {
-                    return _observableThrow(e) as any as Observable<GetAccountForViewDto[]>;
+                    return _observableThrow(e) as any as Observable<PagedResultDtoOfGetAccountForViewDto>;
                 }
             } else
-                return _observableThrow(response_) as any as Observable<GetAccountForViewDto[]>;
+                return _observableThrow(response_) as any as Observable<PagedResultDtoOfGetAccountForViewDto>;
         }));
     }
 
-    protected processGetAccountBranches(response: HttpResponseBase): Observable<GetAccountForViewDto[]> {
+    protected processGetAccountBranches(response: HttpResponseBase): Observable<PagedResultDtoOfGetAccountForViewDto> {
         const status = response.status;
         const responseBlob =
             response instanceof HttpResponse ? response.body :
@@ -4057,14 +4057,7 @@ export class AccountsServiceProxy {
             return blobToText(responseBlob).pipe(_observableMergeMap((_responseText: string) => {
             let result200: any = null;
             let resultData200 = _responseText === "" ? null : JSON.parse(_responseText, this.jsonParseReviver);
-            if (Array.isArray(resultData200)) {
-                result200 = [] as any;
-                for (let item of resultData200)
-                    result200!.push(GetAccountForViewDto.fromJS(item));
-            }
-            else {
-                result200 = <any>null;
-            }
+            result200 = PagedResultDtoOfGetAccountForViewDto.fromJS(resultData200);
             return _observableOf(result200);
             }));
         } else if (status !== 200 && status !== 204) {
@@ -6597,12 +6590,13 @@ export class AppDashboardServiceProxy {
 
     /**
      * @param filter (optional) 
+     * @param timeZoneValue (optional) 
      * @param sorting (optional) 
      * @param skipCount (optional) 
      * @param maxResultCount (optional) 
      * @return Success
      */
-    getAll(filter: string | null | undefined, sharingLevel: DashboardFilterType, sorting: string | null | undefined, skipCount: number | undefined, maxResultCount: number | undefined): Observable<PagedResultDtoOfGetDashboardForViewDto> {
+    getAll(filter: string | null | undefined, sharingLevel: DashboardFilterType, timeZoneValue: string | null | undefined, sorting: string | null | undefined, skipCount: number | undefined, maxResultCount: number | undefined): Observable<PagedResultDtoOfGetDashboardForViewDto> {
         let url_ = this.baseUrl + "/api/services/app/AppDashboard/GetAll?";
         if (filter !== undefined && filter !== null)
             url_ += "Filter=" + encodeURIComponent("" + filter) + "&";
@@ -6610,6 +6604,8 @@ export class AppDashboardServiceProxy {
             throw new Error("The parameter 'sharingLevel' must be defined and cannot be null.");
         else
             url_ += "SharingLevel=" + encodeURIComponent("" + sharingLevel) + "&";
+        if (timeZoneValue !== undefined && timeZoneValue !== null)
+            url_ += "TimeZoneValue=" + encodeURIComponent("" + timeZoneValue) + "&";
         if (sorting !== undefined && sorting !== null)
             url_ += "Sorting=" + encodeURIComponent("" + sorting) + "&";
         if (skipCount === null)
