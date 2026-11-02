@@ -236,7 +236,7 @@ export class ViewFieldManagerComponent extends AppComponentBase implements OnIni
     private requestRevision(field: AppFieldDto, hideEditor = false): void {
         if (!this.currentItem) return;
         this.isRevisionSaved = false;
-        this.savedRevisionFieldId = null;
+        this.savedRevisionFieldId = null; 
         if (!hideEditor) this.modal.hide();
         this.revisionEditor.showRevision(this.copyItem(field), this.currentItem.currentRevisionNo, !hideEditor);
     }
