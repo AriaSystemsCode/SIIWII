@@ -21,10 +21,8 @@
                         </span>
                     </div>
                     <div class="kt-subheader__toolbar">
-                     
-<div
-    class="kt-subheader__wrapper"
-    *ngIf="
+
+                        <div class="kt-subheader__wrapper" *ngIf="
         accountTypeResolved &&
         currentTab === accountInfoPageTabsEnum.ProfileCreateOrEdit &&
         (
@@ -35,30 +33,20 @@
             isMyAccount
         ) &&
         currentAccountTypeId !== 21
-    "
->
-    <a
-        class="btn btnCancel w-auto mr-4"
-        (click)="resetFormData()"
-    >
-        {{ l('Cancel') }}
-    </a>
+    ">
+                            <a class="btn btnCancel w-auto mr-4" (click)="resetFormData()">
+                                {{ l('Cancel') }}
+                            </a>
 
-    <button
-        type="button"
-        class="btn bgPurple btn-1bc5bd w-auto"
-        [buttonBusy]="saving"
-        [busyText]="l('SavingWithThreeDot')"
-        (click)="save()"
-        [disabled]="
+                            <button type="button" class="btn bgPurple btn-1bc5bd w-auto" [buttonBusy]="saving"
+                                [busyText]="l('SavingWithThreeDot')" (click)="save()" [disabled]="
             !accountInfoForm.form.valid ||
             !touched ||
             !selectedRoles?.length
-        "
-    >
-        {{ l('Save') }}
-    </button>
-</div>
+        ">
+                                {{ l('Save') }}
+                            </button>
+                        </div>
 
                     </div>
                 </div>
@@ -114,7 +102,7 @@
                                     </div>
                                 </div>
                                 <div>
-                               
+
 
                                     <div class=" d-flex align-items-center m-2 w-100"
                                         *ngIf="accountDataForView && !isHost && !isRecordOwner">
@@ -162,7 +150,8 @@
                                                         style="white-space: nowrap; max-width: calc(100% - 70px);">
                                                         <span>
                                                             {{
-                                                            getFormattedConnectionName(connectionsInfo[0]?.connectedLabel) | textSubstring : 33
+                                                            getFormattedConnectionName(connectionsInfo[0]?.connectedLabel)
+                                                            | textSubstring : 33
                                                             }}
                                                         </span>
                                                         <i class="pi pi-times ml-1 removI"
@@ -255,16 +244,13 @@
                                 </li>
 
                                 <li class="nav-item">
-                                 
-                                        <a
-    class="nav-link profile-nav-link justify-content-between"
-    (click)="openProfileTab()"
-    [ngClass]="{
+
+                                    <a class="nav-link profile-nav-link justify-content-between"
+                                        (click)="openProfileTab()" [ngClass]="{
         'active':
             currentTab === accountInfoPageTabsEnum.ProfileView ||
             currentTab === accountInfoPageTabsEnum.ProfileCreateOrEdit
-    }"
->
+    }">
 
                                         <span class="d-flex align-items-center gap-12">
                                             <span class="nav-icon-box">
@@ -298,7 +284,7 @@
                                                     src="assets/profile/My-Account-Information-Default.svg">
                                             </span>
 
-                                            <span class="nav-title" 
+                                            <span class="nav-title"
                                                 *ngIf="accountLevel === accountLevelEnum.Profile && !viewMode">
                                                 {{l("MyProfile")}}
                                             </span>
@@ -335,11 +321,13 @@
 
                                         <span class="nav-title"
                                             *ngIf="accountLevel === accountLevelEnum.Profile && !viewMode">
-                                            {{ accountDataForView?.accountTypeId != 21 ? l("MyBranches/Addresses") : l("MyAddresses") }}
+                                            {{ accountDataForView?.accountTypeId != 21 ? l("MyBranches/Addresses") :
+                                            l("MyAddresses") }}
                                         </span>
                                         <span class="nav-title"
                                             *ngIf="accountLevel !== accountLevelEnum.Profile || viewMode">
-                                            {{ accountDataForView?.accountTypeId != 21 ? l("AccountBranches/Addresses") : l("AccountAddresses")}}
+                                            {{ accountDataForView?.accountTypeId != 21 ? l("AccountBranches/Addresses")
+                                            : l("AccountAddresses")}}
                                         </span>
                                     </a>
                                 </li>
@@ -447,9 +435,7 @@
                         </div>
                     </div>
                     <div class="col rendered-content">
-                 <div
-    class="tab1"
-      *ngIf="
+                        <div class="tab1" *ngIf="
         accountTypeResolved &&
         !isPersonalAccount &&
         currentTab === accountInfoPageTabsEnum.ProfileCreateOrEdit
@@ -461,13 +447,16 @@
                                     <div class="kt-portlet__body">
                                         <div class="row">
                                             <div class="offset-md-2 col-md-9">
-                                                <p class="title-blue">{{ accountInfoTemp?.accountTypeId != 21 ? l("CompanyInformation") : l("ProfileInformation") }}</p>
+                                                <p class="title-blue">{{ accountInfoTemp?.accountTypeId != 21 ?
+                                                    l("CompanyInformation") : l("ProfileInformation") }}</p>
                                             </div>
                                         </div>
 
                                         <div class="form-group row ">
                                             <label for="colFormLabelSm"
-                                                class="col-sm-2 col-form-label col-form-label-sm label-form">{{ accountInfoTemp?.accountTypeId != 21 ? l("CompnayLogo") : l("ProfilePicture")}}
+                                                class="col-sm-2 col-form-label col-form-label-sm label-form">{{
+                                                accountInfoTemp?.accountTypeId != 21 ? l("CompnayLogo") :
+                                                l("ProfilePicture")}}
                                             </label>
                                             <app-image-upload [sycAttachmentCategory]="sycAttachmentCategoryLogo"
                                                 [isDisabled]="(accountDataForView?.isConnected && currentTab === accountInfoPageTabsEnum.ProfileCreateOrEdit && !isRecordOwner)"
@@ -479,7 +468,8 @@
 
                                         <div class="form-group row ">
                                             <label
-                                                class="col-sm-2 col-form-label col-form-label-sm label-form">{{accountInfoTemp?.accountTypeId != 21  ? l("CompnayImage") : l("CoverImg")  }}
+                                                class="col-sm-2 col-form-label col-form-label-sm label-form">{{accountInfoTemp?.accountTypeId
+                                                != 21 ? l("CompnayImage") : l("CoverImg") }}
                                             </label>
                                             <app-image-upload [sycAttachmentCategory]="sycAttachmentCategoryBanner"
                                                 [isDisabled]="(accountDataForView?.isConnected && currentTab === accountInfoPageTabsEnum.ProfileCreateOrEdit && !isRecordOwner)"
@@ -490,10 +480,9 @@
 
                                         </div>
 
-                                  
 
-<div class="form-group row"
-                                            *ngIf="accountInfoTemp?.accountTypeId != 21">
+
+                                        <div class="form-group row" *ngIf="accountInfoTemp?.accountTypeId != 21">
                                             <div
                                                 class="col-sm-10 offset-sm-2 d-flex align-items-center d-flex flex-wrap">
                                                 <!--Other image 1-->
@@ -562,7 +551,7 @@
                                         </div>
 
 
-                                        <div class="form-group row"  *ngIf="accountInfoTemp?.accountTypeId != 21">
+                                        <div class="form-group row" *ngIf="accountInfoTemp?.accountTypeId != 21">
                                             <label for="colFormLabelSm"
                                                 class="col-sm-2 col-form-label col-form-label-sm label-form">
                                                 <span class="text-danger font-weight-bold">*</span>
@@ -581,26 +570,19 @@
 
                                         </div>
 
-                                        
+
                                         <!-- BUSINESS / GROUP NAME -->
-                                        <div class="form-group row "
-                                            *ngIf="accountInfoTemp?.accountTypeId != 21">
+                                        <div class="form-group row " *ngIf="accountInfoTemp?.accountTypeId != 21">
                                             <label class="col-sm-2 col-form-label col-form-label-sm label-form ">
                                                 <span class="text-danger font-weight-bold">*</span>
                                                 {{l("Name")}}
                                             </label>
                                             <div class="col-sm-8 ">
-                                                <input type="text"
-                                                    id="AccountInfoTemp_Name"
-                                                    #nameInput="ngModel"
+                                                <input type="text" id="AccountInfoTemp_Name" #nameInput="ngModel"
                                                     class="form-control form-control-sm aria-input-text"
                                                     [disabled]="accountDataForView?.isConnected && currentTab === accountInfoPageTabsEnum.ProfileCreateOrEdit && !isRecordOwner"
-                                                    [(ngModel)]="accountInfoTemp.name"
-                                                    name="name"
-                                                    minlength="2"
-                                                    maxlength="250"
-                                                    required
-                                                    (input)="changeTouchState()"
+                                                    [(ngModel)]="accountInfoTemp.name" name="name" minlength="2"
+                                                    maxlength="250" required (input)="changeTouchState()"
                                                     [placeholder]="'PleaseEnterCompanyName...' | localize">
                                                 <validation-messages [formCtrl]="nameInput"></validation-messages>
                                             </div>
@@ -609,48 +591,42 @@
                                         <!-- PERSONAL: FIRST NAME -->
                                         <div class="form-group row account-field-row"
                                             *ngIf="accountInfoTemp?.accountTypeId == 21">
-                                            <label class="col-sm-2 col-form-label col-form-label-sm label-form account-field-label">
+                                            <label
+                                                class="col-sm-2 col-form-label col-form-label-sm label-form account-field-label">
                                                 <span class="text-danger font-weight-bold">*</span>
                                                 {{l("FirstName")}}
                                             </label>
                                             <div class="col-sm-8 account-field-control">
-                                                <input type="text"
-                                                    class="form-control form-control-sm aria-input-text"
-                                                    [(ngModel)]="personalContactTemp.firstName"
-                                                    name="personalFirstName"
-                                                    #personalFirstNameInput="ngModel"
-                                                    minlength="2"
-                                                    maxlength="100"
-                                                    required
-                                                    (input)="changeTouchState()"
+                                                <input type="text" class="form-control form-control-sm aria-input-text"
+                                                    [(ngModel)]="personalContactTemp.firstName" name="personalFirstName"
+                                                    #personalFirstNameInput="ngModel" minlength="2" maxlength="100"
+                                                    required (input)="changeTouchState()"
                                                     [placeholder]="'Please Enter Name' | localize">
-                                                <validation-messages [formCtrl]="personalFirstNameInput"></validation-messages>
+                                                <validation-messages
+                                                    [formCtrl]="personalFirstNameInput"></validation-messages>
                                             </div>
                                         </div>
 
                                         <!-- PERSONAL: LAST NAME -->
                                         <div class="form-group row account-field-row"
                                             *ngIf="accountInfoTemp?.accountTypeId == 21">
-                                            <label class="col-sm-2 col-form-label col-form-label-sm label-form account-field-label">
+                                            <label
+                                                class="col-sm-2 col-form-label col-form-label-sm label-form account-field-label">
                                                 <span class="text-danger font-weight-bold">*</span>
                                                 {{l("LastName")}}
                                             </label>
                                             <div class="col-sm-8 account-field-control">
-                                                <input type="text"
-                                                    class="form-control form-control-sm aria-input-text"
-                                                    [(ngModel)]="personalContactTemp.lastName"
-                                                    name="personalLastName"
-                                                    #personalLastNameInput="ngModel"
-                                                    minlength="2"
-                                                    maxlength="100"
-                                                    required
-                                                    (input)="changeTouchState()"
+                                                <input type="text" class="form-control form-control-sm aria-input-text"
+                                                    [(ngModel)]="personalContactTemp.lastName" name="personalLastName"
+                                                    #personalLastNameInput="ngModel" minlength="2" maxlength="100"
+                                                    required (input)="changeTouchState()"
                                                     [placeholder]="'Please Enter last Name' | localize">
-                                                <validation-messages [formCtrl]="personalLastNameInput"></validation-messages>
+                                                <validation-messages
+                                                    [formCtrl]="personalLastNameInput"></validation-messages>
                                             </div>
                                         </div>
 
-<div class="form-group row"  *ngIf="accountInfoTemp?.accountTypeId != 21">
+                                        <div class="form-group row" *ngIf="accountInfoTemp?.accountTypeId != 21">
                                             <label for="colFormLabelSm"
                                                 class="col-sm-2 col-form-label col-form-label-sm label-form">
                                                 <!-- <span class="text-danger font-weight-bold">*</span> -->
@@ -688,11 +664,12 @@
                                                     [formCtrl]="emailAddressInput"></validation-messages>
                                             </div>
                                         </div>
-                                        
+
                                         <!-- PERSONAL: EMAIL + IS PUBLIC -->
                                         <div class="form-group row account-field-row"
                                             *ngIf="accountInfoTemp?.accountTypeId == 21">
-                                            <label class="col-sm-2 col-form-label col-form-label-sm label-form account-field-label">
+                                            <label
+                                                class="col-sm-2 col-form-label col-form-label-sm label-form account-field-label">
                                                 <span class="text-danger font-weight-bold">*</span>
                                                 {{l("Email")}}
                                             </label>
@@ -700,21 +677,16 @@
                                                 <div class="account-field-input">
                                                     <input type="email"
                                                         class="form-control form-control-sm aria-input-text"
-                                                        [(ngModel)]="accountInfoTemp.eMailAddress"
-                                                        name="personalEmail"
-                                                        #personalEmailInput="ngModel"
-                                                        minlength="7"
-                                                        maxlength="100"
-                                                        email
-                                                        required
-                                                        (input)="changeTouchState()"
+                                                        [(ngModel)]="accountInfoTemp.eMailAddress" name="personalEmail"
+                                                        #personalEmailInput="ngModel" minlength="7" maxlength="100"
+                                                        email required (input)="changeTouchState()"
                                                         [placeholder]="'PleaseEnterEmail...' | localize">
-                                                    <validation-messages [formCtrl]="personalEmailInput"></validation-messages>
+                                                    <validation-messages
+                                                        [formCtrl]="personalEmailInput"></validation-messages>
                                                 </div>
                                                 <div class="account-public-switch">
                                                     <span class="isPublic">{{"IsPublic" | localize}}</span>
-                                                    <p-inputSwitch
-                                                        name="personalEmailIsPublic"
+                                                    <p-inputSwitch name="personalEmailIsPublic"
                                                         [(ngModel)]="personalContactTemp.emailAddressIsPublic"
                                                         (onChange)="changeTouchState()">
                                                     </p-inputSwitch>
@@ -722,7 +694,7 @@
                                             </div>
                                         </div>
 
-<div class="form-group row" *ngIf="accountDataForView?.accountTypeId != 21">
+                                        <div class="form-group row" *ngIf="accountDataForView?.accountTypeId != 21">
                                             <label for="colFormLabelSm"
                                                 class="col-sm-2 col-form-label col-form-label-sm label-form">
                                                 {{l("Website")}}</label>
@@ -747,25 +719,24 @@
                                                 class="col-sm-2 col-form-label col-form-label-sm label-form account-field-label">{{l("AccountType")}}</label>
                                             <div class="col-sm-8">
                                                 <!-- <div class="d-flex flex-grow-1"> -->
-                                                    <div class="flex-grow-1 mr-1 account-page">
+                                                <div class="flex-grow-1 mr-1 account-page">
 
-                                                        <p-dropdown *ngIf="accountLevel == accountLevelEnum.Manual"
-                                                           (onChange)="onAccountTypeChange($event)"
-                                                            #manualAccountTypeInput="ngModel"
-                                                            placeholder="{{ 'Account Type' | localize }} *"
-                                                            [options]="accountTypes"
-                                                            [disabled]="accountDataForView?.isConnected && currentTab === accountInfoPageTabsEnum.ProfileCreateOrEdit && !isRecordOwner"
-                                                            [ngStyle]="{'cursor': accountDataForView?.isConnected && currentTab === accountInfoPageTabsEnum.ProfileCreateOrEdit ? 'not-allowed' : 'pointer'}"
-                                                            styleClass="ticket-dropdown form-control aria-select text-left"
-                                                            [filter]="false" name="accountType"
-                                                            [(ngModel)]="accountInfoTemp.accountTypeId" required>
-                                                        </p-dropdown>
+                                                    <p-dropdown *ngIf="accountLevel == accountLevelEnum.Manual"
+                                                        (onChange)="onAccountTypeChange($event)"
+                                                        #manualAccountTypeInput="ngModel"
+                                                        placeholder="{{ 'Account Type' | localize }} *"
+                                                        [options]="accountTypes"
+                                                        [disabled]="accountDataForView?.isConnected && currentTab === accountInfoPageTabsEnum.ProfileCreateOrEdit && !isRecordOwner"
+                                                        [ngStyle]="{'cursor': accountDataForView?.isConnected && currentTab === accountInfoPageTabsEnum.ProfileCreateOrEdit ? 'not-allowed' : 'pointer'}"
+                                                        styleClass="ticket-dropdown form-control aria-select text-left"
+                                                        [filter]="false" name="accountType"
+                                                        [(ngModel)]="accountInfoTemp.accountTypeId" required>
+                                                    </p-dropdown>
 
-                                                        <input *ngIf="accountLevel != accountLevelEnum.Manual"
-                                                            type="text"
-                                                            class="form-control form-control-sm aria-input-text"
-                                                            [value]="accountTypeDisplayValue" readonly
-                                                            [placeholder]="'AccountType' | localize" />
+                                                    <input *ngIf="accountLevel != accountLevelEnum.Manual" type="text"
+                                                        class="form-control form-control-sm aria-input-text"
+                                                        [value]="accountTypeDisplayValue" readonly
+                                                        [placeholder]="'AccountType' | localize" />
 
                                                     <!-- </div> -->
                                                 </div>
@@ -773,44 +744,39 @@
                                             </div>
                                         </div>
 
-                                              
+
                                         <!-- PERSONAL: JOB TITLE -->
                                         <div class="form-group row account-field-row"
                                             *ngIf="accountInfoTemp?.accountTypeId == 21">
-                                            <label class="col-sm-2 col-form-label col-form-label-sm label-form account-field-label">
+                                            <label
+                                                class="col-sm-2 col-form-label col-form-label-sm label-form account-field-label">
                                                 {{l("JobTitle")}}
                                             </label>
                                             <div class="col-sm-8 account-field-control">
-                                                <input type="text"
-                                                    class="form-control form-control-sm aria-input-text"
-                                                    [(ngModel)]="personalContactTemp.jobTitle"
-                                                    name="personalJobTitle"
-                                                    maxlength="100"
-                                                    (input)="changeTouchState()"
+                                                <input type="text" class="form-control form-control-sm aria-input-text"
+                                                    [(ngModel)]="personalContactTemp.jobTitle" name="personalJobTitle"
+                                                    maxlength="100" (input)="changeTouchState()"
                                                     [placeholder]="'Please Enter job Title' | localize">
                                             </div>
                                         </div>
 
                                         <!-- PERSONAL: PHONE + IS PUBLIC -->
-                                        <div class="form-group row "
-                                          >
-                                            <label class="col-sm-2 col-form-label col-form-label-sm label-form account-field-label">
+                                        <div class="form-group row ">
+                                            <label
+                                                class="col-sm-2 col-form-label col-form-label-sm label-form account-field-label">
                                                 {{l("Phone")}}
                                             </label>
                                             <div class="col-sm-8 ">
                                                 <!-- <div class="account-field-input"> -->
-                                                    <input type="text"
-                                                        class="form-control form-control-sm aria-input-text"
-                                                        [(ngModel)]="accountInfoTemp.phone1Number"
-                                                        name="personalPhone"
-                                                        maxlength="30"
-                                                        (input)="changeTouchState()"
-                                                        [placeholder]="'Please Enter phone Number' | localize">
+                                                <input type="text" class="form-control form-control-sm aria-input-text"
+                                                    [(ngModel)]="accountInfoTemp.phone1Number" name="personalPhone"
+                                                    maxlength="30" (input)="changeTouchState()"
+                                                    [placeholder]="'Please Enter phone Number' | localize">
                                                 <!-- </div> -->
-                                                <div class="account-public-switch"   *ngIf="accountInfoTemp?.accountTypeId == 21">
+                                                <div class="account-public-switch"
+                                                    *ngIf="accountInfoTemp?.accountTypeId == 21">
                                                     <span class="isPublic">{{"IsPublic" | localize}}</span>
-                                                    <p-inputSwitch
-                                                        name="personalPhoneIsPublic"
+                                                    <p-inputSwitch name="personalPhoneIsPublic"
                                                         [(ngModel)]="personalContactTemp.phone1IsPublic"
                                                         (onChange)="changeTouchState()">
                                                     </p-inputSwitch>
@@ -827,28 +793,20 @@
                                             <div class="col-sm-8">
 
 
-                                            <p-multiSelect
-                                                [options]="roles"
-                                                [(ngModel)]="selectedRoles"
-                                                [ngModelOptions]="{ standalone: true }"
-                                                optionLabel="name"
-                                                optionValue="name"
-                                                placeholder="Select Roles"
-                                                [maxSelectedLabels]="3"
-                                                styleClass="roles-multiselect"
-                                                display="chip"
-                                                [disabled]="accountDataForView?.isConnected &&
+                                                <p-multiSelect [options]="roles" [(ngModel)]="selectedRoles"
+                                                    [ngModelOptions]="{ standalone: true }" optionLabel="name"
+                                                    optionValue="name" placeholder="Select Roles"
+                                                    [maxSelectedLabels]="3" styleClass="roles-multiselect"
+                                                    display="chip" [disabled]="accountDataForView?.isConnected &&
                                                             currentTab === accountInfoPageTabsEnum.ProfileCreateOrEdit &&
-                                                            !isRecordOwner"
-                                                (onPanelShow)="storeRolesBeforeChange()"
-                                                (onChange)="onRolesChange($event)">
-                                            </p-multiSelect>
+                                                            !isRecordOwner" (onPanelShow)="storeRolesBeforeChange()"
+                                                    (onChange)="onRolesChange($event)">
+                                                </p-multiSelect>
 
                                             </div>
                                         </div>
 
-                                        <div class="form-group row"
-                                            *ngIf="accountInfoTemp?.accountTypeId != 21">
+                                        <div class="form-group row" *ngIf="accountInfoTemp?.accountTypeId != 21">
 
                                             <label for="colFormLabelSm"
                                                 class="col-sm-2 col-form-label col-form-label-sm label-form d-flex">
@@ -864,43 +822,32 @@
                                                     [placeholder]="'PleaseSelect' | localize"></p-dropdown>
                                             </div>
                                         </div>
-                                        <div
-    class="form-group row "
-   
->
-    <label
-        class="
+                                        <div class="form-group row ">
+                                            <label class="
             col-sm-2
             col-form-label
             col-form-label-sm
             label-form
           
-        "
-    >
-        {{ l("Language") }}
-    </label>
+        ">
+                                                {{ l("Language") }}
+                                            </label>
 
-    <div class="col-sm-8">
+                                            <div class="col-sm-8">
 
-        <p-dropdown
-            [options]="allLanguages"
-            [disabled]="
+                                                <p-dropdown [options]="allLanguages" [disabled]="
                 accountDataForView?.isConnected &&
                 currentTab ===
                     accountInfoPageTabsEnum.ProfileCreateOrEdit &&
                 !isRecordOwner
-            "
-            styleClass="form-control aria-select"
-            [filter]="false"
-            name="languageId"
-            [(ngModel)]="accountInfoTemp.languageId"
-            (onChange)="changeTouchState()"
-            [placeholder]="'PleaseSelect' | localize"
-        >
-        </p-dropdown>
+            " styleClass="form-control aria-select" [filter]="false" name="languageId"
+                                                    [(ngModel)]="accountInfoTemp.languageId"
+                                                    (onChange)="changeTouchState()"
+                                                    [placeholder]="'PleaseSelect' | localize">
+                                                </p-dropdown>
 
-    </div>
-</div>
+                                            </div>
+                                        </div>
 
                                         <!--  <div class="form-group row"
                                             *ngIf="(accountLevel == accountLevelEnum.Manual || (accountDataForView?.isConnected && currentTab === accountInfoPageTabsEnum.ProfileCreateOrEdit)) && !isRecordOwner">
@@ -969,7 +916,8 @@
 
                                         <div class="form-group row">
                                             <label for="colFormLabelSm"
-                                                class="col-sm-2 col-form-label col-form-label-sm label-form">{{accountInfoTemp?.accountTypeId != 21 ?  l("AboutUs") : l("About")  }}
+                                                class="col-sm-2 col-form-label col-form-label-sm label-form">{{accountInfoTemp?.accountTypeId
+                                                != 21 ? l("AboutUs") : l("About") }}
                                             </label>
                                             <div class="col-sm-8">
                                                 <textarea class="form-control z-depth-1 aria-textarea-text"
@@ -1184,8 +1132,9 @@
                             </div>
                         </div>
                         <div class="tab2" *ngIf="currentTab == accountInfoPageTabsEnum.Branches ">
-                            <app-branches [branches]='accountDataForView.branches' [accountId]='accountId' 
-                                (askToPublish)="askToPublish($event)" [viewMode]="viewMode" [accountData]="accountDataForView"></app-branches>
+                            <app-branches [branches]='accountDataForView.branches' [accountId]='accountId'
+                                (askToPublish)="askToPublish($event)" [viewMode]="viewMode"
+                                [accountData]="accountDataForView"></app-branches>
                         </div>
                         <div class="tab3" *ngIf="currentTab == accountInfoPageTabsEnum.Payments">
                             <app-payment-methods-list [accountId]='accountId'
@@ -1196,14 +1145,12 @@
                                 (create)="createOrEditMemberHandler()" (view)="viewMemberHandler($event)">
                             </app-members-list>
                         </div>
-                    <!-- =========================================================
+                        <!-- =========================================================
      PERSONAL ACCOUNT
      Create / Edit / View all handled by ViewProfileComponent
      ========================================================= -->
 
-<div
-    class="tab5"
-    *ngIf="
+                        <div class="tab5" *ngIf="
         accountTypeResolved &&
         isPersonalAccount &&
         (
@@ -1213,99 +1160,48 @@
             currentTab ===
                 accountInfoPageTabsEnum.ProfileCreateOrEdit
         )
-    "
->
-    <app-view-profile
-        [accountData]="personalProfileAccountData"
-        [contactData]="personalProfileContactData"
-
-        [entityExtraData]="
+    ">
+                            <app-view-profile [accountData]="personalProfileAccountData"
+                                [contactData]="personalProfileContactData" [entityExtraData]="
             entityExtraData || accountInfoTemp?.entityExtraData
-        "
-
-        [isPublished]="isPublished"
-        [viewMode]="viewMode"
-        [accountLevel]="accountLevel"
-        [isSync]="isSync"
-        [connectionCount]="connectionCount"
-
-        [personalAccount]="true"
-
-        [createMode]="!accountId"
-
-        [startInEditMode]="
+        " [isPublished]="isPublished" [viewMode]="viewMode" [accountLevel]="accountLevel" [isSync]="isSync"
+                                [connectionCount]="connectionCount" [personalAccount]="true" [createMode]="!accountId"
+                                [startInEditMode]="
             !accountId ||
             currentTab ===
                 accountInfoPageTabsEnum.ProfileCreateOrEdit
-        "
-
-        (editedContactData)="
+        " (syncCompleted)="getMyAccountDataForView()" (editedContactData)="
             getCotactData($event)
-        "
-
-        (editedData)="
+        " (editedData)="
             savePerData($event)
-        "
-
-        (edit)="
+        " (edit)="
             openPersonalEditMode()
-        "
-
-        (cancelEdit)="
+        " (cancelEdit)="
             onPersonalEditCancel()
-        "
-
-        (delete)="
+        " (delete)="
             askToConfirmDeleteAccount()
-        "
-    >
-    </app-view-profile>
-</div>
+        ">
+                            </app-view-profile>
+                        </div>
 
-<div
-    class="tab5"
-    *ngIf="
+                        <div class="tab5" *ngIf="
         accountTypeResolved &&
         currentAccountTypeId != null &&
         !isPersonalAccount &&
         currentTab ===
             accountInfoPageTabsEnum.ProfileView
-    "
->
+    ">
 
-    <app-view-profile
-
-        [accountData]="accountDataForView"
-
-        [contactData]="accountContactForView"
-
-        [entityExtraData]="entityExtraData"
-
-        [isPublished]="isPublished"
-
-        [viewMode]="viewMode"
-
-        [accountLevel]="accountLevel"
-
-        (edit)="triggerProfile($event)"
-
-        (editedData)="savePerData($event)"
-
-        (delete)="askToConfirmDeleteAccount()"
-
-        (editedContactData)="
+                            <app-view-profile [accountData]="accountDataForView" [contactData]="accountContactForView"
+                                [entityExtraData]="entityExtraData" [isPublished]="isPublished" [viewMode]="viewMode"
+                                [accountLevel]="accountLevel" (edit)="triggerProfile($event)"
+                                (editedData)="savePerData($event)" (delete)="askToConfirmDeleteAccount()"
+                                (editedContactData)="
             getCotactData($event)
-        "
+        " [isSync]="isSync" [connectionCount]="connectionCount" [personalAccount]="false">
+                            </app-view-profile>
 
-        [isSync]="isSync"
-
-        [connectionCount]="connectionCount"
-
-        [personalAccount]="false"
-    >
-    </app-view-profile>
-
-</div>
+                        </div>
                         <div class="tab6"
                             [ngClass]="{'d-none' : currentTab != accountInfoPageTabsEnum.CreateOrEditMember}">
                             <app-create-or-edit-member [accData]="accountDataForView"
