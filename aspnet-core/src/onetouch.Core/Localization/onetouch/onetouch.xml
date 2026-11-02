@@ -3296,10 +3296,11 @@ Please select one of the available linesheet templates
 <text name="SpreadsheetNotFoundDescription" value="This spreadsheet does not exist or is no longer available." />
 
 
-		
-  		<text name="OptionsList"> Options List </text>
+
+		<text name="OptionsList"> Options List </text>
 		<text name="FieldsAddedSuccessfully"> Fields Added Successfully </text>
 		<text name="EnterReferenceNumber">Enter Reference Number </text>
+	
 	</texts>  
 </localizationDictionary>
 

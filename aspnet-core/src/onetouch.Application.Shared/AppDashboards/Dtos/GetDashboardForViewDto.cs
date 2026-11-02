@@ -30,6 +30,7 @@ namespace onetouch.AppDashboards.Dtos
     {
         public string Filter { get; set; }
         public DashboardFilterType SharingLevel { get; set; } = 0;
+        public string? TimeZoneValue { get; set; }
     }
     public enum DashboardFilterType
     {

@@ -454,10 +454,12 @@ export class CreateOrEditAppItemComponent
             });
     }
 
-    getAppItemTypeExtraAttributesById(id: number) {
+      getAppItemTypeExtraAttributesById(id: number) {
                     let source: ExtraAttributesSource=0;
         if (!id) return;
-        return this._sycEntityObjectTypesServiceProxy.getAllWithExtraAttributes(id,source);
+        return this._sycEntityObjectTypesServiceProxy.getAllWithExtraAttributes(
+            id,source
+        );
     }
 
     getAppItemTypeExtraAttributesByIdFun(id) {
