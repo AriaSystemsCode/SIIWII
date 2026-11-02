@@ -41,7 +41,7 @@ import { AccountsServiceProxy, AppItemsServiceProxy, MarketplaceAccountsServiceP
         DynamicApiDispatcherService,
         AccountsServiceProxy,
         AppItemsServiceProxy,
-        MarketplaceAccountsServiceProxy
+        MarketplaceAccountsServiceProxy 
     ]
 })
 export class FieldManagerModule { }
