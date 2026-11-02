@@ -229,7 +229,7 @@ export class ViewFieldManagerComponent extends AppComponentBase implements OnIni
         }).then(result => {
             if (!result.isConfirmed) return;
             this.requestRevision(revision, true);
-            this.revisionEditor.save();
+            this.revisionEditor.save(true);
         });
     }
 
