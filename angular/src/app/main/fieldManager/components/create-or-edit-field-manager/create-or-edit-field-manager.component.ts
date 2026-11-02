@@ -132,7 +132,22 @@ export class CreateOrEditFieldManagerComponent extends AppComponentBase implemen
         this.activeTab = tab;
     }
 
-    save(): void {
+    save(skipConfirmation = false): void {
+        if (this.isRevisionEdit && !skipConfirmation) {
+            Swal.fire({
+                title: '',
+                text: 'A new revision will be created and will become current revision.',
+                icon: 'info',
+                showCancelButton: true,
+                confirmButtonText: 'Yes',
+                cancelButtonText: 'No',
+                allowOutsideClick: false,
+                allowEscapeKey: false
+            }).then(result => {
+                if (result.isConfirmed) this.save(true);
+            });
+            return;
+        }
          this.dropdownOptions = this.dropdownOptions
             .filter(option => option.option.trim().length > 0 || option.value.trim().length > 0)
             .map(option => ({
@@ -211,7 +226,9 @@ export class CreateOrEditFieldManagerComponent extends AppComponentBase implemen
                 }
 
                 const revision = this.isEdit ? savedField.currentRevisionNo : undefined;
-                this.notify.success(revision
+                this.notify.success(this.isRevisionEdit
+                    ? 'New revision is created'
+                    : revision
                     ? `Revision #${revision} saved successfully.`
                     : (this.l('SavedSuccessfully') ?? 'Saved successfully'));
                 this.item = savedField;
@@ -238,10 +255,11 @@ export class CreateOrEditFieldManagerComponent extends AppComponentBase implemen
 
           Swal.fire({
                             title: "",
-                            text:  "Do you want to cancel and lose all your progress?",
+                            text:  "Are you sure you want to discard changes?",
                             icon: "info",
-                            confirmButtonText:
-                                "Ok",
+                            showCancelButton: true,
+                            confirmButtonText: "Yes",
+                            cancelButtonText: "No",
                             allowOutsideClick: false,
                             allowEscapeKey: false,
                             backdrop: true,
