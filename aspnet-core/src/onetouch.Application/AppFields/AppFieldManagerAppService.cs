@@ -412,10 +412,10 @@ namespace onetouch.AppFields
             if (!input.AllFields) query = query.Where(x => x.IsExtraField);
             if (!string.IsNullOrWhiteSpace(input.SearchText))
             {
-                var search = input.SearchText.Trim();
-                query = query.Where(x => x.FieldCode.Contains(search) || x.FieldName.Contains(search) ||
-                    (x.Description != null && x.Description.Contains(search)) ||
-                    (x.TrackingNo != null && x.TrackingNo.Contains(search)));
+                var search = input.SearchText.Trim().ToLowerInvariant();
+                query = query.Where(x => x.FieldCode.ToLower().Contains(search) || x.FieldName.ToLower().Contains(search) ||
+                    (x.Description != null && x.Description.ToLower().Contains(search)) ||
+                    (x.TrackingNo != null && x.TrackingNo.ToLower().Contains(search)));
             }
             if (input.FieldTypeId.HasValue) query = query.Where(x => x.FieldTypeId == input.FieldTypeId.Value);
             if (input.FieldStatusId.HasValue) query = query.Where(x => x.FieldStatusId == input.FieldStatusId.Value);
