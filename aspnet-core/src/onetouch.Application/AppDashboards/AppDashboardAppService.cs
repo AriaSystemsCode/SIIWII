@@ -186,8 +186,21 @@ namespace onetouch.AppDashboards
                                 }
                                 using (UnitOfWorkManager.Current.DisableFilter(AbpDataFilters.MustHaveTenant, AbpDataFilters.MayHaveTenant))
                                 {
-                                    dashboard.SharedWithUsers.
-                                         Add(await _appEntitiesAppService.GetUserInformation(user.Id));
+                                    var userInfo = await _appEntitiesAppService.GetUserInformation(user.Id);
+                                    if (userInfo != null)
+                                    {
+                                        if (string.IsNullOrEmpty(userInfo.UserName))
+                                            userInfo.UserName = user.FullName;
+                                        dashboard.SharedWithUsers.
+                                     Add(userInfo);
+                                    }
+                                    else
+                                    {
+                                        UserInformationDto userInf = new UserInformationDto();
+                                        userInf.UserName = user.FullName;
+                                        dashboard.SharedWithUsers.
+                                     Add(userInf);
+                                    }
                                 }
 
                             }
