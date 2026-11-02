@@ -255,7 +255,7 @@ export class CreateOrEditFieldManagerComponent extends AppComponentBase implemen
 
           Swal.fire({
                             title: "",
-                            text:  "Are you sure you want to discard changes?",
+                            text:  "Are you sure you want to discard changes?", 
                             icon: "info",
                             showCancelButton: true,
                             confirmButtonText: "Yes",
