@@ -30,6 +30,7 @@ using onetouch.Authorization.Users;
 using onetouch.Configuration;
 using onetouch.DashboardCustomization;
 using onetouch.EntityFrameworkCore;
+using onetouch.Globals;
 using onetouch.Helpers;
 using onetouch.SycIdentifierDefinitions;
 using onetouch.SystemObjects;
@@ -57,14 +58,17 @@ namespace onetouch.AppDashboards
         private readonly IAppEntitiesAppService _appEntitiesAppService;
         private readonly SycIdentifierDefinitionsAppService _iAppSycIdentifierDefinitionsService;
         private readonly IAppFieldManagerAppService _iAppFieldManagerAppService;
+        private readonly TimeZoneInfoAppService _timeZoneInfoAppService;
         public AppDashboardAppService(IRepository<AppEntity, long> appEntityRepository,
             Helper helper, IRepository<AppEntitySharings, long> appEntitySharingRepository,
             IAppEntitiesAppService appEntitiesAppService,
             IAppConfigurationAccessor appConfigurationAccessor,
             SycIdentifierDefinitionsAppService iAppSycIdentifierDefinitionsService,
             IAppFieldManagerAppService iAppFieldManagerAppService,
-            IRepository<SydObject, long> sydObjectRepository)
+            IRepository<SydObject, long> sydObjectRepository,
+            TimeZoneInfoAppService timeZoneInfoAppService)
         {
+            _timeZoneInfoAppService = timeZoneInfoAppService;
             _sydObjectRepository = sydObjectRepository;
             _appEntityRepository = appEntityRepository;
             _helper = helper;
@@ -125,6 +129,8 @@ namespace onetouch.AppDashboards
 
                 foreach (var dashboard in dashboardsList)
                 {
+                    
+
                     var userCreator = await UserManager.GetUserByIdAsync(dashboard.CreatorUserId);
                     if (userCreator != null)
                         dashboard.CreatorUserName = userCreator.FullName;
@@ -141,6 +147,22 @@ namespace onetouch.AppDashboards
                 z.SharedUserId == AbpSession.UserId).FirstOrDefaultAsync();
                     if (sharing != null)
                         dashboard.LastViewDate = sharing.LastViewDate;
+
+
+                    //Timezone Conversion[start]
+                    if (input.TimeZoneValue != null)
+                    {
+                        var currentTimeZone = TimeZone.CurrentTimeZone.StandardName.ToString();
+                        var utcValue = _timeZoneInfoAppService
+                            .GetUTCDatetimeValue(DateTime.Parse(dashboard.LastModificationDate.ToString()), currentTimeZone);
+                        dashboard.LastModificationDate = _timeZoneInfoAppService.GetDatetimeValueFromUTC(utcValue, input.TimeZoneValue);
+
+                        var utcValueView = _timeZoneInfoAppService
+                            .GetUTCDatetimeValue(DateTime.Parse(dashboard.LastViewDate.ToString()), currentTimeZone);
+                        dashboard.LastViewDate = _timeZoneInfoAppService.GetDatetimeValueFromUTC(utcValueView, input.TimeZoneValue);
+                    }
+                    //Timezone {End}
+
 
                     dashboard.SharedWithUsers = new List<onetouch.AppEntities.Dtos.UserInformationDto>();
                     var entitySharingAll = await _appEntitySharingRepository.GetAll()
