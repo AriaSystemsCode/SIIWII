@@ -64,7 +64,20 @@ namespace onetouch.AppDashboards
             var selectedFields = input.Fields
                 .Distinct(StringComparer.OrdinalIgnoreCase)
                 .ToList();
-
+            if (selectedFields != null && selectedFields.Count > 0)
+            {
+                for (int fldCnt = 0; fldCnt < selectedFields.Count; fldCnt++)
+                {
+                    var fld = selectedFields[fldCnt];
+                    bool tableHasfld = TableHasField(_dbContext, tableName, fld);
+                    if (!tableHasfld)
+                    {
+                        selectedFields[fldCnt] = "b.[" + fld.TrimEnd() + "]";
+                    }
+                    else
+                    { selectedFields[fldCnt] = "a.[" + fld.TrimEnd() + "]"; }
+                }
+            }
             var parameters = new List<DbParameter>();
             var where = new List<string>();
 
@@ -301,8 +314,8 @@ namespace onetouch.AppDashboards
                     }
                 }
             }
-            sortField = "[" + sortField + "]" +
-                    (sortField.ToUpper().TrimEnd() == "ID" ? "" : ",[Id]");
+            sortField = "" + sortField + "" +
+                    (sortField.ToUpper().TrimEnd() == "ID" ? "" : ",a.[Id]");
             // 7. Apply paging
             var skip = Math.Max(0, input.SkipCount);
             var take = input.MaxResultCount <= 0
@@ -311,10 +324,13 @@ namespace onetouch.AppDashboards
             if (selectedFields.FirstOrDefault(z=>z.ToUpper().StartsWith("ID"))
                 ==null)
             {
-                selectedFields.Add("Id");
+                selectedFields.Add("a.[Id]");
             }
+           
+            //var selectSql = string.Join(
+            //   ", ", selectedFields.Select(f => $"a.[{f}]"));
             var selectSql = string.Join(
-                ", ", selectedFields.Select(f => $"a.[{f}]"));
+               ", ", selectedFields.Select(f => $"{f}"));
 
             var sql =
                 $"SELECT {selectSql} FROM {tableName}" +

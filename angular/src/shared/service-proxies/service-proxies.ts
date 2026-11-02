@@ -6590,12 +6590,13 @@ export class AppDashboardServiceProxy {
 
     /**
      * @param filter (optional) 
+     * @param timeZoneValue (optional) 
      * @param sorting (optional) 
      * @param skipCount (optional) 
      * @param maxResultCount (optional) 
      * @return Success
      */
-    getAll(filter: string | null | undefined, sharingLevel: DashboardFilterType, sorting: string | null | undefined, skipCount: number | undefined, maxResultCount: number | undefined): Observable<PagedResultDtoOfGetDashboardForViewDto> {
+    getAll(filter: string | null | undefined, sharingLevel: DashboardFilterType, timeZoneValue: string | null | undefined, sorting: string | null | undefined, skipCount: number | undefined, maxResultCount: number | undefined): Observable<PagedResultDtoOfGetDashboardForViewDto> {
         let url_ = this.baseUrl + "/api/services/app/AppDashboard/GetAll?";
         if (filter !== undefined && filter !== null)
             url_ += "Filter=" + encodeURIComponent("" + filter) + "&";
@@ -6603,6 +6604,8 @@ export class AppDashboardServiceProxy {
             throw new Error("The parameter 'sharingLevel' must be defined and cannot be null.");
         else
             url_ += "SharingLevel=" + encodeURIComponent("" + sharingLevel) + "&";
+        if (timeZoneValue !== undefined && timeZoneValue !== null)
+            url_ += "TimeZoneValue=" + encodeURIComponent("" + timeZoneValue) + "&";
         if (sorting !== undefined && sorting !== null)
             url_ += "Sorting=" + encodeURIComponent("" + sorting) + "&";
         if (skipCount === null)

@@ -132,7 +132,7 @@ BEGIN TRY
 
     CREATE TABLE #EntityNames (FieldName nvarchar(250) COLLATE DATABASE_DEFAULT NOT NULL PRIMARY KEY);
     INSERT #EntityNames VALUES (N'EntityObjectStatusCode'), (N'EntityObjectTypeCode');
-    SELECT f.Id, f.FieldName, f.CurrentRevisionNo, f.FieldTypeId
+    SELECT f.Id, f.FieldCode, f.FieldName, f.CurrentRevisionNo, f.FieldTypeId
     INTO #EntityFields FROM dbo.AppFields f WITH (UPDLOCK, HOLDLOCK)
     JOIN #EntityNames n ON n.FieldName = f.FieldName
     WHERE f.TenantId IS NULL AND f.SycObjectId IS NULL AND f.IsDeleted = 0
