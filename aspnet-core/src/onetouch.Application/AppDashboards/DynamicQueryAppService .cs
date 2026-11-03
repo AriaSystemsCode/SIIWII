@@ -283,7 +283,10 @@ namespace onetouch.AppDashboards
                 countSql, parameters);
 
             // 6. Validate sorting
+            //var sortField = "";
+            //if (string.IsNullOrWhiteSpace(input.Sorting))
             var sortField = selectedFields[0];
+
             var direction = "ASC";
 
             if (!string.IsNullOrWhiteSpace(input.Sorting))
@@ -315,7 +318,7 @@ namespace onetouch.AppDashboards
                 }
             }
             sortField = "" + sortField + "" +
-                    (sortField.ToUpper().TrimEnd() == "ID" ? "" : ",a.[Id]");
+                    (sortField == "a.[Id]" ? "" : ",a.[Id]");
             // 7. Apply paging
             var skip = Math.Max(0, input.SkipCount);
             var take = input.MaxResultCount <= 0
