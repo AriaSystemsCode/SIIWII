@@ -164,14 +164,24 @@ export class SpreadsheetRefreshService {
 
     /** The API wants a moment whose toISOString has no timezone suffix. */
     private toApiDate(updatedDate?: string | null): any {
-        if (!updatedDate) {
-            return undefined;
-        }
-
-        const date = moment.utc(updatedDate);
-        date.toISOString = () => date.format('YYYY-MM-DDTHH:mm:ss');
-        return date;
+    if (!updatedDate) {
+        return undefined;
     }
+
+    const date = moment(updatedDate, [
+        'YYYY-MM-DD HH:mm:ss',
+        'YYYY-MM-DDTHH:mm:ss'
+    ], true);
+
+    if (!date.isValid()) {
+        console.warn('Invalid updatedDate:', updatedDate);
+        return undefined;
+    }
+
+    date.toISOString = () => date.format('YYYY-MM-DD HH:mm:ss');
+
+    return date;
+}
 
     private sourceFields(meta: SpreadsheetSheetDataSource): string[] {
         const names = (meta.source?.columns ?? []).map(f => String(f).trim()).filter(f => !!f && f.toLowerCase() !== 'id');

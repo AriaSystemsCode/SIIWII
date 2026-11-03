@@ -166,7 +166,10 @@ dataSource?: {
     service: string;
     api: string;
     parameter: string;
+    valueParameter?: string;
     valueField?: string;
+    labelField?: string;
+    parameterValue?: any;
 };
 paginationSetting?: {
     list?: Array<{

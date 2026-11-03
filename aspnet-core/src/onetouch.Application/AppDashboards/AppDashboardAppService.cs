@@ -819,7 +819,7 @@ namespace onetouch.AppDashboards
             if (sydobjct != null)
             {
                 var fieldsList = await _iAppFieldManagerAppService.GetFields(new GetFieldsInput { 
-                    SelectedObjectId= sydobjct.Id,AllFields= true,MaxResultCount=1000
+                    SelectedObjectId= sydobjct.Id,AllFields= true,IncludeDeletedAppliedFields= true,MaxResultCount=1000
                     });
                 if (fieldsList != null && fieldsList.TotalCount > 0)
                 {

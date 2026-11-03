@@ -178,7 +178,7 @@ export class SpreadsheetDataPanelComponent extends AppComponentBase implements O
     private toFilterField(field: ExtraAttribute): FilterBuilderField {
         return {
             name: field.name,
-            label: field.description || field.name,
+            label:  field.name,
             dataType: field.dataType || 'String--Textbox',
             acceptMultipleValues: field.acceptMultipleValues === true,
             isLookup: field.isLookup === true,
@@ -215,7 +215,7 @@ export class SpreadsheetDataPanelComponent extends AppComponentBase implements O
                 }
 
                 return {
-                    label: String(item.label ?? item.description ?? item.name ?? item.text ?? item.value ?? item.code ?? item.id ?? ''),
+                    label: String(item.label  ?? item.name ?? item.text ?? item.value ?? item.code ?? item.id ?? ''),
                     value: item.value ?? item.code ?? item.id ?? item.name
                 };
             })

@@ -1817,5 +1817,10 @@
 		<text name="Portrait">عمودي</text>
 		<text name="Landscape">أفقي</text>
     <text name="DashboardNameLengthValidation">يجب أن يتكون اسم لوحة المعلومات من 5 إلى 9 أحرف.</text>
+	<text name="DataSourceApi">واجهة برمجة تطبيقات مصدر البيانات</text>
+	<text name="DataSourceParameter">معامل مصدر البيانات</text>
+	<text name="DataSourceService">خدمة مصدر البيانات</text>
+	<text name="DataSourceValueParameter">معامل قيمة مصدر البيانات</text>
+	<text name="EntityObjectTypeCode">رمز نوع كائن البيانات</text>
   </texts>
 </localizationDictionary>
