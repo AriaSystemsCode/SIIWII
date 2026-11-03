@@ -992,101 +992,100 @@ const values: Record<string, any> = {
     }
 }
 
-
 private onLookupLoaded(
     field: FilterBuilderField,
     existingItems: SelectOption[],
     result: any
 ): void {
 
-    const source = field.dataSource!;
+    const source = field.dataSource;
 
-    // 1. Get records from API response
-    const isArrayResponse =
-        Array.isArray(result) ||
-        Array.isArray(result?.result);
+    if (!source) {
+        return;
+    }
 
-    const records: any[] =
-        Array.isArray(result)
-            ? result
-            : Array.isArray(result?.result)
-                ? result.result
-                : result?.items ??
-                  result?.result?.items ??
-                  [];
+    const response = result?.result ?? result;
 
-    // 2. Dropdown display field
-    // Example: account.name
-    const labelPath =
-        (source as any).labelField ||
-        source.parameter ||
-        'name';
+    const records: any[] = Array.isArray(response)
+        ? response
+        : response?.items ?? [];
 
-    // 3. Dropdown saved value field
-    // Example: account.ssin
-    const valuePath =
-        (source as any).valueParameter ||
-        source.valueField ||
-        'id';
+    const serviceName = (source.service || '')
+        .replace(/ServiceProxy$/, '')
+        .toLowerCase();
 
-    // 4. Convert API records to dropdown options
+    const isEntityObjectTypes =
+        serviceName === 'sycentityobjecttypes' ||
+        serviceName === 'sycentityobjecttypesappservice';
+
+    const labelPath = source.parameter;
+    const valuePath = source.valueParameter;
+
     const newItems: SelectOption[] = records
-        .map(record => {
+        .map((record: any): SelectOption | null => {
 
             const data = record?.data ?? record;
 
-            const label =
-                this.getByPath(data, labelPath) ??
-                this.getByPath(record, labelPath) ??
-                record?.label ??
-                data?.account?.name ??
-                data?.sycEntityObjectType?.name ??
-                data?.name ??
-                data?.displayName;
+            const label = isEntityObjectTypes
+                ? (
+                    data?.sycEntityObjectType?.name ??
+                    record?.label
+                )
+                : (
+                    this.getByPath(data, labelPath) ??
+                    this.getByPath(record, labelPath) ??
+                    data?.sycEntityObjectType?.name ??
+                    record?.label ??
+                    data?.name ??
+                    data?.account?.name
+                );
 
-            const value =
-                this.getByPath(data, valuePath) ??
-                this.getByPath(record, valuePath) ??
-                data?.account?.ssin ??
-                data?.sycEntityObjectType?.code ??
-                data?.id ??
-                record?.value;
+            const value = isEntityObjectTypes
+                ? data?.sycEntityObjectType?.code
+                : (
+                    this.getByPath(data, valuePath) ??
+                    this.getByPath(record, valuePath) ??
+                    data?.account?.ssin ??
+                    data?.sycEntityObjectType?.code ??
+                    data?.id ??
+                    record?.value
+                );
+
+            if (
+                value === undefined ||
+                value === null ||
+                value === ''
+            ) {
+                return null;
+            }
 
             return {
-                label: String(label ?? value ?? '').trim(),
+                label: String(label ?? value),
                 value
             };
         })
-        .filter(option =>
-            option.value !== null &&
-            option.value !== undefined
-        );
+        .filter((item): item is SelectOption => item !== null);
 
-    // 5. Remove duplicate values
-    const uniqueItems = new Map<string, SelectOption>();
+    // Merge options without duplicates
+    const unique = new Map<string, SelectOption>();
 
     [...existingItems, ...newItems].forEach(item => {
-        uniqueItems.set(String(item.value), item);
+        unique.set(String(item.value), item);
     });
 
-    // 6. Handle pagination
-    const totalCount = isArrayResponse
-        ? uniqueItems.size
-        : Number(
-            result?.totalCount ??
-            result?.result?.totalCount ??
-            uniqueItems.size
-        );
+    const mergedItems = [...unique.values()];
 
-    // 7. Update dropdown options
+    // Store the complete LookupState, not only the options array
     this.lookups.set(field.name, {
-        items: [...uniqueItems.values()],
-        totalCount,
+        items: mergedItems,
+        totalCount: Number(
+            response?.totalCount ??
+            mergedItems.length
+        ),
         isLoading: false,
         isLoaded: true
     });
 }
-
 
 
     private setLookupLoading(fieldName: string, isLoading: boolean): void {
