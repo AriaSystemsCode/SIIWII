@@ -539,14 +539,14 @@ showOverlay :boolean=false
         .subscribe((result) => {
             _result = result;
             if (_result === 0) {
-                this.notify.success(this.l(_result + " Item synced"));
+                this.notify.info("No published products were found in the selection. Share products before syncing them.");
                 this.reloadPage();
                 return;
             }
 
             Swal.fire({
                 title: "",
-                text: _result?.toString() + " of " + this.multiSelectionInfo?.totalCount?.toString() + " products will be synced",
+                text: _result?.toString() + " of " + this.multiSelectionInfo?.totalCount?.toString() + " products synced. Unpublished products were skipped.",
                 icon: "info",
                 confirmButtonText: "OK",
                 customClass: {
@@ -562,6 +562,10 @@ showOverlay :boolean=false
                 }
             });
 
+            this.reloadPage();
+        }, () => {
+            // The global HTTP handler displays the server's failure details. Refresh
+            // because other products may already have committed successfully.
             this.reloadPage();
         });
     }
