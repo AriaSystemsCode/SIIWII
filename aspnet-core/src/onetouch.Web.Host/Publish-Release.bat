@@ -27,6 +27,12 @@ for %%D in (attachments tempattachments) do (
     if errorlevel 1 goto :failed
 )
 
+echo Removing DevExpress assemblies from the published Host output...
+for /r "%HOST_OUTPUT_DIR%" %%F in (DevExpress*.dll) do (
+    if exist "%%~fF" del /q "%%~fF"
+    if errorlevel 1 goto :failed
+)
+
 echo Host publish cleanup completed.
 
 dotnet publish "%ASPNET_CORE_DIR%\src\onetouch.Migrator\onetouch.Migrator.csproj" -c Release -o "%ARTIFACTS_DIR%\migrator"
