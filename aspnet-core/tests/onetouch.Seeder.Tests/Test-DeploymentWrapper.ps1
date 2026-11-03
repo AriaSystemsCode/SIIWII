@@ -14,7 +14,7 @@ function dotnet {
     $global:onetouchSeederWrapperTestState.Attempts++
 }
 function Invoke-Fixture {
-    & $wrapper -SeederDll $runner -BackendReleasePath $fixture -ConfigPath $config
+    & $wrapper -SeederDll $runner -BackendReleasePath $fixture -ConfigPath $config -Environment Testing
 }
 function Assert-True($condition, $message) {
     if (-not $condition) { throw "FAIL: $message" }

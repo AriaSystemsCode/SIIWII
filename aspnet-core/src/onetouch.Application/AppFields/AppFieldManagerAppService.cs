@@ -378,7 +378,7 @@ namespace onetouch.AppFields
             var keys = rows.Select(x => x.FieldDefinitionKey).Distinct().ToList();
             if (keys.Count == 0) return new HashSet<Guid>();
             var activeKeys = await VisibleFields().Where(x => !x.IsDeleted && keys.Contains(x.FieldDefinitionKey))
-                .Select(x => x.FieldDefinitionKey).AsNoTracking().ToListAsync();
+                .Select(x => x.FieldDefinitionKey).ToListAsync();
             return activeKeys.ToHashSet();
         }
 

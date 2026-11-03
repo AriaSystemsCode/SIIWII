@@ -1,10 +1,11 @@
 ﻿using System;
+using System.Linq;
 using Abp;
-using Abp.Collections.Extensions;
 using Abp.Dependency;
 using Castle.Facilities.Logging;
 using Abp.Castle.Logging.Log4Net;
 using Abp.PlugIns;
+using onetouch.Migrations.Deployment;
 
 namespace onetouch.Migrator
 {
@@ -12,45 +13,71 @@ namespace onetouch.Migrator
     {
         private static bool _skipConnVerification;
 
-        public static void Main(string[] args)
+        public static int Main(string[] args)
         {
-            ParseArgs(args);
-
-            using (var bootstrapper = AbpBootstrapper.Create<onetouchMigratorModule>())
+            if (args.Contains("--help") || args.Contains("-h"))
             {
-                bootstrapper.IocManager.IocContainer
-                    .AddFacility<LoggingFacility>(f => f.UseAbpLog4Net()
-                        .WithConfig("log4net.config")
-                    );
+                Console.WriteLine("onetouch.Migrator --config <settings.json> [-s]");
+                Console.WriteLine("Loads the specified settings file, prompts for Testing, Staging, or Production, then migrates matching dbo.Clients rows from Aria.Master.");
+                Console.WriteLine("-s skips the final migration confirmation; it does not skip environment selection.");
+                return 0;
+            }
 
-                bootstrapper.Initialize();
+            try
+            {
+                var configPath = ParseArgs(args);
+                MigratorConfiguration.Load(configPath);
+                var environment = ClientDatabaseRegistry.PromptForEnvironment();
 
-                using (var migrateExecuter = bootstrapper.IocManager.ResolveAsDisposable<MultiTenantMigrateExecuter>())
+                using (var bootstrapper = AbpBootstrapper.Create<onetouchMigratorModule>())
                 {
-                    migrateExecuter.Object.Run(_skipConnVerification);
-                }
+                    bootstrapper.IocManager.IocContainer
+                        .AddFacility<LoggingFacility>(f => f.UseAbpLog4Net()
+                            .WithConfig("log4net.config")
+                        );
 
-                if (_skipConnVerification) return;
-                
-                Console.WriteLine("Press ENTER to exit...");
-                Console.ReadLine();
+                    bootstrapper.Initialize();
+
+                    using (var migrateExecuter = bootstrapper.IocManager.ResolveAsDisposable<MultiTenantMigrateExecuter>())
+                        return migrateExecuter.Object.Run(environment, _skipConnVerification) ? 0 : 1;
+                }
+            }
+            catch (ClientDatabaseSelectionException ex)
+            {
+                Console.Error.WriteLine($"Target selection failed: {ex.Message}");
+                return 1;
+            }
+            catch (Exception ex)
+            {
+                Console.Error.WriteLine($"Migration could not complete ({ex.GetType().Name}). No completion was reported.");
+                return 1;
             }
         }
 
-        private static void ParseArgs(string[] args)
+        private static string ParseArgs(string[] args)
         {
-            if (args.IsNullOrEmpty())
+            string configPath = null;
+            for (var i = 0; i < args.Length; i++)
             {
-                return;
-            }
-
-            foreach (var arg in args)
-            {
-                if (arg == "-s")
+                if (args[i] == "-s")
                 {
                     _skipConnVerification = true;
                 }
+                else if (args[i] == "--config")
+                {
+                    if (++i >= args.Length || string.IsNullOrWhiteSpace(args[i]) || configPath != null)
+                        throw new ArgumentException("--config requires one settings file path.");
+                    configPath = args[i];
+                }
+                else
+                {
+                    throw new ArgumentException($"Unknown argument: {args[i]}");
+                }
             }
+
+            if (string.IsNullOrWhiteSpace(configPath))
+                throw new ArgumentException("--config <settings.json> is required.");
+            return configPath;
         }
     }
 }

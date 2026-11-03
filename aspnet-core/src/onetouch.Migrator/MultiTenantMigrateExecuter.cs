@@ -1,14 +1,11 @@
 using System;
-using System.Collections.Generic;
-using Abp.Data;
 using Abp.Dependency;
-using Abp.Domain.Repositories;
-using Abp.Domain.Uow;
 using Abp.Extensions;
-using Abp.MultiTenancy;
 using Abp.Runtime.Security;
+using Microsoft.Data.SqlClient;
+using Microsoft.Extensions.Configuration;
 using onetouch.EntityFrameworkCore;
-using onetouch.Migrations.Seed;
+using onetouch.Migrations.Deployment;
 using onetouch.MultiTenancy;
 
 namespace onetouch.Migrator
@@ -18,96 +15,62 @@ namespace onetouch.Migrator
         public Log Log { get; private set; }
 
         private readonly AbpZeroDbMigrator _migrator;
-        private readonly IRepository<Tenant> _tenantRepository;
-        private readonly IDbPerTenantConnectionStringResolver _connectionStringResolver;
 
-        public MultiTenantMigrateExecuter(
-            AbpZeroDbMigrator migrator, 
-            IRepository<Tenant> tenantRepository,
-            Log log,
-            IDbPerTenantConnectionStringResolver connectionStringResolver)
+        public MultiTenantMigrateExecuter(AbpZeroDbMigrator migrator, Log log)
         {
             Log = log;
-
             _migrator = migrator;
-            _tenantRepository = tenantRepository;
-            _connectionStringResolver = connectionStringResolver;
         }
 
-        public void Run(bool skipConnVerification)
+        public bool Run(DeploymentEnvironment environment, bool skipConfirmation)
         {
-            var hostConnStr = _connectionStringResolver.GetNameOrConnectionString(new ConnectionStringResolveArgs(MultiTenancySides.Host));
-            if (hostConnStr.IsNullOrWhiteSpace())
-            {
-                Log.Write("Configuration file should contain a connection string named 'Default'");
-                return;
-            }
+            var targets = ClientDatabaseRegistry.LoadTargets(
+                MigratorConfiguration.Current.GetConnectionString("AriaMaster"), environment);
 
-            Log.Write("Host database: " + ConnectionStringHelper.GetConnectionString(hostConnStr));
-            if (!skipConnVerification)
+            Log.Write($"Selected {targets.Count} {environment} database(s) from Aria.Master dbo.Clients:");
+            foreach (var target in targets)
+                Log.Write($"  {target.Label}");
+
+            if (!skipConfirmation)
             {
-                Log.Write("Continue to migration for this host database and all tenants..? (Y/N): ");
-                var command = Console.ReadLine();
-                if (!command.IsIn("Y", "y"))
+                Log.Write("Continue with schema migrations for these databases? (Y/N): ");
+                var answer = Console.ReadLine();
+                if (!answer.IsIn("Y", "y"))
                 {
-                    Log.Write("Migration canceled.");
-                    return;
+                    Log.Write("Migration canceled. No client databases were processed.");
+                    return false;
                 }
             }
 
-            Log.Write("HOST database migration started...");
-
-            try
+            var failed = false;
+            var index = 0;
+            foreach (var target in targets)
             {
-                _migrator.CreateOrMigrateForHost(SeedHelper.SeedHostDb);
-            }
-            catch (Exception ex)
-            {
-                Log.Write("An error occured during migration of host database:");
-                Log.Write(ex.ToString());
-                Log.Write("Canceled migrations.");
-                return;
-            }
-
-            Log.Write("HOST database migration completed.");
-            Log.Write("--------------------------------------------------------");
-
-            var migratedDatabases = new HashSet<string>();
-            var tenants = _tenantRepository.GetAllList(t => t.ConnectionString != null && t.ConnectionString != "");
-            for (int i = 0; i < tenants.Count; i++)
-            {
-                var tenant = tenants[i];
-                Log.Write(string.Format("Tenant database migration started... ({0} / {1})", (i + 1), tenants.Count));
-                Log.Write("Name              : " + tenant.Name);
-                Log.Write("TenancyName       : " + tenant.TenancyName);
-                Log.Write("Tenant Id         : " + tenant.Id);
-                Log.Write("Connection string : " + SimpleStringCipher.Instance.Decrypt(tenant.ConnectionString));
-
-                if (!migratedDatabases.Contains(tenant.ConnectionString))
+                index++;
+                try
                 {
-                    try
+                    // The existing ABP migrator expects a tenant record with an encrypted
+                    // connection string. This transient record points it at the selected
+                    // Aria.Master client database without consulting the host tenant table.
+                    var tenant = new Tenant($"deployment-{index}", target.Label)
                     {
-                        _migrator.CreateOrMigrateForTenant(tenant);
-                    }
-                    catch (Exception ex)
-                    {
-                        Log.Write("An error occured during migration of tenant database:");
-                        Log.Write(ex.ToString());
-                        Log.Write("Skipped this tenant and will continue for others...");
-                    }
-
-                    migratedDatabases.Add(tenant.ConnectionString);
+                        ConnectionString = SimpleStringCipher.Instance.Encrypt(target.ConnectionString)
+                    };
+                    _migrator.CreateOrMigrateForTenant(tenant);
+                    Log.Write($"{environment} database={target.Label}: MIGRATED");
                 }
-                else
+                catch (Exception ex)
                 {
-                    Log.Write("This database has already migrated before (you have more than one tenant in same database). Skipping it....");
+                    failed = true;
+                    var sql = ex as SqlException ?? ex.InnerException as SqlException;
+                    Log.Write($"{environment} database={target.Label}: FAILED type={ex.GetType().Name} sqlNumber={sql?.Number}");
                 }
-
-                Log.Write(string.Format("Tenant database migration completed. ({0} / {1})", (i + 1), tenants.Count));
-                Log.Write("--------------------------------------------------------");
             }
 
-            Log.Write("All databases have been migrated.");
+            Log.Write(failed
+                ? $"Migration finished for {environment} with failures. Review each database result above."
+                : $"Migration completed successfully for all {targets.Count} {environment} database(s).");
+            return !failed;
         }
     }
 }
