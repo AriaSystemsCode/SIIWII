@@ -85,6 +85,7 @@ namespace onetouch.AppFields.Dto
         public long? SelectedObjectId { get; set; }
         public long? SelectedObjectTypeId { get; set; }
         public bool AllFields { get; set; } = true;
+        public bool IncludeDeletedAppliedFields { get; set; }
         public string SearchText { get; set; }
         public long? FieldTypeId { get; set; }
         public long? FieldStatusId { get; set; }

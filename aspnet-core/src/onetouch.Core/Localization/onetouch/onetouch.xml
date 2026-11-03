@@ -3078,6 +3078,11 @@ Please select one of the available linesheet templates
 		<text name="DefaultValue">Default Value</text>
 		<text name="DateFormat">Date Format</text>
 		<text name="DropdownOptions">Dropdown Options</text>
+		<text name="DataSourceApi">Data Source API</text>
+		<text name="DataSourceParameter">Data Source Parameter</text>
+		<text name="DataSourceService">Data Source Service</text>
+		<text name="DataSourceValueParameter">Data Source Value Parameter</text>
+		<text name="EntityObjectTypeCode">Entity Object Type Code</text>
 		<text name="AddOption">Add option</text>
 		<text name="Option">Option</text>
 		<text name="ExtraAttributes">Extra Attributes</text>

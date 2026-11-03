@@ -1985,5 +1985,10 @@
 
 
 
+	<text name="DataSourceApi">واجهة برمجة تطبيقات مصدر البيانات</text>
+	<text name="DataSourceParameter">معامل مصدر البيانات</text>
+	<text name="DataSourceService">خدمة مصدر البيانات</text>
+	<text name="DataSourceValueParameter">معامل قيمة مصدر البيانات</text>
+	<text name="EntityObjectTypeCode">رمز نوع كائن البيانات</text>
   </texts>
 </localizationDictionary>

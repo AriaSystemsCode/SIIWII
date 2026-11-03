@@ -250,7 +250,9 @@ namespace onetouch.AppFields
                             (x.SycEntityObjectTypeId == null || x.SycEntityObjectTypeId == selectedType.Id)) ||
                         (baseObjectIds.Contains(x.SycObjectId) && x.SycEntityObjectTypeId == null))
                         .AsNoTracking().ToListAsync();
+                    var activeKeys = input.IncludeDeletedAppliedFields ? null : await GetActiveFieldKeys(rows);
                     var filtered = FilterFields(SelectAppliedDefinitions(rows.Where(x =>
+                        (activeKeys == null || activeKeys.Contains(x.FieldDefinitionKey)) &&
                         !suppressedHostKeys.Contains(x.FieldDefinitionKey)), tenantId, objectIds).AsQueryable(), input);
                     count = filtered.Count();
                     page = SortFields(filtered, input.Sorting).Skip(input.SkipCount).Take(input.MaxResultCount).ToList();
@@ -260,22 +262,19 @@ namespace onetouch.AppFields
                     var objectIds = await GetEffectiveObjectIds(input.SelectedObjectId.Value);
                     var rows = await assignments.Include(x => x.SettingValues).Where(x => objectIds.Contains(x.SycObjectId) &&
                         x.SycEntityObjectTypeId == null).AsNoTracking().ToListAsync();
+                    var activeKeys = input.IncludeDeletedAppliedFields ? null : await GetActiveFieldKeys(rows);
                     var filtered = FilterFields(SelectAppliedDefinitions(rows.Where(x =>
+                        (activeKeys == null || activeKeys.Contains(x.FieldDefinitionKey)) &&
                         !suppressedHostKeys.Contains(x.FieldDefinitionKey)), tenantId, objectIds).AsQueryable(), input);
                     count = filtered.Count();
                     page = SortFields(filtered, input.Sorting).Skip(input.SkipCount).Take(input.MaxResultCount).ToList();
                 }
                 else
                 {
-                    using (UnitOfWorkManager.Current.DisableFilter(AbpDataFilters.SoftDelete))
-                    {
-                        var usedKeys = assignments.Select(x => x.FieldDefinitionKey);
-                        var query = FilterFields(VisibleFields()
-                            .Where(x => !x.IsDeleted || usedKeys.Contains(x.FieldDefinitionKey)), input);
-                        count = await query.CountAsync();
-                        page = await SortFields(query.Include(x => x.SettingValues), input.Sorting).Skip(input.SkipCount)
-                            .Take(input.MaxResultCount).AsNoTracking().ToListAsync();
-                    }
+                    var query = FilterFields(VisibleFields().Where(x => !x.IsDeleted), input);
+                    count = await query.CountAsync();
+                    page = await SortFields(query.Include(x => x.SettingValues), input.Sorting).Skip(input.SkipCount)
+                        .Take(input.MaxResultCount).AsNoTracking().ToListAsync();
                 }
                 var pageKeys = page.Select(x => x.FieldDefinitionKey).Distinct().ToList();
                 Dictionary<Guid, bool> archived;
@@ -372,6 +371,15 @@ namespace onetouch.AppFields
                     var assignment = group.First();
                     return assignment.ToAppField();
                 });
+        }
+
+        private async Task<HashSet<Guid>> GetActiveFieldKeys(List<AppTableField> rows)
+        {
+            var keys = rows.Select(x => x.FieldDefinitionKey).Distinct().ToList();
+            if (keys.Count == 0) return new HashSet<Guid>();
+            var activeKeys = await VisibleFields().Where(x => !x.IsDeleted && keys.Contains(x.FieldDefinitionKey))
+                .Select(x => x.FieldDefinitionKey).AsNoTracking().ToListAsync();
+            return activeKeys.ToHashSet();
         }
 
         private async Task<List<long>> GetEffectiveObjectIds(long objectId)
