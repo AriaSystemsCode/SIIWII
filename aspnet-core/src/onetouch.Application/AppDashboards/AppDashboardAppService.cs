@@ -153,13 +153,19 @@ namespace onetouch.AppDashboards
                     if (input.TimeZoneValue != null)
                     {
                         var currentTimeZone = TimeZone.CurrentTimeZone.StandardName.ToString();
-                        var utcValue = _timeZoneInfoAppService
-                            .GetUTCDatetimeValue(DateTime.Parse(dashboard.LastModificationDate.ToString()), currentTimeZone);
-                        dashboard.LastModificationDate = _timeZoneInfoAppService.GetDatetimeValueFromUTC(utcValue, input.TimeZoneValue);
-
-                        var utcValueView = _timeZoneInfoAppService
-                            .GetUTCDatetimeValue(DateTime.Parse(dashboard.LastViewDate.ToString()), currentTimeZone);
-                        dashboard.LastViewDate = _timeZoneInfoAppService.GetDatetimeValueFromUTC(utcValueView, input.TimeZoneValue);
+                        if (dashboard.LastModificationDate != null)
+                        {
+                            
+                            var utcValue = _timeZoneInfoAppService
+                                .GetUTCDatetimeValue(DateTime.Parse(dashboard.LastModificationDate.ToString()), currentTimeZone);
+                            dashboard.LastModificationDate = _timeZoneInfoAppService.GetDatetimeValueFromUTC(utcValue, input.TimeZoneValue);
+                        }
+                        if (dashboard.LastViewDate!=null)
+                        {
+                            var utcValueView = _timeZoneInfoAppService
+                                .GetUTCDatetimeValue(DateTime.Parse(dashboard.LastViewDate.ToString()), currentTimeZone);
+                            dashboard.LastViewDate = _timeZoneInfoAppService.GetDatetimeValueFromUTC(utcValueView, input.TimeZoneValue);
+                        }
                     }
                     //Timezone {End}
 
