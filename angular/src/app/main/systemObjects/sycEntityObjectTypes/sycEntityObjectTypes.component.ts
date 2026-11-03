@@ -89,6 +89,7 @@ export class SycEntityObjectTypesComponent extends AppComponentBase {
             undefined,
             undefined,
             undefined,
+            undefined,
             this.sycEntityObjectTypeParents,
             this.primengTableHelper.getSorting(this.dataTable),
             this.primengTableHelper.getSkipCount(this.paginator, event),

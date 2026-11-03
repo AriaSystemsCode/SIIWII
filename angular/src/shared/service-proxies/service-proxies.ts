@@ -7318,7 +7318,7 @@ export class AppDashboardServiceProxy {
     /**
      * @return Success
      */
-    getTablesList(): Observable<string[]> {
+    getTablesList(): Observable<TableInfo[]> {
         let url_ = this.baseUrl + "/api/services/app/AppDashboard/GetTablesList";
         url_ = url_.replace(/[?&]$/, "");
 
@@ -7337,14 +7337,14 @@ export class AppDashboardServiceProxy {
                 try {
                     return this.processGetTablesList(response_ as any);
                 } catch (e) {
-                    return _observableThrow(e) as any as Observable<string[]>;
+                    return _observableThrow(e) as any as Observable<TableInfo[]>;
                 }
             } else
-                return _observableThrow(response_) as any as Observable<string[]>;
+                return _observableThrow(response_) as any as Observable<TableInfo[]>;
         }));
     }
 
-    protected processGetTablesList(response: HttpResponseBase): Observable<string[]> {
+    protected processGetTablesList(response: HttpResponseBase): Observable<TableInfo[]> {
         const status = response.status;
         const responseBlob =
             response instanceof HttpResponse ? response.body :
@@ -7358,7 +7358,7 @@ export class AppDashboardServiceProxy {
             if (Array.isArray(resultData200)) {
                 result200 = [] as any;
                 for (let item of resultData200)
-                    result200!.push(item);
+                    result200!.push(TableInfo.fromJS(item));
             }
             else {
                 result200 = <any>null;
@@ -13813,6 +13813,7 @@ export class AppFieldManagerServiceProxy {
      * @param selectedObjectId (optional) 
      * @param selectedObjectTypeId (optional) 
      * @param allFields (optional) 
+     * @param includeDeletedAppliedFields (optional) 
      * @param searchText (optional) 
      * @param fieldTypeId (optional) 
      * @param fieldStatusId (optional) 
@@ -13830,7 +13831,7 @@ export class AppFieldManagerServiceProxy {
      * @param maxResultCount (optional) 
      * @return Success
      */
-    getFields(selectedObjectId: number | null | undefined, selectedObjectTypeId: number | null | undefined, allFields: boolean | undefined, searchText: string | null | undefined, fieldTypeId: number | null | undefined, fieldStatusId: number | null | undefined, fieldLevelId: number | null | undefined, fieldStatusCode: string | null | undefined, fieldLevelCode: string | null | undefined, trackingNo: string | null | undefined, isStandard: boolean | null | undefined, createdByUserId: number | null | undefined, createdFrom: moment.Moment | null | undefined, createdTo: moment.Moment | null | undefined, groupBy: string | null | undefined, sorting: string | null | undefined, skipCount: number | undefined, maxResultCount: number | undefined): Observable<PagedResultDtoOfAppFieldListDto> {
+    getFields(selectedObjectId: number | null | undefined, selectedObjectTypeId: number | null | undefined, allFields: boolean | undefined, includeDeletedAppliedFields: boolean | undefined, searchText: string | null | undefined, fieldTypeId: number | null | undefined, fieldStatusId: number | null | undefined, fieldLevelId: number | null | undefined, fieldStatusCode: string | null | undefined, fieldLevelCode: string | null | undefined, trackingNo: string | null | undefined, isStandard: boolean | null | undefined, createdByUserId: number | null | undefined, createdFrom: moment.Moment | null | undefined, createdTo: moment.Moment | null | undefined, groupBy: string | null | undefined, sorting: string | null | undefined, skipCount: number | undefined, maxResultCount: number | undefined): Observable<PagedResultDtoOfAppFieldListDto> {
         let url_ = this.baseUrl + "/api/services/app/AppFieldManager/GetFields?";
         if (selectedObjectId !== undefined && selectedObjectId !== null)
             url_ += "SelectedObjectId=" + encodeURIComponent("" + selectedObjectId) + "&";
@@ -13840,6 +13841,10 @@ export class AppFieldManagerServiceProxy {
             throw new Error("The parameter 'allFields' cannot be null.");
         else if (allFields !== undefined)
             url_ += "AllFields=" + encodeURIComponent("" + allFields) + "&";
+        if (includeDeletedAppliedFields === null)
+            throw new Error("The parameter 'includeDeletedAppliedFields' cannot be null.");
+        else if (includeDeletedAppliedFields !== undefined)
+            url_ += "IncludeDeletedAppliedFields=" + encodeURIComponent("" + includeDeletedAppliedFields) + "&";
         if (searchText !== undefined && searchText !== null)
             url_ += "SearchText=" + encodeURIComponent("" + searchText) + "&";
         if (fieldTypeId !== undefined && fieldTypeId !== null)
@@ -50723,6 +50728,7 @@ export class SycEntityObjectTypesServiceProxy {
      * @param codeFilter (optional) 
      * @param nameFilter (optional) 
      * @param extraDataFilter (optional) 
+     * @param sydObjectCodeFilter (optional) 
      * @param sydObjectNameFilter (optional) 
      * @param sydObjectIdFilter (optional) 
      * @param sycEntityObjectTypeNameFilter (optional) 
@@ -50733,7 +50739,7 @@ export class SycEntityObjectTypesServiceProxy {
      * @param maxResultCount (optional) 
      * @return Success
      */
-    getAll(filter: string | null | undefined, codeFilter: string | null | undefined, nameFilter: string | null | undefined, extraDataFilter: string | null | undefined, sydObjectNameFilter: string | null | undefined, sydObjectIdFilter: number | undefined, sycEntityObjectTypeNameFilter: string | null | undefined, hidden: boolean | null | undefined, parentIds: number[] | null | undefined, sorting: string | null | undefined, skipCount: number | undefined, maxResultCount: number | undefined): Observable<PagedResultDtoOfTreeNodeOfGetSycEntityObjectTypeForViewDto> {
+    getAll(filter: string | null | undefined, codeFilter: string | null | undefined, nameFilter: string | null | undefined, extraDataFilter: string | null | undefined, sydObjectCodeFilter: string | null | undefined, sydObjectNameFilter: string | null | undefined, sydObjectIdFilter: number | undefined, sycEntityObjectTypeNameFilter: string | null | undefined, hidden: boolean | null | undefined, parentIds: number[] | null | undefined, sorting: string | null | undefined, skipCount: number | undefined, maxResultCount: number | undefined): Observable<PagedResultDtoOfTreeNodeOfGetSycEntityObjectTypeForViewDto> {
         let url_ = this.baseUrl + "/api/services/app/SycEntityObjectTypes/GetAll?";
         if (filter !== undefined && filter !== null)
             url_ += "Filter=" + encodeURIComponent("" + filter) + "&";
@@ -50743,6 +50749,8 @@ export class SycEntityObjectTypesServiceProxy {
             url_ += "NameFilter=" + encodeURIComponent("" + nameFilter) + "&";
         if (extraDataFilter !== undefined && extraDataFilter !== null)
             url_ += "ExtraDataFilter=" + encodeURIComponent("" + extraDataFilter) + "&";
+        if (sydObjectCodeFilter !== undefined && sydObjectCodeFilter !== null)
+            url_ += "SydObjectCodeFilter=" + encodeURIComponent("" + sydObjectCodeFilter) + "&";
         if (sydObjectNameFilter !== undefined && sydObjectNameFilter !== null)
             url_ += "SydObjectNameFilter=" + encodeURIComponent("" + sydObjectNameFilter) + "&";
         if (sydObjectIdFilter === null)
@@ -50925,6 +50933,7 @@ export class SycEntityObjectTypesServiceProxy {
      * @param codeFilter (optional) 
      * @param nameFilter (optional) 
      * @param extraDataFilter (optional) 
+     * @param sydObjectCodeFilter (optional) 
      * @param sydObjectNameFilter (optional) 
      * @param sydObjectIdFilter (optional) 
      * @param sycEntityObjectTypeNameFilter (optional) 
@@ -50935,7 +50944,7 @@ export class SycEntityObjectTypesServiceProxy {
      * @param maxResultCount (optional) 
      * @return Success
      */
-    getAllWithChildsForProductWithPaging(filter: string | null | undefined, codeFilter: string | null | undefined, nameFilter: string | null | undefined, extraDataFilter: string | null | undefined, sydObjectNameFilter: string | null | undefined, sydObjectIdFilter: number | undefined, sycEntityObjectTypeNameFilter: string | null | undefined, hidden: boolean | null | undefined, parentIds: number[] | null | undefined, sorting: string | null | undefined, skipCount: number | undefined, maxResultCount: number | undefined): Observable<PagedResultDtoOfTreeNodeOfGetSycEntityObjectTypeForViewDto> {
+    getAllWithChildsForProductWithPaging(filter: string | null | undefined, codeFilter: string | null | undefined, nameFilter: string | null | undefined, extraDataFilter: string | null | undefined, sydObjectCodeFilter: string | null | undefined, sydObjectNameFilter: string | null | undefined, sydObjectIdFilter: number | undefined, sycEntityObjectTypeNameFilter: string | null | undefined, hidden: boolean | null | undefined, parentIds: number[] | null | undefined, sorting: string | null | undefined, skipCount: number | undefined, maxResultCount: number | undefined): Observable<PagedResultDtoOfTreeNodeOfGetSycEntityObjectTypeForViewDto> {
         let url_ = this.baseUrl + "/api/services/app/SycEntityObjectTypes/GetAllWithChildsForProductWithPaging?";
         if (filter !== undefined && filter !== null)
             url_ += "Filter=" + encodeURIComponent("" + filter) + "&";
@@ -50945,6 +50954,8 @@ export class SycEntityObjectTypesServiceProxy {
             url_ += "NameFilter=" + encodeURIComponent("" + nameFilter) + "&";
         if (extraDataFilter !== undefined && extraDataFilter !== null)
             url_ += "ExtraDataFilter=" + encodeURIComponent("" + extraDataFilter) + "&";
+        if (sydObjectCodeFilter !== undefined && sydObjectCodeFilter !== null)
+            url_ += "SydObjectCodeFilter=" + encodeURIComponent("" + sydObjectCodeFilter) + "&";
         if (sydObjectNameFilter !== undefined && sydObjectNameFilter !== null)
             url_ += "SydObjectNameFilter=" + encodeURIComponent("" + sydObjectNameFilter) + "&";
         if (sydObjectIdFilter === null)
@@ -61390,6 +61401,63 @@ export class SystemTablesServiceProxy {
     }
 
     protected processGetObjectDashboardId(response: HttpResponseBase): Observable<number> {
+        const status = response.status;
+        const responseBlob =
+            response instanceof HttpResponse ? response.body :
+            (response as any).error instanceof Blob ? (response as any).error : undefined;
+
+        let _headers: any = {}; if (response.headers) { for (let key of response.headers.keys()) { _headers[key] = response.headers.get(key); }}
+        if (status === 200) {
+            return blobToText(responseBlob).pipe(_observableMergeMap((_responseText: string) => {
+            let result200: any = null;
+            let resultData200 = _responseText === "" ? null : JSON.parse(_responseText, this.jsonParseReviver);
+                result200 = resultData200 !== undefined ? resultData200 : <any>null;
+    
+            return _observableOf(result200);
+            }));
+        } else if (status !== 200 && status !== 204) {
+            return blobToText(responseBlob).pipe(_observableMergeMap((_responseText: string) => {
+            return throwException("An unexpected server error occurred.", status, _responseText, _headers);
+            }));
+        }
+        return _observableOf(null as any);
+    }
+
+    /**
+     * @param objectId (optional) 
+     * @return Success
+     */
+    getObjectCodeById(objectId: number | undefined): Observable<string> {
+        let url_ = this.baseUrl + "/api/services/app/SystemTables/GetObjectCodeById?";
+        if (objectId === null)
+            throw new Error("The parameter 'objectId' cannot be null.");
+        else if (objectId !== undefined)
+            url_ += "objectId=" + encodeURIComponent("" + objectId) + "&";
+        url_ = url_.replace(/[?&]$/, "");
+
+        let options_ : any = {
+            observe: "response",
+            responseType: "blob",
+            headers: new HttpHeaders({
+                "Accept": "text/plain"
+            })
+        };
+
+        return this.http.request("get", url_, options_).pipe(_observableMergeMap((response_ : any) => {
+            return this.processGetObjectCodeById(response_);
+        })).pipe(_observableCatch((response_: any) => {
+            if (response_ instanceof HttpResponseBase) {
+                try {
+                    return this.processGetObjectCodeById(response_ as any);
+                } catch (e) {
+                    return _observableThrow(e) as any as Observable<string>;
+                }
+            } else
+                return _observableThrow(response_) as any as Observable<string>;
+        }));
+    }
+
+    protected processGetObjectCodeById(response: HttpResponseBase): Observable<string> {
         const status = response.status;
         const responseBlob =
             response instanceof HttpResponse ? response.body :
@@ -79562,6 +79630,62 @@ export class DynamicQueryResult implements IDynamicQueryResult {
 export interface IDynamicQueryResult {
     totalCount: number;
     items: { [key: string]: any; }[] | undefined;
+
+    [key: string]: any;
+}
+
+export class TableInfo implements ITableInfo {
+    tableName!: string | undefined;
+    objectCode!: string | undefined;
+    objectId!: number;
+
+    [key: string]: any;
+
+    constructor(data?: ITableInfo) {
+        if (data) {
+            for (var property in data) {
+                if (data.hasOwnProperty(property))
+                    (<any>this)[property] = (<any>data)[property];
+            }
+        }
+    }
+
+    init(_data?: any) {
+        if (_data) {
+            for (var property in _data) {
+                if (_data.hasOwnProperty(property))
+                    this[property] = _data[property];
+            }
+            this.tableName = _data["tableName"];
+            this.objectCode = _data["objectCode"];
+            this.objectId = _data["objectId"];
+        }
+    }
+
+    static fromJS(data: any): TableInfo {
+        data = typeof data === 'object' ? data : {};
+        let result = new TableInfo();
+        result.init(data);
+        return result;
+    }
+
+    toJSON(data?: any) {
+        data = typeof data === 'object' ? data : {};
+        for (var property in this) {
+            if (this.hasOwnProperty(property))
+                data[property] = this[property];
+        }
+        data["tableName"] = this.tableName;
+        data["objectCode"] = this.objectCode;
+        data["objectId"] = this.objectId;
+        return data;
+    }
+}
+
+export interface ITableInfo {
+    tableName: string | undefined;
+    objectCode: string | undefined;
+    objectId: number;
 
     [key: string]: any;
 }

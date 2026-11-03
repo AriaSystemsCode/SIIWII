@@ -112,22 +112,20 @@ export class DynamicApiDispatcherService {
         };
 
         if (
-            normalizedMethodName.toLowerCase() ===
-            'getallsycentitystatusfortabledropdown' &&
-            selectedService === this.sycEntityObjectStatusesService
-        ) {
-            apiValues.objectCode = 'TRANSACTION';
-        }
+    normalizedMethodName.toLowerCase() ===
+    'getallsycentitystatusfortabledropdown' &&
+    selectedService === this.sycEntityObjectStatusesService
+) {
+    apiValues.objectCode = values?.objectCode;
+}
 
-      if (
+if (
     selectedService === this.sycEntityObjectTypesService &&
     normalizedMethodName.toLowerCase() === 'getall'
 ) {
-    apiValues.sydObjectNameFilter = 'TRANSACTION';
+    apiValues.sydObjectCodeFilter = values?.sydObjectCodeFilter;
 
-    // Do not send a string to the numeric ID filter
     delete apiValues.sydObjectIdFilter;
-  
 }
 
         const paramNames =

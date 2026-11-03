@@ -7,8 +7,8 @@
 
         <div class="d-flex align-items-center gap-2">
 
-            <button *ngIf="isEditMode" type="button" class="btn btn-sm btn-clear-danger mr-2"
-                    [disabled]="isAdding" (click)="clearDataSource()">
+            <button *ngIf="isEditMode" type="button" class="btn btn-sm btn-clear-danger mr-2" [disabled]="isAdding"
+                (click)="clearDataSource()">
                 <i class="fa fa-trash-alt mr-2"></i>{{ 'ClearData' | localize }}
             </button>
 
@@ -27,26 +27,18 @@
             <label class="font-weight-bold">{{ 'Table' | localize }}</label>
 
             <small *ngIf="isEditMode" class="d-block text-muted mb-2">
-    {{ 'TableCannotBeChanged' | localize }}
-</small>
+                {{ 'TableCannotBeChanged' | localize }}
+            </small>
 
             <div *ngIf="isLoadingTables && !isEditMode" class="d-flex align-items-center text-muted mb-2">
                 <i class="fa fa-spinner fa-spin mr-2"></i>{{ 'Loading' | localize }}
             </div>
 
-            <p-dropdown
-                inputId="spreadsheet-data-table"
-                name="spreadsheet-data-table"
-                [options]="tables"
-                [(ngModel)]="selectedTable"
-                [ngModelOptions]="{ standalone: true }"
-                [filter]="true"
-                [showClear]="!isEditMode"
+            <p-dropdown inputId="spreadsheet-data-table" name="spreadsheet-data-table" [options]="tables"
+                optionLabel="tableName" optionValue="tableName" [(ngModel)]="selectedTable"
+                [ngModelOptions]="{ standalone: true }" [filter]="true" filterBy="tableName" [showClear]="!isEditMode"
                 [disabled]="isEditMode || isAdding || isLoadingTables || isLoadingColumns"
-                 [placeholder]="'SelectTable' | localize"
-                appendTo="body"
-                styleClass="w-100"
-                [style]="{ width: '100%' }"
+                [placeholder]="'SelectTable' | localize" appendTo="body" styleClass="w-100" [style]="{ width: '100%' }"
                 (onChange)="onTableSelectionChange($event.value)">
             </p-dropdown>
 
@@ -70,10 +62,12 @@
                         <strong>{{ 'Columns' | localize }}</strong>
 
                         <div>
-                            <button type="button" class="btn btn-sm btn-link" [disabled]="isAdding" (click)="selectAllColumns()">
+                            <button type="button" class="btn btn-sm btn-link" [disabled]="isAdding"
+                                (click)="selectAllColumns()">
                                 {{ 'SelectAll' | localize }}
                             </button>
-                            <button type="button" class="btn btn-sm btn-link" [disabled]="isAdding" (click)="clearColumns()">
+                            <button type="button" class="btn btn-sm btn-link" [disabled]="isAdding"
+                                (click)="clearColumns()">
                                 {{ 'Clear' | localize }}
                             </button>
                         </div>
@@ -83,11 +77,9 @@
                     <div *ngIf="!tableColumns.length" class="text-muted py-2">{{ 'NoColumnsFound' | localize }}</div>
 
                     <div *ngFor="let column of tableColumns" class="form-check mb-2 d-flex align-items-center">
-                        <input type="checkbox" class="form-check-input"
-                               [id]="'column-' + column.attributeId"
-                               [checked]="isColumnSelected(column)"
-                               [disabled]="isAdding"
-                               (change)="toggleColumn(column, $event)" />
+                        <input type="checkbox" class="form-check-input" [id]="'column-' + column.attributeId"
+                            [checked]="isColumnSelected(column)" [disabled]="isAdding"
+                            (change)="toggleColumn(column, $event)" />
 
                         <label class="form-check-label mx-2" [for]="'column-' + column.attributeId">
                             {{ column.name }}
@@ -103,7 +95,8 @@
 
                         <strong>{{ 'Filters' | localize }}</strong>
 
-                        <button type="button" class="btn btn-addF btn-sm" [disabled]="isAdding" (click)="openFilterDialog()">
+                        <button type="button" class="btn btn-addF btn-sm" [disabled]="isAdding"
+                            (click)="openFilterDialog()">
                             <i class="fa mr-2" [ngClass]="hasFilters ? 'fa-edit' : 'fa-plus'"></i>
                             {{ (hasFilters ? 'EditFilters' : 'AddFilters') | localize }}
                         </button>
@@ -113,12 +106,12 @@
                     <!-- read-only summary of the applied filters -->
                     <div *ngIf="filterPreview as root; else noFilters" class="filter-preview">
 
-                     <div class="filter-preview-title">
-    <span class="filter-match-value">
-        {{ (root.matchMode === 'any' ? 'Any' : 'All') | localize }}
-    </span>
-    {{ 'OfFollowingConditions' | localize }}:
-</div>
+                        <div class="filter-preview-title">
+                            <span class="filter-match-value">
+                                {{ (root.matchMode === 'any' ? 'Any' : 'All') | localize }}
+                            </span>
+                            {{ 'OfFollowingConditions' | localize }}:
+                        </div>
 
                         <ng-container *ngTemplateOutlet="previewGroup; context: { $implicit: root }"></ng-container>
 
@@ -146,13 +139,14 @@
                                 <div *ngIf="node.type === 'group'" class="filter-preview-nested">
 
                                     <div class="filter-preview-nested-title">
-    <span class="filter-match-value">
-        {{ (node.matchMode === 'any' ? 'AnyOf' : 'AllOf') | localize }}
-        {{ 'These' | localize }}:
-    </span>
-</div>
+                                        <span class="filter-match-value">
+                                            {{ (node.matchMode === 'any' ? 'AnyOf' : 'AllOf') | localize }}
+                                            {{ 'These' | localize }}:
+                                        </span>
+                                    </div>
 
-                                    <ng-container *ngTemplateOutlet="previewGroup; context: { $implicit: node }"></ng-container>
+                                    <ng-container
+                                        *ngTemplateOutlet="previewGroup; context: { $implicit: node }"></ng-container>
 
                                 </div>
 
@@ -165,30 +159,25 @@
                 </div>
 
                 <!-- ===== FILTER DIALOG ===== -->
-                <p-dialog
-                    [(visible)]="showFilterDialog"
-                    [modal]="true"
-                    [draggable]="false"
-                    [resizable]="false"
-                    [dismissableMask]="false"
-                    [closable]="true"
+                <p-dialog [(visible)]="showFilterDialog" [modal]="true" [draggable]="false" [resizable]="false"
+                    [dismissableMask]="false" [closable]="true"
                     [style]="{ width: '900px', maxWidth: 'calc(100vw - 24px)' }"
                     [breakpoints]="{ '992px': '90vw', '576px': 'calc(100vw - 16px)' }"
-                    [contentStyle]="{ padding: '0', overflow: 'hidden' }"
-                    [baseZIndex]="11000"
-                    appendTo="body">
+                    [contentStyle]="{ padding: '0', overflow: 'hidden' }" [baseZIndex]="11000" appendTo="body">
 
                     <ng-template pTemplate="header">
                         <span class="font-weight-bold">{{ 'Filters' | localize }}</span>
                     </ng-template>
 
                     <app-filter-builder
-                        *ngIf="showFilterDialog"
-                        [fields]="filterBuilderFields"
-                        [filterTree]="filterTree"
-                        (applyTree)="onApplyTree($event)"
-                        (cancel)="closeFilterDialog()">
-                    </app-filter-builder>
+    *ngIf="showFilterDialog"
+    [fields]="filterBuilderFields"
+    [filterTree]="filterTree"
+    [objectCode]="selectedObjectCode"
+    [tableName]="selectedTable"
+    (applyTree)="onApplyTree($event)"
+    (cancel)="closeFilterDialog()">
+</app-filter-builder>
 
                 </p-dialog>
 
@@ -202,12 +191,12 @@
                         <span class="insert-destination-content">
                             <strong>{{ 'InsertAsNewSheet' | localize }}</strong>
                             <small class="d-block text-muted">
-    {{
-        (insertAsNewSheet
-            ? 'CreateNewWorksheetForData'
-            : 'InsertIntoCurrentWorksheetDescription') | localize
-    }}
-</small>
+                                {{
+                                (insertAsNewSheet
+                                ? 'CreateNewWorksheetForData'
+                                : 'InsertIntoCurrentWorksheetDescription') | localize
+                                }}
+                            </small>
                         </span>
 
                     </label>
@@ -217,18 +206,18 @@
                         <i class="fa fa-table mr-2"></i>
                         {{ 'Sheet' | localize }}: <strong>{{ targetSheetName }}</strong>
 
-                       <div *ngIf="targetSheetHasData" class="text-warning small mt-2">
-    <i class="fa fa-exclamation-triangle mr-1"></i>
-    {{ 'ExistingWorksheetDataWillBeReplaced' | localize }}
-</div>
+                        <div *ngIf="targetSheetHasData" class="text-warning small mt-2">
+                            <i class="fa fa-exclamation-triangle mr-1"></i>
+                            {{ 'ExistingWorksheetDataWillBeReplaced' | localize }}
+                        </div>
 
                     </div>
 
                 </div>
 
                 <!-- ===== SUBMIT ===== -->
-                <button type="button" class="btn btn-primary btn-block"
-                        [disabled]="isAdding || !selectedColumns.length" (click)="addSheet()">
+                <button type="button" class="btn btn-primary btn-block" [disabled]="isAdding || !selectedColumns.length"
+                    (click)="addSheet()">
 
                     <i *ngIf="isAdding" class="fa fa-spinner fa-spin mr-2"></i>
                     <i *ngIf="!isAdding" class="fa mr-2" [ngClass]="isEditMode ? 'fa-check' : 'fa-plus'"></i>
@@ -246,11 +235,6 @@
 </div>
 
 <!-- ===== CLEAR DATA CONFIRMATION ===== -->
-<p-confirmDialog
-    key="clearDataSourceConfirm"
-    appendTo="body"
-    [closable]="false"
-    [dismissableMask]="false"
-    [style]="{ width: '440px', maxWidth: '95vw' }"
-    styleClass="clear-data-confirm-dialog">
+<p-confirmDialog key="clearDataSourceConfirm" appendTo="body" [closable]="false" [dismissableMask]="false"
+    [style]="{ width: '440px', maxWidth: '95vw' }" styleClass="clear-data-confirm-dialog">
 </p-confirmDialog>

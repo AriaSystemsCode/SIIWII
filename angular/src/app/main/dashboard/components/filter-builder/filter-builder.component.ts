@@ -35,6 +35,8 @@ export class FilterBuilderComponent   extends AppComponentBase implements OnChan
     @Input() conditions: FilterBuilderCondition[] = [];  
     @Input() matchMode: FilterMatchMode = 'all';
     @Input() filterTree: FilterConditionGroup | null = null;
+    @Input() objectCode = '';
+@Input() tableName = '';
 
     @Output() applyTree = new EventEmitter<FilterConditionGroup>();
     @Output() matchModeChange = new EventEmitter<FilterMatchMode>();
@@ -911,11 +913,16 @@ private loadLookupOptions(
 
     const serviceName = source.service;
     const methodName = source.api;
-
-    const values: Record<string, any> = {
-        skipCount,
-        maxResultCount: this.lookupPageSize
-    };
+const values: Record<string, any> = {
+    skipCount,
+    maxResultCount: this.lookupPageSize,
+    objectCode: this.objectCode,
+    sydObjectCodeFilter:
+        this.objectCode === 'TRANSACTION' &&
+        this.tableName === 'AppTransactionHeaders'
+            ? 'TRANSACTION-HEADER-DATA'
+            : this.objectCode
+};
 
     // Add configured API parameter dynamically
     if (source.parameter) {
