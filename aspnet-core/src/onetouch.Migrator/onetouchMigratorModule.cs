@@ -4,7 +4,6 @@ using Abp.Modules;
 using Abp.Reflection.Extensions;
 using Castle.MicroKernel.Registration;
 using Microsoft.Extensions.Configuration;
-using onetouch.Configuration;
 using onetouch.EntityFrameworkCore;
 using onetouch.Migrator.DependencyInjection;
 
@@ -19,9 +18,7 @@ namespace onetouch.Migrator
         {
             abpZeroTemplateEntityFrameworkCoreModule.SkipDbSeed = true;
 
-            _appConfiguration = AppConfigurations.Get(
-                typeof(onetouchMigratorModule).GetAssembly().GetDirectoryPathOrNull(), addUserSecrets: true
-            );
+            _appConfiguration = MigratorConfiguration.Current;
         }
 
         public override void PreInitialize()

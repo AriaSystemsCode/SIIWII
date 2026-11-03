@@ -7,7 +7,7 @@ It reuses the existing seed helper; translation generation is not changed.
 ## Release contract
 
 `SeedRelease.RequiredVersion` in `Program.cs` is the version-controlled required
-seed snapshot (version 18 moves Field Manager setting sections). Increment it whenever
+seed snapshot (version 19 adds AppEntity lookup settings). Increment it whenever
 the cumulative seed routines or their assets change. It is not an arbitrary
 command-line value.
 Each database records successful snapshots in `dbo.__OneTouchSeedHistory`.
@@ -18,8 +18,8 @@ Future non-cumulative data transformations require explicit ordered steps instea
 Version 2 runs the idempotent AppEntity, transaction header, and transaction
 detail Field Manager scripts after schema migrations. A database whose AppFields
 rows were cleared after the older one-time EF migration will be refilled when
-this seeder applies version 2 or later. The existing Migrator and installer also call the
-same host seed method directly.
+this seeder applies version 2 or later. The installer also calls the same host
+seed method directly.
 
 Version 3 also seeds six Field Manager setting definitions for String--Textbox
 (AllowNull, Length, DefaultValue, Required, Visible, Editable) and six applied
@@ -97,6 +97,7 @@ already match the release. New databases must be created/migrated separately.
 From `aspnet-core`:
 
 ```powershell
+dotnet publish src/onetouch.Migrator/onetouch.Migrator.csproj -c Release -o artifacts/migrator
 dotnet publish src/onetouch.Seeder/onetouch.Seeder.csproj -c Release -o artifacts/seeder
 dotnet run --project tests/onetouch.Seeder.Tests/onetouch.Seeder.Tests.csproj
 ```
@@ -106,32 +107,39 @@ outside the IIS web root. The runner sets its working directory to the supplied
 backend content root because existing seeds read `Assets` from that location.
 The seeder requires the .NET 7 runtime, matching the existing backend target.
 
-## Configuration and read-only preflight
+## Environment selection and read-only preflight
 
-Pass one effective JSON settings file with `ConnectionStrings.Default` and
-`ConnectionStrings.AriaMaster`. These can be overridden by environment variables
-`ConnectionStrings__Default` and `ConnectionStrings__AriaMaster`. There is NO
-hardcoded credential fallback, environment-specific JSON merge, or secret logging.
-Do not commit production credentials. Select the intended environment explicitly.
+Both the Migrator and Seeder prompt for Testing, Staging, or Production before
+starting database work. Each reads `dbo.Clients` from `ConnectionStrings.AriaMaster`
+and selects rows where `Server` contains the chosen environment, case-insensitively.
+Only those client databases are processed; the default application database is
+not added to the target list. If there are no matching rows, the tool exits with
+an error and processes no databases. Duplicate rows pointing to the same SQL
+server and catalog are processed once.
+
+Both tools accept the same `--config <settings.json>` path. For example, point
+both at the BE folder's `appsettings.Production.json`. When the selected file is
+named `appsettings.<Environment>.json`, the tools load the sibling `appsettings.json`
+first, then apply that environment file as an override. Environment variables,
+including `ConnectionStrings__AriaMaster`, take precedence. There is no hardcoded
+credential fallback or secret logging. Do not commit production credentials.
 
 ```powershell
-dotnet artifacts/seeder/onetouch.Seeder.dll --config <effective-settings.json> --check
+dotnet artifacts/migrator/onetouch.Migrator.dll --config <BE-folder>\appsettings.Production.json
+dotnet artifacts/seeder/onetouch.Seeder.dll --config <BE-folder>\appsettings.Production.json --check
 ```
 
-Check mode only reads registry/history; it creates no tables or seed data.
+Check mode only reads the selected client registry rows and seed history; it creates no tables or seed data.
 Exit codes: **0** all selected databases match this release, **1** failure,
 **2** at least one selected database does not match the required seed version.
 A newer database is not accepted by check and is refused by apply (no downgrade).
 The SQL principal needs permission to see/read the history table for check mode.
 
-Unless `--default-only` is selected, all rows of `dbo.Clients` are included; the current implementation assumes no
-active-client column. Blank/invalid connections fail the job rather than silently
-skipping a client. Default and client databases are deduplicated by server/catalog;
-server case is normalized but catalog case is preserved for case-sensitive SQL instances.
-Use consistent server names (DNS aliases cannot be normalized
-offline). Physical databases reached by aliases still share the database lock and
-version history, preventing a second successful application of the same version.
-Console labels are `default` / `client-N` in registry URL order, without secrets.
+Blank or invalid matching connections fail the job rather than silently skipping
+a client. Client databases are deduplicated by server/catalog; server case is
+normalized but catalog case is preserved for case-sensitive SQL instances.
+Physical databases reached by aliases still share the database lock and version
+history, preventing a second successful application of the same version.
 
 ## Deployment sequence (operator / pipeline)
 
@@ -140,13 +148,13 @@ Console labels are `default` / `client-N` in registry URL order, without secrets
 2. Put EVERY backend instance serving these databases offline, drain active requests,
    and pause background workers that write to them. `app_offline.htm` on one server
    alone is not sufficient for a multi-server deployment.
-3. Deploy the backend, seeder, matching Assets and required schema changes. Do not
-   restore traffic yet. Existing migrator tooling may itself seed; do not run it
-   concurrently with this runner, and account for that legacy behavior separately.
-4. Run the guarded wrapper (from `aspnet-core`):
+3. Deploy the backend, Migrator, Seeder and matching Assets. Do not restore traffic yet.
+   Run the Migrator and select the target environment; it applies schema changes to
+   each matching client database and reports every result.
+4. Run the guarded Seeder wrapper (from `aspnet-core`):
 
 ```powershell
-./deployment/Invoke-SeedRelease.ps1 -SeederDll <published-seeder.dll> -BackendReleasePath <backend-release-directory> -ConfigPath <effective-settings.json>
+./deployment/Invoke-SeedRelease.ps1 -SeederDll <published-seeder.dll> -BackendReleasePath <backend-release-directory> -ConfigPath <BE-folder>\appsettings.Production.json
 ```
 
 5. Require successful exit, review per-database status, and run deployment smoke
@@ -160,29 +168,19 @@ bypassing this sequence can expose an unseeded database. Ordinary restarts do no
 
 ## New client provisioning / targeted retry
 
-After schema provisioning and registry registration, before enabling client access:
+After schema provisioning and registry registration, before enabling client access,
+the Seeder can target one URL within the selected environment:
 
 ```powershell
-dotnet <published-seeder.dll> --config <effective-settings.json> --content-root <backend-release-directory> --client-url <exact-registered-url> --apply --maintenance-confirmed
-dotnet <published-seeder.dll> --config <effective-settings.json> --client-url <exact-registered-url> --check
+dotnet <published-seeder.dll> --config <BE-folder>\appsettings.Production.json --content-root <backend-release-directory> --client-url <exact-registered-url> --apply --maintenance-confirmed
+dotnet <published-seeder.dll> --config <BE-folder>\appsettings.Production.json --client-url <exact-registered-url> --check
 ```
 
-`--client-url` selects only matching registry rows, not the unrelated default DB.
+`--client-url` selects one matching registry row within the environment you choose,
+not the unrelated default DB. The Visual Studio profiles `Seeder - check` and
+`Seeder - apply` use the Web Host settings file and still prompt for the environment.
 If other clients share that database, take all of them offline as well. The explicit
 maintenance confirmation is an operator assertion, not automatic access control.
-
-To run only `ConnectionStrings.Default`, use `--default-only --expected-database
-onetouchDevDb3`. The runner compares the actual default catalog to that exact
-name and does not query or seed any registered client. The Seeder project also
-includes Visual Studio launch profiles named `onetouchDevDb3 - check` and
-`onetouchDevDb3 - apply`. Select the apply profile explicitly to seed from
-Visual Studio. Those profiles use paths relative to the Seeder project folder;
-confirm that the Web Host config points to the intended server before applying.
-For a local SQL Server on the developer's computer, use `Local onetouchDevDb3 -
-check` or `Local onetouchDevDb3 - apply` instead. These profiles override only
-`ConnectionStrings.Default` with integrated authentication to `localhost` and
-do not query the client registry. Relative paths are resolved from the current
-working directory first, then the Seeder project folder for Visual Studio runs.
 
 ## Concurrency, failures and retry
 
@@ -211,7 +209,8 @@ required. Do not blindly retry a deterministic data/schema failure.
 The included no-database tests validate CLI safety and target identity only.
 On disposable restored databases, verify:
 
-- Default plus two client DBs, duplicate registry connections, and targeted selection.
+- Environment filtering across Testing, Staging, and Production, no-match failure,
+  duplicate registry connections, and targeted selection within an environment.
 - Initial version applies, repeat run skips, increased release version applies.
 - Newer recorded version refuses downgrade; unknown client/blank connection fails.
 - Seed error after earlier SaveChanges rolls back both seed writes and success record.
