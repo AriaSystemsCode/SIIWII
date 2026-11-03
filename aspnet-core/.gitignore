@@ -27,6 +27,7 @@ src/onetouch.Web.Host/wwwroot/tempattachments/
 # Build results
 [Dd]ebug/
 [Rr]elease/
+artifacts/
 x64/
 *_i.c
 *_p.c
