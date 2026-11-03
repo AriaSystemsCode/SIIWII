@@ -539,14 +539,14 @@ showOverlay :boolean=false
         .subscribe((result) => {
             _result = result;
             if (_result === 0) {
-                this.notify.info("No selected products needed syncing. Shared products are synced when they have newer changes.");
+                this.notify.info("No published products were found in the selection. Share products before syncing them.");
                 this.reloadPage();
                 return;
             }
 
             Swal.fire({
                 title: "",
-                text: _result?.toString() + " of " + this.multiSelectionInfo?.totalCount?.toString() + " products synced. Products already up to date were skipped.",
+                text: _result?.toString() + " of " + this.multiSelectionInfo?.totalCount?.toString() + " products synced. Unpublished products were skipped.",
                 icon: "info",
                 confirmButtonText: "OK",
                 customClass: {
