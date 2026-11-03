@@ -290,6 +290,9 @@ export class CreateOrEditSpreadsheetComponent extends AppComponentBase implement
             ? this.sheetSources.find(s => s.sheetName === this.editingSheetName) ?? null
             : null;
     }
+    private getUtcTimestamp(): string {
+    return moment.utc().format('YYYY-MM-DDTHH:mm:ss[Z]');
+}
 
     private findSheet(name: string): any {
         return this.allSheets.find((s: any) => s?.name === name);
@@ -2601,9 +2604,10 @@ export class CreateOrEditSpreadsheetComponent extends AppComponentBase implement
 
             this.rebuildWidgets(state.workbookJson);
             state.dashboardWidgets = clone(this.widgets);
-            state.updatedDate = moment().format('YYYY-MM-DD HH:mm:ss');
-            this.updateRefreshInfo(state);
-
+            // A normal Save must not advance the data refresh cursor.
+state.updatedDate = this.spreadsheetUpdatedDate;
+state.lastRefreshDate = this.lastRefreshDate;
+state.refreshedBy = this.refreshedBy;
             await firstValueFrom(
                 this.dashboardService.saveSpreadSheetJson(dashboardId, {
                     ...state,
@@ -2807,102 +2811,177 @@ export class CreateOrEditSpreadsheetComponent extends AppComponentBase implement
         return cleaned;
     }
 
-  private updateRefreshInfo(state: SpreadsheetPayload): void {
+  private updateRefreshInfo(
+    state: SpreadsheetPayload,
+    refreshedAtUtc?: string
+): void {
+
     const user = this.appSession.user;
 
     const fullName = [user?.name, user?.surname]
         .filter(Boolean)
         .join(' ');
 
-    // state.lastRefreshDate = moment
-    //     .utc(moment(new Date()).format('YYYY-MM-DDTHH:mm:ss'))
-    //     .format('YYYY-MM-DDTHH:mm:ss');
-     state.lastRefreshDate = moment().format('YYYY-MM-DD HH:mm:ss');
-   
+    state.lastRefreshDate =
+        refreshedAtUtc ?? this.getUtcTimestamp();
 
     state.refreshedBy = fullName;
 }
-    async refreshSpreadsheet(): Promise<void> {
-        if (this.isRefreshing || !this.spreadsheet || !this.dashboardId) {
-            return;
+  
+async refreshSpreadsheet(): Promise<void> {
+
+    if (this.isRefreshing || !this.spreadsheet || !this.dashboardId) {
+        return;
+    }
+
+    this.isRefreshing = true;
+    this.showLoading('Refreshing Spreadsheet...');
+
+    // Capture the refresh boundary BEFORE requesting changes.
+    const refreshStartedAtUtc = moment
+        .utc()
+        .format('YYYY-MM-DDTHH:mm:ss[Z]');
+
+    const activeSheetBefore = this.activeSheetName;
+    const pivotBefore = this.showPivot ? text(this.pivotSheet) : '';
+
+    try {
+
+        // ============================================
+        // 1. CLOSE OPEN PANELS
+        // ============================================
+
+        this.closeChartPanel();
+        this.closeDataPanel();
+
+        if (this.showPivot) {
+            await this.closePivot();
         }
 
-        this.isRefreshing = true;
-        this.showLoading('Refreshing Spreadsheet...');
+        // ============================================
+        // 2. GET CURRENT WORKBOOK STATE
+        // ============================================
 
-        const activeSheetBefore = this.activeSheetName;
-        const pivotBefore = this.showPivot ? text(this.pivotSheet) : '';
+        const current = await this.buildSavedState();
 
-        try {
-            this.closeChartPanel();
-            this.closeDataPanel();
+        console.log('[Spreadsheet Refresh] Previous date:', current.updatedDate);
+        console.log('[Spreadsheet Refresh] New UTC date:', refreshStartedAtUtc);
 
-            if (this.showPivot) {
-                await this.closePivot();
+        // ============================================
+        // 3. FETCH CHANGES AND UPDATE WORKBOOK
+        // ============================================
+
+        const refreshed = await this.refreshService.refresh(current, {
+            tenantId: this.appSession.tenantId,
+            highlight: true,
+            onProgress: (message, done, total) => {
+                this.loadingMessage = message;
+                this.setProgress(done, total);
+                this.cdr.detectChanges();
             }
+        });
 
-            const current = await this.buildSavedState();
+        // ============================================
+        // 4. UPDATE REFRESH INFORMATION
+        // ============================================
 
-            const refreshed = await this.refreshService.refresh(current, {
-                tenantId: this.appSession.tenantId,
-                highlight: true,
-                onProgress: (message, done, total) => {
-                    this.loadingMessage = message;
-                    this.setProgress(done, total);
-                }
-            });
+        this.loadingMessage = 'Saving refreshed Spreadsheet...';
 
-            // Save only after all source sheets and charts are refreshed.
-            this.loadingMessage = 'Saving refreshed Spreadsheet...';
+        const user = this.appSession.user;
 
-            this.updateRefreshInfo(refreshed);
-            refreshed.updatedDate = refreshed.lastRefreshDate;
+        const fullName = [user?.name, user?.surname]
+            .filter(Boolean)
+            .join(' ');
 
-            await firstValueFrom(
-                this.dashboardService.saveSpreadSheetJson(this.dashboardId, {
+        // Save timestamps as UTC.
+        refreshed.updatedDate = refreshStartedAtUtc;
+        refreshed.lastRefreshDate = refreshStartedAtUtc;
+        refreshed.refreshedBy = fullName;
+
+        // ============================================
+        // 5. SAVE REFRESHED WORKBOOK
+        // ============================================
+
+        await firstValueFrom(
+            this.dashboardService.saveSpreadSheetJson(
+                this.dashboardId,
+                {
                     ...refreshed,
                     recordCount: this.countRecords(refreshed.workbookJson)
-                } as any)
-            );
+                } as any
+            )
+        );
 
-            // Reopen the exact workbook that was saved.
-            this.ignoreSpreadsheetChanges = true;
-            await this.openWorkbook(refreshed);
+        // ============================================
+        // 6. REOPEN SAVED WORKBOOK
+        // ============================================
 
-            if (
-                activeSheetBefore &&
-                this.findSheet(activeSheetBefore) &&
-                this.activeSheetName !== activeSheetBefore
-            ) {
-                await this.activateSheet(activeSheetBefore);
-            }
+        this.ignoreSpreadsheetChanges = true;
 
-            const pivotAnalysis = pivotBefore
-                ? this.findAnalysis(pivotBefore)
-                : null;
+        await this.openWorkbook(refreshed);
 
-            if (pivotAnalysis) {
-                await this.openPivot(pivotAnalysis);
-            }
+        // ============================================
+        // 7. RESTORE ACTIVE SHEET
+        // ============================================
 
-            this.isDirty = false;
-            this.notify.success(
-                'Spreadsheet refreshed and saved successfully.'
-            );
-
-        } catch (error) {
-            console.error('[Spreadsheet] Refresh or save failed:', error);
-            this.notify.error(
-                'Unable to complete Spreadsheet refresh and save.'
-            );
-        } finally {
-            this.ignoreSpreadsheetChanges = false;
-            this.isRefreshing = false;
-            this.hideLoading();
-            this.cdr.detectChanges();
-            this.resizeLater(100);
+        if (
+            activeSheetBefore &&
+            this.findSheet(activeSheetBefore) &&
+            this.activeSheetName !== activeSheetBefore
+        ) {
+            await this.activateSheet(activeSheetBefore);
         }
+
+        // ============================================
+        // 8. RESTORE PIVOT
+        // ============================================
+
+        const pivotAnalysis = pivotBefore
+            ? this.findAnalysis(pivotBefore)
+            : null;
+
+        if (pivotAnalysis) {
+            await this.openPivot(pivotAnalysis);
+        }
+
+        // ============================================
+        // 9. FINISH
+        // ============================================
+
+        this.isDirty = false;
+
+        console.log('[Spreadsheet Refresh] Completed:', {
+            previousDate: current.updatedDate,
+            updatedDate: refreshed.updatedDate,
+            lastRefreshDate: refreshed.lastRefreshDate,
+            refreshedBy: refreshed.refreshedBy
+        });
+
+        this.notify.success(
+            'Spreadsheet refreshed and saved successfully.'
+        );
+
+    } catch (error) {
+
+        console.error(
+            '[Spreadsheet] Refresh or save failed:',
+            error
+        );
+
+        this.notify.error(
+            'Unable to complete Spreadsheet refresh and save.'
+        );
+
+    } finally {
+
+        this.ignoreSpreadsheetChanges = false;
+        this.isRefreshing = false;
+
+        this.hideLoading();
+        this.cdr.detectChanges();
+        this.resizeLater(100);
     }
+}
 
     async onDataSourceCleared(sheetName: string): Promise<void> {
 
