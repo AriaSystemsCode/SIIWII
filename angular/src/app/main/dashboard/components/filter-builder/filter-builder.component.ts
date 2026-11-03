@@ -784,110 +784,303 @@ private loadSavedLookupOptions(group: FilterConditionGroup): void {
         this.staticVisible.set(field.name, visibleCount + this.lookupPageSize);
     }
 
-    private loadLookupOptions(field: FilterBuilderField, append: boolean): void {
-        const previous = this.lookups.get(field.name);
-        if (previous?.isLoading) return;
-        if (append && previous?.isLoaded && previous.items.length >= previous.totalCount) return;
+   
+private loadLookupOptions(
+    field: FilterBuilderField,
+    append: boolean
+): void {
 
-        const existingItems = append ? (previous?.items ?? []) : [];
-        const skipCount = existingItems.length;
+    const previous = this.lookups.get(field.name);
 
-        this.lookups.set(field.name, {
-            items: existingItems,
-            totalCount: previous?.totalCount ?? 0,
-            isLoading: true,
-            isLoaded: previous?.isLoaded ?? false
-        });
+    if (previous?.isLoading) {
+        return;
+    }
 
-        // ---- Lookup by entityObjectTypeCode (e.g. SHIPVIA) ----
-        const code = this.getLookupCode(field);
+    if (
+        append &&
+        previous?.isLoaded &&
+        previous.items.length >= previous.totalCount
+    ) {
+        return;
+    }
 
-        if (field.isLookup && code) {
+    const existingItems = append
+        ? (previous?.items ?? [])
+        : [];
 
-            this.extraAttributeData
-                .getExtraAttributeLookupDataWithPaging(code, skipCount, this.lookupPageSize)
-                .pipe(finalize(() => this.setLookupLoading(field.name, false)))
-                .subscribe({
-                    next: (result: any) => {
-                        const records: any[] = result?.items ?? result?.result?.items ?? [];
+    const skipCount = existingItems.length;
 
-                        const newItems: SelectOption[] = records
-                            .map(item => ({
-                                label: String(item.label ?? item.name ?? item.description ?? item.code ?? item.value ?? item.id ?? ''),
-                                value: item.value ?? item.id
-                            }))
-                            .filter(item => item.value !== null && item.value !== undefined);
+    this.lookups.set(field.name, {
+        items: existingItems,
+        totalCount: previous?.totalCount ?? 0,
+        isLoading: true,
+        isLoaded: previous?.isLoaded ?? false
+    });
 
-                        // keep one item per value
-                        const unique = new Map<string, SelectOption>();
-                        [...existingItems, ...newItems].forEach(item => unique.set(String(item.value), item));
+    // ==========================================
+    // 1. Lookup using entityObjectTypeCode
+    // ==========================================
 
-                        this.lookups.set(field.name, {
-                            items: [...unique.values()],
-                            totalCount: Number(
-                                result?.totalCount ?? result?.result?.totalCount ?? (skipCount + newItems.length)
-                            ),
-                            isLoading: false,
-                            isLoaded: true
-                        });
-                    },
-                    error: error => console.error('[Filter Builder] Entity lookup failed:', code, error)
-                });
+    const code = this.getLookupCode(field);
 
-            return;
-        }
+    if (field.isLookup && code) {
 
-        // ---- Lookup by dynamic API (dataSource.service / dataSource.api) ----
-        if (!this.hasDynamicSource(field)) {
-            this.lookups.delete(field.name);
-            return;
-        }
-
-        const source = field.dataSource!;
-        const serviceName = source.service.endsWith('ServiceProxy')
-            ? source.service
-            : `${source.service}ServiceProxy`;
-
-        this.dynamicApi.dispatch(serviceName, source.api, {
-            skipCount,
-            maxResultCount: this.lookupPageSize
-        }).pipe(finalize(() => this.setLookupLoading(field.name, false)))
+        this.extraAttributeData
+            .getExtraAttributeLookupDataWithPaging(
+                code,
+                skipCount,
+                this.lookupPageSize
+            )
+            .pipe(
+                finalize(() =>
+                    this.setLookupLoading(field.name, false)
+                )
+            )
             .subscribe({
-                next: (result: any) => this.onLookupLoaded(field, existingItems, result),
-                error: (error: any) => console.error('[Filter Builder] Lookup failed:', field.name, error)
+
+                next: (result: any) => {
+
+                    const records: any[] =
+                        result?.items ??
+                        result?.result?.items ??
+                        [];
+
+                    const newItems: SelectOption[] = records
+                        .map(item => ({
+                            label: String(
+                                item.label ??
+                                item.name ??
+                                item.description ??
+                                item.code ??
+                                item.value ??
+                                item.id ??
+                                ''
+                            ),
+                            value: item.value ?? item.id
+                        }))
+                        .filter(item =>
+                            item.value !== null &&
+                            item.value !== undefined
+                        );
+
+                    const unique =
+                        new Map<string, SelectOption>();
+
+                    [...existingItems, ...newItems]
+                        .forEach(item =>
+                            unique.set(
+                                String(item.value),
+                                item
+                            )
+                        );
+
+                    this.lookups.set(field.name, {
+                        items: [...unique.values()],
+                        totalCount: Number(
+                            result?.totalCount ??
+                            result?.result?.totalCount ??
+                            (skipCount + newItems.length)
+                        ),
+                        isLoading: false,
+                        isLoaded: true
+                    });
+                },
+
+                error: error => {
+                    console.error(
+                        '[Filter Builder] Entity lookup failed:',
+                        code,
+                        error
+                    );
+                }
             });
+
+        return;
     }
 
-    private onLookupLoaded(field: FilterBuilderField, existingItems: SelectOption[], result: any): void {
-        const source = field.dataSource!;
-        const records: any[] = result?.items ?? result?.result?.items ?? [];
+    // ==========================================
+    // 2. Dynamic API lookup
+    // ==========================================
 
-        const labelPath = source.parameter || 'name';
-      const valuePath =
-    (source as any).valueParameter ||
-    source.valueField ||
-    'account.id';
-
-        const newItems: SelectOption[] = records
-            .map(record => {
-                const label = this.getByPath(record, labelPath);
-                const value = this.getByPath(record, valuePath) ?? record.id ?? record.value;
-
-                return { label: String(label ?? value ?? ''), value };
-            })
-            .filter(option => option.value !== null && option.value !== undefined);
-
-        // keep one item per value
-        const uniqueItems = new Map<string, SelectOption>();
-        [...existingItems, ...newItems].forEach(item => uniqueItems.set(String(item.value), item));
-
-        this.lookups.set(field.name, {
-            items: Array.from(uniqueItems.values()),
-            totalCount: Number(result?.totalCount ?? result?.result?.totalCount ?? newItems.length),
-            isLoading: false,
-            isLoaded: true
-        });
+    if (!this.hasDynamicSource(field)) {
+        this.lookups.delete(field.name);
+        return;
     }
+
+    const source = field.dataSource!;
+
+    const serviceName = source.service;
+    const methodName = source.api;
+
+    const values: Record<string, any> = {
+        skipCount,
+        maxResultCount: this.lookupPageSize
+    };
+
+    // Add configured API parameter dynamically
+    if (source.parameter) {
+
+        const parameterName = source.parameter;
+
+        const camelCaseName =
+            parameterName.charAt(0).toLowerCase() +
+            parameterName.slice(1);
+
+        const parameterValue =
+            (source as any).parameterValue ??
+            (field as any)[parameterName] ??
+            (field as any)[camelCaseName];
+
+        if (parameterValue !== undefined) {
+            values[parameterName] = parameterValue;
+        }
+    }
+
+    // ==========================================
+    // 3. Execute dynamic API
+    // ==========================================
+
+    try {
+
+        this.dynamicApi
+            .dispatch(
+                serviceName,
+                methodName,
+                values
+            )
+            .pipe(
+                finalize(() =>
+                    this.setLookupLoading(field.name, false)
+                )
+            )
+            .subscribe({
+
+                next: (result: any) => {
+                    this.onLookupLoaded(
+                        field,
+                        existingItems,
+                        result
+                    );
+                },
+
+                error: (error: any) => {
+                    console.error(
+                        '[Filter Builder] Dynamic lookup failed:',
+                        field.name,
+                        error
+                    );
+                }
+            });
+
+    } catch (error) {
+
+        this.setLookupLoading(field.name, false);
+
+        console.error(
+            '[Filter Builder] Dispatch failed:',
+            serviceName,
+            methodName,
+            error
+        );
+    }
+}
+
+
+private onLookupLoaded(
+    field: FilterBuilderField,
+    existingItems: SelectOption[],
+    result: any
+): void {
+
+    const source = field.dataSource!;
+
+    // 1. Get records from API response
+    const isArrayResponse =
+        Array.isArray(result) ||
+        Array.isArray(result?.result);
+
+    const records: any[] =
+        Array.isArray(result)
+            ? result
+            : Array.isArray(result?.result)
+                ? result.result
+                : result?.items ??
+                  result?.result?.items ??
+                  [];
+
+    // 2. Dropdown display field
+    // Example: account.name
+    const labelPath =
+        (source as any).labelField ||
+        source.parameter ||
+        'name';
+
+    // 3. Dropdown saved value field
+    // Example: account.ssin
+    const valuePath =
+        (source as any).valueParameter ||
+        source.valueField ||
+        'id';
+
+    // 4. Convert API records to dropdown options
+    const newItems: SelectOption[] = records
+        .map(record => {
+
+            const data = record?.data ?? record;
+
+            const label =
+                this.getByPath(data, labelPath) ??
+                this.getByPath(record, labelPath) ??
+                record?.label ??
+                data?.account?.name ??
+                data?.sycEntityObjectType?.name ??
+                data?.name ??
+                data?.displayName;
+
+            const value =
+                this.getByPath(data, valuePath) ??
+                this.getByPath(record, valuePath) ??
+                data?.account?.ssin ??
+                data?.sycEntityObjectType?.code ??
+                data?.id ??
+                record?.value;
+
+            return {
+                label: String(label ?? value ?? '').trim(),
+                value
+            };
+        })
+        .filter(option =>
+            option.value !== null &&
+            option.value !== undefined
+        );
+
+    // 5. Remove duplicate values
+    const uniqueItems = new Map<string, SelectOption>();
+
+    [...existingItems, ...newItems].forEach(item => {
+        uniqueItems.set(String(item.value), item);
+    });
+
+    // 6. Handle pagination
+    const totalCount = isArrayResponse
+        ? uniqueItems.size
+        : Number(
+            result?.totalCount ??
+            result?.result?.totalCount ??
+            uniqueItems.size
+        );
+
+    // 7. Update dropdown options
+    this.lookups.set(field.name, {
+        items: [...uniqueItems.values()],
+        totalCount,
+        isLoading: false,
+        isLoaded: true
+    });
+}
+
+
 
     private setLookupLoading(fieldName: string, isLoading: boolean): void {
         const state = this.lookups.get(fieldName);
@@ -898,9 +1091,35 @@ private loadSavedLookupOptions(group: FilterConditionGroup): void {
     }
 
     /** getByPath(item, 'account.id') -> item.account.id */
-    private getByPath(object: any, path: string): any {
-        return String(path || '')
-            .split('.')
-            .reduce((current, key) => current?.[key], object);
+private getByPath(object: any, path: string): any {
+
+    if (!object || !path) {
+        return undefined;
     }
+
+    return String(path)
+        .split('.')
+        .reduce((current, key) => {
+
+            if (current === null || current === undefined) {
+                return undefined;
+            }
+
+            // Exact property match
+            if (Object.prototype.hasOwnProperty.call(current, key)) {
+                return current[key];
+            }
+
+            // Case-insensitive property match
+            const matchingKey = Object.keys(current).find(
+                property =>
+                    property.toLowerCase() === key.toLowerCase()
+            );
+
+            return matchingKey !== undefined
+                ? current[matchingKey]
+                : undefined;
+
+        }, object);
+}
 }

@@ -148,13 +148,13 @@ export class CreateOrEditSpreadsheetComponent extends AppComponentBase implement
     isApplyingChart = false;
     chartAggregation: ChartAggregation = 'None';
     chartAggregationOptions = [
-    { label: this.l('NoAggregation'), value: 'None' },
-    { label: this.l('Sum'), value: 'Sum' },
-    { label: this.l('Count'), value: 'Count' },
-    { label: this.l('Average'), value: 'Average' },
-    { label: this.l('Minimum'), value: 'Min' },
-    { label: this.l('Maximum'), value: 'Max' }
-];
+        { label: this.l('NoAggregation'), value: 'None' },
+        { label: this.l('Sum'), value: 'Sum' },
+        { label: this.l('Count'), value: 'Count' },
+        { label: this.l('Average'), value: 'Average' },
+        { label: this.l('Minimum'), value: 'Min' },
+        { label: this.l('Maximum'), value: 'Max' }
+    ];
 
     // ---- Drilldown (Ctrl + click on a chart point) ----
     drilldownVisible = false;
@@ -171,14 +171,14 @@ export class CreateOrEditSpreadsheetComponent extends AppComponentBase implement
     refreshedBy: string | null = null;
 
     syncfusionLocale = 'en';
-syncfusionRtl = false;
-syncfusionLocaleReady = false;
+    syncfusionRtl = false;
+    syncfusionLocaleReady = false;
 
-isArLang:boolean=false
-currentLang:string=''
+    isArLang: boolean = false
+    currentLang: string = ''
 
-spreadsheetNotFound = false;
-spreadsheetLoading = false;
+    spreadsheetNotFound = false;
+    spreadsheetLoading = false;
 
 
     constructor(
@@ -187,13 +187,13 @@ spreadsheetLoading = false;
         private dashboardService: AppDashboardServiceProxy,
         private refreshService: SpreadsheetRefreshService,
         private drilldown: DrilldownService,
-            private http: HttpClient,
+        private http: HttpClient,
         private cdr: ChangeDetectorRef
     ) {
         super(injector);
 
-                  this.currentLang = abp.utils.getCookieValue('Abp.Localization.CultureName')
-        this.currentLang == 'ar' || this.currentLang == 'ar-EG'  ? this.isArLang = true : this.isArLang = false
+        this.currentLang = abp.utils.getCookieValue('Abp.Localization.CultureName')
+        this.currentLang == 'ar' || this.currentLang == 'ar-EG' ? this.isArLang = true : this.isArLang = false
     }
 
     // =====================================================
@@ -202,67 +202,67 @@ spreadsheetLoading = false;
 
     /** Untyped access to Syncfusion APIs missing from the typings. */
 
-    
 
-private async initializeSyncfusionLocale(): Promise<void> {
-    this.syncfusionLocaleReady = false;
 
-    const language =
-        abp.utils.getCookieValue('Abp.Localization.CultureName') ||
-        abp.localization.currentLanguage?.name ||
-        'en';
+    private async initializeSyncfusionLocale(): Promise<void> {
+        this.syncfusionLocaleReady = false;
 
-    const isArabic = language.toLowerCase().startsWith('ar');
+        const language =
+            abp.utils.getCookieValue('Abp.Localization.CultureName') ||
+            abp.localization.currentLanguage?.name ||
+            'en';
 
-    this.isArLang = isArabic;
-    this.syncfusionRtl = isArabic;
+        const isArabic = language.toLowerCase().startsWith('ar');
 
-    if (isArabic) {
-        try {
-            const translations = await firstValueFrom(
-                this.http.get<any>('assets/syncfusion/ar.json')
-            );
+        this.isArLang = isArabic;
+        this.syncfusionRtl = isArabic;
 
-            L10n.load(
-                translations.ar
-                    ? translations
-                    : { ar: translations }
-            );
+        if (isArabic) {
+            try {
+                const translations = await firstValueFrom(
+                    this.http.get<any>('assets/syncfusion/ar.json')
+                );
 
-            setCulture('ar');
-            this.syncfusionLocale = 'ar';
+                L10n.load(
+                    translations.ar
+                        ? translations
+                        : { ar: translations }
+                );
 
-            console.log('[Syncfusion] Arabic localization loaded');
-        } catch (error) {
-            console.error(
-                '[Syncfusion] Arabic localization failed:',
-                error
-            );
+                setCulture('ar');
+                this.syncfusionLocale = 'ar';
 
-            this.syncfusionLocale = 'en';
+                console.log('[Syncfusion] Arabic localization loaded');
+            } catch (error) {
+                console.error(
+                    '[Syncfusion] Arabic localization failed:',
+                    error
+                );
+
+                this.syncfusionLocale = 'en';
+                setCulture('en');
+            }
+        } else {
             setCulture('en');
+            this.syncfusionLocale = 'en';
         }
-    } else {
-        setCulture('en');
-        this.syncfusionLocale = 'en';
+
+        this.pivotChartTypes = [
+            'Column',
+            'Bar',
+            'Area',
+            'Pie',
+            'Doughnut',
+            'Line',
+            'Scatter'
+        ].map(type => ({
+            label: this.l(type),
+            value: type
+        }));
+
+        this.syncfusionLocaleReady = true;
+        this.cdr.detectChanges();
     }
-
-    this.pivotChartTypes = [
-        'Column',
-        'Bar',
-        'Area',
-        'Pie',
-        'Doughnut',
-        'Line',
-        'Scatter'
-    ].map(type => ({
-        label: this.l(type),
-        value: type
-    }));
-
-    this.syncfusionLocaleReady = true;
-    this.cdr.detectChanges();
-}
 
 
     private get grid(): any {
@@ -408,13 +408,13 @@ private async initializeSyncfusionLocale(): Promise<void> {
     //     });
     // }
     ngOnInit(): void {
-    this.route.paramMap.subscribe(params => {
-        const id = params.get('id');
-        this.dashboardId = id ? Number(id) : null;
-    });
+        this.route.paramMap.subscribe(params => {
+            const id = params.get('id');
+            this.dashboardId = id ? Number(id) : null;
+        });
 
-    void this.initializeSyncfusionLocale();
-}
+        void this.initializeSyncfusionLocale();
+    }
 
     ngOnDestroy(): void {
         this.stopSheetWatcher();
@@ -432,83 +432,83 @@ private async initializeSyncfusionLocale(): Promise<void> {
         this.loadDashboard();
     }
 
-private loadDashboard(): void {
-    if (!this.dashboardId || !this.spreadsheet) {
-        return;
-    }
+    private loadDashboard(): void {
+        if (!this.dashboardId || !this.spreadsheet) {
+            return;
+        }
 
-    this.ignoreSpreadsheetChanges = true;
-    this.spreadsheetNotFound = false;
-    this.spreadsheetLoading = true;
+        this.ignoreSpreadsheetChanges = true;
+        this.spreadsheetNotFound = false;
+        this.spreadsheetLoading = true;
 
-    this.dashboardService.getDashboardForView(this.dashboardId).subscribe({
-        next: async (result: any) => {
-            try {
-                const dashboard = result?.dashboard ?? result;
+        this.dashboardService.getDashboardForView(this.dashboardId).subscribe({
+            next: async (result: any) => {
+                try {
+                    const dashboard = result?.dashboard ?? result;
 
-                // Dashboard not found
-                if (!dashboard || Number(dashboard.id) === 0) {
-                    this.spreadsheetNotFound = true;
-                    this.dashboardTtle = '';
+                    // Dashboard not found
+                    if (!dashboard || Number(dashboard.id) === 0) {
+                        this.spreadsheetNotFound = true;
+                        this.dashboardTtle = '';
+                        this.isDirty = false;
+                        return;
+                    }
+
+                    this.dashboardTtle = dashboard?.title ?? '';
+
+                    if (dashboard?.spreadsheet) {
+                        await this.openWorkbook(dashboard.spreadsheet);
+                    } else {
+                        // Existing dashboard without a spreadsheet
+                        await this.createEmptyWorkbook();
+                    }
+
+                } catch (error) {
+                    console.error(
+                        '[Spreadsheet] Failed to initialize dashboard spreadsheet:',
+                        error
+                    );
+
+                    this.notify.error(this.l('UnableToLoadSpreadsheet'));
+
+                } finally {
+                    this.spreadsheetLoading = false;
                     this.isDirty = false;
-                    return;
+                    this.ignoreSpreadsheetChanges = false;
+
+                    if (!this.spreadsheetNotFound) {
+                        this.syncSheetIdentity();
+                        this.syncSheetToUi();
+                        this.startSheetWatcher();
+
+                        setTimeout(() => {
+                            this.syncSheetToUi();
+                            this.cdr.detectChanges();
+                        }, 200);
+                    }
+
+                    this.cdr.detectChanges();
                 }
+            },
 
-                this.dashboardTtle = dashboard?.title ?? '';
-
-                if (dashboard?.spreadsheet) {
-                    await this.openWorkbook(dashboard.spreadsheet);
-                } else {
-                    // Existing dashboard without a spreadsheet
-                    await this.createEmptyWorkbook();
-                }
-
-            } catch (error) {
+            error: (error: any) => {
                 console.error(
-                    '[Spreadsheet] Failed to initialize dashboard spreadsheet:',
+                    '[Spreadsheet] Failed to load dashboard:',
                     error
                 );
 
-                this.notify.error(this.l('UnableToLoadSpreadsheet'));
-
-            } finally {
+                this.spreadsheetNotFound = error?.status === 404;
                 this.spreadsheetLoading = false;
-                this.isDirty = false;
                 this.ignoreSpreadsheetChanges = false;
 
                 if (!this.spreadsheetNotFound) {
-                    this.syncSheetIdentity();
-                    this.syncSheetToUi();
-                    this.startSheetWatcher();
-
-                    setTimeout(() => {
-                        this.syncSheetToUi();
-                        this.cdr.detectChanges();
-                    }, 200);
+                    this.notify.error(this.l('UnableToLoadDashboard'));
                 }
 
                 this.cdr.detectChanges();
             }
-        },
-
-        error: (error: any) => {
-            console.error(
-                '[Spreadsheet] Failed to load dashboard:',
-                error
-            );
-
-            this.spreadsheetNotFound = error?.status === 404;
-            this.spreadsheetLoading = false;
-            this.ignoreSpreadsheetChanges = false;
-
-            if (!this.spreadsheetNotFound) {
-                this.notify.error(this.l('UnableToLoadDashboard'));
-            }
-
-            this.cdr.detectChanges();
-        }
-    });
-}
+        });
+    }
 
     /** Loads a saved spreadsheet ({ workbookJson, sheetDataSources, ... }). Also used after Refresh. */
     private async openWorkbook(saved: any): Promise<void> {
@@ -934,7 +934,7 @@ private loadDashboard(): void {
 
         const sheetName = this.activeSheetName.trim().toLowerCase();
         const hasSource = this.sheetSources.some(item => String(item.sheetName ?? '').trim().toLowerCase() === sheetName);
-      const label = hasSource ? this.l('ListProperties') : this.l('NewDataSource');
+        const label = hasSource ? this.l('ListProperties') : this.l('NewDataSource');
 
         this.lastListRibbonLabel = label;
 
@@ -2601,9 +2601,8 @@ private loadDashboard(): void {
 
             this.rebuildWidgets(state.workbookJson);
             state.dashboardWidgets = clone(this.widgets);
-            state.updatedDate = moment().format('YYYY-MM-DDTHH:mm:ss.SSS') + '0000';
+            state.updatedDate = moment().format('YYYY-MM-DD HH:mm:ss');
             this.updateRefreshInfo(state);
-// state.updatedDate = state.lastRefreshDate;
 
             await firstValueFrom(
                 this.dashboardService.saveSpreadSheetJson(dashboardId, {
@@ -2808,21 +2807,20 @@ private loadDashboard(): void {
         return cleaned;
     }
 
-    private updateRefreshInfo(state: SpreadsheetPayload): void {
+  private updateRefreshInfo(state: SpreadsheetPayload): void {
     const user = this.appSession.user;
-    const tenant = this.appSession.tenant;
 
-    const fullName = [
-        user?.name,
-        user?.surname
-    ].filter(Boolean).join(' ');
+    const fullName = [user?.name, user?.surname]
+        .filter(Boolean)
+        .join(' ');
 
-    const now =
-        moment().format('YYYY-MM-DDTHH:mm:ss.SSS') + '0000';
+    // state.lastRefreshDate = moment
+    //     .utc(moment(new Date()).format('YYYY-MM-DDTHH:mm:ss'))
+    //     .format('YYYY-MM-DDTHH:mm:ss');
+     state.lastRefreshDate = moment().format('YYYY-MM-DD HH:mm:ss');
+   
 
-    state.lastRefreshDate = now;
-    state.refreshedBy =
-        `${fullName}`;
+    state.refreshedBy = fullName;
 }
     async refreshSpreadsheet(): Promise<void> {
         if (this.isRefreshing || !this.spreadsheet || !this.dashboardId) {
@@ -2857,8 +2855,8 @@ private loadDashboard(): void {
             // Save only after all source sheets and charts are refreshed.
             this.loadingMessage = 'Saving refreshed Spreadsheet...';
 
-           this.updateRefreshInfo(refreshed);
-refreshed.updatedDate = refreshed.lastRefreshDate;
+            this.updateRefreshInfo(refreshed);
+            refreshed.updatedDate = refreshed.lastRefreshDate;
 
             await firstValueFrom(
                 this.dashboardService.saveSpreadSheetJson(this.dashboardId, {

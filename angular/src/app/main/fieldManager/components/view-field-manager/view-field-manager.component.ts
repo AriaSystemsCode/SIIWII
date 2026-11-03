@@ -229,14 +229,14 @@ export class ViewFieldManagerComponent extends AppComponentBase implements OnIni
         }).then(result => {
             if (!result.isConfirmed) return;
             this.requestRevision(revision, true);
-            this.revisionEditor.save();
+            this.revisionEditor.save(true);
         });
     }
 
     private requestRevision(field: AppFieldDto, hideEditor = false): void {
         if (!this.currentItem) return;
         this.isRevisionSaved = false;
-        this.savedRevisionFieldId = null;
+        this.savedRevisionFieldId = null; 
         if (!hideEditor) this.modal.hide();
         this.revisionEditor.showRevision(this.copyItem(field), this.currentItem.currentRevisionNo, !hideEditor);
     }
