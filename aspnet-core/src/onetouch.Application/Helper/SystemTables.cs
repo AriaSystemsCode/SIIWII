@@ -980,6 +980,11 @@ namespace onetouch.Helpers
             var obj = await _sydObjectRepository.FirstOrDefaultAsync(x => x.Code == "DASHBOARD");
             return obj.Id;
         }
+        public async Task<string> GetObjectCodeById(long objectId)
+        {
+            var obj = await _sydObjectRepository.FirstOrDefaultAsync(x => x.Id == objectId);
+            return obj.Code;
+        }
         //I52[End]
     }
 }

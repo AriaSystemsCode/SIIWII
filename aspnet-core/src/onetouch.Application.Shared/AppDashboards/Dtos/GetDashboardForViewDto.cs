@@ -102,4 +102,9 @@ namespace onetouch.AppDashboards.Dtos
         public List<Dictionary<string, object>> Items { get; set; }
             = new List<Dictionary<string, object>>();
     }
+    public class TableInfo 
+    {
+        public string TableName { set; get; }
+        public string ObjectCode { set; get; }
+    }
 }

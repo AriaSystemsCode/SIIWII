@@ -915,15 +915,16 @@ namespace onetouch.AppDashboards
             var returnResult = await dynamicQueryAppService.Query(input);
             return returnResult;
         }
-        public async Task<List<string>> GetTablesList() 
+        public async Task<List<TableInfo>> GetTablesList() 
         {
-            List<string> returnList = new List<string>();
+            List<TableInfo> returnList = new List<TableInfo>();
             var dataTree = await _iAppFieldManagerAppService.GetObjectTypeTree();
             if (dataTree != null && dataTree.Count() > 0)
             {
                 foreach (var node in dataTree)
                 {
-                    var dataObjects = FindAllByNodeType(node, "DataObject");
+                    var objectCode = await _helper.SystemTables.GetObjectCodeById(node.SycObjectId);
+                    var dataObjects = FindAllByNodeType(node, "DataObject", objectCode);
                     if (dataObjects != null && dataObjects.Count > 0)
                     {
                         returnList.AddRange(dataObjects);
@@ -933,22 +934,22 @@ namespace onetouch.AppDashboards
             return returnList;
 
         }
-        public static List<string> FindAllByNodeType(
+        public static List<TableInfo> FindAllByNodeType(
     ObjectTypeTreeNodeDto obj,
-    string nodeType)
+    string nodeType, string parentObjectCode)
         {
-            var results = new List<string>();
+            var results = new List<TableInfo>();
 
             if (obj == null)
                 return results;
 
             if (obj.NodeType == nodeType)
-                results.Add(obj.Name);
+                results.Add(new TableInfo {TableName= obj.Name,ObjectCode= parentObjectCode });
 
             foreach (var child in obj.Children)
             {
                 results.AddRange(
-                    FindAllByNodeType(child, nodeType));
+                    FindAllByNodeType(child, nodeType, parentObjectCode));
             }
 
             return results;
