@@ -924,7 +924,7 @@ namespace onetouch.AppDashboards
                 foreach (var node in dataTree)
                 {
                     var objectCode = await _helper.SystemTables.GetObjectCodeById(node.SycObjectId);
-                    var dataObjects = FindAllByNodeType(node, "DataObject", objectCode);
+                    var dataObjects = FindAllByNodeType(node, "DataObject", objectCode, node.SycObjectId);
                     if (dataObjects != null && dataObjects.Count > 0)
                     {
                         returnList.AddRange(dataObjects);
@@ -936,7 +936,7 @@ namespace onetouch.AppDashboards
         }
         public static List<TableInfo> FindAllByNodeType(
     ObjectTypeTreeNodeDto obj,
-    string nodeType, string parentObjectCode)
+    string nodeType, string parentObjectCode,long parentObjectId)
         {
             var results = new List<TableInfo>();
 
@@ -944,12 +944,15 @@ namespace onetouch.AppDashboards
                 return results;
 
             if (obj.NodeType == nodeType)
-                results.Add(new TableInfo {TableName= obj.Name,ObjectCode= parentObjectCode });
+                results.Add(new TableInfo {TableName= obj.Name,
+                    ObjectCode= parentObjectCode,
+                ObjectId = parentObjectId
+                });
 
             foreach (var child in obj.Children)
             {
                 results.AddRange(
-                    FindAllByNodeType(child, nodeType, parentObjectCode));
+                    FindAllByNodeType(child, nodeType, parentObjectCode, parentObjectId));
             }
 
             return results;

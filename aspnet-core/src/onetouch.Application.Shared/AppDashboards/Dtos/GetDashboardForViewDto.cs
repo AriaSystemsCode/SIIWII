@@ -106,5 +106,6 @@ namespace onetouch.AppDashboards.Dtos
     {
         public string TableName { set; get; }
         public string ObjectCode { set; get; }
+        public long ObjectId { set; get; }
     }
 }
