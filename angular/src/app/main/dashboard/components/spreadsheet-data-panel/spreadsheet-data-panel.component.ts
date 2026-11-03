@@ -67,7 +67,11 @@ export class SpreadsheetDataPanelComponent extends AppComponentBase implements O
     isLoadingColumns = false;
 
     // ---- Table, columns, filters, destination ----
-    tables: string[] = [];
+    tables: {
+        tableName: string;
+        objectCode: string;
+        objectId: number;
+    }[] = [];
     selectedTable = '';
     tableColumns: ExtraAttribute[] = [];
     selectedColumns: ExtraAttribute[] = [];
@@ -178,7 +182,7 @@ export class SpreadsheetDataPanelComponent extends AppComponentBase implements O
     private toFilterField(field: ExtraAttribute): FilterBuilderField {
         return {
             name: field.name,
-            label:  field.name,
+            label: field.name,
             dataType: field.dataType || 'String--Textbox',
             acceptMultipleValues: field.acceptMultipleValues === true,
             isLookup: field.isLookup === true,
@@ -215,7 +219,7 @@ export class SpreadsheetDataPanelComponent extends AppComponentBase implements O
                 }
 
                 return {
-                    label: String(item.label  ?? item.name ?? item.text ?? item.value ?? item.code ?? item.id ?? ''),
+                    label: String(item.label ?? item.name ?? item.text ?? item.value ?? item.code ?? item.id ?? ''),
                     value: item.value ?? item.code ?? item.id ?? item.name
                 };
             })
@@ -275,24 +279,24 @@ export class SpreadsheetDataPanelComponent extends AppComponentBase implements O
         return this.filterBuilderFields.find(field => field.name === fieldName)?.label || fieldName;
     }
 
-   getConditionOperatorLabel(operator: string): string {
-    const labels: Record<string, string> = {
-        eq: '=',
-        neq: '≠',
-        gt: '>',
-        gte: '>=',
-        lt: '<',
-        lte: '<=',
-        contains: this.l('Contains'),
-        notcontains: this.l('DoesNotContain'),
-        startswith: this.l('StartsWith'),
-        endswith: this.l('EndsWith'),
-        in: this.l('IsIn'),
-        notin: this.l('IsNotIn')
-    };
+    getConditionOperatorLabel(operator: string): string {
+        const labels: Record<string, string> = {
+            eq: '=',
+            neq: '≠',
+            gt: '>',
+            gte: '>=',
+            lt: '<',
+            lte: '<=',
+            contains: this.l('Contains'),
+            notcontains: this.l('DoesNotContain'),
+            startswith: this.l('StartsWith'),
+            endswith: this.l('EndsWith'),
+            in: this.l('IsIn'),
+            notin: this.l('IsNotIn')
+        };
 
-    return labels[operator] || operator;
-}
+        return labels[operator] || operator;
+    }
 
     getConditionValueLabel(condition: FilterConditionRule): string {
         const value = condition.value;
@@ -308,30 +312,58 @@ export class SpreadsheetDataPanelComponent extends AppComponentBase implements O
             return option.label;
         }
 
-     return typeof value === 'boolean' ? this.l(value ? 'Yes' : 'No') : String(value);
+        return typeof value === 'boolean' ? this.l(value ? 'Yes' : 'No') : String(value);
     }
 
-    private async loadEditSource(): Promise<void> {
-        const source = this.editSource?.source;
+   private async loadEditSource(): Promise<void> {
+    const source = this.editSource?.source;
 
-        this.isEditMode = true;
-        this.insertAsNewSheet = false;
-        this.showFilterDialog = false;
-        this.selectedTable = source?.sourceKey || source?.type || '';
-        this.tables = this.selectedTable ? [this.selectedTable] : [];
-        this.clearTableSelection();
+    this.isEditMode = true;
+    this.insertAsNewSheet = false;
+    this.showFilterDialog = false;
 
-        if (!source || !this.selectedTable || !(await this.loadTableFields(this.selectedTable))) {
-            this.cdr.detectChanges();
-            return;
+    this.selectedTable = source?.sourceKey || source?.type || '';
+
+    // Load table metadata to get objectCode
+    this.tables = [];
+
+    if (this.selectedTable) {
+        try {
+            const result = await firstValueFrom(
+                this.appDashboardService.getTablesList()
+            );
+
+            this.tables = Array.isArray(result) ? result : [];
+        } catch (error) {
+            this.loadingFailed.emit(error);
         }
-
-        const savedColumns: string[] = source.columns ?? [];
-        this.selectedColumns = this.tableColumns.filter(column => savedColumns.includes(column.name));
-        this.filterTree = this.restoreSavedFilterTree(source.filters, source.mode === 'any' ? 'any' : 'all');
-
-        this.cdr.detectChanges();
     }
+
+    this.clearTableSelection();
+
+    if (
+        !source ||
+        !this.selectedTable ||
+        !(await this.loadTableFields(this.selectedTable))
+    ) {
+        this.cdr.detectChanges();
+        return;
+    }
+
+  const savedColumns: string[] = source.columns ?? [];
+
+this.selectedColumns = this.tableColumns.filter(
+    column => savedColumns.some(
+        saved => saved.toLowerCase() === column.name?.toLowerCase()
+    )
+);
+    this.filterTree = this.restoreSavedFilterTree(
+        source.filters,
+        source.mode === 'any' ? 'any' : 'all'
+    );
+
+    this.cdr.detectChanges();
+}
 
     /** Returns the saved tree. Older data only has flat conditions, which are converted to a tree. */
     private restoreSavedFilterTree(filters: any, fallbackMode: FilterMatchMode): FilterConditionGroup | null {
@@ -390,25 +422,25 @@ export class SpreadsheetDataPanelComponent extends AppComponentBase implements O
     }
 
 
-clearDataSource(): void {
-    const sheetName = this.editSource?.sheetName;
+    clearDataSource(): void {
+        const sheetName = this.editSource?.sheetName;
 
-    if (this.isAdding || !this.isEditMode || !sheetName) {
-        return;
+        if (this.isAdding || !this.isEditMode || !sheetName) {
+            return;
+        }
+
+        this.confirmationService.confirm({
+            key: 'clearDataSourceConfirm',
+            header: this.l('ClearDataSource'),
+            message: this.l('ClearDataSourceConfirmation', sheetName),
+            icon: 'pi pi-exclamation-triangle',
+            acceptLabel: this.l('Yes'),
+            rejectLabel: this.l('Cancel'),
+            acceptButtonStyleClass: 'p-button-text p-button-secondary',
+            rejectButtonStyleClass: 'p-button-text p-button-transparent',
+            accept: () => this.dataSourceCleared.emit(sheetName)
+        });
     }
-
-    this.confirmationService.confirm({
-        key: 'clearDataSourceConfirm',
-        header: this.l('ClearDataSource'),
-        message: this.l('ClearDataSourceConfirmation', sheetName),
-        icon: 'pi pi-exclamation-triangle',
-        acceptLabel: this.l('Yes'),
-        rejectLabel: this.l('Cancel'),
-        acceptButtonStyleClass: 'p-button-text p-button-secondary',
-        rejectButtonStyleClass: 'p-button-text p-button-transparent',
-        accept: () => this.dataSourceCleared.emit(sheetName)
-    });
-}
 
 
     private buildApiConditions(): DynamicCondition[] {
@@ -511,14 +543,14 @@ clearDataSource(): void {
         const replacesSheet = this.isEditMode || !this.insertAsNewSheet;
 
         if (replacesSheet && !sheetName) {
-         this.notify.warn(this.l('SelectDestinationWorksheet'));
+            this.notify.warn(this.l('SelectDestinationWorksheet'));
             return;
         }
 
         if (!this.isEditMode && !this.insertAsNewSheet && this.targetSheetHasData) {
-          const isConfirmed = window.confirm(
-    this.l('ReplaceWorksheetConfirmation', sheetName)
-);
+            const isConfirmed = window.confirm(
+                this.l('ReplaceWorksheetConfirmation', sheetName)
+            );
 
             if (!isConfirmed) {
                 return;
@@ -596,7 +628,7 @@ clearDataSource(): void {
             }
 
             if (loaded === 0) {
-              this.notify.info(this.l('NoRecordsFound'));
+                this.notify.info(this.l('NoRecordsFound'));
             }
 
         } catch (error) {
@@ -666,4 +698,10 @@ clearDataSource(): void {
     private waitForPaint(): Promise<void> {
         return new Promise(resolve => requestAnimationFrame(() => requestAnimationFrame(() => resolve())));
     }
+
+    get selectedObjectCode(): string {
+    return this.tables.find(
+        table => table.tableName === this.selectedTable
+    )?.objectCode ?? '';
+}
 }

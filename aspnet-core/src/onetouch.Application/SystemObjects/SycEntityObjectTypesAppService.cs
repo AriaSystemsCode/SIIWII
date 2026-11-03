@@ -315,6 +315,7 @@ namespace onetouch.SystemObjects
                             .WhereIf(!string.IsNullOrWhiteSpace(input.NameFilter), e => e.Name == input.NameFilter)
                             .WhereIf(!string.IsNullOrWhiteSpace(input.ExtraDataFilter), e => e.ExtraAttributes == input.ExtraDataFilter)
                             .WhereIf(!string.IsNullOrWhiteSpace(input.SydObjectNameFilter), e => e.ObjectFk != null && e.ObjectFk.Name == input.SydObjectNameFilter)
+                            .WhereIf(!string.IsNullOrWhiteSpace(input.SydObjectCodeFilter), e => e.ObjectFk != null && e.ObjectFk.Code == input.SydObjectCodeFilter)
                             .WhereIf(input?.SydObjectIdFilter > 0, e => e.ObjectId == input.SydObjectIdFilter)
                             .WhereIf(!string.IsNullOrWhiteSpace(input.SycEntityObjectTypeNameFilter), e => e.ParentFk != null && e.ParentFk.Name == input.SycEntityObjectTypeNameFilter)
                             //MMT T-SII-20220901.0019 - General : search for word doesn't work in product type[Start]
