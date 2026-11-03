@@ -430,7 +430,7 @@ export class BrowseFieldManagerComponent extends AppComponentBase implements OnI
             icon: 'info',
             showCancelButton: true,
             confirmButtonText: 'Yes',
-            cancelButtonText: 'No',
+            cancelButtonText: 'No', 
             allowOutsideClick: false,
             allowEscapeKey: false,
             backdrop: true
