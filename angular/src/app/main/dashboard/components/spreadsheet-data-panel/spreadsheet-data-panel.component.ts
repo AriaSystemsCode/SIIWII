@@ -350,12 +350,13 @@ export class SpreadsheetDataPanelComponent extends AppComponentBase implements O
         return;
     }
 
-    const savedColumns: string[] = source.columns ?? [];
+  const savedColumns: string[] = source.columns ?? [];
 
-    this.selectedColumns = this.tableColumns.filter(
-        column => savedColumns.includes(column.tableName)
-    );
-
+this.selectedColumns = this.tableColumns.filter(
+    column => savedColumns.some(
+        saved => saved.toLowerCase() === column.name?.toLowerCase()
+    )
+);
     this.filterTree = this.restoreSavedFilterTree(
         source.filters,
         source.mode === 'any' ? 'any' : 'all'
