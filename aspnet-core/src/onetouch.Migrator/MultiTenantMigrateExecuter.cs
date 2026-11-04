@@ -2,13 +2,11 @@ using System;
 using System.Linq;
 using Abp.Dependency;
 using Abp.Extensions;
-using Abp.Runtime.Security;
 using Microsoft.Data.SqlClient;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using onetouch.EntityFrameworkCore;
 using onetouch.Migrations.Deployment;
-using onetouch.MultiTenancy;
 
 namespace onetouch.Migrator
 {
@@ -16,12 +14,9 @@ namespace onetouch.Migrator
     {
         public Log Log { get; private set; }
 
-        private readonly AbpZeroDbMigrator _migrator;
-
-        public MultiTenantMigrateExecuter(AbpZeroDbMigrator migrator, Log log)
+        public MultiTenantMigrateExecuter(Log log)
         {
             Log = log;
-            _migrator = migrator;
         }
 
         public bool Run(DeploymentEnvironment environment, bool skipConfirmation)
@@ -45,22 +40,15 @@ namespace onetouch.Migrator
             }
 
             var failed = false;
-            var index = 0;
             foreach (var target in targets)
             {
-                index++;
                 Log.Write($"{environment} database={target.Label}: connection={DescribeConnection(target.ConnectionString)}");
                 LogMigrationStatus(target, "BEFORE", Log);
                 try
                 {
-                    // The existing ABP migrator expects a tenant record with an encrypted
-                    // connection string. This transient record points it at the selected
-                    // Aria.Master client database without consulting the host tenant table.
-                    var tenant = new Tenant($"deployment-{index}", target.Label)
-                    {
-                        ConnectionString = SimpleStringCipher.Instance.Encrypt(target.ConnectionString)
-                    };
-                    _migrator.CreateOrMigrateForTenant(tenant);
+                    using (var context = CreateContext(target.ConnectionString))
+                        context.Database.Migrate();
+
                     Log.Write($"{environment} database={target.Label}: MIGRATED");
                     LogMigrationStatus(target, "AFTER", Log);
                 }
@@ -97,9 +85,7 @@ namespace onetouch.Migrator
         {
             try
             {
-                var options = new DbContextOptionsBuilder<onetouchDbContext>();
-                onetouchDbContextConfigurer.Configure(options, target.ConnectionString);
-                using var context = new onetouchDbContext(options.Options);
+                using var context = CreateContext(target.ConnectionString);
 
                 var appMigrations = context.Database.GetMigrations().ToList();
                 var databaseMigrations = context.Database.GetAppliedMigrations().ToList();
@@ -113,6 +99,13 @@ namespace onetouch.Migrator
             {
                 log.Write($"{phase} migration status unavailable database={target.Label}: {ex}");
             }
+        }
+
+        private static onetouchDbContext CreateContext(string connectionString)
+        {
+            var options = new DbContextOptionsBuilder<onetouchDbContext>();
+            onetouchDbContextConfigurer.Configure(options, connectionString);
+            return new onetouchDbContext(options.Options);
         }
 
         private static SqlException FindSqlException(Exception exception)
