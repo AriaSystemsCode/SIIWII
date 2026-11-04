@@ -1,8 +1,10 @@
 using System;
+using System.Linq;
 using Abp.Dependency;
 using Abp.Extensions;
 using Abp.Runtime.Security;
 using Microsoft.Data.SqlClient;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using onetouch.EntityFrameworkCore;
 using onetouch.Migrations.Deployment;
@@ -47,6 +49,8 @@ namespace onetouch.Migrator
             foreach (var target in targets)
             {
                 index++;
+                Log.Write($"{environment} database={target.Label}: connection={DescribeConnection(target.ConnectionString)}");
+                LogMigrationStatus(target, "BEFORE", Log);
                 try
                 {
                     // The existing ABP migrator expects a tenant record with an encrypted
@@ -58,12 +62,14 @@ namespace onetouch.Migrator
                     };
                     _migrator.CreateOrMigrateForTenant(tenant);
                     Log.Write($"{environment} database={target.Label}: MIGRATED");
+                    LogMigrationStatus(target, "AFTER", Log);
                 }
                 catch (Exception ex)
                 {
                     failed = true;
-                    var sql = ex as SqlException ?? ex.InnerException as SqlException;
-                    Log.Write($"{environment} database={target.Label}: FAILED type={ex.GetType().Name} sqlNumber={sql?.Number}");
+                    var sql = FindSqlException(ex);
+                    Log.Write($"{environment} database={target.Label}: FAILED type={ex.GetType().Name} sqlNumber={sql?.Number}{Environment.NewLine}{ex}");
+                    LogMigrationStatus(target, "AFTER FAILURE", Log);
                 }
             }
 
@@ -71,6 +77,53 @@ namespace onetouch.Migrator
                 ? $"Migration finished for {environment} with failures. Review each database result above."
                 : $"Migration completed successfully for all {targets.Count} {environment} database(s).");
             return !failed;
+        }
+
+        private static string DescribeConnection(string connectionString)
+        {
+            var connection = new SqlConnectionStringBuilder(connectionString);
+            var authentication = connection.IntegratedSecurity
+                ? "Windows integrated"
+                : string.IsNullOrWhiteSpace(connection.UserID)
+                    ? "SQL/default credentials"
+                    : $"SQL login={connection.UserID}";
+
+            return $"Server={connection.DataSource}; Database={connection.InitialCatalog}; Authentication={authentication}; " +
+                   $"Encrypt={connection["Encrypt"]}; TrustServerCertificate={connection["TrustServerCertificate"]}; " +
+                   $"ConnectTimeout={connection.ConnectTimeout} seconds; Password=(redacted)";
+        }
+
+        private static void LogMigrationStatus(ClientDatabaseTarget target, string phase, Log log)
+        {
+            try
+            {
+                var options = new DbContextOptionsBuilder<onetouchDbContext>();
+                onetouchDbContextConfigurer.Configure(options, target.ConnectionString);
+                using var context = new onetouchDbContext(options.Options);
+
+                var appMigrations = context.Database.GetMigrations().ToList();
+                var databaseMigrations = context.Database.GetAppliedMigrations().ToList();
+                var pendingCount = appMigrations.Except(databaseMigrations).Count();
+                log.Write($"{phase} migration status database={target.Label}: " +
+                          $"currentDbMigration={databaseMigrations.LastOrDefault() ?? "(none)"}; " +
+                          $"currentAppMigration={appMigrations.LastOrDefault() ?? "(none)"}; " +
+                          $"pendingMigrations={pendingCount}");
+            }
+            catch (Exception ex)
+            {
+                log.Write($"{phase} migration status unavailable database={target.Label}: {ex}");
+            }
+        }
+
+        private static SqlException FindSqlException(Exception exception)
+        {
+            for (var current = exception; current != null; current = current.InnerException)
+            {
+                if (current is SqlException sqlException)
+                    return sqlException;
+            }
+
+            return null;
         }
     }
 }
