@@ -232,7 +232,6 @@ export class CreateOrEditSpreadsheetComponent extends AppComponentBase implement
                 setCulture('ar');
                 this.syncfusionLocale = 'ar';
 
-                console.log('[Syncfusion] Arabic localization loaded');
             } catch (error) {
                 console.error(
                     '[Syncfusion] Arabic localization failed:',
@@ -290,9 +289,7 @@ export class CreateOrEditSpreadsheetComponent extends AppComponentBase implement
             ? this.sheetSources.find(s => s.sheetName === this.editingSheetName) ?? null
             : null;
     }
-    private getUtcTimestamp(): string {
-    return moment.utc().format('YYYY-MM-DDTHH:mm:ss[Z]');
-}
+
 
     private findSheet(name: string): any {
         return this.allSheets.find((s: any) => s?.name === name);
@@ -2605,9 +2602,22 @@ export class CreateOrEditSpreadsheetComponent extends AppComponentBase implement
             this.rebuildWidgets(state.workbookJson);
             state.dashboardWidgets = clone(this.widgets);
             // A normal Save must not advance the data refresh cursor.
-state.updatedDate = this.spreadsheetUpdatedDate;
-state.lastRefreshDate = this.lastRefreshDate;
-state.refreshedBy = this.refreshedBy;
+
+              const user = this.appSession.user;
+            
+            
+                    const fullName = [
+                        user?.name,
+                        user?.surname
+                    ].filter(Boolean).join(' ');
+            
+                    const now = moment.utc().format('YYYY-MM-DDTHH:mm:ss[Z]');
+            
+                    // state.lastRefreshDate = now;
+                    state.refreshedBy = `${fullName}`;
+                    state.updatedDate = now;
+
+
             await firstValueFrom(
                 this.dashboardService.saveSpreadSheetJson(dashboardId, {
                     ...state,
@@ -2811,22 +2821,7 @@ state.refreshedBy = this.refreshedBy;
         return cleaned;
     }
 
-  private updateRefreshInfo(
-    state: SpreadsheetPayload,
-    refreshedAtUtc?: string
-): void {
 
-    const user = this.appSession.user;
-
-    const fullName = [user?.name, user?.surname]
-        .filter(Boolean)
-        .join(' ');
-
-    state.lastRefreshDate =
-        refreshedAtUtc ?? this.getUtcTimestamp();
-
-    state.refreshedBy = fullName;
-}
   
 async refreshSpreadsheet(): Promise<void> {
 
@@ -2838,9 +2833,7 @@ async refreshSpreadsheet(): Promise<void> {
     this.showLoading('Refreshing Spreadsheet...');
 
     // Capture the refresh boundary BEFORE requesting changes.
-    const refreshStartedAtUtc = moment
-        .utc()
-        .format('YYYY-MM-DDTHH:mm:ss[Z]');
+    const refreshStartedAtUtc = moment.utc().format('YYYY-MM-DDTHH:mm:ss[Z]');
 
     const activeSheetBefore = this.activeSheetName;
     const pivotBefore = this.showPivot ? text(this.pivotSheet) : '';
@@ -2857,19 +2850,7 @@ async refreshSpreadsheet(): Promise<void> {
         if (this.showPivot) {
             await this.closePivot();
         }
-
-        // ============================================
-        // 2. GET CURRENT WORKBOOK STATE
-        // ============================================
-
         const current = await this.buildSavedState();
-
-        console.log('[Spreadsheet Refresh] Previous date:', current.updatedDate);
-        console.log('[Spreadsheet Refresh] New UTC date:', refreshStartedAtUtc);
-
-        // ============================================
-        // 3. FETCH CHANGES AND UPDATE WORKBOOK
-        // ============================================
 
         const refreshed = await this.refreshService.refresh(current, {
             tenantId: this.appSession.tenantId,
@@ -2944,19 +2925,8 @@ async refreshSpreadsheet(): Promise<void> {
             await this.openPivot(pivotAnalysis);
         }
 
-        // ============================================
-        // 9. FINISH
-        // ============================================
 
         this.isDirty = false;
-
-        console.log('[Spreadsheet Refresh] Completed:', {
-            previousDate: current.updatedDate,
-            updatedDate: refreshed.updatedDate,
-            lastRefreshDate: refreshed.lastRefreshDate,
-            refreshedBy: refreshed.refreshedBy
-        });
-
         this.notify.success(
             'Spreadsheet refreshed and saved successfully.'
         );
