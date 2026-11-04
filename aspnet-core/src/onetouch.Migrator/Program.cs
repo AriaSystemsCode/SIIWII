@@ -49,7 +49,7 @@ namespace onetouch.Migrator
             }
             catch (Exception ex)
             {
-                Console.Error.WriteLine($"Migration could not complete ({ex.GetType().Name}). No completion was reported.");
+                Console.Error.WriteLine($"Migration could not complete ({ex.GetType().Name}). No completion was reported.{Environment.NewLine}{ex}");
                 return 1;
             }
         }
