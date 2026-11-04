@@ -89,6 +89,7 @@ using onetouch.MultiTenancy;
 using Org.BouncyCastle.Crypto.Agreement.JPake;
 using onetouch.Authorization.Roles;
 using onetouch.Authorization.Users;
+using Microsoft.AspNetCore.Http;
 
 namespace onetouch.AppItems
 {
@@ -9508,6 +9509,18 @@ namespace onetouch.AppItems
             mappingExpression.ForMember(dest => dest.PriceB, act => act.MapFrom(src => src.PriceB.ToString().TrimEnd()));
             mappingExpression.ForMember(dest => dest.PriceC, act => act.MapFrom(src => src.PriceC.ToString().TrimEnd()));
             mappingExpression.ForMember(dest => dest.PriceD, act => act.MapFrom(src => src.PriceD.ToString().TrimEnd()));
+            //mappingExpression.ForMember(dest => dest.SoldOutDate, act => act.MapFrom(src => DateOnly.Parse(src.SoldOutDate== "1/1/1900 12:00:00 AM"|| string.IsNullOrEmpty(src.StartShipDate) ? DateOnly. :src.SoldOutDate)));
+            //mappingExpression.ForMember(dest => dest.SoldOutDate, act => act.MapFrom(src => (string.IsNullOrEmpty(src.SoldOutDate) || src.SoldOutDate == "1/1/1900 12:00:00 AM") ? null : DateOnly.Parse(src.SoldOutDate)));
+            mappingExpression.ForMember(
+    dest => dest.SoldOutDate,
+    act => act.MapFrom(src =>
+        string.IsNullOrEmpty(src.SoldOutDate) ||
+        src.SoldOutDate == "1/1/1900 12:00:00 AM"
+            ? (DateOnly?)null
+            : DateOnly.Parse(src.SoldOutDate)
+    )
+);
+
 
 
         }
