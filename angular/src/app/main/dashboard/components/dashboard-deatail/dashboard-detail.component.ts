@@ -519,11 +519,6 @@ dashboardNotFound = false;
             sheetName: this.dashboardSheetName
         });
 
-        console.log('[Dashboard Drilldown]', {
-            clickedElement: (event.target as Element)?.id,
-            result
-        });
-
         if (!result) {
             return;
         }
