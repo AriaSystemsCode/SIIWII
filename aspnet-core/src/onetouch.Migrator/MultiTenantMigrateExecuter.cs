@@ -89,11 +89,11 @@ namespace onetouch.Migrator
 
                 var appMigrations = context.Database.GetMigrations().ToList();
                 var databaseMigrations = context.Database.GetAppliedMigrations().ToList();
-                var pendingCount = appMigrations.Except(databaseMigrations).Count();
+                var pendingMigrations = appMigrations.Except(databaseMigrations).ToList();
                 log.Write($"{phase} migration status database={target.Label}: " +
                           $"currentDbMigration={databaseMigrations.LastOrDefault() ?? "(none)"}; " +
                           $"currentAppMigration={appMigrations.LastOrDefault() ?? "(none)"}; " +
-                          $"pendingMigrations={pendingCount}");
+                          $"pendingMigrations={pendingMigrations.Count} [{string.Join(", ", pendingMigrations)}]");
             }
             catch (Exception ex)
             {
