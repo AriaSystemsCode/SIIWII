@@ -232,7 +232,6 @@ export class CreateOrEditSpreadsheetComponent extends AppComponentBase implement
                 setCulture('ar');
                 this.syncfusionLocale = 'ar';
 
-                console.log('[Syncfusion] Arabic localization loaded');
             } catch (error) {
                 console.error(
                     '[Syncfusion] Arabic localization failed:',
@@ -290,6 +289,7 @@ export class CreateOrEditSpreadsheetComponent extends AppComponentBase implement
             ? this.sheetSources.find(s => s.sheetName === this.editingSheetName) ?? null
             : null;
     }
+
 
     private findSheet(name: string): any {
         return this.allSheets.find((s: any) => s?.name === name);
@@ -2601,8 +2601,22 @@ export class CreateOrEditSpreadsheetComponent extends AppComponentBase implement
 
             this.rebuildWidgets(state.workbookJson);
             state.dashboardWidgets = clone(this.widgets);
-            state.updatedDate = moment().format('YYYY-MM-DD HH:mm:ss');
-            this.updateRefreshInfo(state);
+            // A normal Save must not advance the data refresh cursor.
+
+              const user = this.appSession.user;
+            
+            
+                    const fullName = [
+                        user?.name,
+                        user?.surname
+                    ].filter(Boolean).join(' ');
+            
+                    const now = moment.utc().format('YYYY-MM-DDTHH:mm:ss[Z]');
+            
+                    // state.lastRefreshDate = now;
+                    state.refreshedBy = `${fullName}`;
+                    state.updatedDate = now;
+
 
             await firstValueFrom(
                 this.dashboardService.saveSpreadSheetJson(dashboardId, {
@@ -2807,153 +2821,213 @@ export class CreateOrEditSpreadsheetComponent extends AppComponentBase implement
         return cleaned;
     }
 
-  private updateRefreshInfo(state: SpreadsheetPayload): void {
-    const user = this.appSession.user;
 
-    const fullName = [user?.name, user?.surname]
-        .filter(Boolean)
-        .join(' ');
+  
+async refreshSpreadsheet(): Promise<void> {
 
-    // state.lastRefreshDate = moment
-    //     .utc(moment(new Date()).format('YYYY-MM-DDTHH:mm:ss'))
-    //     .format('YYYY-MM-DDTHH:mm:ss');
-     state.lastRefreshDate = moment().format('YYYY-MM-DD HH:mm:ss');
-   
+    if (this.isRefreshing || !this.spreadsheet || !this.dashboardId) {
+        return;
+    }
 
-    state.refreshedBy = fullName;
-}
-    async refreshSpreadsheet(): Promise<void> {
-        if (this.isRefreshing || !this.spreadsheet || !this.dashboardId) {
-            return;
+    this.isRefreshing = true;
+    this.showLoading('Refreshing Spreadsheet...');
+
+    // Capture the refresh boundary BEFORE requesting changes.
+    const refreshStartedAtUtc = moment.utc().format('YYYY-MM-DDTHH:mm:ss[Z]');
+
+    const activeSheetBefore = this.activeSheetName;
+    const pivotBefore = this.showPivot ? text(this.pivotSheet) : '';
+
+    try {
+
+        // ============================================
+        // 1. CLOSE OPEN PANELS
+        // ============================================
+
+        this.closeChartPanel();
+        this.closeDataPanel();
+
+        if (this.showPivot) {
+            await this.closePivot();
         }
+        const current = await this.buildSavedState();
 
-        this.isRefreshing = true;
-        this.showLoading('Refreshing Spreadsheet...');
-
-        const activeSheetBefore = this.activeSheetName;
-        const pivotBefore = this.showPivot ? text(this.pivotSheet) : '';
-
-        try {
-            this.closeChartPanel();
-            this.closeDataPanel();
-
-            if (this.showPivot) {
-                await this.closePivot();
+        const refreshed = await this.refreshService.refresh(current, {
+            tenantId: this.appSession.tenantId,
+            highlight: true,
+            onProgress: (message, done, total) => {
+                this.loadingMessage = message;
+                this.setProgress(done, total);
+                this.cdr.detectChanges();
             }
+        });
 
-            const current = await this.buildSavedState();
+        // ============================================
+        // 4. UPDATE REFRESH INFORMATION
+        // ============================================
 
-            const refreshed = await this.refreshService.refresh(current, {
-                tenantId: this.appSession.tenantId,
-                highlight: true,
-                onProgress: (message, done, total) => {
-                    this.loadingMessage = message;
-                    this.setProgress(done, total);
-                }
-            });
+        this.loadingMessage = 'Saving refreshed Spreadsheet...';
 
-            // Save only after all source sheets and charts are refreshed.
-            this.loadingMessage = 'Saving refreshed Spreadsheet...';
+        const user = this.appSession.user;
 
-            this.updateRefreshInfo(refreshed);
-            refreshed.updatedDate = refreshed.lastRefreshDate;
+        const fullName = [user?.name, user?.surname]
+            .filter(Boolean)
+            .join(' ');
 
-            await firstValueFrom(
-                this.dashboardService.saveSpreadSheetJson(this.dashboardId, {
+        // Save timestamps as UTC.
+        refreshed.updatedDate = refreshStartedAtUtc;
+        refreshed.lastRefreshDate = refreshStartedAtUtc;
+        refreshed.refreshedBy = fullName;
+
+        // ============================================
+        // 5. SAVE REFRESHED WORKBOOK
+        // ============================================
+
+        await firstValueFrom(
+            this.dashboardService.saveSpreadSheetJson(
+                this.dashboardId,
+                {
                     ...refreshed,
                     recordCount: this.countRecords(refreshed.workbookJson)
-                } as any)
-            );
-
-            // Reopen the exact workbook that was saved.
-            this.ignoreSpreadsheetChanges = true;
-            await this.openWorkbook(refreshed);
-
-            if (
-                activeSheetBefore &&
-                this.findSheet(activeSheetBefore) &&
-                this.activeSheetName !== activeSheetBefore
-            ) {
-                await this.activateSheet(activeSheetBefore);
-            }
-
-            const pivotAnalysis = pivotBefore
-                ? this.findAnalysis(pivotBefore)
-                : null;
-
-            if (pivotAnalysis) {
-                await this.openPivot(pivotAnalysis);
-            }
-
-            this.isDirty = false;
-            this.notify.success(
-                'Spreadsheet refreshed and saved successfully.'
-            );
-
-        } catch (error) {
-            console.error('[Spreadsheet] Refresh or save failed:', error);
-            this.notify.error(
-                'Unable to complete Spreadsheet refresh and save.'
-            );
-        } finally {
-            this.ignoreSpreadsheetChanges = false;
-            this.isRefreshing = false;
-            this.hideLoading();
-            this.cdr.detectChanges();
-            this.resizeLater(100);
-        }
-    }
-
-    async onDataSourceCleared(sheetName: string): Promise<void> {
-
-        if (!this.spreadsheet || !sheetName) {
-            return;
-        }
-
-        const sheet = this.findSheet(sheetName);
-
-        if (!sheet) {
-            this.notify.warn('Worksheet not found.');
-            return;
-        }
-
-        const hasSource = this.sheetSources.some(
-            source => source.sheetName === sheetName
+                } as any
+            )
         );
 
-        if (!hasSource) {
-            this.notify.warn('No linked data source found.');
-            return;
+        // ============================================
+        // 6. REOPEN SAVED WORKBOOK
+        // ============================================
+
+        this.ignoreSpreadsheetChanges = true;
+
+        await this.openWorkbook(refreshed);
+
+        // ============================================
+        // 7. RESTORE ACTIVE SHEET
+        // ============================================
+
+        if (
+            activeSheetBefore &&
+            this.findSheet(activeSheetBefore) &&
+            this.activeSheetName !== activeSheetBefore
+        ) {
+            await this.activateSheet(activeSheetBefore);
         }
 
-        try {
+        // ============================================
+        // 8. RESTORE PIVOT
+        // ============================================
 
-            await this.clearSheetForEdit(sheetName);
-            this.sheetSources = this.sheetSources.filter(
-                source => source.sheetName !== sheetName
-            );
-            delete this.sheetRecordIds[sheetName];
-            this.newDataSheetName = null;
-            this.newDataSheetFields = [];
-            this.newDataSheetLoadedRows = 0;
-            this.closeDataPanel();
-            this.updateListRibbonButton();
-            this.markDirty();
-            this.notify.success(
-                'Data source removed and worksheet cleared. Click Save to persist.'
-            );
+        const pivotAnalysis = pivotBefore
+            ? this.findAnalysis(pivotBefore)
+            : null;
 
-        } catch (error) {
-
-            console.error(
-                '[Spreadsheet] Failed to clear data source:',
-                error
-            );
-
-            this.notify.error(
-                'Unable to clear worksheet data.'
-            );
+        if (pivotAnalysis) {
+            await this.openPivot(pivotAnalysis);
         }
+
+
+        this.isDirty = false;
+        this.notify.success(
+            'Spreadsheet refreshed and saved successfully.'
+        );
+
+    } catch (error) {
+
+        console.error(
+            '[Spreadsheet] Refresh or save failed:',
+            error
+        );
+
+        this.notify.error(
+            'Unable to complete Spreadsheet refresh and save.'
+        );
+
+    } finally {
+
+        this.ignoreSpreadsheetChanges = false;
+        this.isRefreshing = false;
+
+        this.hideLoading();
+        this.cdr.detectChanges();
+        this.resizeLater(100);
     }
+}
+
+  async onDataSourceCleared(event: {
+    sheetName: string;
+    clearWorksheetData: boolean;
+}): Promise<void> {
+
+    const { sheetName, clearWorksheetData } = event;
+
+    if (!this.spreadsheet || !sheetName) {
+        return;
+    }
+
+    const sheet = this.findSheet(sheetName);
+
+    if (!sheet) {
+        this.notify.warn('Worksheet not found.');
+        return;
+    }
+
+    const hasSource = this.sheetSources.some(
+        source => source.sheetName === sheetName
+    );
+
+    if (!hasSource) {
+        this.notify.warn('No linked data source found.');
+        return;
+    }
+
+    try {
+
+        // Clear cells only when the checkbox is checked.
+        if (clearWorksheetData) {
+            await this.clearSheetForEdit(sheetName);
+        }
+
+        // Always remove the linked data source.
+        this.sheetSources = this.sheetSources.filter(
+            source => source.sheetName !== sheetName
+        );
+
+        // Remove linked record tracking.
+        delete this.sheetRecordIds[sheetName];
+
+        // Reset temporary loading state.
+        this.newDataSheetName = null;
+        this.newDataSheetFields = [];
+        this.newDataSheetLoadedRows = 0;
+
+        // Close panel and update UI.
+        this.closeDataPanel();
+        this.updateListRibbonButton();
+
+        // Require Save to persist the change.
+        this.markDirty();
+
+        if (clearWorksheetData) {
+            this.notify.success(
+                'Data source removed and worksheet cleared. Click Save on the spreadsheet to persist this change.'
+            );
+        } else {
+            this.notify.success(
+                'Data source removed. Existing worksheet data has been kept. Click Save on the spreadsheet to persist this change.'
+            );
+        }
+
+    } catch (error) {
+
+        console.error(
+            '[Spreadsheet] Failed to remove data source:',
+            error
+        );
+
+        this.notify.error(
+            'Unable to remove the linked data source.'
+        );
+    }
+}
 
 }

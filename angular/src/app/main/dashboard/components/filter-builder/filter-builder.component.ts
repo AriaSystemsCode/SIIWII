@@ -82,7 +82,7 @@ private readonly equalityOperators: SelectOption[] = [
 
 private readonly dateOperators: SelectOption[] = [
     { label: this.l('IsIn'), value: 'in' },
-    { label: this.l('IsNotIn'), value: 'notin' },
+    // { label: this.l('IsNotIn'), value: 'notin' },
     { label: this.l('Equal'), value: 'eq' },
     { label: this.l('NotEqual'), value: 'neq' },
     { label: this.l('Before'), value: 'lt' },
@@ -164,23 +164,55 @@ private loadSavedLookupOptions(group: FilterConditionGroup): void {
 }
 
     /** Copies a saved group and turns saved date strings back into Date objects. */
-    private restoreGroup(group: FilterConditionGroup): FilterConditionGroup {
-        return {
-            type: 'group',
-            matchMode: group.matchMode,
-            children: group.children.map(node => {
-                if (node.type === 'group') {
-                    return this.restoreGroup(node);
-                }
+   private restoreGroup(
+    group: FilterConditionGroup
+): FilterConditionGroup {
 
-                return {
-                    ...node,
-                    value: this.restoreValue(node.field, node.value),
-                    dateRange: node.dateRange?.map(date => new Date(date))
-                };
-            })
-        };
-    }
+    return {
+        type: 'group',
+        matchMode: group.matchMode,
+
+        children: group.children.map(node => {
+
+            // Restore nested groups
+            if (node.type === 'group') {
+                return this.restoreGroup(node);
+            }
+
+            const isBetween =
+                node.operator === 'between' ||
+                node.operator === 'notbetween';
+
+            return {
+                ...node,
+
+                // Restore original operator for UI
+                operator:
+                    node.operator === 'between'
+                        ? 'in'
+                        : node.operator === 'notbetween'
+                            ? 'notin'
+                            : node.operator,
+
+                // Between value is used only for API
+                value: isBetween
+                    ? null
+                    : this.restoreValue(
+                        node.field,
+                        node.value
+                    ),
+
+                // Keep selected period
+                datePeriod: node.datePeriod,
+
+                // Restore custom date range
+                dateRange: node.dateRange?.map(
+                    date => new Date(date)
+                )
+            };
+        })
+    };
+}
 
     private restoreValue(fieldName: string, value: any): any {
         if (value === null || value === undefined || value === '') {
@@ -503,15 +535,37 @@ private loadSavedLookupOptions(group: FilterConditionGroup): void {
                 continue;
             }
 
-            if (this.isDatePeriodOperator(node)) {
-                const period = this.buildDatePeriodGroup(node);
+          if (this.isDatePeriodOperator(node)) {
+    const range = this.getDateRange(node);
 
-                if (period) {
-                    children.push(period);
-                }
-                continue;
-            }
+    if (!range) {
+        continue;
+    }
 
+    children.push({
+        type: 'rule',
+        field: node.field,
+
+        operator: node.operator === 'notin'
+            ? 'notbetween'
+            : 'between',
+
+        // First date
+        value: this.formatDate(range[0]),
+
+        // Second date
+        value2: this.formatDate(range[1]),
+
+        // Preserve UI selection
+        datePeriod: node.datePeriod,
+
+        dateRange: node.datePeriod === 'dateRange'
+            ? node.dateRange
+            : undefined
+    });
+
+    continue;
+}
             children.push({
                 type: 'rule',
                 field: node.field,
