@@ -6,38 +6,52 @@ namespace onetouch.Migrations
     {
         protected override void Up(MigrationBuilder migrationBuilder)
         {
-            migrationBuilder.AddColumn<int>(
-                name: "EntityObjectTypeId",
-                table: "SycAttachmentCategories",
-                nullable: true);
+            migrationBuilder.Sql(@"
+IF COL_LENGTH(N'dbo.SycAttachmentCategories', N'EntityObjectTypeId') IS NULL
+    ALTER TABLE [dbo].[SycAttachmentCategories] ADD [EntityObjectTypeId] int NULL;
 
-            migrationBuilder.CreateIndex(
-                name: "IX_SycAttachmentCategories_EntityObjectTypeId",
-                table: "SycAttachmentCategories",
-                column: "EntityObjectTypeId");
+IF NOT EXISTS (
+    SELECT 1
+    FROM sys.indexes
+    WHERE [object_id] = OBJECT_ID(N'dbo.SycAttachmentCategories')
+      AND [name] = N'IX_SycAttachmentCategories_EntityObjectTypeId')
+    CREATE INDEX [IX_SycAttachmentCategories_EntityObjectTypeId]
+        ON [dbo].[SycAttachmentCategories] ([EntityObjectTypeId]);
 
-            migrationBuilder.AddForeignKey(
-                name: "FK_SycAttachmentCategories_SycEntityObjectTypes_EntityObjectTypeId",
-                table: "SycAttachmentCategories",
-                column: "EntityObjectTypeId",
-                principalTable: "SycEntityObjectTypes",
-                principalColumn: "Id",
-                onDelete: ReferentialAction.Restrict);
+IF NOT EXISTS (
+    SELECT 1
+    FROM sys.foreign_keys
+    WHERE [parent_object_id] = OBJECT_ID(N'dbo.SycAttachmentCategories')
+      AND [name] = N'FK_SycAttachmentCategories_SycEntityObjectTypes_EntityObjectTypeId')
+    ALTER TABLE [dbo].[SycAttachmentCategories] WITH CHECK
+        ADD CONSTRAINT [FK_SycAttachmentCategories_SycEntityObjectTypes_EntityObjectTypeId]
+        FOREIGN KEY ([EntityObjectTypeId])
+        REFERENCES [dbo].[SycEntityObjectTypes] ([Id]);
+");
         }
 
         protected override void Down(MigrationBuilder migrationBuilder)
         {
-            migrationBuilder.DropForeignKey(
-                name: "FK_SycAttachmentCategories_SycEntityObjectTypes_EntityObjectTypeId",
-                table: "SycAttachmentCategories");
+            migrationBuilder.Sql(@"
+IF EXISTS (
+    SELECT 1
+    FROM sys.foreign_keys
+    WHERE [parent_object_id] = OBJECT_ID(N'dbo.SycAttachmentCategories')
+      AND [name] = N'FK_SycAttachmentCategories_SycEntityObjectTypes_EntityObjectTypeId')
+    ALTER TABLE [dbo].[SycAttachmentCategories]
+        DROP CONSTRAINT [FK_SycAttachmentCategories_SycEntityObjectTypes_EntityObjectTypeId];
 
-            migrationBuilder.DropIndex(
-                name: "IX_SycAttachmentCategories_EntityObjectTypeId",
-                table: "SycAttachmentCategories");
+IF EXISTS (
+    SELECT 1
+    FROM sys.indexes
+    WHERE [object_id] = OBJECT_ID(N'dbo.SycAttachmentCategories')
+      AND [name] = N'IX_SycAttachmentCategories_EntityObjectTypeId')
+    DROP INDEX [IX_SycAttachmentCategories_EntityObjectTypeId]
+        ON [dbo].[SycAttachmentCategories];
 
-            migrationBuilder.DropColumn(
-                name: "EntityObjectTypeId",
-                table: "SycAttachmentCategories");
+IF COL_LENGTH(N'dbo.SycAttachmentCategories', N'EntityObjectTypeId') IS NOT NULL
+    ALTER TABLE [dbo].[SycAttachmentCategories] DROP COLUMN [EntityObjectTypeId];
+");
         }
     }
 }
