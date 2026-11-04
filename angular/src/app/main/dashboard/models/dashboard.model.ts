@@ -217,6 +217,7 @@ export interface FilterConditionRule {
     field: string;
     operator: string;
     value: any;
+    value2?: any;
     datePeriod?: string;
     dateRange?: Date[];
 }

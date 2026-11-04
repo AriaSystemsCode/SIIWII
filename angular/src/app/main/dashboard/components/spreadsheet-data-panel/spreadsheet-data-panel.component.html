@@ -9,7 +9,7 @@
 
             <button *ngIf="isEditMode" type="button" class="btn btn-sm btn-clear-danger mr-2" [disabled]="isAdding"
                 (click)="clearDataSource()">
-                <i class="fa fa-trash-alt mr-2"></i>{{ 'ClearData' | localize }}
+                <i class="fa fa-trash-alt mr-2"></i>{{ 'ClearDataSource' | localize }}
             </button>
 
             <button type="button" class="btn btn-sm btn-light" (click)="closePanel()">
@@ -132,8 +132,12 @@
 
                                 <div *ngIf="node.type === 'rule'" class="filter-preview-rule">
                                     <strong>{{ getConditionFieldLabel(node.field) }}</strong>
-                                    <em>{{ getConditionOperatorLabel(node.operator) }}</em>
-                                    <span class="filter-preview-value">{{ getConditionValueLabel(node) }}</span>
+
+                                    <em>{{ getConditionOperatorLabel(node.operator, node) }}</em>
+
+                                    <span class="filter-preview-value">
+                                        {{ getConditionValueLabel(node) }}
+                                    </span>
                                 </div>
 
                                 <div *ngIf="node.type === 'group'" class="filter-preview-nested">
@@ -169,15 +173,10 @@
                         <span class="font-weight-bold">{{ 'Filters' | localize }}</span>
                     </ng-template>
 
-                    <app-filter-builder
-    *ngIf="showFilterDialog"
-    [fields]="filterBuilderFields"
-    [filterTree]="filterTree"
-    [objectCode]="selectedObjectCode"
-    [tableName]="selectedTable"
-    (applyTree)="onApplyTree($event)"
-    (cancel)="closeFilterDialog()">
-</app-filter-builder>
+                    <app-filter-builder *ngIf="showFilterDialog" [fields]="filterBuilderFields"
+                        [filterTree]="filterTree" [objectCode]="selectedObjectCode" [tableName]="selectedTable"
+                        (applyTree)="onApplyTree($event)" (cancel)="closeFilterDialog()">
+                    </app-filter-builder>
 
                 </p-dialog>
 
@@ -235,6 +234,82 @@
 </div>
 
 <!-- ===== CLEAR DATA CONFIRMATION ===== -->
-<p-confirmDialog key="clearDataSourceConfirm" appendTo="body" [closable]="false" [dismissableMask]="false"
-    [style]="{ width: '440px', maxWidth: '95vw' }" styleClass="clear-data-confirm-dialog">
-</p-confirmDialog>
+<!-- CLEAR DATA SOURCE DIALOG -->
+<p-dialog
+    [(visible)]="showClearDataSourceDialog"
+    [modal]="true"
+    [draggable]="false"
+    [resizable]="false"
+    [closable]="true"
+    [dismissableMask]="false"
+    [style]="{ width: '460px', maxWidth: '95vw' }"
+    appendTo="body"
+    [header]="'ClearDataSource' | localize"
+    (onHide)="cancelClearDataSource()">
+
+    <div class="p-2">
+
+        <!-- Confirmation message -->
+        <p class="mb-4">
+            {{
+                'RemoveLinkedDataSourceConfirmation'
+                    | localize:clearDataSourceSheetName
+            }}
+        </p>
+
+        <!-- Checkbox -->
+        <div class="border rounded p-3 mb-3">
+
+            <label class="d-flex align-items-center mb-0"
+                   style="gap: 10px; cursor: pointer;">
+
+                <input
+                    type="checkbox"
+                    [(ngModel)]="clearWorksheetData"
+                    [ngModelOptions]="{ standalone: true }"
+                    style="width: 18px; height: 18px;" />
+
+                <strong>
+                    {{ 'AlsoClearWorksheetData' | localize }}
+                </strong>
+
+            </label>
+
+            <!-- <small class="d-block text-muted mt-2">
+                {{
+                    (clearWorksheetData
+                        ? 'WorksheetDataWillBeCleared'
+                        : 'WorksheetDataWillBeKept') | localize
+                }}
+            </small> -->
+
+        </div>
+
+        <!-- Save reminder -->
+        <div class="text-muted small">
+            <i class="pi pi-info-circle mr-2"></i>
+            {{ 'ClickSaveToPersistChange' | localize }}
+        </div>
+
+    </div>
+
+    <!-- Footer -->
+    <ng-template pTemplate="footer">
+
+        <button
+            type="button"
+            class="btn btn-light mr-2"
+            (click)="cancelClearDataSource()">
+            {{ 'Cancel' | localize }}
+        </button>
+
+        <button
+            type="button"
+            class="btn btn-danger"
+            (click)="confirmClearDataSource()">
+            {{ 'Yes' | localize }}
+        </button>
+
+    </ng-template>
+
+</p-dialog>

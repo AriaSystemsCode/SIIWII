@@ -2983,56 +2983,81 @@ async refreshSpreadsheet(): Promise<void> {
     }
 }
 
-    async onDataSourceCleared(sheetName: string): Promise<void> {
+  async onDataSourceCleared(event: {
+    sheetName: string;
+    clearWorksheetData: boolean;
+}): Promise<void> {
 
-        if (!this.spreadsheet || !sheetName) {
-            return;
+    const { sheetName, clearWorksheetData } = event;
+
+    if (!this.spreadsheet || !sheetName) {
+        return;
+    }
+
+    const sheet = this.findSheet(sheetName);
+
+    if (!sheet) {
+        this.notify.warn('Worksheet not found.');
+        return;
+    }
+
+    const hasSource = this.sheetSources.some(
+        source => source.sheetName === sheetName
+    );
+
+    if (!hasSource) {
+        this.notify.warn('No linked data source found.');
+        return;
+    }
+
+    try {
+
+        // Clear cells only when the checkbox is checked.
+        if (clearWorksheetData) {
+            await this.clearSheetForEdit(sheetName);
         }
 
-        const sheet = this.findSheet(sheetName);
-
-        if (!sheet) {
-            this.notify.warn('Worksheet not found.');
-            return;
-        }
-
-        const hasSource = this.sheetSources.some(
-            source => source.sheetName === sheetName
+        // Always remove the linked data source.
+        this.sheetSources = this.sheetSources.filter(
+            source => source.sheetName !== sheetName
         );
 
-        if (!hasSource) {
-            this.notify.warn('No linked data source found.');
-            return;
-        }
+        // Remove linked record tracking.
+        delete this.sheetRecordIds[sheetName];
 
-        try {
+        // Reset temporary loading state.
+        this.newDataSheetName = null;
+        this.newDataSheetFields = [];
+        this.newDataSheetLoadedRows = 0;
 
-            await this.clearSheetForEdit(sheetName);
-            this.sheetSources = this.sheetSources.filter(
-                source => source.sheetName !== sheetName
-            );
-            delete this.sheetRecordIds[sheetName];
-            this.newDataSheetName = null;
-            this.newDataSheetFields = [];
-            this.newDataSheetLoadedRows = 0;
-            this.closeDataPanel();
-            this.updateListRibbonButton();
-            this.markDirty();
+        // Close panel and update UI.
+        this.closeDataPanel();
+        this.updateListRibbonButton();
+
+        // Require Save to persist the change.
+        this.markDirty();
+
+        if (clearWorksheetData) {
             this.notify.success(
-                'Data source removed and worksheet cleared. Click Save to persist.'
+                'Data source removed and worksheet cleared. Click Save on the spreadsheet to persist this change.'
             );
-
-        } catch (error) {
-
-            console.error(
-                '[Spreadsheet] Failed to clear data source:',
-                error
-            );
-
-            this.notify.error(
-                'Unable to clear worksheet data.'
+        } else {
+            this.notify.success(
+                'Data source removed. Existing worksheet data has been kept. Click Save on the spreadsheet to persist this change.'
             );
         }
+
+    } catch (error) {
+
+        console.error(
+            '[Spreadsheet] Failed to remove data source:',
+            error
+        );
+
+        this.notify.error(
+            'Unable to remove the linked data source.'
+        );
     }
+}
 
 }

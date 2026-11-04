@@ -1240,6 +1240,7 @@ $danger-bg: #fff0f0;
         gap: 12px;
         box-sizing: border-box;
     }
+   
 
     .filter-field,
     .filter-operator,
@@ -1317,3 +1318,7 @@ $danger-bg: #fff0f0;
     color: #64748b;
     font-size: 12px;
 }
+
+ .filter-operator {
+        max-width: 175px  !important;
+    }
