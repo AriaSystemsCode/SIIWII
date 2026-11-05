@@ -143,6 +143,14 @@ namespace onetouch.Web.Startup
 
         public async Task Invoke(HttpContext context)
         {
+            // Swagger can send an explicit client URL because its requests may not
+            // include the browser's Origin header.
+            var clientUrl = context.Request.Headers["X-Client-Url"].FirstOrDefault();
+            if (!string.IsNullOrWhiteSpace(clientUrl))
+            {
+                context.Items["XXXClientUrl"] = clientUrl;
+            }
+
             // Read Origin header
             var origin = context.Request.Headers["Origin"].FirstOrDefault();
 
