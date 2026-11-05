@@ -114,6 +114,7 @@ export class AccountInfoComponent extends AppComponentBase implements OnInit {
     // relations / connections
     relationId = 0;
     roleSeller = false;
+    roleEmployer = false;
     connectionsInfo: ConnectionInfo[] = [];
     availableConnectionsInfo: ConnectionInfo[] = [];
     availableConnections: any[] = [];
@@ -191,6 +192,12 @@ export class AccountInfoComponent extends AppComponentBase implements OnInit {
             this.roleSeller = (roles || []).some(r =>
                 (r.requesterMarketplaceRole || '').toLowerCase().includes('seller') ||
                 (r.recipientMarketplaceRole || '').toLowerCase().includes('seller')
+
+            );
+
+                this.roleEmployer = (roles || []).some(r =>
+                (r.requesterMarketplaceRole || '').toLowerCase().includes('employer') 
+
             );
         });
     }
