@@ -152,17 +152,18 @@ namespace onetouch.Web.Startup
                 context.Items["XXXClientUrl"] = clientUrl;
             }
 
-            // Read Origin header
+            // Prefer Origin for FE calls because its host identifies the client UI.
             var origin = context.Request.Headers["Origin"].FirstOrDefault();
 
-            if (!string.IsNullOrEmpty(origin))
+            if (string.IsNullOrWhiteSpace(origin))
             {
-                // Example: log it, or attach to HttpContext.Items
-                Console.WriteLine($"[OriginMiddleware] Request Origin: {origin}");
-
-                // Store in HttpContext for later use
-                context.Items["XXXRequestOrigin"] = origin;
+                // Browser navigations and direct API calls may omit Origin. In that
+                // case, resolve the client from the host serving this request.
+                origin = $"{context.Request.Scheme}://{context.Request.Host}";
             }
+
+            Console.WriteLine($"[OriginMiddleware] Request client URL: {origin}");
+            context.Items["XXXRequestOrigin"] = origin;
 
             await _next(context);
         }
