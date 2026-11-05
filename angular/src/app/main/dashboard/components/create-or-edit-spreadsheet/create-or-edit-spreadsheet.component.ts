@@ -180,6 +180,8 @@ export class CreateOrEditSpreadsheetComponent extends AppComponentBase implement
     spreadsheetNotFound = false;
     spreadsheetLoading = false;
 
+    private knownSheetNames = new Map<any, string>();
+
 
     constructor(
         injector: Injector,
@@ -2464,6 +2466,8 @@ export class CreateOrEditSpreadsheetComponent extends AppComponentBase implement
 
     /** Syncs ids/names before save (also handles renamed/deleted tabs). */
     private syncSheetIdentity(): void {
+            this.syncRenamedSheets();
+
         const existingSheets = this.allSheets.filter((sheet: any) => !!text(sheet?.name));
         const existingNames = new Set(existingSheets.map((sheet: any) => text(sheet.name)));
 
@@ -3028,6 +3032,115 @@ async refreshSpreadsheet(): Promise<void> {
             'Unable to remove the linked data source.'
         );
     }
+}
+
+private captureSheetNames(): void {
+    this.knownSheetNames.clear();
+
+    this.allSheets.forEach(sheet => {
+        if (sheet?.id != null) {
+            this.knownSheetNames.set(sheet.id, text(sheet.name));
+        }
+    });
+}
+
+private syncRenamedSheets(): void {
+    for (const sheet of this.allSheets) {
+        if (sheet?.id == null) continue;
+
+        const oldName = this.knownSheetNames.get(sheet.id);
+        const newName = text(sheet.name);
+
+        if (oldName && oldName !== newName) {
+            this.applySheetRename(oldName, newName);
+        }
+
+        this.knownSheetNames.set(sheet.id, newName);
+    }
+}
+private applySheetRename(oldName: string, newName: string): void {
+    if (!oldName || !newName || oldName === newName) return;
+
+    const renameRange = (range: string): string => {
+        if (!range) return range;
+
+        const parsed = parseRange(range);
+
+        if (!parsed || parsed.sheetName !== oldName) {
+            return range;
+        }
+
+        const address = range.slice(range.lastIndexOf('!') + 1);
+        return `${quoteSheetName(newName)}!${address}`;
+    };
+
+    // Data source metadata
+    this.sheetSources.forEach(source => {
+        if (source.sheetName === oldName) {
+            source.sheetName = newName;
+        }
+    });
+
+    // Record ID mapping
+    if (Object.prototype.hasOwnProperty.call(this.sheetRecordIds, oldName)) {
+        this.sheetRecordIds[newName] = this.sheetRecordIds[oldName];
+        delete this.sheetRecordIds[oldName];
+    }
+
+    // Pivot analysis metadata
+    this.analyses.forEach((analysis: any) => {
+        if (analysis.sourceSheetName === oldName) {
+            analysis.sourceSheetName = newName;
+        }
+
+        if (analysis.sheetName === oldName) {
+            analysis.sheetName = newName;
+        }
+    });
+
+    // Dashboard widget metadata
+    this.widgets.forEach((widget: any) => {
+        if (widget.sourceSheetName === oldName) {
+            widget.sourceSheetName = newName;
+        }
+
+        if (widget.dashboardSheetName === oldName) {
+            widget.dashboardSheetName = newName;
+        }
+
+        if (widget.sourceRange) {
+            widget.sourceRange = renameRange(widget.sourceRange);
+        }
+    });
+
+    // Chart source references
+    this.allSheets.forEach(sheet => {
+        getSheetCharts(sheet).forEach((chart: any) => {
+            chart.range = renameRange(chart.range);
+            chart.originalRange = renameRange(chart.originalRange);
+            chart.categoryRange = renameRange(chart.categoryRange);
+
+            if (Array.isArray(chart.seriesRanges)) {
+                chart.seriesRanges = chart.seriesRanges.map((item: any) =>
+                    typeof item === 'string'
+                        ? renameRange(item)
+                        : { ...item, range: renameRange(item.range) }
+                );
+            }
+        });
+    });
+
+    // Current UI state
+    if (this.sourceSheet === oldName) this.sourceSheet = newName;
+    if (this.pivotSheet === oldName) this.pivotSheet = newName;
+    if (this.editingSheetName === oldName) this.editingSheetName = newName;
+    if (this.dataPanelTargetSheetName === oldName) this.dataPanelTargetSheetName = newName;
+    if (this.chartSheet === oldName) this.chartSheet = newName;
+    if (this.newDataSheetName === oldName) this.newDataSheetName = newName;
+
+    this.markDirty();
+
+    console.log(`[Spreadsheet] Renamed "${oldName}" to "${newName}"`);
 }
 
 }
