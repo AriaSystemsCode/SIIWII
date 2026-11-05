@@ -1,0 +1,18 @@
+@media (min-width: 768px) and (max-width: 1024px) {
+
+    .tablet-drilldown-dialog {
+        max-width: calc(100vw - 105px) !important;
+    }
+
+    /* English */
+    html[dir="ltr"] .tablet-drilldown-dialog {
+        margin-left: 85px !important;
+        margin-right: 0 !important;
+    }
+
+    /* Arabic */
+    html[dir="rtl"] .tablet-drilldown-dialog {
+        margin-right: 85px !important;
+        margin-left: 0 !important;
+    }
+}
