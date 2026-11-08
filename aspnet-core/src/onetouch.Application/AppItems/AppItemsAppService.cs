@@ -7573,7 +7573,7 @@ namespace onetouch.AppItems
             var existingParentsById = existingParentIds.Count == 0
                 ? new Dictionary<long, AppItem>()
                 : (await _appItemRepository.GetAll()
-                    .AsNoTracking()
+                    //.AsNoTracking()
                     .AsSplitQuery()
                     .Where(z => existingParentIds.Contains(z.Id) && z.ListingItemId == null)
                     .Include(z => z.EntityFk).ThenInclude(z => z.EntityCategories)
