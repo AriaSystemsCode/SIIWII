@@ -7,15 +7,7 @@
         <div class="kt-subheader kt-grid__item linesheet-subheader" *ngIf="!isModal">
             <div [class]="containerClass">
                 <div class="kt-subheader__main">
-                    <h3 class="kt-subheader__title">
-                        <a class="text-capitalize text-dark" type="button" (click)="redirectToAppItemList()">
-                            <i class="fas fa-arrow-left"></i>
-                            {{ "Back" | localize }}
-                        </a>
-                    </h3>
-                    <span class="
-                            kt-subheader__separator kt-subheader__separator--v
-                        "></span>
+                 
                     <span class="kt-subheader__desc">
                         {{ "Linesheet" | localize }}
                     </span>
@@ -135,7 +127,7 @@
                                 class="h-100 d-none">
                                 <app-catalogue-report-data-selection-step (continue)="dataSelectionDone()"
                                     [printInfoParam]="printInfoParam" [getAllAppItemsInput]="getAllAppItemsInput"
-                                    [itemListId]="itemListId" class="h-75">
+                                    [itemListId]="itemListId" [isMarketplaceList]="isMarketplaceList" class="h-75">
                                 </app-catalogue-report-data-selection-step>
                             </div>
                         </ng-container>

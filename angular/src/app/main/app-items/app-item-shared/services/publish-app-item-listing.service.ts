@@ -42,21 +42,15 @@ export class PublishAppItemListingService extends AppComponentBase {
             );
         }
 
+        this.productId = listingAppItemId;
+        this.screen = 1;
+        this.sharingStatus = publishItemOptions?.sharingLevel ?? (alreadyPublished ? 1 : 0);
+        this.itemSharing = publishItemOptions?.itemSharing || [];
+        this.subscribersNumber = publishItemOptions?.numberOfSubscribers || 0;
+
         this._publishService
             .openSharingModal(publishItemOptions)
-            .subscribe((_publishItemOptions) => {
-                _publishItemOptions.listingItemId = listingAppItemId;
-                this.showMainSpinner();
-                this.publish(_publishItemOptions)
-                    .pipe(
-                        finalize(() => {
-                            this.hideMainSpinner();
-                        })
-                    )
-                    .subscribe((res) => {
-                        successCallBack();
-                    });
-            });
+            .subscribe(() => successCallBack());
     }
 
     set subscribersNumber(val: number) {
