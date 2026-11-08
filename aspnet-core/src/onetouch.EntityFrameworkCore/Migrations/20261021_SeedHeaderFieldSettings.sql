@@ -53,7 +53,7 @@ BEGIN TRY
         WHERE f.SycObjectId = @fieldObjectId AND f.EntitySycObjectId = @stringTypeId
           AND f.TenantId IS NULL AND f.IsDeleted = 0
           AND (f.FieldTypeId <> s.FieldTypeId OR f.IsStandard <> 1
-            OR f.IsExtraField <> 0 OR f.FieldLevelCode <> N'System' OR f.Required <> 0))
+            OR f.IsExtraField <> 0 OR f.FieldLevelCode NOT IN (N'System', N'Application') OR f.Required <> 0))
         THROW 51722, 'An existing String--Textbox setting conflicts with the header settings seed.', 1;
 
     ;WITH Missing AS
