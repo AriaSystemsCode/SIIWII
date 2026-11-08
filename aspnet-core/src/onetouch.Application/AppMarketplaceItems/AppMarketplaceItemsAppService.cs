@@ -1834,21 +1834,41 @@ namespace onetouch.AppMarketplaceItems
                     if (input.CurrencyCode != null)
                         exchangeRate = _helper.SystemTables.GetExchangeRate("USD", input.CurrencyCode);
 
-                    var relatedList = _appEntitiesRelationship.GetAll()
-                                .Where(z => z.EntityId == marketplaceItem.Id).PageBy(input);//&& z.EntityTypeCode == "LISTING" && z.RelatedEntityTypeCode == "LISTING"
-                    var related = await relatedList.ToListAsync();
+                    // Page distinct, viewable marketplace items instead of relationship
+                    // rows. Duplicate/stale relationship rows must not inflate the total
+                    // or push selected products off a page.
+                    var visibleMarketplaceItems = _appMarketplaceItem.GetAll()
+                        .Where(z => z.SharingLevel == 1 ||
+                            (z.SharingLevel == 2 && z.ItemSharingFkList.Count(c => c.SharedUserId == AbpSession.UserId) > 0));
+                    var relatedItemIdsQuery = _appEntitiesRelationship.GetAll()
+                        .Where(z => z.EntityId == marketplaceItem.Id)
+                        .Join(visibleMarketplaceItems,
+                            relationship => relationship.RelatedEntityId,
+                            relatedItem => relatedItem.Id,
+                            (relationship, relatedItem) => new { relationship.Id, ItemId = relatedItem.Id })
+                        .GroupBy(relationship => relationship.ItemId)
+                        .Select(group => new { ItemId = group.Key, FirstRelationshipId = group.Min(item => item.Id) });
 
-                    if (related != null && related.Count > 0)
+                    var totalCount = await relatedItemIdsQuery.CountAsync();
+                    var relatedItemIds = await relatedItemIdsQuery
+                        .OrderBy(item => item.FirstRelationshipId)
+                        .Skip(input.SkipCount)
+                        .Take(input.MaxResultCount)
+                        .Select(item => item.ItemId)
+                        .ToListAsync();
+
+                    var relatedItems = relatedItemIds.Count == 0
+                        ? new List<AppMarketplaceItems>()
+                        : await visibleMarketplaceItems
+                            .Where(item => relatedItemIds.Contains(item.Id))
+                            .ToListAsync();
+                    var relatedItemsById = relatedItems.ToDictionary(item => item.Id);
+
+                    if (relatedItemIds.Count > 0)
                     {
-                        foreach (var mitem in related)
+                        foreach (var relatedItemId in relatedItemIds)
                         {
-
-                            var marketpaceItem = await _appMarketplaceItem.GetAll().Include(z => z.ItemPricesFkList)
-                                .Include(z => z.EntityAttachments).ThenInclude(z => z.AttachmentFk)
-                                .Where(z => z.Id == mitem.RelatedEntityId &&
-                                (z.SharingLevel == 1 || (z.SharingLevel == 2 && z.ItemSharingFkList.Count(c => c.SharedUserId == AbpSession.UserId) > 0))
-                                ).FirstOrDefaultAsync();
-                            if (marketpaceItem != null)
+                            if (relatedItemsById.TryGetValue(relatedItemId, out var marketpaceItem))
                             {
                                 var itemData = await GetAppMarketplaceViewData(marketpaceItem.SSIN, input.CurrencyCode);
                                 if (itemData != null)
@@ -1899,8 +1919,6 @@ namespace onetouch.AppMarketplaceItems
                         }
                     }
 
-                    var totalCount = await _appEntitiesRelationship.GetAll()
-                                .Where(z => z.EntityId == marketplaceItem.Id).CountAsync();
                     return new PagedResultDto<GetAppMarketItemForViewDto>(
                     totalCount,
                          appItemsList

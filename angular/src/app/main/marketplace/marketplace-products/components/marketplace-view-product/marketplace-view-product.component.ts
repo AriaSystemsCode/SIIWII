@@ -1053,7 +1053,7 @@ export class MarketplaceViewProductComponent
             /* startShipToDate */ undefined,
             /* brands */ null,
             /* currencyCode */ this.productBodyData?.currencyCode ?? null,
-            /* itemSSIN */ this.productDetails?.code ?? this.productBodyData?.code ?? null,
+            /* itemSSIN */ this.productDetails?.ssin ?? this.productDetails?.code ?? this.productBodyData?.ssin ?? this.productBodyData?.code ?? null,
             /* categoryFilters */ null,
             undefined,
 
