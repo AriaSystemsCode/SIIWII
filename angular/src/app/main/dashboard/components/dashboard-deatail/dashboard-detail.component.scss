@@ -13,11 +13,11 @@
 }
 
 
-// @media (min-width: 1025px) {
-// .dashboard-detail-page{
-//     margin-top: -45px;
-// }
-// }
+@media (min-width: 1025px) {
+.mt-en-dt{
+    margin-top: -45px !important;
+}
+}
 /* =========================================================
    HEADER
    ========================================================= */
@@ -556,6 +556,7 @@
     }
 
     :host ::ng-deep .dashboard-export-btn {
+        color: #fff;
         padding: 0 14px;
     }
 
