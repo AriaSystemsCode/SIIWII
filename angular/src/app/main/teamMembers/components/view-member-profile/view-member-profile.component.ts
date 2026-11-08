@@ -1,17 +1,22 @@
 import { Component, ViewChild, Injector, Output, EventEmitter, OnInit, Input, ViewEncapsulation } from '@angular/core';
-import { AccountsServiceProxy, SycAttachmentCategoryDto, CreateOrEditAccountInfoDto, TreeNodeOfBranchForViewDto, BranchForViewDto, UserEditDto,  UserServiceProxy, UserListDto, AppEntityExtraDataDto } from '@shared/service-proxies/service-proxies';
+import {
+  AccountsServiceProxy, SycAttachmentCategoryDto, CreateOrEditAccountInfoDto, UserEditDto,
+  UserServiceProxy, UserListDto, AppEntityExtraDataDto, SycEntityObjectTypesServiceProxy
+} from '@shared/service-proxies/service-proxies';
 import { AppComponentBase } from '@shared/common/app-component-base';
-import { NgImageSliderComponent } from 'ng-image-slider';
 import { AppConsts } from '@shared/AppConsts';
 import { finalize } from 'rxjs/operators';
 import { ViewMemberProfileComponentInputsI } from '../../models/view-member-profile-model';
 import { appModuleAnimation } from '@shared/animations/routerTransition';
-import { Observable } from 'rxjs';
-import { SelectBranchModalComponent } from '@app/select-branch/select-branch-modal/select-branch-modal.component';
 import { CreateOrEditUserModalComponent } from '@app/admin/users/create-or-edit-user-modal.component';
-import { ActivatedRoute } from '@node_modules/@angular/router';
 import Swal from 'sweetalert2';
 import { UpdateLogoService } from '@shared/utils/update-logo.service';
+import {
+  RELATION_ATTR, RELATION_DEFINITION_CODE, RELATION_ENTITY_TYPE,
+  extractRelationAttributes, buildRelationInputs, collectRelationChanges,
+  clearRelationChange, applyRelationChanges
+} from '../../models/relation-settings.helper';
+
 
 @Component({
   selector: 'app-view-member-profile',
@@ -22,457 +27,328 @@ import { UpdateLogoService } from '@shared/utils/update-logo.service';
 })
 export class ViewMemberProfileComponent extends AppComponentBase implements OnInit {
 
-  @ViewChild('selectBranchModal', { static: true }) selectBranchModal: SelectBranchModalComponent;
-  @ViewChild("createOrEditUserModal", { static: true }) createOrEditUserModal: CreateOrEditUserModalComponent;
+  @ViewChild('createOrEditUserModal', { static: true }) createOrEditUserModal: CreateOrEditUserModalComponent;
 
-  @Input('accountInfoTemp') accountInfoTemp: CreateOrEditAccountInfoDto = new CreateOrEditAccountInfoDto()
-  @Input('fromManualAcc') fromManualAcc: boolean
+  // kept so existing parent bindings keep compiling
+  @Input('accountInfoTemp') accountInfoTemp: CreateOrEditAccountInfoDto = new CreateOrEditAccountInfoDto();
+  @Input('fromManualAcc') fromManualAcc: boolean;
 
-  @Output() edit: EventEmitter<number> = new EventEmitter<number>()
-  @Output() delete: EventEmitter<number> = new EventEmitter<number>()
+  @Output() edit = new EventEmitter<number>();
+  @Output() delete = new EventEmitter<number>();
 
-
-
-  editMode = false;
   memberData: CreateOrEditAccountInfoDto;
-  newEditMemberInfo: CreateOrEditAccountInfoDto;
   canEdit: boolean;
   canDelete: boolean;
-  canView: boolean;
 
   attachmentBaseUrl: string = AppConsts.attachmentBaseUrl;
-  logoPhoto: string
-  coverPhoto: string
-  title: string
-  contactDisplayName: string
+  logoPhoto: string;
+  coverPhoto: string;
+  title: string;
+  contactDisplayName: string;
   active = false;
+  phones: { typeName: string; number: string; ext: string }[] = [];
 
-  logoDefaultImage = "../../../assets/common/images/default-profile-picture.png"
-  coverDefaultImage = "../../../assets/placeholders/_default_cover.jpg"
-  sycAttachmentCategoryLogo: SycAttachmentCategoryDto
-  sycAttachmentCategoryBanner: SycAttachmentCategoryDto
+  logoDefaultImage = '../../../assets/common/images/default-profile-picture.png';
+  coverDefaultImage = '../../../assets/placeholders/_default_cover.jpg';
+  sycAttachmentCategoryLogo: SycAttachmentCategoryDto;
+  sycAttachmentCategoryBanner: SycAttachmentCategoryDto;
 
-  Editting: boolean = false;
-  adminContact: boolean = false;
-  isManualOrExternalContact: boolean = true
-
-  editInfo = true;
-  NoteditInfo = false;
-  userAdminId :number
-  userSearchQuery: string = '';
+  /** true => only Relationship Settings are being edited inline */
+  Editting = false;
+  isManualOrExternalContact = true;
   filteredUsers: UserListDto[] = [];
-  originalFilteredUsers: UserListDto[] = [];
-  memberIslink: boolean = false;
-  showUserList: boolean = false;
 
-  constructor(injector: Injector, private _AccountsServiceProxy: AccountsServiceProxy,  private _userService: UserServiceProxy,private route: ActivatedRoute,private  UpdateLogoService:UpdateLogoService) {
+  // Relationship settings
+  relationAttributes: any[] = [];
+  relationAttributeObject: any = null;
+  relationEntityObjectTypeId: number;
+  relationInputsDto: any = null;
+  private relationChanges = new Map<number, any>();
+
+  private lastInputId: number;
+
+  constructor(
+    injector: Injector,
+    private _AccountsServiceProxy: AccountsServiceProxy,
+    private _userService: UserServiceProxy,
+    private _updateLogoService: UpdateLogoService,
+    private _sycEntityObjectTypesServiceProxy: SycEntityObjectTypesServiceProxy
+  ) {
     super(injector);
-    this.accountInfoTemp = new CreateOrEditAccountInfoDto();
-
   }
 
   ngOnInit() {
-
-    this.getAllAttachmentCategories()
-
+    this.getAllAttachmentCategories();
   }
-  private buildBranchDisplay(member: CreateOrEditAccountInfoDto | undefined): string {
-    if (!member) {
-      return '';
-    }
-  
-    const parts: string[] = [];
-  
-    if (member.branchName) {
-      // Branch name followed by " - "
-      parts.push(member.branchName + ' -');
-    }
-  
-    if (member.addressLine1) {
-      parts.push(member.addressLine1);
-    }
-    if (member.addressLine2) {
-      parts.push(member.addressLine2);
-    }
-    if (member.city) {
-      parts.push(member.city);
-    }
-    if (member.state) {
-      parts.push(member.state);
-    }
-    if (member.zipCode) {
-      parts.push(member.zipCode);
-    }
-    if (member.countryName) {
-      parts.push(member.countryName);
-    }
-  
-   
-    return parts.join(', ');
-  }
-  
-  editMember() {
-    this.Editting = true;
-    this.userAdminId = Number(this.route.snapshot.queryParamMap.get('userId'));
-    this.userAdminId != 0 ? this.adminContact = true : this.adminContact = false;
-  
-    if (!this.fromManualAcc) {
-      this.editInfo = false;
-      this.NoteditInfo = true;
-  
-    
-      this.editjobTitleValue = this.getStringValue(706);
-  
-      this.editBranchValue = this.buildBranchDisplay(this.memberData);
-    this.oldEditBranchValue = this.editBranchValue;
-    } else {
-      const memberId: number = this.memberData?.id;
-      if (isNaN(memberId)) return;
-      this.edit.emit(memberId);
-    }
-  }
-  
-  deleteMember() {
-    const memberId: number = this.memberData?.id;
-    if (isNaN(memberId)) return
-    var isConfirmed: Observable<boolean>;
-    isConfirmed = this.askToConfirm("AreYouSureYouWantToDeleteThisContact?", "AreYouSure");
 
-    isConfirmed.subscribe((res) => {
-      if (res) {
-        this.delete.emit(memberId)
-      }
+  // ---------------------------------------------------------------- permissions
+
+  /** Manual / external contact, or the contact belongs to the current tenant => full edit page. */
+  get canFullEditMember(): boolean {
+    if (!this.memberData) {
+      return false;
     }
+
+    return (
+      this.fromManualAcc === true ||
+      (
+        this.appSession.tenantId != null &&
+        this.memberData.tenantOwner != null &&
+        Number(this.appSession.tenantId) ===
+        Number(this.memberData.tenantOwner)
+      )
     );
   }
-  private lastInputId: number;
 
-  show(input: ViewMemberProfileComponentInputsI, isManualOrExternalContact?: boolean) {
+  get canShowEditButton(): boolean {
+    return !!this.canEdit || this.canFullEditMember;
+  }
+
+  get canEditSettings(): boolean {
+    return !!this.canEdit && !this.canFullEditMember;
+  }
+
+  get canDeleteMember(): boolean {
+    if (!this.memberData) {
+      return false;
+    }
+
+    // Manual Account => Delete allowed
+    // Other contacts => use existing delete permission
+    return this.fromManualAcc === true || !!this.canDelete;
+  }
+
+
+
+  // ---------------------------------------------------------------- show / hide
+
+  show(
+    input: ViewMemberProfileComponentInputsI,
+    isManualOrExternalContact?: boolean
+  ): void {
+
     this.lastInputId = input.id;
-    this.isManualOrExternalContact = isManualOrExternalContact;
-  
-    this.canDelete = input.canDelete;
+
+    this.isManualOrExternalContact =
+      isManualOrExternalContact === true;
+
     this.canEdit = input.canEdit;
+    this.canDelete = input.canDelete;
+
     this.title = input.title;
-  
-    this.editInfo = true;
-    this.NoteditInfo = false;
-    this.Editting = false;
-  
+    this.resetEditState();
+
     this.showMainSpinner();
-  
+
     this._AccountsServiceProxy
       .getAppContactForView(input.id)
-      .pipe(
-        finalize(() => {
-          this.hideMainSpinner();
-          this.active = true;
-        })
-      )
+      .pipe(finalize(() => {
+        this.hideMainSpinner();
+        this.active = true;
+      }))
       .subscribe(result => {
+
         this.memberData = result;
-        this.memberData.accountId = this.memberData.accountId; // keeps current behavior
-  
 
-        this.showUserList = false;
-        this.userSearchQuery = '';
-  
-        this._userService
-          .getUsers('', undefined, undefined, undefined, undefined, undefined, 0)
-          .subscribe(users => {
-            const entityExtraData = this.memberData?.entityExtraData || [];
-            const indx = entityExtraData.findIndex(x => x.attributeId === 715);
-  
-            if (indx >= 0) {
-              this.memberIslink = true;
-              const linkedUserId = entityExtraData[indx].attributeValue;
-              this.filteredUsers = users.items.filter(
-                user => user.id.toString() !== linkedUserId && !user.memberId
-              );
-            } else {
-              this.memberIslink = false;
-              this.filteredUsers = users.items.filter(user => !user.memberId);
-            }
-  
-            this.originalFilteredUsers = [...this.filteredUsers];
-          });
-  
-          const firstName = this.getAttributeStringFromDto(result, 701);
-          const lastName  = this.getAttributeStringFromDto(result, 702);
-  
-        this.contactDisplayName = firstName ? firstName : '';
-        this.contactDisplayName += lastName ? ' ' + lastName : '';
-  
-     
-        const attachments = this.memberData?.entityAttachments || [];
-  
-        const logoAttachment = attachments.find(
-          att => att.attachmentCategoryId === 1 && !!att.url
-        );
-        if (logoAttachment?.url) {
-          this.logoPhoto = `${this.attachmentBaseUrl}/${logoAttachment.url}`;
-        } else {
-          this.logoPhoto = undefined;
-        }
-  
-        const coverAttachment = attachments.find(
-          att => att.attachmentCategoryId === 2 && !!att.url
-        );
+        console.log('Manual Account:', this.fromManualAcc);
+        console.log('Tenant Owner:', result?.tenantOwner);
+        console.log('Can Full Edit:', this.canFullEditMember);
+        console.log('Can Delete:', this.canDeleteMember);
 
-        if (coverAttachment?.url) {
-          this.coverPhoto = `${this.attachmentBaseUrl}/${coverAttachment.url}`;
-        } else {
-          this.coverPhoto = undefined;
-        }
+        // Keep all existing code here:
+        this.loadRelationAttributes();
+        this.loadUsers();
+
+        this.contactDisplayName = [
+          this.getStringValue(701),
+          this.getStringValue(702)
+        ].filter(x => !!x).join(' ');
+
+        this.logoPhoto = this.getAttachmentUrl(1);
+        this.coverPhoto = this.getAttachmentUrl(2);
+
+        this.phones = [1, 2, 3]
+          .map(i => ({
+            typeName: result[`phone${i}TypeName`],
+            number: result[`phone${i}Number`],
+            ext: result[`phone${i}Ex`]
+          }))
+          .filter((p, index) => index === 0 || !!p.number);
       });
   }
-  
+
   hide() {
-    this.active = false
-    this.memberData = undefined
-    this.canDelete = undefined
-    this.canEdit = undefined
-    this.canView = undefined
+    this.active = false;
+    this.memberData = undefined;
+    this.canDelete = undefined;
+    this.canEdit = undefined;
+    this.resetEditState();
+  }
+
+  refresh(event: boolean) {
+    if (event && this.lastInputId) {
+      this.show(
+        { id: this.lastInputId, canEdit: this.canEdit, canDelete: this.canDelete, title: this.title },
+        this.isManualOrExternalContact
+      );
+    }
+  }
+
+  private getAttachmentUrl(categoryId: number): string | undefined {
+    const url = this.memberData?.entityAttachments?.find(a => a.attachmentCategoryId === categoryId && !!a.url)?.url;
+    return url ? `${this.attachmentBaseUrl}/${url}` : undefined;
   }
 
   getAllAttachmentCategories() {
-    this.getSycAttachmentCategoriesByCodes(['LOGO', "BANNER"]).subscribe((result) => {
+    this.getSycAttachmentCategoriesByCodes(['LOGO', 'BANNER']).subscribe(result => {
       result.forEach(item => {
-        if (item.code == "LOGO") this.sycAttachmentCategoryLogo = item
-        else if (item.code == "BANNER") this.sycAttachmentCategoryBanner = item
-      })
-    })
-
+        if (item.code == 'LOGO') this.sycAttachmentCategoryLogo = item;
+        else if (item.code == 'BANNER') this.sycAttachmentCategoryBanner = item;
+      });
+    });
   }
+
+  // ---------------------------------------------------------------- edit / delete
+
+  editMember(): void {
+
+    if (!this.memberData?.id || !this.canShowEditButton) {
+      return;
+    }
+
+    const memberId = this.memberData.id;
+
+    if (this.canFullEditMember) {
+
+      console.log('Opening full edit:', memberId);
+
+      this.edit.emit(memberId);
+      return;
+    }
+
+    // Different tenant => Relationship Settings only
+    this.Editting = true;
+    this.prepareRelationInputs();
+  }
+
+  cancel(): void {
+    this.resetEditState();
+  }
+
+  deleteMember(): void {
+
+    if (!this.canDeleteMember || !this.memberData?.id) {
+      return;
+    }
+
+    const memberId = this.memberData.id;
+
+    this.askToConfirm(
+      'AreYouSureYouWantToDeleteThisContact?',
+      'AreYouSure'
+    ).subscribe(confirmed => {
+
+      if (confirmed) {
+        this.delete.emit(memberId);
+      }
+
+    });
+  }
+
+  saveRelationSettings(): void {
+    if (!this.canEditSettings || !this.Editting) return;
+
+    const payload = CreateOrEditAccountInfoDto.fromJS(this.memberData.toJSON());
+    applyRelationChanges(payload, this.relationChanges, this.relationEntityObjectTypeId);
+
+    this.showMainSpinner();
+    this._AccountsServiceProxy
+      .createOrUpdateContact(payload)
+      .pipe(finalize(() => this.hideMainSpinner()))
+      .subscribe(() => {
+        this.notify.success(this.l('SuccessfullySaved'));
+        this.refresh(true); // show() resets edit state
+      });
+  }
+
+  private resetEditState(): void {
+    this.Editting = false;
+    this.relationChanges.clear();
+    this.relationAttributeObject = null;
+    this.relationInputsDto = null;
+  }
+
+  // ---------------------------------------------------------------- user link
+
   CreateUserName() {
     this.createOrEditUserModal.user = new UserEditDto();
-    this.createOrEditUserModal.teamMemberId = this.memberData?.id
-    this.createOrEditUserModal.user.name = this.memberData?.extraDataAttributes[0]?.selectedValues?.[this.memberData.extraDataAttributes[0].selectedValues.length - 1]?.value
-    this.createOrEditUserModal.user.surname = this.memberData?.extraDataAttributes[1]?.selectedValues?.[this.memberData.extraDataAttributes[1].selectedValues.length - 1]?.value
+    this.createOrEditUserModal.teamMemberId = this.memberData?.id;
+    this.createOrEditUserModal.user.name = this.getStringValue(701);
+    this.createOrEditUserModal.user.surname = this.getStringValue(702);
     this.createOrEditUserModal.fromTeamMember = true;
-    this.createOrEditUserModal.show()
+    this.createOrEditUserModal.show();
   }
 
   EditUserName() {
-  
     const rawId = this.getUserIdValue();
-
     if (!rawId) {
-      this.message.warn(this.l('ThisMemberIsNotLinkedToUser')); // or your preferred message
+      this.message.warn(this.l('ThisMemberIsNotLinkedToUser'));
       return;
     }
 
     const userId = Number(rawId);
-
     if (Number.isNaN(userId) || userId <= 0) {
-      // this.message.error('Invalid linked user id: ' + rawId);
-      // return;
-      this.CreateUserName()
+      this.CreateUserName();
+      return;
     }
 
     this.createOrEditUserModal.user = new UserEditDto();
     this.createOrEditUserModal.user.id = userId;
     this.createOrEditUserModal.teamMemberId = this.memberData?.id;
     this.createOrEditUserModal.fromTeamMember = true;
-  
+
     this.showMainSpinner();
-  
     this._userService
       .getUserForEdit(userId)
       .pipe(finalize(() => this.hideMainSpinner()))
       .subscribe(userResult => {
-        if (userResult) {
-          this.createOrEditUserModal.user.name        = userResult.user?.name;
-          this.createOrEditUserModal.user.surname     = userResult.user?.surname;
-          this.createOrEditUserModal.user.userName    = userResult.user?.userName;
-          this.createOrEditUserModal.user.emailAddress= userResult.user?.emailAddress;
-          this.createOrEditUserModal.user.phoneNumber = userResult.user?.phoneNumber;
+        const u = userResult?.user;
+        if (u) {
+          const target = this.createOrEditUserModal.user;
+          target.name = u.name;
+          target.surname = u.surname;
+          target.userName = u.userName;
+          target.emailAddress = u.emailAddress;
+          target.phoneNumber = u.phoneNumber;
         }
-  
         this.createOrEditUserModal.show(userId);
       });
   }
-  
-  editjobTitleValue: string = '';
-  editBranchValue: string = '';
-  oldEditBranchValue: string = "";
-  Save_editMember() {
-
-    const attr = this.memberData?.entityExtraData?.find(attr => attr.attributeId === 706);
-    if (attr) {
-      attr.attributeValue = this.editjobTitleValue
-    }
-    this.newEditMemberInfo = this.memberData;
-    this.newEditMemberInfo.branchName = this.editBranchValue;
-    this.newEditMemberInfo.parentId = this.selectedBranchid;
-
-    this.editInfo = true;
-    this.NoteditInfo = false;
-    this._AccountsServiceProxy.createOrUpdateContact(this.newEditMemberInfo)
-      .pipe(finalize(() => {
-        this.hideMainSpinner();
-        this.Editting = false;
-        this.refresh(true);
-      }))
-      .subscribe(result => {
-        this.notify.success(this.l('SuccessfullySaved'));
-      });
-
-
-  }
-
-  selectBranch() {
-    if (!this.memberData?.accountId) return; // silent no-op (no warning)
-    this.getAccountBranches();
-  }
-
-
-  branches: TreeNodeOfBranchForViewDto[] = [];
-  selectedBranchid;
-  getAccountBranches() {
-    this._AccountsServiceProxy.getBranchForEdit(this.memberData.accountId).subscribe((rootBranchData) => {
-      const rootBranch: TreeNodeOfBranchForViewDto = new TreeNodeOfBranchForViewDto()
-      rootBranch.expanded = false
-      rootBranch.children = undefined
-      rootBranch.leaf = false
-      rootBranch.label = rootBranchData.name
-      rootBranch.data = new BranchForViewDto()
-      rootBranch.data.branch = rootBranchData
-      rootBranch.data.id = rootBranchData.id
-      this.branches = [rootBranch]
-      if (this.branches?.length > 0) {
-        this.selectBranchModal.show(this.branches);
-      }
-      else {
-        this.message.info("No Branches Found");
-      }
-    })
-  }
-
-
-  branchSelected(Branch) {
-    console.log(Branch, 'BranchBranchBranchBranchBranch')
-    this.editBranchValue = Branch?.name ? Branch?.name : '';
-    this.editBranchValue += Branch?.contactAddresses[0]?.addressLine1 ? (this.editBranchValue != '' ? ' - ' + Branch?.contactAddresses[0]?.addressLine1 : Branch?.contactAddresses[0]?.addressLine1) : '';
-    this.editBranchValue += Branch?.contactAddresses[0]?.addressLine2 ? (this.editBranchValue != '' ? ' , ' + Branch?.contactAddresses[0]?.addressLine2 : Branch?.contactAddresses[0]?.addressLine2) : '';
-    this.editBranchValue += Branch?.contactAddresses[0]?.city ? (this.editBranchValue != '' ? ' , ' + Branch?.contactAddresses[0]?.city : Branch?.contactAddresses[0]?.city) : '';
-    this.editBranchValue += Branch?.contactAddresses[0]?.state ? (this.editBranchValue != '' ? ' , ' + Branch?.contactAddresses[0]?.state : Branch?.contactAddresses[0]?.state) : '';
-    this.editBranchValue += Branch?.contactAddresses[0]?.zipCode ? (this.editBranchValue != '' ? ' , ' + Branch?.contactAddresses[0]?.zipCode : Branch?.contactAddresses[0]?.zipCode) : '';
-    this.editBranchValue += Branch?.contactAddresses[0]?.countryName ? (this.editBranchValue != '' ? ' , ' + Branch?.contactAddresses[0]?.countryName : Branch?.contactAddresses[0]?.countryName) : '';
-    this.selectedBranchid = Branch.id;
-
-  }
-
-  branchSelectionCanceled() {
-    this.selectBranchModal.close();
-  }
-  cancel() {
-    this.editjobTitleValue = this.memberData?.contact?.jobTitle;
-    this.editBranchValue =
-      (this.memberData?.branchName ? (this.memberData?.branchName + ' ' + " - ") : '') +
-      (this.memberData?.addressLine1 ? (this.memberData?.addressLine1 + ', ') : '') +
-      (this.memberData?.addressLine2 ? this.memberData?.addressLine2 + ', ' : '') +
-      (this.memberData?.city ? (this.memberData?.city + ', ') : '') +
-      (this.memberData?.state ? (this.memberData?.state + ', ') : '') +
-      (this.memberData?.zipCode ? (this.memberData?.zipCode + ', ') : '') +
-      (this.memberData?.countryName ? (this.memberData?.countryName) : '');
-
-    this.oldEditBranchValue = this.editBranchValue;
-  }
-
-
 
   getUserIdValue(): string | null {
-
-    const userAttr = this.memberData?.extraDataAttributes
-      ?.find(attr => attr.extraAttributeId === 715);
-  
-    const extraVal = userAttr?.selectedValues?.length
-      ? userAttr.selectedValues[userAttr.selectedValues.length - 1].value
-      : null;
-  
-    let val = extraVal;
-  
-
-    if (!val || !val.toString().trim()) {
-      const entityAttr = this.memberData?.entityExtraData
-        ?.find(e => e.attributeId === 715);
-      val = entityAttr?.attributeValue ?? null;
-    }
-  
-    return val && val.toString().trim() !== '' ? val.toString() : null;
-  }
-  
-
-  getJoinDate(): string | null {
-    const joinDateAttr = this.memberData?.extraDataAttributes?.find(attr => attr.extraAttributeId === 707);
-    const val = joinDateAttr?.selectedValues?.[joinDateAttr.selectedValues.length - 1]?.value;
-    return val && val.trim() !== '' ? val : null;
+    return this.getAttributeStringFromDto(this.memberData, 715) || null;
   }
 
-  getJoinDateIsPublic(): boolean {
-    const isPublicAttr = this.memberData?.extraDataAttributes?.find(attr => attr.extraAttributeId === 713);
-    const val = isPublicAttr?.selectedValues?.[isPublicAttr.selectedValues.length - 1]?.value;
-    return val === 'true';
-  }
-
-
-  refresh(event: boolean) {
-    if (event && this.lastInputId) {
-      this.show({
-        id: this.lastInputId,
-        canEdit: this.canEdit,
-        canDelete: this.canDelete,
-        title: this.title
-      });
-    }
-  }
-
-
-  getStringValue(attrId: number): string {
-    return this.getAttributeStringFromDto(this.memberData, attrId);
-  }
-  
-
-
-  toggleUserList() {
-    this.showUserList = !this.showUserList;
-    this.filteredUsers = [...this.originalFilteredUsers];
-    this.userSearchQuery = '';
-    this.loadUsers(this.userSearchQuery);
-  }
-  
-  filterUsers(query: string): void {
-    this.loadUsers(query);
-  }
-  
-  loadUsers(query: string) {
+  loadUsers(query: string = ''): void {
     this._userService
       .getUsers(query || '', undefined, undefined, undefined, undefined, undefined, 0)
       .subscribe(users => {
-        const linkedIndex = this.memberData.entityExtraData.findIndex(x => x.attributeId === 715);
-  
-        if (linkedIndex >= 0) {
-          const linkedUserId = this.memberData.entityExtraData[linkedIndex].attributeValue;
-          this.filteredUsers = users.items.filter(user => user.id.toString() !== linkedUserId && !user.memberId);
-        } else {
-          this.filteredUsers = users.items.filter(user => !user.memberId);
-        }
-        });
-      }
-  
-  linkToUser(user: UserListDto, i: number) {
+        const linkedUserId = this.memberData?.entityExtraData?.find(x => x.attributeId === 715)?.attributeValue;
+        this.filteredUsers = users.items.filter(u => u.id.toString() !== linkedUserId && !u.memberId);
+      });
+  }
+
+  linkToUser(user: UserListDto, index: number) {
     this.showMainSpinner();
-  
+
     if (user.memberId) {
-      // User already linked
       this._AccountsServiceProxy.getAppContactForView(user.memberId)
-        .pipe(finalize(() => {this.hideMainSpinner();}))
+        .pipe(finalize(() => this.hideMainSpinner()))
         .subscribe(result => {
           Swal.fire({
-            title: "",
+            title: '',
             text: `User already linked to team member '${result.name}'`,
-            icon: "info",
+            icon: 'info',
             customClass: {
               popup: 'popup-class',
               icon: 'icon-class',
@@ -484,65 +360,108 @@ export class ViewMemberProfileComponent extends AppComponentBase implements OnIn
         });
       return;
     }
-  
-    // Link user
-    const linkedIndex = this.memberData.entityExtraData.findIndex(x => x.attributeId === 715);
-  
-    if (linkedIndex >= 0) {
-      this.memberData.entityExtraData[linkedIndex].attributeValue = user.id.toString();
+
+    if (!this.memberData.entityExtraData) this.memberData.entityExtraData = [];
+    const extraData = this.memberData.entityExtraData;
+    const linked = extraData.find(x => x.attributeId === 715);
+
+    if (linked) {
+      linked.attributeValue = user.id.toString();
     } else {
-      const extraData: AppEntityExtraDataDto = new AppEntityExtraDataDto();
-      extraData.attributeId = 715;
-      extraData.attributeValue = user.id.toString();
-      this.memberData.entityExtraData.push(extraData);
+      const dto = new AppEntityExtraDataDto();
+      dto.attributeId = 715;
+      dto.attributeValue = user.id.toString();
+      extraData.push(dto);
     }
-  
+
     this._AccountsServiceProxy.createOrUpdateContact(this.memberData)
       .pipe(finalize(() => {
-        this.filteredUsers.splice(i, 1);
-        this.showUserList = false;
-        this.memberIslink = true;
+        this.filteredUsers.splice(index, 1);
         this.hideMainSpinner();
       }))
-      .subscribe({
-        next: () => {
-          this.UpdateLogoService.updateProfilePicture();
-          this.refresh(true);
-  
-        },
-        
+      .subscribe(() => {
+        this._updateLogoService.updateProfilePicture();
+        this.refresh(true);
       });
   }
-  private getAttributeStringFromDto(
-    dto: CreateOrEditAccountInfoDto | undefined,
-    attrId: number
-  ): string {
-    if (!dto) {
-      return '';
-    }
-  
-    
-    const extraAttr = dto.extraDataAttributes
-      ?.find(a => a.extraAttributeId === attrId);
-  
-    const extraVal = extraAttr?.selectedValues?.length
-      ? extraAttr.selectedValues[extraAttr.selectedValues.length - 1].value
-      : null;
-  
-    if (extraVal && extraVal.toString().trim() !== '') {
-      return extraVal.toString();
-    }
-  
 
-    const entityAttr = dto.entityExtraData
-      ?.find(e => e.attributeId === attrId);
-  
-    const entityVal = entityAttr?.attributeValue;
-  
-    return entityVal && entityVal.toString().trim() !== ''
-      ? entityVal.toString()
-      : '';
+  // ---------------------------------------------------------------- attribute helpers
+
+  getStringValue(attrId: number): string {
+    return this.getAttributeStringFromDto(this.memberData, attrId);
   }
-  
-  
+
+  /** Join date (707) value, or null when empty. */
+  getJoinDate(): string | null {
+    return this.getStringValue(RELATION_ATTR.JOIN_DATE) || null;
+  }
+
+  /** Join date visibility flag (713). */
+  getJoinDateIsPublic(): boolean {
+    return this.getStringValue(713).toLowerCase() === 'true';
+  }
+
+  /** Join date is shown in view mode only when it has a value and is public. */
+  get showJoinDate(): boolean {
+    return !!this.getJoinDate() && this.getJoinDateIsPublic();
+  }
+
+  private getAttributeStringFromDto(dto: CreateOrEditAccountInfoDto | undefined, attrId: number): string {
+    if (!dto) return '';
+
+    const selected = dto.extraDataAttributes?.find(a => a.extraAttributeId === attrId)?.selectedValues;
+    const extraVal = selected?.length ? selected[selected.length - 1].value : null;
+    if (extraVal && extraVal.toString().trim() !== '') return extraVal.toString();
+
+    const entityVal = dto.entityExtraData?.find(e => e.attributeId === attrId)?.attributeValue;
+    return entityVal && entityVal.toString().trim() !== '' ? entityVal.toString() : '';
+  }
+
+  // ---------------------------------------------------------------- relationship settings
+
+  loadRelationAttributes(): void {
+    this.relationAttributeObject = null;
+    this.relationAttributes = [];
+
+    this._sycEntityObjectTypesServiceProxy
+      .getAllWithExtraAttributesByCode(RELATION_DEFINITION_CODE, RELATION_ENTITY_TYPE)
+      .subscribe(result => {
+        const { entityObjectTypeId, attributes } = extractRelationAttributes(result);
+        this.relationEntityObjectTypeId = entityObjectTypeId;
+        this.relationAttributes = attributes;
+      });
+  }
+
+ private prepareRelationInputs(): void {
+    this.relationChanges.clear();
+
+    const branchId =
+        this.memberData?.parentId ??
+        this.getStringValue(718);
+
+    const { relationInputsDto, relationAttributeObject } =
+        buildRelationInputs(
+            this.relationAttributes,
+            id => {
+                if (id === RELATION_ATTR.BRANCH) {
+                    return branchId != null
+                        ? String(branchId)
+                        : '';
+                }
+
+                return this.getStringValue(id);
+            }
+        );
+
+    this.relationInputsDto = relationInputsDto;
+    this.relationAttributeObject = relationAttributeObject;
+}
+
+  onRelationSettingsChanged(changes: any[]): void {
+    collectRelationChanges(this.relationChanges, changes);
+  }
+
+  onRelationSettingCleared(attributeId: number): void {
+    clearRelationChange(this.relationChanges, attributeId);
+  }
 }

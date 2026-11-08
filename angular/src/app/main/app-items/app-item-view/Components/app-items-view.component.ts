@@ -50,6 +50,11 @@ import { finalize } from "rxjs";
 import { DomSanitizer } from "@node_modules/@angular/platform-browser";
 import * as pdfjsLib from 'pdfjs-dist/legacy/build/pdf';
 
+
+interface ProductAttachmentView extends AppEntityAttachmentDto {
+    previewAttachment?: AppEntityAttachmentDto;
+}
+
 @Component({
     selector: "app-app-items-view",
     templateUrl: "./app-items-view.component.html",
@@ -188,7 +193,7 @@ export class AppItemsViewComponent
     languageSettingName  =AppConsts.languageSettingName;
     pdfCache: { [key: string]: string } = {};
 
-    activeAttachments: AppEntityAttachmentDto[] = [];
+  activeAttachments: ProductAttachmentView[] = [];
 currentIndex = 0;
 
 pdfThumbMap: Record<number, string | null> = {};
@@ -210,7 +215,7 @@ previewImageUrl = '';
         private sanitizer: DomSanitizer
     ) {
         super(injector, _location);
-        (pdfjsLib as any).GlobalWorkerOptions.workerSrc = '/assets/pdfjs/pdf.worker.min.js';
+        (pdfjsLib as any).GlobalWorkerOptions.workerSrc = '/assets/pdfjs/pdf.worker.min.mjs';
         this.getAspectatio();
     }
 
@@ -427,42 +432,7 @@ previewImageUrl = '';
             }
           );
       }
-      
-    // showImagesOfVaritaionSelectedValues(img: any) {
-    //     this.varitaionSelectedIndex =
-    //         this.appItemForViewDto.variations[0].selectedValues.indexOf(img);
-    //     /* this.showProductAttachment = false; */
-    //     this.centerImage = null;
-    //     if (
-    //         !this.appItemForViewDto.variations[0].selectedValues[
-    //             this.varitaionSelectedIndex
-    //         ].entityAttachments ||
-    //         this.appItemForViewDto.variations[0].selectedValues[
-    //             this.varitaionSelectedIndex
-    //         ].entityAttachments.length == 0
-    //     ) {
-    //         // get attachment
-    //         this._appItemsServiceProxy
-    //             .getFirstAttributeAttachments(
-    //                 this.productId,
-    //                 this.appItemForViewDto.variations[0].extraAttributeId,
-    //                 this.appItemForViewDto.variations[0].selectedValues[
-    //                     this.varitaionSelectedIndex
-    //                 ].value
-    //             )
-    //             .subscribe((res) => {
-    //                 this.appItemForViewDto.variations[0].selectedValues[
-    //                     this.varitaionSelectedIndex
-    //                 ].entityAttachments = res;
 
-    //                 this.setVariationsRelatedValues();
-    //                 this.setActiveAttachments(
-    //                     this.appItemForViewDto.variations[0].selectedValues[this.varitaionSelectedIndex].entityAttachments
-    //                   );
-                      
-    //             });
-    //     } else this.setVariationsRelatedValues();
-    // }
 
     showImagesOfVaritaionSelectedValues(img: any) {
         this.varitaionSelectedIndex =
@@ -470,32 +440,7 @@ previewImageUrl = '';
       
         const selected =
           this.appItemForViewDto.variations[0].selectedValues[this.varitaionSelectedIndex];
-      
-        // const afterSet = () => {
-       
 
-        //     if(selected.entityAttachments?.length){
-        //         this.setActiveAttachments(this.appItemForViewDto?.entityAttachments);
-
-        //     }else {
-        //   this.setActiveAttachments(selected.entityAttachments);
-
-        //     }
-      
-         
-        // //   this.centerImage = this.activeAttachments?.[this.currentIndex] ?? null;
-      
-      
-        //   if (this.centerImage) {
-        //     this.centerImage.isPdfFile = this.kindOf(this.centerImage) === 'pdf';
-        //     this.centerImage.isVideoFile = this.kindOf(this.centerImage) === 'video';
-        //     this.centerImage.isImageFile = this.kindOf(this.centerImage) === 'image';
-        //   }
-      
-        //   this.selectedValuesName = selected.value;
-        //   this.filterPricing();
-        // };
-      
         const afterSet = () => {
             const colorAttachments = selected.entityAttachments ?? [];
             const fallback = this.appItemForViewDto?.entityAttachments ?? [];
@@ -1219,22 +1164,98 @@ previewImageUrl = '';
         this.timezoneOffset = new Date().getTimezoneOffset();
     }
 
-    private setActiveAttachments(list: AppEntityAttachmentDto[] | null | undefined) {
-        this.activeAttachments = (list ?? []).filter(x => !!x?.url);
+      
 
-        // if (!this.activeAttachments.length) {
-        //   this.currentIndex = 0;
-        //   this.centerImage = null;
-        //   return;
-        // }
-      
-        const imgIndex = this.activeAttachments.findIndex(x => this.kindOf(x) === 'image');
-        this.currentIndex = imgIndex >= 0 ? imgIndex : 0;
-      
-        this.preloadVisiblePdfThumbs();
+
+private setActiveAttachments(
+    list: AppEntityAttachmentDto[]
+): void {
+
+    const attachments = (list || []).filter(
+        item => !!item?.url
+    );
+
+    const result: ProductAttachmentView[] = [];
+    const used = new Set<number>();
+
+    attachments.forEach((attachment, position) => {
+
+        if (used.has(position)) return;
+
+        const type = this.kindOf(attachment);
+
+        if (type === 'pdf') {
+
+            const pdfItem = {
+                ...attachment,
+                previewAttachment: undefined
+            } as ProductAttachmentView;
+
+            used.add(position);
+
+            // Find an image sharing this PDF's index.
+            const thumbnailPosition = attachments.findIndex(
+                (candidate, candidatePosition) =>
+                    candidatePosition !== position &&
+                    !used.has(candidatePosition) &&
+                    this.kindOf(candidate) === 'image' &&
+                    candidate.index === attachment.index &&
+                    !candidate.isDefault
+            );
+
+            if (thumbnailPosition !== -1) {
+                pdfItem.previewAttachment =
+                    attachments[thumbnailPosition];
+
+                used.add(thumbnailPosition);
+            }
+
+            result.push(pdfItem);
+            return;
+        }
+
+        // Do not display a thumbnail separately if
+        // it belongs to a PDF with the same index.
+        if (type === 'image') {
+
+            const hasMatchingPdf = attachments.some(
+                (candidate, candidatePosition) =>
+                    !used.has(candidatePosition) &&
+                    this.kindOf(candidate) === 'pdf' &&
+                    candidate.index === attachment.index &&
+                    !attachment.isDefault
+            );
+
+            if (hasMatchingPdf) {
+                return;
+            }
+        }
+
+        result.push({
+            ...attachment
+        } as ProductAttachmentView);
+
+        used.add(position);
+    });
+
+    this.activeAttachments = result;
+
+    // Select first logical attachment.
+    this.currentIndex = 0;
+
+    // Reset previews when changing product or variation.
+    this.pdfThumbMap = {};
+    this.pdfThumbLoadingMap = {};
+
+    this.preloadVisiblePdfThumbs();
+
+    if (this.activeAttachments.length > 0) {
         this.preparePdfThumbIfNeeded(this.currentIndex);
-      }
-      
+    }
+}
+
+
+
       
     getUrl(a: any): string {
         const url = (a?.url ?? '').trim();
@@ -1266,68 +1287,252 @@ previewImageUrl = '';
         this.currentIndex = i;
         this.preparePdfThumbIfNeeded(i);
       }
-      private async buildPdfThumbFromBlob(blob: Blob, targetWidth = 520): Promise<string> {
-        const ab = await blob.arrayBuffer();
-        const loadingTask = (pdfjsLib as any).getDocument({ data: new Uint8Array(ab) });
-        const pdf = await loadingTask.promise;
-        const page1 = await pdf.getPage(1);
-      
-        const viewport1 = page1.getViewport({ scale: 1 });
-        const scale = targetWidth / viewport1.width;
-        const viewport = page1.getViewport({ scale });
-      
+   
+private async buildPdfThumbFromBlob(
+    blob: Blob,
+    targetWidth = 520
+): Promise<string> {
+
+    const bytes = new Uint8Array(
+        await blob.arrayBuffer()
+    );
+
+    const loadingTask = (pdfjsLib as any).getDocument({
+        data: bytes,
+        disableFontFace: true
+    });
+
+    const pdf = await loadingTask.promise;
+
+    try {
+        const page = await pdf.getPage(1);
+
+        const baseViewport = page.getViewport({
+            scale: 1
+        });
+
+        const scale = targetWidth / baseViewport.width;
+
+        const viewport = page.getViewport({
+            scale
+        });
+
         const canvas = document.createElement('canvas');
-        const ctx = canvas.getContext('2d')!;
-        canvas.width = Math.floor(viewport.width);
-        canvas.height = Math.floor(viewport.height);
-      
-        await page1.render({ canvasContext: ctx, viewport }).promise;
-      
-        page1.cleanup?.();
-        pdf.destroy?.();
-      
-        return canvas.toDataURL('image/png');
-      }
-      
-      private async preparePdfThumbIfNeeded(index: number) {
-        const item = this.activeAttachments?.[index];
-        if (!item || this.kindOf(item) !== 'pdf') {
-          this.pdfThumbMap[index] = null;
-          this.pdfThumbLoadingMap[index] = false;
-          return;
+        const context = canvas.getContext('2d');
+
+        if (!context) {
+            throw new Error('Canvas 2D context unavailable');
         }
+
+        canvas.width = Math.ceil(viewport.width);
+        canvas.height = Math.ceil(viewport.height);
+
+        await page.render({
+            canvasContext: context,
+            viewport
+        }).promise;
+
+        const image = canvas.toDataURL('image/png');
+
+        page.cleanup();
+
+        return image;
+
+    } finally {
+        await pdf.destroy();
+    }
+}
+
+    //   private async preparePdfThumbIfNeeded(index: number) {
+    //     const item = this.activeAttachments?.[index];
+    //     if (!item || this.kindOf(item) !== 'pdf') {
+    //       this.pdfThumbMap[index] = null;
+    //       this.pdfThumbLoadingMap[index] = false;
+    //       return;
+    //     }
       
-        const path = (item.url ?? item.fileName ?? '').trim();
-        if (!path) return;
+    //     const path = (item.url ?? item.fileName ?? '').trim();
+    //     if (!path) return;
       
-        if (this.pdfThumbByPath[path]) {
-          this.pdfThumbMap[index] = this.pdfThumbByPath[path];
-          this.pdfThumbLoadingMap[index] = false;
-          return;
-        }
+    //     if (this.pdfThumbByPath[path]) {
+    //       this.pdfThumbMap[index] = this.pdfThumbByPath[path];
+    //       this.pdfThumbLoadingMap[index] = false;
+    //       return;
+    //     }
       
-        this.pdfThumbLoadingMap[index] = true;
+    //     this.pdfThumbLoadingMap[index] = true;
       
+    //     try {
+    //       const fullUrl = this.getUrl(item);
+    //       const res = await this._appItemsServiceProxy.getFile64FromUrl(fullUrl).toPromise();
+      
+    //       const base64 = (res && typeof res === 'string' && res.includes(',')) ? res.split(',')[1] : res;
+    //       const byteChars = atob(base64);
+    //       const byteNumbers = new Array(byteChars.length);
+    //       for (let i = 0; i < byteChars.length; i++) byteNumbers[i] = byteChars.charCodeAt(i);
+      
+    //       const blob = new Blob([new Uint8Array(byteNumbers)], { type: 'application/pdf' });
+    //       const thumb = await this.buildPdfThumbFromBlob(blob, 520);
+      
+    //       this.pdfThumbByPath[path] = thumb;
+    //       this.pdfThumbMap[index] = thumb;
+    //     } catch {
+    //       this.pdfThumbMap[index] = null;
+    //     } finally {
+    //       this.pdfThumbLoadingMap[index] = false;
+    //     }
+    //   }
+
+    
+
+
+private pdfPreviewInProgress = new Set<string>();
+
+private async preparePdfThumbIfNeeded(
+    index: number
+): Promise<void> {
+
+    const item = this.activeAttachments?.[index];
+
+    if (!item || this.kindOf(item) !== 'pdf') {
+        return;
+    }
+
+    const path = (item.url || '').trim();
+    if (!path) {
+        this.pdfThumbMap[index] = null;
+        return;
+    }
+
+    // Use a saved thumbnail when one is explicitly associated.
+    if (item.previewAttachment?.url) {
+        this.pdfThumbMap[index] =
+            this.getUrl(item.previewAttachment);
+        this.pdfThumbLoadingMap[index] = false;
+        return;
+    }
+
+    if (this.pdfThumbByPath[path]) {
+        this.pdfThumbMap[index] = this.pdfThumbByPath[path];
+        this.pdfThumbLoadingMap[index] = false;
+        return;
+    }
+
+    // Avoid duplicate requests from preload + setMain.
+    if (this.pdfPreviewInProgress.has(path)) {
+        return;
+    }
+
+    this.pdfPreviewInProgress.add(path);
+    this.pdfThumbLoadingMap[index] = true;
+
+    const fullUrl = this.getUrl(item);
+
+    try {
+        let pdfBytes: Uint8Array | null = null;
+
+        // First: existing backend Base64 endpoint.
         try {
-          const fullUrl = this.getUrl(item);
-          const res = await this._appItemsServiceProxy.getFile64FromUrl(fullUrl).toPromise();
-      
-          const base64 = (res && typeof res === 'string' && res.includes(',')) ? res.split(',')[1] : res;
-          const byteChars = atob(base64);
-          const byteNumbers = new Array(byteChars.length);
-          for (let i = 0; i < byteChars.length; i++) byteNumbers[i] = byteChars.charCodeAt(i);
-      
-          const blob = new Blob([new Uint8Array(byteNumbers)], { type: 'application/pdf' });
-          const thumb = await this.buildPdfThumbFromBlob(blob, 520);
-      
-          this.pdfThumbByPath[path] = thumb;
-          this.pdfThumbMap[index] = thumb;
-        } catch {
-          this.pdfThumbMap[index] = null;
-        } finally {
-          this.pdfThumbLoadingMap[index] = false;
+            const response = await this._appItemsServiceProxy
+                .getFile64FromUrl(fullUrl)
+                .toPromise();
+
+            if (!response || typeof response !== 'string') {
+                throw new Error('Empty or invalid Base64 response');
+            }
+
+            const base64 = response.includes(',')
+                ? response.split(',').pop()!
+                : response;
+
+            const binary = atob(base64.replace(/\s/g, ''));
+            pdfBytes = new Uint8Array(binary.length);
+
+            for (let i = 0; i < binary.length; i++) {
+                pdfBytes[i] = binary.charCodeAt(i);
+            }
+
+            console.log('[PDF] Loaded from backend endpoint');
+
+        } catch (backendError) {
+            console.warn(
+                '[PDF] Backend Base64 loading failed:',
+                backendError
+            );
+
+            // Second: fetch the PDF directly.
+            // Requires the attachment server to allow CORS
+            // if it is on another origin.
+            const response = await fetch(fullUrl, {
+                credentials: 'include'
+            });
+
+            if (!response.ok) {
+                throw new Error(
+                    `PDF request failed: ${response.status}`
+                );
+            }
+
+            pdfBytes = new Uint8Array(
+                await response.arrayBuffer()
+            );
+
+            console.log('[PDF] Loaded directly');
         }
-      }
+
+        if (
+            !pdfBytes ||
+            pdfBytes.length < 5 ||
+            String.fromCharCode(...pdfBytes.slice(0, 5)) !== '%PDF-'
+        ) {
+            throw new Error(
+                'Response is not valid PDF data'
+            );
+        }
+
+        const blob = new Blob(
+            [pdfBytes],
+            { type: 'application/pdf' }
+        );
+
+        const preview = await this.buildPdfThumbFromBlob(
+            blob,
+            520
+        );
+
+        this.pdfThumbByPath[path] = preview;
+
+        // Update every matching gallery item.
+        this.activeAttachments.forEach((attachment, i) => {
+            if (attachment.url === path) {
+                this.pdfThumbMap[i] = preview;
+            }
+        });
+
+    } catch (error) {
+        console.error(
+            '[PDF] Preview generation failed:',
+            fullUrl,
+            error
+        );
+
+        if (this.activeAttachments[index]?.url === path) {
+            this.pdfThumbMap[index] = null;
+        }
+
+    } finally {
+        this.pdfPreviewInProgress.delete(path);
+
+        this.activeAttachments.forEach((attachment, i) => {
+            if (attachment.url === path) {
+                this.pdfThumbLoadingMap[i] = false;
+            }
+        });
+    }
+}
+
+
+
       
       private preloadVisiblePdfThumbs() {
         const visible = Math.min(this.activeAttachments.length, 7);
@@ -1355,6 +1560,10 @@ previewImageUrl = '';
       onMainError(ev: any) {
         ev.target.src = this.defaultLogo;
       }
-                              
-      
+                       
+      onPdfPreviewError(index: number): void {
+    this.pdfThumbMap[index] = null;
+    this.pdfThumbLoadingMap[index] = false;
+}
+   
 }

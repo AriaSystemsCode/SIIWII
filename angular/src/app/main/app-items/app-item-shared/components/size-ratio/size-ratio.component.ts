@@ -61,7 +61,6 @@ export class SizeRatioComponent extends AppComponentBase implements OnChanges,Af
     this.statusChanged.emit(true)
   }
   sizeRatioNameChanges($event){
-    debugger
   }
   totalQty :number = 0
   calculateQtySum(){

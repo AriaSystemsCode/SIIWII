@@ -1,0 +1,188 @@
+
+<div class="attachment-uploader">
+
+    <!-- SCROLLABLE CONTENT -->
+    <div class="attachment-uploader-content">
+
+        <!-- HEADER -->
+        <div class="upload-heading">
+            <i class="fas fa-cloud-upload-alt"></i>
+
+            <div>
+                <h5>{{ 'UploadFiles' | localize }}</h5>
+                <p>{{ 'SelectAndUploadYourFiles' | localize }}</p>
+            </div>
+        </div>
+
+        <!-- MAIN UPLOAD -->
+        <div class="upload-zone" *ngIf="!selectedFile">
+
+            <label for="mainAttachment" class="upload-label">
+                <i class="fas fa-cloud-upload-alt"></i>
+
+                <span>{{ 'ClickToUpload' | localize }}</span>
+
+                <small>
+                    {{ 'AspectRatio' | localize }}: {{ aspectRatio }}
+                </small>
+
+                <small>
+                    {{ 'MaximumFileSize' | localize }}:
+                    {{ maxFileSizeMB }} MB
+                </small>
+
+                <small>
+                    PNG, JPG, JPEG, WEBP
+                    <ng-container *ngIf="allowPdf">, PDF</ng-container>
+                    <ng-container *ngIf="allowVideo">, MP4</ng-container>
+                </small>
+            </label>
+
+            <input
+                id="mainAttachment"
+                type="file"
+                [accept]="acceptedFormats"
+                (change)="onFileSelected($event)"
+                hidden
+            />
+        </div>
+
+        <!-- SELECTED FILE PREVIEW -->
+        <div class="preview-wrapper" *ngIf="selectedFile">
+
+            <div class="preview-card">
+
+                <!-- IMAGE OR PDF -->
+                <img
+                    *ngIf="displayPreview"
+                    [src]="displayPreview"
+                    class="main-preview"
+                    [alt]="'AttachmentPreview' | localize"
+                />
+
+                <!-- VIDEO -->
+                <video
+                    *ngIf="isVideoFile"
+                    [src]="videoPreview"
+                    class="main-preview"
+                    controls
+                    preload="metadata">
+                </video>
+
+                <!-- PDF LOADING -->
+                <div
+                    class="preview-loading"
+                    *ngIf="
+                        isPdfFile &&
+                        isPdfLoading &&
+                        !thumbnailPreview
+                    ">
+                    <i class="fas fa-spinner fa-spin"></i>
+                    <span>
+                        {{ 'GeneratingPdfPreview' | localize }}
+                    </span>
+                </div>
+
+                <!-- PDF FALLBACK -->
+                <div
+                    class="preview-fallback"
+                    *ngIf="
+                        isPdfFile &&
+                        !pdfPreview &&
+                        !thumbnailPreview &&
+                        !isPdfLoading
+                    ">
+                    <i class="fas fa-file-pdf"></i>
+                </div>
+
+                <!-- REMOVE MAIN FILE -->
+                <button
+                    type="button"
+                    class="remove-preview-btn"
+                    [attr.aria-label]="'RemoveAttachment' | localize"
+                    (click)="removeFile()">
+                    <i class="fas fa-times"></i>
+                </button>
+
+            </div>
+        </div>
+
+        <!-- PDF THUMBNAIL ONLY -->
+        <div
+            class="thumbnail-section"
+            *ngIf="isPdfFile && showThumbnailForMedia">
+
+            <h6>{{ 'ThumbnailImageOptional' | localize }}</h6>
+
+            <div
+                class="upload-zone thumbnail-zone"
+                *ngIf="!thumbnailFile">
+
+                <label
+                    for="thumbnailAttachment"
+                    class="upload-label">
+
+                    <i class="far fa-image"></i>
+
+                    <span>{{ 'UploadThumbnail' | localize }}</span>
+
+                    <small>PNG, JPG, JPEG, WEBP</small>
+                </label>
+
+                <input
+                    id="thumbnailAttachment"
+                    type="file"
+                    accept="image/png,image/jpeg,image/webp"
+                    (change)="onThumbnailSelected($event)"
+                    hidden
+                />
+            </div>
+
+            <div
+                class="thumbnail-selected"
+                *ngIf="thumbnailFile">
+
+                <img
+                    [src]="thumbnailPreview"
+                    class="thumbnail-preview"
+                    [alt]="'ThumbnailPreview' | localize"
+                />
+
+                <button
+                    type="button"
+                    class="remove-preview-btn"
+                    [attr.aria-label]="'RemoveThumbnail' | localize"
+                    (click)="removeThumbnail()">
+                    <i class="fas fa-times"></i>
+                </button>
+            </div>
+        </div>
+
+        <!-- ERROR -->
+        <div class="text-danger mt-2" *ngIf="errorMessage">
+            {{ errorMessage | localize }}
+        </div>
+
+    </div>
+
+    <!-- FIXED BOTTOM ACTIONS -->
+    <div class="attachment-uploader-footer">
+
+        <button
+            type="button"
+            class="btn btn-light"
+            (click)="cancel()">
+            {{ 'Cancel' | localize }}
+        </button>
+
+        <button
+            type="button"
+            class="btn bgPurple"
+            [disabled]="!selectedFile"
+            (click)="confirmUpload()">
+            {{ 'Upload' | localize }}
+        </button>
+
+    </div>
+
+</div>

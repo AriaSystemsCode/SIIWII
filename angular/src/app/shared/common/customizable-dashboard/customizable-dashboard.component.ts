@@ -65,7 +65,6 @@ isArabic: boolean = false;
     this.loading = true;
     this._dashboardCustomizationServiceProxy.getDashboardDefinition(this.dashboardName, DashboardCustomizationConst.Applications.Angular)
     .subscribe((dashboardDefinitionResult: DashboardOutput) => {
-        debugger;
         this.dashboardDefinition = dashboardDefinitionResult;
         if (!this.dashboardDefinition.widgets || this.dashboardDefinition.widgets.length === 0) {
             this.loading = false;

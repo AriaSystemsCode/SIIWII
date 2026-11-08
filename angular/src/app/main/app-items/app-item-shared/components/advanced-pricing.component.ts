@@ -123,7 +123,6 @@ export class AdvancedPricingComponent extends AppComponentBase implements OnChan
   }
 
   submit(){
-    debugger
     if(!this.isValid) return this.notify.error(this.l('FormIsInvalid'))
     const defaultCurrencyExist = this.rows.filter(item=>item.rowHeader.value == this.tenantDefaultCurrency.value).length;
     if(!defaultCurrencyExist) return this.notify.error(this.l("DefaultCurrencyMustExist"))
