@@ -22,15 +22,15 @@
             </div>
         </div>
 
-        <div [class]="containerClass + ' kt-grid__item kt-grid__item--fluid'"  class="mt-ar">
+        <div [class]="containerClass + ' kt-grid__item kt-grid__item--fluid'" class="mt-ar">
             <div class="kt-portlet">
                 <div class="kt-portlet__body">
                     <div class="row align-items-center">
                         <!--<Primeng-TurboTable-Start>-->
                         <div class="col primeng-datatable-container" [busyIf]="primengTableHelper.isLoading">
                             <p-table #dataTable (onLazyLoad)="getEditions()" [value]="primengTableHelper.records"
-                                rows="{{primengTableHelper.defaultRecordsCountPerPage}}" [paginator]="false"
-                                [lazy]="true" responsiveLayout="stack" [breakpoint]="'960px'" [tableStyle]="{'min-width': '50rem'}">
+                                [rows]="primengTableHelper.defaultRecordsCountPerPage" [paginator]="false" [lazy]="true"
+                                responsiveLayout="scroll" [tableStyle]="{'min-width': '50rem'}">
                                 <ng-template pTemplate="header">
                                     <tr>
                                         <th style="width: 130px;"
@@ -57,50 +57,67 @@
                                 <ng-template pTemplate="body" let-record="$implicit">
                                     <tr>
                                         <td style="width: 130px;text-align:center">
-                                            <div class="btn-group dropdown" dropdown>
-                                                <button dropdownToggle class="dropdown-toggle btn btn-sm btn-primary">
-                                                    <i class="fa fa-cog"></i><span class="caret"></span>
-                                                    {{"Actions" | localize}}
-                                                </button>
-                                                <ul class="dropdown-menu" *dropdownMenu>
-                                                    <li>
-                                                        <a href="javascript:;"
-                                                            *ngIf="'Pages.Editions.Edit' | permission"
-                                                            (click)="editEditionModal.show(record.id)">{{'Edit' | localize}}</a>
-                                                    </li>
+                                            <div
+    class="btn-group"
+    dropdown
+    container="body"
+    [placement]="isArabic ? 'bottom left' : 'bottom right'">
 
-                                                    <li>
-                                                        <a href="javascript:;"
-                                                            *ngIf="'Pages.Editions.Delete' | permission"
-                                                            (click)="deleteEdition(record)">{{'Delete' | localize}}</a>
-                                                    </li>
+    <button
+        type="button"
+        dropdownToggle
+        class="dropdown-toggle btn btn-sm btn-primary">
+        <i class="fa fa-cog"></i>
+        {{ 'Actions' | localize }}
+    </button>
 
-                                                    <li>
-                                                        <a href="javascript:;"
-                                                            *ngIf="'Pages.Editions.MoveTenantsToAnotherEdition' | permission"
-                                                            (click)="moveTenantsToAnotherEditionModal.show(record.id)">{{'MoveTenantsToAnotherEdition' | localize}}</a>
-                                                    </li>
-                                                </ul>
-                                            </div>
+    <ul
+        class="dropdown-menu edition-actions-menu"
+        [ngClass]="isArabic ? 'edition-menu-ar' : 'edition-menu-en'"
+        *dropdownMenu>
+
+        <li *ngIf="'Pages.Editions.Edit' | permission">
+            <a href="javascript:;" (click)="editEditionModal.show(record.id)">
+                {{ 'Edit' | localize }}
+            </a>
+        </li>
+
+        <li *ngIf="'Pages.Editions.Delete' | permission">
+            <a href="javascript:;" (click)="deleteEdition(record)">
+                {{ 'Delete' | localize }}
+            </a>
+        </li>
+
+        <li *ngIf="'Pages.Editions.MoveTenantsToAnotherEdition' | permission">
+            <a href="javascript:;" (click)="moveTenantsToAnotherEditionModal.show(record.id)">
+                {{ 'MoveTenantsToAnotherEdition' | localize }}
+            </a>
+        </li>
+    </ul>
+</div>
                                         </td>
                                         <td>
                                             <span class="p-column-title">{{'EditionName' | localize}}</span>
                                             {{record.displayName}}
                                         </td>
-                                    <td>
-                                        <span class="p-column-title">{{'Price' | localize}}</span>
-                                        <span
-                                            *ngIf="record.dailyPrice || record.weeklyPrice || record.monthlyPrice || record.annualPrice">
-                                            {{appSession.application.currencySign}}{{record.dailyPrice}} {{"Daily" | localize }} /
-                                            {{appSession.application.currencySign}}{{record.weeklyPrice}} {{"Weekly" | localize }} /
-                                            {{appSession.application.currencySign}}{{record.monthlyPrice}} {{"Monthly" | localize }} /
-                                            {{appSession.application.currencySign}}{{record.annualPrice}} {{"Annual" | localize }}
-                                        </span>
-                                        <span
-                                            *ngIf="!record.dailyPrice && !record.weeklyPrice && !record.monthlyPrice && !record.annualPrice">
-                                            {{"Free" | localize}}
-                                        </span>
-                                    </td>
+                                        <td>
+                                            <span class="p-column-title">{{'Price' | localize}}</span>
+                                            <span
+                                                *ngIf="record.dailyPrice || record.weeklyPrice || record.monthlyPrice || record.annualPrice">
+                                                {{appSession.application.currencySign}}{{record.dailyPrice}} {{"Daily" |
+                                                localize }} /
+                                                {{appSession.application.currencySign}}{{record.weeklyPrice}} {{"Weekly"
+                                                | localize }} /
+                                                {{appSession.application.currencySign}}{{record.monthlyPrice}}
+                                                {{"Monthly" | localize }} /
+                                                {{appSession.application.currencySign}}{{record.annualPrice}} {{"Annual"
+                                                | localize }}
+                                            </span>
+                                            <span
+                                                *ngIf="!record.dailyPrice && !record.weeklyPrice && !record.monthlyPrice && !record.annualPrice">
+                                                {{"Free" | localize}}
+                                            </span>
+                                        </td>
                                         <td>
                                             <span class="p-column-title">{{'IsTrialActive' | localize}}</span>
                                             <span *ngIf="record.trialDayCount">
