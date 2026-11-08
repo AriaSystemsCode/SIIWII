@@ -134,15 +134,8 @@ namespace onetouch.Web.Startup
                                 }
                             }
 
-                            // Do not silently route Swagger requests with an explicit client
-                            // selector to the default database.
-                            if (!string.IsNullOrWhiteSpace(explicitClientUrl))
-                            {
-                                throw new InvalidOperationException(
-                                    $"No client with URL '{explicitClientUrl}' and a database connection was found.");
-                            }
-
-                            // Keep the existing fallback behavior for FE requests without a match.
+                            // No matching client (or no client database connection): use the
+                            // configured default connection string.
                             return base.GetNameOrConnectionString(args);
                         }
                     }
