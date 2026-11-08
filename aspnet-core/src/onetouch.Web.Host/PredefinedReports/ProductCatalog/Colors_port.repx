@@ -64,7 +64,8 @@
           <Controls>
             <Item1 Ref="41" ControlType="XRPictureBox" Name="pictureBox1" Sizing="ZoomImage" KeepTogether="false" SizeF="81.96183,87.8" LocationFloat="11.9181681,5.538082" BackColor="Transparent" Borders="None">
               <ExpressionBindings>
-                <Item1 Ref="42" EventName="BeforePrint" PropertyName="ImageUrl" Expression="[Attachment]" />
+                <Item1 Ref="42" EventName="BeforePrint" PropertyName="ImageUrl" Expression="iif(Contains(Upper([Attachment]), 'HTTP'), [Attachment], '')" />
+                <Item2 Ref="65" EventName="BeforePrint" PropertyName="BackColor" Expression="iif(Contains(Upper([Attachment]), 'HTTP'), '', [Attachment])" />
               </ExpressionBindings>
               <StylePriority Ref="43" UseBackColor="false" UseBorders="false" />
             </Item1>
