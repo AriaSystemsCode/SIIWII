@@ -278,11 +278,14 @@ namespace onetouch.AppFields
                 }
                 var pageKeys = page.Select(x => x.FieldDefinitionKey).Distinct().ToList();
                 Dictionary<Guid, bool> archived;
+                HashSet<Guid> discontinuedKeys;
                 using (UnitOfWorkManager.Current.DisableFilter(AbpDataFilters.SoftDelete))
                 {
                     var catalog = await _fields.GetAll().Where(x => pageKeys.Contains(x.FieldDefinitionKey))
-                        .Select(x => new { x.FieldDefinitionKey, x.IsDeleted }).AsNoTracking().ToListAsync();
+                        .Select(x => new { x.FieldDefinitionKey, x.IsDeleted, x.FieldStatusCode }).AsNoTracking().ToListAsync();
                     archived = catalog.ToDictionary(x => x.FieldDefinitionKey, x => x.IsDeleted);
+                    discontinuedKeys = catalog.Where(x => !x.IsDeleted && x.FieldStatusCode == "Discontinued")
+                        .Select(x => x.FieldDefinitionKey).ToHashSet();
                 }
                 var creatorIds = page.Where(x => x.CreatorUserId.HasValue)
                     .Select(x => x.CreatorUserId.Value).Distinct().ToList();
@@ -335,6 +338,7 @@ namespace onetouch.AppFields
                     IsHidden = x.IsHidden,
                     CanEdit = canEdit && archived.TryGetValue(x.FieldDefinitionKey, out var editableArchived) && !editableArchived,
                     CanDelete = canDelete && archived.TryGetValue(x.FieldDefinitionKey, out var deletableArchived) && !deletableArchived &&
+                        discontinuedKeys.Contains(x.FieldDefinitionKey) &&
                         (!AbpSession.TenantId.HasValue || x.TenantId == AbpSession.TenantId),
                     CanHide = AbpSession.TenantId.HasValue && x.TenantId == null &&
                         archived.TryGetValue(x.FieldDefinitionKey, out var hideArchived) && !hideArchived,
@@ -601,7 +605,8 @@ namespace onetouch.AppFields
                         CanEditAttributes = canEdit,
                         CanCreateRevision = CanCreateRevision(field),
                         CanSync = canSync,
-                        CanDelete = !field.IsDeleted && own && PermissionChecker.IsGranted(AppPermissions.Pages_Administration_FieldManager_Delete),
+                        CanDelete = !field.IsDeleted && field.FieldStatusCode == "Discontinued" && own &&
+                            PermissionChecker.IsGranted(AppPermissions.Pages_Administration_FieldManager_Delete),
                         CanHide = !field.IsDeleted && AbpSession.TenantId.HasValue && field.TenantId == null,
                         IsTenantCustomCopyRequired = AbpSession.TenantId.HasValue && field.TenantId == null
                     }
@@ -774,6 +779,8 @@ namespace onetouch.AppFields
                 if (field == null) throw new UserFriendlyException("Field was not found.");
                 if (field.TenantId != AbpSession.TenantId)
                     throw new UserFriendlyException("A tenant cannot delete a host field.");
+                if (field.FieldStatusCode != "Discontinued")
+                    throw new UserFriendlyException("Only a discontinued field can be deleted.");
                 await ArchiveCurrentRevision(field);
                 field.CurrentRevisionNo = NextRevision(field.CurrentRevisionNo);
                 await RecordHistory(field, "Delete");
