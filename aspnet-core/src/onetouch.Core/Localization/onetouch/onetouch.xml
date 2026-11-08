@@ -3306,6 +3306,8 @@ Please select one of the available linesheet templates
 		<text name="FieldsAddedSuccessfully"> Fields Added Successfully </text>
 		<text name="EnterReferenceNumber">Enter Reference Number </text>
 	
+	<text name="RemoveLinkedDataSourceConfirmation"
+      >"Are you sure you want to remove the linked data source from &quot;{0}&quot; </text>
 	</texts>  
 </localizationDictionary>
 

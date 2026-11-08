@@ -1990,5 +1990,8 @@
 	<text name="DataSourceService">خدمة مصدر البيانات</text>
 	<text name="DataSourceValueParameter">معامل قيمة مصدر البيانات</text>
 	<text name="EntityObjectTypeCode">رمز نوع كائن البيانات</text>
+
+  <text name="RemoveLinkedDataSourceConfirmation">
+    هل أنت متأكد من أنك تريد إزالة مصدر البيانات المرتبط من &quot;{0}&quot;؟ </text>
   </texts>
 </localizationDictionary>

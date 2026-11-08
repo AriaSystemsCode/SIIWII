@@ -58,7 +58,8 @@ export class SpreadsheetDataPanelComponent extends AppComponentBase implements O
     @Output() close = new EventEmitter<void>();
     @Output() batchLoaded = new EventEmitter<SpreadsheetDataBatch>();
     @Output() loadingFailed = new EventEmitter<any>();
-    @Output() dataSourceCleared = new EventEmitter<string>();
+    @Output() dataSourceCleared = new EventEmitter<{sheetName: string;clearWorksheetData: boolean;}>();
+
 
     // ---- Panel state ----
     isEditMode = false;
@@ -79,6 +80,9 @@ export class SpreadsheetDataPanelComponent extends AppComponentBase implements O
     filterTree: FilterConditionGroup | null = null;
     showFilterDialog = false;
     insertAsNewSheet = true;
+    clearWorksheetData = true;
+showClearDataSourceDialog = false;
+clearDataSourceSheetName = '';
 
     constructor(
         injector: Injector,
@@ -279,41 +283,98 @@ export class SpreadsheetDataPanelComponent extends AppComponentBase implements O
         return this.filterBuilderFields.find(field => field.name === fieldName)?.label || fieldName;
     }
 
-    getConditionOperatorLabel(operator: string): string {
-        const labels: Record<string, string> = {
-            eq: '=',
-            neq: '≠',
-            gt: '>',
-            gte: '>=',
-            lt: '<',
-            lte: '<=',
-            contains: this.l('Contains'),
-            notcontains: this.l('DoesNotContain'),
-            startswith: this.l('StartsWith'),
-            endswith: this.l('EndsWith'),
-            in: this.l('IsIn'),
-            notin: this.l('IsNotIn')
-        };
+    getConditionOperatorLabel(
+    operator: string,
+    condition?: FilterConditionRule
+): string {
 
-        return labels[operator] || operator;
-    }
+    const labels: Record<string, string> = {
+        eq: '=',
+        neq: '≠',
+        gt: '>',
+        gte: '>=',
+        lt: '<',
+        lte: '<=',
+        contains: this.l('Contains'),
+        notcontains: this.l('DoesNotContain'),
+        startswith: this.l('StartsWith'),
+        endswith: this.l('EndsWith'),
+        in: this.l('IsIn'),
+        notin: this.l('IsNotIn')
+    };
 
-    getConditionValueLabel(condition: FilterConditionRule): string {
-        const value = condition.value;
+    if (operator === 'between' || operator === 'notbetween') {
 
-        if (value === null || value === undefined || value === '') {
-            return '""';
+        if (condition?.datePeriod === 'dateRange') {
+            return operator === 'between'
+                ? this.l('Between')
+                : this.l('NotBetween');
         }
 
-        const field = this.filterBuilderFields.find(item => item.name === condition.field);
-        const option = field?.options?.find(item => String(item.value) === String(value));
+        return operator === 'between'
+            ? this.l('IsIn')
+            : this.l('IsNotIn');
+    }
 
-        if (option) {
-            return option.label;
+    return labels[operator] || operator;
+}
+
+getConditionValueLabel(condition: FilterConditionRule): string {
+
+    const value = condition.value;
+
+    // Date period conditions
+    if (
+        condition.operator === 'between' ||
+        condition.operator === 'notbetween'
+    ) {
+
+        // Display selected period name
+        if (condition.datePeriod && condition.datePeriod !== 'dateRange') {
+
+            const periodLabels: Record<string, string> = {
+                today: 'Today',
+                last7days: 'Last7Days',
+                last30days: 'Last30Days',
+                monthToDate: 'MonthToDate',
+                lastMonth: 'LastMonth',
+                yearToDate: 'YearToDate',
+                last365days: 'Last365Days'
+            };
+
+            const labelKey = periodLabels[condition.datePeriod];
+
+            if (labelKey) {
+                return this.l(labelKey);
+            }
         }
 
-        return typeof value === 'boolean' ? this.l(value ? 'Yes' : 'No') : String(value);
+        // Custom Date Range: show actual dates
+       if (condition.datePeriod === 'dateRange') {
+    return `${condition.value} - ${condition.value2 ?? ''}`;
+}
     }
+
+    if (value === null || value === undefined || value === '') {
+        return '""';
+    }
+
+    const field = this.filterBuilderFields.find(
+        item => item.name === condition.field
+    );
+
+    const option = field?.options?.find(
+        item => String(item.value) === String(value)
+    );
+
+    if (option) {
+        return option.label;
+    }
+
+    return typeof value === 'boolean'
+        ? this.l(value ? 'Yes' : 'No')
+        : String(value);
+}
 
    private async loadEditSource(): Promise<void> {
     const source = this.editSource?.source;
@@ -422,25 +483,36 @@ this.selectedColumns = this.tableColumns.filter(
     }
 
 
-    clearDataSource(): void {
-        const sheetName = this.editSource?.sheetName;
+ clearDataSource(): void {
+    const sheetName = this.editSource?.sheetName;
 
-        if (this.isAdding || !this.isEditMode || !sheetName) {
-            return;
-        }
-
-        this.confirmationService.confirm({
-            key: 'clearDataSourceConfirm',
-            header: this.l('ClearDataSource'),
-            message: this.l('ClearDataSourceConfirmation', sheetName),
-            icon: 'pi pi-exclamation-triangle',
-            acceptLabel: this.l('Yes'),
-            rejectLabel: this.l('Cancel'),
-            acceptButtonStyleClass: 'p-button-text p-button-secondary',
-            rejectButtonStyleClass: 'p-button-text p-button-transparent',
-            accept: () => this.dataSourceCleared.emit(sheetName)
-        });
+    if (this.isAdding || !this.isEditMode || !sheetName) {
+        return;
     }
+
+    this.clearDataSourceSheetName = sheetName;
+    this.clearWorksheetData = true; // Checked by default
+    this.showClearDataSourceDialog = true;
+}
+
+confirmClearDataSource(): void {
+    if (!this.clearDataSourceSheetName) {
+        return;
+    }
+
+    this.dataSourceCleared.emit({
+        sheetName: this.clearDataSourceSheetName,
+        clearWorksheetData: this.clearWorksheetData
+    });
+
+    this.showClearDataSourceDialog = false;
+    this.clearDataSourceSheetName = '';
+}
+
+cancelClearDataSource(): void {
+    this.showClearDataSourceDialog = false;
+    this.clearDataSourceSheetName = '';
+}
 
 
     private buildApiConditions(): DynamicCondition[] {
@@ -482,13 +554,24 @@ this.selectedColumns = this.tableColumns.filter(
         return group.children.flatMap(node => node.type === 'rule' ? [node] : this.flattenRules(node));
     }
 
-    private ruleToCondition(rule: { field: string; operator: string; value: any }): DynamicCondition {
-        const condition = new DynamicCondition();
-        condition.field = rule.field;
-        condition.operator = rule.operator;
-        condition.value = this.formatConditionValue(rule.value);
-        return condition;
+    private ruleToCondition(rule: FilterConditionRule): DynamicCondition {
+    const condition = new DynamicCondition();
+
+    condition.field = rule.field;
+    condition.operator = rule.operator;
+    condition.value = this.formatConditionValue(rule.value);
+
+    if (
+        rule.operator === 'between' ||
+        rule.operator === 'notbetween'
+    ) {
+        if (rule.value2 !== null && rule.value2 !== undefined) {
+            condition.value2 = this.formatConditionValue(rule.value2);
+        }
     }
+
+    return condition;
+}
 
     /** Nested conditions are added as flat keys: orWithList[0].field, orWithList[0].operator ... */
     private addNestedCondition(parent: DynamicCondition, listName: NestedListName, child: DynamicCondition): void {

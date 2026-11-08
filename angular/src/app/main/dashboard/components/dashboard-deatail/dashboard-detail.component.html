@@ -1,6 +1,6 @@
 <p-toast></p-toast>
 
-<div class="dashboard-detail-page  px-0"  [style.margin-top]="isArLang ? '70px' : '-45px'">
+<div class="dashboard-detail-page  px-0"  [style.margin-top]="isArLang ? '70px' : ''" [ngClass]="!isArLang ? 'mt-en-dt mt-md-3':''">
 
     <!-- ================= HEADER ================= -->
     <div class="dash-topbar"  *ngIf="!dashboardNotFound">

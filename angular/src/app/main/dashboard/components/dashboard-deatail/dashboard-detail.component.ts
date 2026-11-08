@@ -417,14 +417,14 @@ dashboardNotFound = false;
 
     private updateRefreshInfo(state: SpreadsheetPayload): void {
         const user = this.appSession.user;
-        const tenant = this.appSession.tenant;
+
 
         const fullName = [
             user?.name,
             user?.surname
         ].filter(Boolean).join(' ');
 
-        const now = moment().format('YYYY-MM-DDTHH:mm:ss.SSS') + '0000';
+        const now = moment.utc().format('YYYY-MM-DDTHH:mm:ss[Z]');
 
         state.lastRefreshDate = now;
         state.refreshedBy = `${fullName}`;
@@ -517,11 +517,6 @@ dashboardNotFound = false;
             sheets: (this.dashboardSpreadsheet?.sheets as any[]) ?? [],
             analyses: this.saved?.sheetAnalyses ?? [],
             sheetName: this.dashboardSheetName
-        });
-
-        console.log('[Dashboard Drilldown]', {
-            clickedElement: (event.target as Element)?.id,
-            result
         });
 
         if (!result) {
