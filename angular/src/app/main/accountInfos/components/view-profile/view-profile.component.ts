@@ -30,13 +30,16 @@ export class ViewProfileComponent extends AppComponentBase implements OnChanges,
     @Input() viewMode: boolean;
     @Input() accountLevel: AccountLevelEnum;
     @Input() personalAccount = false;
+    @Input() createMode = false;
+    @Input() startInEditMode = false;
 
     @Output("edit") edit: EventEmitter<boolean> = new EventEmitter<boolean>()
     @Output("editedData") editedData: EventEmitter<any> = new EventEmitter<any>()
     @Output("editedContactData") editedContactData: EventEmitter<any> = new EventEmitter<any>()
     @Output("delete") delete: EventEmitter<boolean> = new EventEmitter<boolean>()
     @Output("publish") publish: EventEmitter<boolean> = new EventEmitter<boolean>()
-
+    @Output() syncCompleted = new EventEmitter<void>();
+    @Output() cancelEdit = new EventEmitter<void>();
 
     showEditConnected: boolean = false;
     priceLevel: string;
@@ -115,17 +118,9 @@ export class ViewProfileComponent extends AppComponentBase implements OnChanges,
     selectedRoles: string[] = [];
     previousSelectedRoles: string[] = [];
 
-    @Input() createMode = false;
-
-    @Input() startInEditMode = false;
-
-    @Output()
-    cancelEdit =
-        new EventEmitter<void>();
-
-
-    private personalModeInitialized =
-        false;
+    private personalModeInitialized =  false;
+    private marketplaceDefaultsInitialized = false;
+    private marketplaceRolesAccountKey: string | null = null;
 
     constructor(
         injector: Injector,
@@ -137,88 +132,42 @@ export class ViewProfileComponent extends AppComponentBase implements OnChanges,
         super(injector)
     }
 
-
-
-    ngOnChanges(
-        changes: SimpleChanges
-    ): void {
-
+    ngOnChanges(changes: SimpleChanges): void {
         if (this.accountData) {
-
             this.ensurePersonalModels();
-
             this.handleAccountData();
-
             if (!this.personalAccount) {
-
-                this.initDepartmentVariables(
-                    true
-                );
-
-                this.initClassificationVariables(
-                    true
-                );
+                this.initDepartmentVariables(true);
+                this.initClassificationVariables(true);
             }
 
             this.getLanguages();
-
-
-            // Load available Marketplace Roles
-            // based on account type
             this.getExtrAttributes();
-
-
-            this.isRecordOwner =
-                this.accountData?.id ===
-                this.appSession.user?.accountId;
+            this.isRecordOwner = this.accountData?.id === this.appSession.user?.accountId;
         }
 
-
-        if (
-            this.personalAccount &&
-            this.startInEditMode &&
-            !this.personalModeInitialized
-        ) {
-
+        if (this.personalAccount && this.startInEditMode && !this.personalModeInitialized) {
             this.enterPersonalEditMode();
-
-            this.personalModeInitialized =
-                true;
+            this.personalModeInitialized = true;
         }
 
-
-        if (
-            this.personalAccount &&
-            !this.startInEditMode
-        ) {
-
+        if (this.personalAccount && !this.startInEditMode) {
             this.Editting = false;
             this.editInfo = true;
             this.NoteditInfo = false;
-
-            this.personalModeInitialized =
-                false;
+            this.personalModeInitialized = false;
         }
     }
     ngOnInit(): void {
         this.getAllForAccountInfo();
-
-        this.allPriceLevel =
-            this.getPriceLevel();
-
+        this.allPriceLevel =  this.getPriceLevel();
         this.allPriceLevel.push({
             label: 'MSRP',
             value: 'MSRP'
         });
 
-        this.currentLang =
-            abp.utils.getCookieValue(
-                'Abp.Localization.CultureName'
-            );
-
-        this.isArabic =
-            this.currentLang === 'ar' ||
-            this.currentLang === 'ar-EG';
+        this.currentLang = abp.utils.getCookieValue('Abp.Localization.CultureName');
+        this.isArabic =  this.currentLang === 'ar' || this.currentLang === 'ar-EG';
 
         this.initUploaders();
     }
@@ -264,12 +213,9 @@ export class ViewProfileComponent extends AppComponentBase implements OnChanges,
             this.editInfo = false;
             this.NoteditInfo = true;
             this.setPersonalData()
-
-
-
         } else if (this.personalAccount && this.editPersonal) {
             if (!this.editedPersonalData) {
-                this.editedPersonalData = { ...this.accountData }; // ensure it's initialized
+                this.editedPersonalData = { ...this.accountData }; 
             }
             this.editedPersonalData.firstName = this.editFirstNameValue
             this.editedPersonalData.lastName = this.editLastNameValue
@@ -303,13 +249,9 @@ export class ViewProfileComponent extends AppComponentBase implements OnChanges,
             this.NoteditInfo = false;
             this.Editting = false;
             this.editPersonal = false;
-
-
         }
 
         else {
-
-
             this.editInfo = true;
             this.NoteditInfo = false;
             this.Editting = false;
@@ -331,9 +273,7 @@ export class ViewProfileComponent extends AppComponentBase implements OnChanges,
         this.scrollDepartment = false;
         this.maxDepartmentCnt = 40;
         this.departmentToLoad = 20;
-        this.totalDepartment =
-            this.accountData.categoriesTotalCount;
-
+        this.totalDepartment =   this.accountData.categoriesTotalCount;
         if (this.noOfDepartmentToShowInitially < this.totalDepartment)
             this.showMoreDepartment = true;
         else this.showMoreDepartment = false;
@@ -362,10 +302,7 @@ export class ViewProfileComponent extends AppComponentBase implements OnChanges,
                         this.showLessDepartment = true;
                     }
 
-                    this.accountData.categories =
-                        this.accountData.categories.concat(
-                            res.items
-                        );
+                    this.accountData.categories = this.accountData.categories.concat(res.items);
                     if (
                         this.accountData.categories.length >= this.maxDepartmentCnt
                     )
@@ -397,8 +334,7 @@ export class ViewProfileComponent extends AppComponentBase implements OnChanges,
     showClassification() {
         if (this.noOfClassificationToShowInitially < this.totalClassification) {
             this.maxClassificationCount = this.classificationToLoad;
-            this.skipClassificationCount =
-                this.noOfClassificationToShowInitially;
+            this.skipClassificationCount =  this.noOfClassificationToShowInitially;
             this.noOfClassificationToShowInitially += this.classificationToLoad;
 
             this._appEntitiesServiceProxy
@@ -417,9 +353,7 @@ export class ViewProfileComponent extends AppComponentBase implements OnChanges,
                         this.showLessClassification = true;
                     }
 
-                    this.accountData.classfications = this.accountData.classfications.concat(
-                        res.items
-                    );
+                    this.accountData.classfications = this.accountData.classfications.concat(res.items);
                     if (
                         this.accountData.classfications.length >= this.maxClassificationCnt
                     )
@@ -441,7 +375,6 @@ export class ViewProfileComponent extends AppComponentBase implements OnChanges,
 
     }
 
-
     editConnnectedAccount() {
         this.showMainSpinner();
         this._AccountsServiceProxy.updateConnectedAccountPriceLevel(this.accountData.id, this.priceLevel)
@@ -458,7 +391,6 @@ export class ViewProfileComponent extends AppComponentBase implements OnChanges,
 
 
     }
-
 
     openShareAccountsModal() {
         this.showMainSpinner();
@@ -477,21 +409,31 @@ export class ViewProfileComponent extends AppComponentBase implements OnChanges,
             );
     }
 
-    syncAccount() {
+    syncAccount(): void {
+        if (this.btnLoader || this.isSync !== true) {
+            return;
+        }
+
+        this.btnLoader = true;
         this.showMainSpinner();
-        this._AccountsServiceProxy.publishProfile(true).pipe(
-            finalize(() => this.hideMainSpinner()
-            )).subscribe(
-                (response: boolean) => {
-                    this.notify.success(this.l("Account sync Successfully"));
-                    this.showIsSync = !response;
-                    this.isSync = !response;
-                    this.isSync = false;
 
-                });
-
+        this._AccountsServiceProxy.publishProfile(true)
+            .pipe(
+                finalize(() => {
+                    this.btnLoader = false;
+                    this.hideMainSpinner();
+                })
+            )
+            .subscribe({
+                next: () => {
+                    this.notify.success(this.l('Account sync Successfully'));
+                    this.syncCompleted.emit();
+                },
+                error: (error) => {
+                    console.error('Sync failed:', error);
+                }
+            });
     }
-
     UnShareAccount() {
         this.showMainSpinner();
         this._AccountsServiceProxy.unPublishProfile().pipe(
@@ -524,15 +466,12 @@ export class ViewProfileComponent extends AppComponentBase implements OnChanges,
     }
 
     isNotManualLevel(): boolean {
-
         return this.accountLevel !== AccountLevelEnum.Manual;
     }
-
 
     isChangePersonalData(): boolean {
         if (!this.editFirstNameValue || !this.editLastNameValue || !this.editJobTitleValue || !this.editEMailAddressValue || !this.editLanguageNameValue || !this.editPhoneNumberValue)
             return false;
-
 
         if (this.editFirstNameValue == this.accountData.name && this.editJobTitleValue == this.accountData.jobTitle && this.editEMailAddressValue == this.accountData.eMailAddres && this.editLanguageNameValue == this.accountData.languageName && this.editPhoneNumberValue == this.accountData.phoneNumber)
             return false;
@@ -550,124 +489,40 @@ export class ViewProfileComponent extends AppComponentBase implements OnChanges,
         });
     }
 
-
     setPersonalData(): void {
-
-        this.editFirstNameValue =
-            this.contactData?.firstName ??
-            this.getExtraDataValue(701) ??
-            '';
-
-        this.editLastNameValue =
-            this.contactData?.lastName ??
-            this.getExtraDataValue(702) ??
-            '';
-            
-
-        this.editJobTitleValue =
-            this.contactData?.jobTitle ??
-            this.getExtraDataValue(706) ??
-            '';
-
-        this.editEMailAddressValue =
-            this.accountData?.eMailAddress ??
-            '';
-
-        this.editPhoneNumberValue =
-            this.accountData?.phone1Number ??
-            '';
-
-        // Notes / About
-        this.editNotesValue =
-            this.contactData?.notes ??
-            '';
-
-        this.contactData.emailAddressIsPublic =
-            this.contactData
-                ?.emailAddressIsPublic ??
-            this.getBooleanExtraDataValue(
-                709
-            );
-
-        this.contactData.phone1IsPublic =
-            this.contactData
-                ?.phone1IsPublic ??
-            this.getBooleanExtraDataValue(
-                710
-            );
-
-
+        this.editFirstNameValue =  this.contactData?.firstName ??  this.getExtraDataValue(701) ?? '';
+        this.editLastNameValue =  this.contactData?.lastName ?? this.getExtraDataValue(702) ??  '';
+        this.editJobTitleValue =   this.contactData?.jobTitle ?? this.getExtraDataValue(706) ?? '';
+        this.editEMailAddressValue = this.accountData?.eMailAddress ?? '';
+        this.editPhoneNumberValue =  this.accountData?.phone1Number ?? '';
+        this.editNotesValue = this.contactData?.notes ??  '';
+        this.contactData.emailAddressIsPublic = this.contactData?.emailAddressIsPublic ?? this.getBooleanExtraDataValue(709);
+        this.contactData.phone1IsPublic = this.contactData?.phone1IsPublic ?? this.getBooleanExtraDataValue(710);
         this.setSelectedMarketplaceRoles();
     }
 
-    private getExtraDataValue(
-        attrId: number
-    ): any {
-
-        return (
-            this.accountData
-                ?.entityExtraData
-                ?.find(
-                    x =>
-                        x.attributeId ===
-                        attrId
-                )
-                ?.attributeValue
-            ??
-            this.entityExtraData
-                ?.find(
-                    x =>
-                        x.attributeId ===
-                        attrId
-                )
-                ?.attributeValue
-        );
-    }
-
-    private getBooleanExtraDataValue(
-        attrId: number
-    ): boolean {
-
-        const value =
-            this.getExtraDataValue(
-                attrId
-            );
-
+    private getExtraDataValue(attrId: number): any {
+    return this.accountData?.entityExtraData?.find(x => x.attributeId === attrId)?.attributeValue ?? this.entityExtraData?.find(x => x.attributeId === attrId)?.attributeValue;
+}
+    private getBooleanExtraDataValue(attrId: number): boolean {
+        const value = this.getExtraDataValue(attrId);
         return (
             value === true ||
             value === 'true'
         );
     }
 
-
     cancelPerAcc(): void {
-
         if (this.createMode) {
-
             this.setPersonalData();
-
             return;
         }
-
-
         this.editInfo = true;
-
         this.NoteditInfo = false;
-
         this.Editting = false;
-
         this.editPersonal = false;
-
-
-        this.companyLogo =
-            this._originalLogoUrl ??
-            this.companyLogo;
-
-        this.coverPhoto =
-            this._originalCoverUrl ??
-            this.coverPhoto;
-
-
+        this.companyLogo = this._originalLogoUrl ?? this.companyLogo;
+        this.coverPhoto =  this._originalCoverUrl ?? this.coverPhoto;
         this.accountData.entityAttachments =
             (
                 this.accountData
@@ -762,8 +617,6 @@ export class ViewProfileComponent extends AppComponentBase implements OnChanges,
         };
     }
 
-
-
     removeImage(_e: any, cat: SycAttachmentCategoryDto, index: number) {
         this.accountData.entityAttachments ??= [];
         const i = this.accountData.entityAttachments.findIndex(a => a.attachmentCategoryId === cat.id && a.index === index);
@@ -772,8 +625,6 @@ export class ViewProfileComponent extends AppComponentBase implements OnChanges,
         if (cat.id === this.sycAttachmentCategoryLogo?.id) { this.companyLogo = undefined; this._removed = { ...(this._removed || {}), logo: true }; }
         if (cat.id === this.sycAttachmentCategoryBanner?.id) { this.coverPhoto = undefined; this._removed = { ...(this._removed || {}), cover: true }; }
     }
-
-
 
     private _removed: { logo?: boolean; cover?: boolean } = {};
 
@@ -846,13 +697,10 @@ export class ViewProfileComponent extends AppComponentBase implements OnChanges,
     }
 
     get hasInvalidEmailOrPhone(): boolean {
-        // Only consider invalid if the user typed something AND it doesn't match the pattern
         const email = (this.editEMailAddressValue || '').trim();
         const phone = (this.editPhoneNumberValue || '').trim();
-
         const emailBad = !!email && !(new RegExp(this.emailPattern).test(email));
         const phoneBad = !!phone && !(new RegExp(this.phonePattern).test(phone));
-
         return emailBad || phoneBad;
     }
 
@@ -860,9 +708,7 @@ export class ViewProfileComponent extends AppComponentBase implements OnChanges,
     get marketplaceRolesList(): string[] {
         const accountExtraData = this.accountData?.entityExtraData;
 
-        const extraData = accountExtraData?.length
-            ? accountExtraData
-            : this.entityExtraData || [];
+        const extraData = accountExtraData?.length  ? accountExtraData  : this.entityExtraData || [];
 
         const roleItem = extraData.find(
             x =>
@@ -877,33 +723,18 @@ export class ViewProfileComponent extends AppComponentBase implements OnChanges,
             .filter(Boolean);
     }
 
-
     buildMarketplaceRolesExtraData(): AppEntityExtraDataDto[] {
-
         if (!this.selectedRoles?.length) {
             return [];
         }
+        const dto = new AppEntityExtraDataDto();
 
-        const dto =
-            new AppEntityExtraDataDto();
-
-        dto.entityId =
-            this.accountData?.entityId ??
-            this.accountData?.id ??
-            0;
-
+        dto.entityId =  this.accountData?.entityId ??  this.accountData?.id ??   0;
         dto.entityObjectTypeId = 610;
-
-        dto.entityObjectTypeCode =
-            'PROD-RAWM-TRIM-POMP';
-
-        dto.entityObjectTypeName =
-            'Marketplace Role';
-
+        dto.entityObjectTypeCode =  'PROD-RAWM-TRIM-POMP';
+        dto.entityObjectTypeName = 'Marketplace Role';
         dto.attributeId = 610;
-
-        dto.attributeCode =
-            'MARKETPLACE-ROLE';
+        dto.attributeCode = 'MARKETPLACE-ROLE';
 
         dto.attributeValue =
             [...new Set(this.selectedRoles)]
@@ -913,49 +744,35 @@ export class ViewProfileComponent extends AppComponentBase implements OnChanges,
         dto.attributeValueId = null;
         dto.attributeValueFkName = null;
         dto.attributeValueFkCode = null;
-
         dto.id = 0;
-
         return [dto];
     }
 
-    // updateMarketplaceRolesExtraData(): void {
-    //   if (!this.accountData) return;
 
-    //   const existingExtraData = this.accountData.entityExtraData || this.entityExtraData || [];
-
-    //   const updated = [
-    //     ...existingExtraData.filter(x => x.attributeId !== 610),
-    //     ...this.buildMarketplaceRolesExtraData()
-    //   ];
-
-
-    //   this.accountData.entityExtraData = updated;
-    //   this.entityExtraData = updated;
-    // }
 
     updateMarketplaceRolesExtraData(): void {
-
-        if (!this.accountData) {
-            return;
-        }
+        if (!this.accountData) return;
 
         const existing =
             this.accountData.entityExtraData ||
             this.entityExtraData ||
             [];
 
-        this.accountData.entityExtraData = [
-            ...existing.filter(
-                x => x.attributeId !== 610
-            ),
+        const otherAttributes = existing.filter(
+            x =>
+                Number(x.attributeId) !== 610 &&
+                String(x.attributeCode || '').toUpperCase() !==
+                'MARKETPLACE-ROLE'
+        );
+
+        const updated = [
+            ...otherAttributes,
             ...this.buildMarketplaceRolesExtraData()
         ];
 
-        this.entityExtraData =
-            this.accountData.entityExtraData;
+        this.accountData.entityExtraData = updated;
+        this.entityExtraData = updated;
     }
-
 
     setSelectedMarketplaceRoles(): void {
         const isMarketplaceRole = (item: any): boolean =>
@@ -978,20 +795,13 @@ export class ViewProfileComponent extends AppComponentBase implements OnChanges,
     }
 
     private enterPersonalEditMode(): void {
-
         this.ensurePersonalModels();
-
         this.Editting = true;
-
         this.editInfo = false;
-
         this.NoteditInfo = true;
-
         this.editPersonal = false;
-
         this.setPersonalData();
     }
-
 
 
     private ensurePersonalModels(): void {
@@ -1020,81 +830,64 @@ export class ViewProfileComponent extends AppComponentBase implements OnChanges,
     }
 
     getExtrAttributes(): void {
-
-        const accountType =
-            this.accountData?.accountType;
+        const accountType = this.accountData?.accountType;
 
         if (!accountType) {
             this.roles = [];
             return;
         }
 
-        this._sycEntityObjectTypesServiceProxy
-            .getAllWithExtraAttributesByCode(
-                accountType,
-                ''
-            )
-            .subscribe(result => {
+        const accountKey = `${this.accountData?.id ?? 'new'}-${accountType}`;
 
+        if (this.marketplaceRolesAccountKey !== accountKey) {
+            this.marketplaceRolesAccountKey = accountKey;
+            this.marketplaceDefaultsInitialized = false;
+        }
+
+        this._sycEntityObjectTypesServiceProxy
+            .getAllWithExtraAttributesByCode(accountType, '')
+            .subscribe(result => {
                 const marketplaceRoleAttribute =
-                    result?.[0]
-                        ?.extraAttributes
-                        ?.extraAttributes
-                        ?.find(
-                            x =>
-                                x.code ===
-                                'MARKETPLACE-ROLE'
-                        );
+                    result?.[0]?.extraAttributes?.extraAttributes
+                        ?.find(x => x.code === 'MARKETPLACE-ROLE');
 
                 if (!marketplaceRoleAttribute) {
                     this.roles = [];
+                    return;
+                }
 
-                    if (this.createMode) {
-                        this.selectedRoles = [];
+                this.roles = (marketplaceRoleAttribute.validEntries || '')
+                    .split('|')
+                    .map(x => x.trim())
+                    .filter(Boolean)
+                    .map(x => ({ name: x }));
+
+                if (this.createMode) {
+                    if (!this.marketplaceDefaultsInitialized) {
+                        this.selectedRoles =
+                            (marketplaceRoleAttribute.defaultValue || '')
+                                .split('|')
+                                .map(x => x.trim())
+                                .filter(Boolean);
+
+                        this.previousSelectedRoles = [
+                            ...this.selectedRoles
+                        ];
+
+                        this.marketplaceDefaultsInitialized = true;
+                        this.updateMarketplaceRolesExtraData();
                     }
 
                     return;
                 }
 
-
-                // Available roles
-                this.roles =
-                    (
-                        marketplaceRoleAttribute
-                            .validEntries || ''
-                    )
-                        .split('|')
-                        .map(x => x.trim())
-                        .filter(Boolean)
-                        .map(x => ({
-                            name: x
-                        }));
-
-
-                // CREATE
-                if (this.createMode) {
-
-                    this.selectedRoles =
-                        (
-                            marketplaceRoleAttribute
-                                .defaultValue || ''
-                        )
-                            .split('|')
-                            .map(x => x.trim())
-                            .filter(Boolean);
-
-                    this.previousSelectedRoles = [
-                        ...this.selectedRoles
-                    ];
-
-                    this.updateMarketplaceRolesExtraData();
-
-                    return;
-                }
-
-
-                // EDIT
                 this.setSelectedMarketplaceRoles();
             });
+    }
+
+    onPersonalRolesChange(event: any): void {
+        this.selectedRoles = [...(event?.value ?? [])];
+        this.previousSelectedRoles = [...this.selectedRoles];
+        this.updateMarketplaceRolesExtraData();
     }
 }
