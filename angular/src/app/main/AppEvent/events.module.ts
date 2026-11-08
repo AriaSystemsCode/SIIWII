@@ -21,6 +21,7 @@ import {
 import { CarouselModule} from "primeng/carousel";
 import { InputSwitchModule } from "primeng/inputswitch";
 import { DialogModule } from "primeng/dialog";
+import { CalendarModule } from "primeng/calendar";
 
 @NgModule({
     declarations: [
@@ -42,7 +43,8 @@ import { DialogModule } from "primeng/dialog";
         ModalModule.forRoot(),
         SelectAddressModule,
         CarouselModule,
-        DialogModule
+        DialogModule,
+        CalendarModule
     ],
 
     exports: [

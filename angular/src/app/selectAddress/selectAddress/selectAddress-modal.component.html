@@ -39,7 +39,7 @@
 
 
                     <div class="row row-address" *ngFor="let address of filteredAddresses;let i=index" [ngClass]="(selectedAddressId == address.id)?'checkedAddress':''" (click)="selectedAddress=address">
-                        <div class="col-md-12 cursor-pointer" style="margin-bottom: 0;display: flex;" (click)="selectedAddressId = address.id">
+                        <div class="col-md-12 cursor-pointer d-flex mb-0 align-items-center"  (click)="selectedAddressId = address.id">
                             <input type="radio" name="address" [value]="address.id" class="radio-select" [(ngModel)]="selectedAddressId"  >
 
                             <p type="text"  
