@@ -766,24 +766,31 @@ namespace onetouch.AppItems
                     foreach (var item in output.AppItem.EntityAttachments)
                     { item.Url = imagesUrl + (appItem.TenantId.HasValue ? appItem.TenantId.ToString() : "-1") + @"/" + item.FileName; }
 
-                    if (appItem.ItemPricesFkList.Count != 0)
+                    var itemPrice = GetRetailPrice(appItem.ItemPricesFkList, currencyCode);
+                    if (itemPrice.HasValue)
                     {
-                        var msrpObj = appItem.ItemPricesFkList.Where(x => x.Code == "MSRP" & x.CurrencyCode == currencyCode).FirstOrDefault();
-                        if (msrpObj != null)
-                        {
-                            output.AppItem.MaxPrice = msrpObj.Price;  //output.AppItem.Price;
-                            output.AppItem.MinPrice = msrpObj.Price;
-                        }
+                        output.AppItem.MaxPrice = itemPrice.Value;
+                        output.AppItem.MinPrice = itemPrice.Value;
                     }
+                    var hasPrice = itemPrice.HasValue;
                     foreach (var prObj in varAppItems)
                     {
                         if (prObj.ItemPricesFkList.Count > 0)
                         {
-                            var itemPrice = prObj.ItemPricesFkList.Where(x => x.Code.ToUpper() == "MSRP" & x.CurrencyCode == currencyCode).Select(x => x.Price).FirstOrDefault();
-                            if (itemPrice != 0)
+                            var variationPrice = GetRetailPrice(prObj.ItemPricesFkList, currencyCode);
+                            if (variationPrice.HasValue && variationPrice.Value != 0)
                             {
-                                output.AppItem.MaxPrice = output.AppItem.MaxPrice > itemPrice ? output.AppItem.MaxPrice : itemPrice;
-                                output.AppItem.MinPrice = output.AppItem.MinPrice > itemPrice ? itemPrice : output.AppItem.MinPrice;
+                                if (!hasPrice)
+                                {
+                                    output.AppItem.MaxPrice = variationPrice.Value;
+                                    output.AppItem.MinPrice = variationPrice.Value;
+                                    hasPrice = true;
+                                }
+                                else
+                                {
+                                    output.AppItem.MaxPrice = output.AppItem.MaxPrice > variationPrice.Value ? output.AppItem.MaxPrice : variationPrice.Value;
+                                    output.AppItem.MinPrice = output.AppItem.MinPrice > variationPrice.Value ? variationPrice.Value : output.AppItem.MinPrice;
+                                }
                             }
                         }
                     }
@@ -1238,6 +1245,17 @@ namespace onetouch.AppItems
                 var elapsed_time = stopwatch.ElapsedMilliseconds;
                 return output;
             }
+        }
+
+        private static decimal? GetRetailPrice(IEnumerable<AppItemPrices> prices, string currencyCode)
+        {
+            return prices?
+                .Where(x => (string.Equals(x.Code, "MSRP", StringComparison.OrdinalIgnoreCase) ||
+                             string.Equals(x.Code, "RRP", StringComparison.OrdinalIgnoreCase)) &&
+                            x.CurrencyCode == currencyCode)
+                .OrderBy(x => string.Equals(x.Code, "MSRP", StringComparison.OrdinalIgnoreCase) ? 0 : 1)
+                .Select(x => (decimal?)x.Price)
+                .FirstOrDefault();
         }
 
         #region get class/category/depts by page objects/names
