@@ -17,7 +17,9 @@ namespace onetouch.Web.PredefinedReports.ProductCatalog
             table2.SizeF = new System.Drawing.SizeF(930F, 84.23249F);
             tableCell25.Font = new DevExpress.Drawing.DXFont("Arial", 12F);
             tableCell26.Font = new DevExpress.Drawing.DXFont("Arial", 12F);
-            tableCell34.Font = new DevExpress.Drawing.DXFont("Arial", 12F);
+            tableCell34.Font = new DevExpress.Drawing.DXFont("Arial", 9F);
+            tableCell34.Padding = new DevExpress.XtraPrinting.PaddingInfo(0, 0, 0, 0, 254F);
+            tableCell34.TextFitMode = DevExpress.XtraReports.UI.TextFitMode.ShrinkOnly;
         }
     }
 }

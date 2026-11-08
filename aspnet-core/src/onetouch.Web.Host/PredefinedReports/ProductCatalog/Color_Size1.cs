@@ -20,6 +20,8 @@ namespace onetouch.Web.PredefinedReports.ProductCatalog
         tableCell34.Padding = new DevExpress.XtraPrinting.PaddingInfo(1, 1, 0, 0, 254F);
         tableCell34.StylePriority.UseTextAlignment = true;
         tableCell34.TextAlignment = DevExpress.XtraPrinting.TextAlignment.MiddleCenter;
+        tableCell34.Font = new DevExpress.Drawing.DXFont("Arial", 9F);
+        tableCell34.TextFitMode = DevExpress.XtraReports.UI.TextFitMode.ShrinkOnly;
         }
     }
 }
