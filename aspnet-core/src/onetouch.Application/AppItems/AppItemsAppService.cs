@@ -3508,6 +3508,26 @@ namespace onetouch.AppItems
                     long publishedEntityId = 0;
                     byte sharingLevel = 0;
 
+                    // AppItem.ParentId belongs to the seller's AppItems table. Resolve it
+                    // to the corresponding marketplace row before copying it across.
+                    long? marketplaceParentId = null;
+                    if (appItem.ParentId.HasValue)
+                    {
+                        var appParent = await _appItemRepository.GetAll().AsNoTracking()
+                            .Where(x => x.Id == appItem.ParentId.Value)
+                            .Select(x => new { x.SSIN, x.Code, x.TenantId })
+                            .FirstOrDefaultAsync();
+
+                        if (appParent != null)
+                        {
+                            marketplaceParentId = await _appMarketplaceItem.GetAll()
+                                .Where(x => x.SSIN == appParent.SSIN || x.Code == appParent.SSIN ||
+                                    (x.ManufacturerCode == appParent.Code && x.TenantOwner == appParent.TenantId))
+                                .Select(x => (long?)x.Id)
+                                .FirstOrDefaultAsync();
+                        }
+                    }
+
                     appItem.ItemSizeScaleHeadersFkList = await _appItemSizeScalesHeaderRepository.GetAll()
                         .Include(a => a.AppItemSizeScalesDetails).AsNoTracking().Where(a => a.AppItemId == input.AppItemId).ToListAsync();
                     appItem.ItemPricesFkList = await _appItemPricesRepository.GetAll().AsNoTracking().Where(a => a.AppItemId == input.AppItemId).ToListAsync();
@@ -3559,6 +3579,7 @@ namespace onetouch.AppItems
 
                         marketplaceItem = ObjectMapper.Map<onetouch.AppMarketplaceItems.AppMarketplaceItems>(appItem);
                         marketplaceItem.Id = 0;
+                        marketplaceItem.ParentId = marketplaceParentId;
                         marketplaceItem.ObjectId = itemObjectId;
                         //XX
                         if (marketplaceItem.Variations != null)
@@ -3675,6 +3696,7 @@ namespace onetouch.AppItems
                         ObjectMapper.Map(appItem, marketplaceItem);
                         marketplaceItem.ItemSizeScaleHeadersFkList = null;
                         marketplaceItem.ParentFkList = null;
+                        marketplaceItem.ParentId = marketplaceParentId;
                         marketplaceItem.Code = code;
                         marketplaceItem.Name = appItem.Name;
                         marketplaceItem.SSIN = ssin;
