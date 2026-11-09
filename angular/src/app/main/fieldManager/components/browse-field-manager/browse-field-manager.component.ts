@@ -496,7 +496,6 @@ export class BrowseFieldManagerComponent extends AppComponentBase implements OnI
     private loadFields(): void {
         const request = ++this.fieldsRequest;
         this.loading = true;
-        this.showMainSpinner();
         const node = this.activePanel === 'entity' ? this.selectedNode : null;
         const isStandard = this.extraDataFilter === 'all'
             ? undefined
@@ -528,7 +527,6 @@ export class BrowseFieldManagerComponent extends AppComponentBase implements OnI
         ).pipe(finalize(() => {
             if (request === this.fieldsRequest) {
                 this.loading = false;
-                this.hideMainSpinner();
             }
         })).subscribe({
             next: result => {
