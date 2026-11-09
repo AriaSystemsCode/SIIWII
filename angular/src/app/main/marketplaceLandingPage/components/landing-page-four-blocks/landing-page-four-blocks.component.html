@@ -1,0 +1,39 @@
+
+<div class="four-blocks-section">
+
+  <div class="section-header">
+    <h4 [style.text-align]="textAlign">
+      {{ title }}
+    </h4>
+  </div>
+
+  <div *ngIf="loading" class="section-loader">
+    <div class="spinner-border" role="status"></div>
+  </div>
+
+  <div class="four-blocks-grid"
+       *ngIf="!loading && blocks.length">
+
+    <div class="block-item"
+         *ngFor="let item of blocks">
+
+      <app-landing-page-block-card
+        [item]="item"
+        [compact]="true"
+        [blockTypeIsSingleOrMixed]="blockTypeIsSingleOrMixed"
+        [loginTenaneSsin]="loginTenaneSsin"
+        (eventDetails)="openEventDetails($event)">
+      </app-landing-page-block-card>
+
+    </div>
+
+  </div>
+
+</div>
+
+
+
+<app-view-event
+  #viewEventModal
+  [hideViewEv]="false">
+</app-view-event>

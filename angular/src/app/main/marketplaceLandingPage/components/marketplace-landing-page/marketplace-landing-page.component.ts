@@ -10,6 +10,16 @@ import { Router } from "@node_modules/@angular/router";
 import Swal from 'sweetalert2';
 
 
+
+interface FourBlocksGroup {
+  type: 'FOUR_BLOCKS_GROUP';
+  order: number;
+  sections: SectionItem[];
+}
+
+type LandingRenderItem = SectionItem | FourBlocksGroup;
+
+
 @Component({
   selector: "app-marketplace-landing-page",
   templateUrl: "./marketplace-landing-page.component.html",
@@ -26,25 +36,47 @@ export class MarketplaceLandingPageComponent
   sections: any
   sectionsFlat: SectionItem[] = [];
 
-loginTenaneSsin:string
-        defaultUrl:string
+  loginTenaneSsin: string
+  defaultUrl: string
+
+  menuSections: SectionItem[] = [];
+
+  isAuthenticated: boolean = false;
+
+  
+renderSections: LandingRenderItem[] = [];
+
+fourBlocksResponsiveOptions = [
+  {
+    breakpoint: '1199px',
+    numVisible: 2,
+    numScroll: 1
+  },
+  {
+    breakpoint: '767px',
+    numVisible: 1,
+    numScroll: 1
+  }
+];
+
 
   constructor(
     injector: Injector,
     private _sydObjectsAppService: SydObjectsServiceProxy,
-     private _AccountsServiceProxy: AccountsServiceProxy, private router: Router,
+    private _AccountsServiceProxy: AccountsServiceProxy, private router: Router,
 
   ) {
     super(injector);
-       this.redirectTo();    
+    this.redirectTo();
 
   }
 
   ngOnInit(): void {
-   this.getLoginAccountDataForView()
+    this.isAuthenticated = !!this.appSession?.user;
+    this.getLoginAccountDataForView()
     localStorage.removeItem("productFilters");
     localStorage.removeItem("marketplaceAccountsBrowseState");
-    
+
     this.addLocal()
     this.pages = this.chunk(this.items, 9); // each page has 9 products
     this.loadSections()
@@ -61,7 +93,7 @@ loginTenaneSsin:string
           ...r,
           _type: this.TYPE_TO_SECTION[r.type] ?? 'ASSB',
           _order: r.order ?? 0,
-          _idx: idx, 
+          _idx: idx,
         }));
 
         const flat: SectionItem[] = normalized.map(r => {
@@ -75,7 +107,7 @@ loginTenaneSsin:string
                   images: r.image ? [r.image] : [], // one row = one slide set (single image)
                   title: r.title ?? null, name: r.name ?? null, titleAlignment: r.titleAlignment
                 },
-                blockTypeIsSingleOrMixed:r.blockTypeIsSingleOrMixed
+                blockTypeIsSingleOrMixed: r.blockTypeIsSingleOrMixed
               };
             case 'ASMB':
               return {
@@ -83,7 +115,7 @@ loginTenaneSsin:string
                 order: r._order,
                 sectionId: r.id,
                 inputs: { images: r.image ? [r.image] : [], title: r.title ?? null, name: r.name ?? null, titleAlignment: r.titleAlignment },
-                blockTypeIsSingleOrMixed:r.blockTypeIsSingleOrMixed
+                blockTypeIsSingleOrMixed: r.blockTypeIsSingleOrMixed
 
               };
             case 'CSMP':
@@ -92,7 +124,7 @@ loginTenaneSsin:string
                 order: r._order,
                 sectionId: r.id,
                 inputs: { title: r.title ?? null, name: r.name ?? null, titleAlignment: r.titleAlignment },
-                blockTypeIsSingleOrMixed:r.blockTypeIsSingleOrMixed
+                blockTypeIsSingleOrMixed: r.blockTypeIsSingleOrMixed
 
               };
 
@@ -102,7 +134,7 @@ loginTenaneSsin:string
                 order: r._order,
                 sectionId: r.id,
                 inputs: { title: r.title, name: r.name ?? null, titleAlignment: r.titleAlignment },
-                blockTypeIsSingleOrMixed:r.blockTypeIsSingleOrMixed
+                blockTypeIsSingleOrMixed: r.blockTypeIsSingleOrMixed
               };
 
             case 'MRCTA':
@@ -111,9 +143,47 @@ loginTenaneSsin:string
                 order: r._order,
                 sectionId: r.id,
                 inputs: { title: r.title ?? null, name: r.name ?? null, titleAlignment: r.titleAlignment },
-                blockTypeIsSingleOrMixed:r.blockTypeIsSingleOrMixed
+                blockTypeIsSingleOrMixed: r.blockTypeIsSingleOrMixed
 
               };
+
+
+            case 'MENU':
+              return {
+                type: 'MENU',
+                order: r._order,
+                sectionId: r.id,
+                inputs: {
+                  title: r.title,
+                  backgroundColor: r.backgroundColor,
+                  textColor: r.textColor
+                }
+              };
+
+
+            case 'IMGS':
+              return {
+                type: 'IMGS',
+                order: r._order,
+                sectionId: r.id,
+                inputs: {
+                  title: r.title,
+                  firstImageLarger: r.firstImageLarger ?? true
+                }
+              };
+
+            case 'FOUR_BLOCKS':
+              return {
+                type: 'FOUR_BLOCKS',
+                order: r._order,
+                sectionId: r.id,
+                blockTypeIsSingleOrMixed: r.blockTypeIsSingleOrMixed,
+                inputs: {
+                  title: r.title,
+                  titleAlignment: r.titleAlignment
+                }
+              };
+
             default:
               return {
                 type: 'PF',
@@ -127,6 +197,12 @@ loginTenaneSsin:string
         flat.sort((a, b) => (a.order - b.order) || (rows.findIndex(rr => rr.id === a.sectionId) - rows.findIndex(rr => rr.id === b.sectionId)));
 
         this.sectionsFlat = flat;
+
+        this.menuSections = flat.filter(
+          section => section.type === 'MENU'
+        );
+
+        this.renderSections = this.buildRenderSections(flat);
       });
 
 
@@ -135,14 +211,18 @@ loginTenaneSsin:string
 
   private TYPE_TO_SECTION: Record<number, SectionType> = {
 
-    0: 'ASSB',
+    // 0: 'ASSB',
     1: 'ASMB',
     2: 'ASSB',
     3: 'CSMP',
     4: 'SRCTA',
     5: 'MRCTA',
     6: 'PF',
-    7: 'SM'
+    7: 'SM',
+    // 0: 'MENU',
+    // 0: 'IMGS',
+    0: 'FOUR_BLOCKS',
+
 
   };
 
@@ -162,56 +242,110 @@ loginTenaneSsin:string
     }
     return out;
   }
-  
-  addLocal(){
-    localStorage.setItem("fromSellerRoom",JSON.stringify(false));
-    localStorage.setItem("fromMarketPlace",JSON.stringify(true));
+
+  addLocal() {
+    localStorage.setItem("fromSellerRoom", JSON.stringify(false));
+    localStorage.setItem("fromMarketPlace", JSON.stringify(true));
     localStorage.removeItem("productFilters");
-    }
+  }
 
 
-    getLoginAccountDataForView() {
-        let id = this.appSession?.user?.accountId
-        if (!id) return
+  getLoginAccountDataForView() {
+    let id = this.appSession?.user?.accountId
+    if (!id) return
 
-      this._AccountsServiceProxy.getAccountForView(id, 5).pipe(
-  
+    this._AccountsServiceProxy.getAccountForView(id, 5).pipe(
+
     ).subscribe((res) => {
       this.loginTenaneSsin = res?.account?.ssin
     })
 
+  }
+
+  async redirectTo() {
+    console.log(this.defaultUrl, 'defau')
+
+    if (this.appSession.tenantId && !this.appSession.user.accountId)
+      await this.askForCompleteProfile();
+  }
+
+  async askForCompleteProfile() {
+
+    Swal.fire({
+      title: "",
+      text: "Please Complete Your Profile Information",
+      icon: "warning",
+      showCancelButton: true,
+      cancelButtonText: "Later",
+      confirmButtonText: "Proceed",
+      allowOutsideClick: false,
+      customClass: {
+        popup: 'popup-class',
+        icon: 'icon-class',
+        content: 'content-class',
+        actions: 'actions-class',
+        confirmButton: 'confirm-button-class2'
+      }
+    }).then((result) => {
+      if (result.isConfirmed)
+        this.router.navigate(['/app/main/account'])
+    });
+  }
+
+  
+private buildRenderSections(
+  sections: SectionItem[]
+): LandingRenderItem[] {
+
+  const result: LandingRenderItem[] = [];
+  let currentGroup: SectionItem[] = [];
+
+  const flushGroup = () => {
+    if (!currentGroup.length) return;
+
+    result.push({
+      type: 'FOUR_BLOCKS_GROUP',
+      order: currentGroup[0].order,
+      sections: [...currentGroup]
+    });
+
+    currentGroup = [];
+  };
+
+  for (const section of sections) {
+
+    // MENU is displayed separately
+    if (section.type === 'MENU') {
+      continue;
     }
 
-       async redirectTo() {
-                console.log(this.defaultUrl,'defau')
-    
-                if (this.appSession.tenantId && !this.appSession.user.accountId)
-                    await this.askForCompleteProfile();
-            }
-        
-            async askForCompleteProfile() {
-          
-                    Swal.fire({
-                        title: "",
-                        text: "Please Complete Your Profile Information",
-                        icon: "warning",
-                        showCancelButton: true,
-                        cancelButtonText: "Later",
-                        confirmButtonText: "Proceed",
-                        allowOutsideClick: false,
-                        customClass: {
-                            popup: 'popup-class',
-                            icon: 'icon-class',
-                            content: 'content-class',
-                            actions: 'actions-class',
-                            confirmButton: 'confirm-button-class2'
-                        }
-                }).then((result) => {
-                    if (result.isConfirmed)
-                    this.router.navigate(['/app/main/account'])
-                });
-            }
-     
+    if (section.type === 'FOUR_BLOCKS') {
+      currentGroup.push(section);
+      continue;
+    }
+
+    // Other section interrupts the group
+    flushGroup();
+    result.push(section);
+  }
+
+  flushGroup();
+
+  return result;
+}
+
+
+
+getFourBlocksSections(
+  item: LandingRenderItem
+): SectionItem[] {
+
+  return item.type === 'FOUR_BLOCKS_GROUP'
+    ? item.sections
+    : [];
+
+}
+
 
   ngOnDestroy() {
     this.unsubscribeToAllSubscriptions();

@@ -1,0 +1,57 @@
+
+<nav [ngClass]="isAuthenticated || (isAuthenticated && !isArabic)   ? 'landing-menu' : 'landing-menu-full' "
+     [style.background-color]="backgroundColor"
+     [style.color]="textColor">
+
+  <div class="menu-items mx-5 px-4 mt-2">
+
+    <div class="menu-item"
+         *ngFor="let section of sections; trackBy: trackBySection">
+
+      <!-- Parent menu section -->
+      <button
+        type="button"
+        class="menu-trigger"
+        [style.color]="textColor"
+        [attr.aria-expanded]="expandedMenu === section.sectionId"
+        (click)="toggleMenu(section)">
+
+        {{ section.inputs?.title || section.inputs?.name }}
+
+      </button>
+
+      <!-- Section blocks dropdown -->
+      <div class="menu-dropdown"
+           *ngIf="expandedMenu === section.sectionId">
+
+        <div *ngIf="loadingSections[section.sectionId]"
+             class="menu-loading">
+          {{ 'Loading' | localize }}...
+        </div>
+
+        <ng-container *ngIf="!loadingSections[section.sectionId]">
+
+          <button
+            type="button"
+            class="dropdown-item"
+            *ngFor="let block of getBlocks(section.sectionId)"
+            (click)="openItem(block)">
+
+            {{ block.name || block.title || block.code }}
+
+          </button>
+
+          <div class="menu-empty"
+               *ngIf="getBlocks(section.sectionId).length === 0">
+            {{'No menu items found' | localize }}
+          </div>
+
+        </ng-container>
+
+      </div>
+
+    </div>
+
+  </div>
+
+</nav>
