@@ -137,9 +137,9 @@ public static class Program
 
 public static class SeedRelease
 {
-    // Increment when the cumulative seed snapshot changes. Version 19 adds AppEntity lookup settings and legacy XML metadata.
+    // Version 20 relevels existing host Field Manager definitions to Application.
     // This is not an EF schema version.
-    public const int RequiredVersion = 19;
+    public const int RequiredVersion = 20;
 }
 
 public sealed record Options(string ConfigPath, string ContentRoot, bool Apply, string? ClientUrl, int CommandTimeout,

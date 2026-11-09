@@ -95,7 +95,7 @@ BEGIN TRY
        AND f.TenantId IS NULL AND f.FieldName = s.FieldName AND f.IsDeleted = 0
         WHERE (f.FieldTypeId <> s.FieldTypeId
            AND NOT (s.FieldName = N'OptionsList' AND f.FieldTypeId = @stringTypeId))
-           OR f.FieldLevelCode <> N'System'
+           OR f.FieldLevelCode NOT IN (N'System', N'Application')
            OR f.IsStandard <> 1 OR f.IsExtraField <> 0)
         THROW 51506, 'An existing String--Chips setting definition conflicts with the seed.', 1;
     IF EXISTS (SELECT 1 FROM #ChipsSettings s JOIN dbo.AppFields f
