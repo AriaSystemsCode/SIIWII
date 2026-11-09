@@ -92325,6 +92325,7 @@ export class AppMarketplaceItemForViewDto implements IAppMarketplaceItemForViewD
     extraAttributesVar!: ExtraAttribute[] | undefined;
     orderByPrePack!: boolean;
     hasPriceLevel!: boolean;
+    ssin!: string | undefined;
     code!: string | undefined;
     name!: string | undefined;
     entityId!: number;
@@ -92668,6 +92669,7 @@ export interface IAppMarketplaceItemForViewDto {
     extraAttributesVar: ExtraAttribute[] | undefined;
     orderByPrePack: boolean;
     hasPriceLevel: boolean;
+    ssin: string | undefined;
     code: string | undefined;
     name: string | undefined;
     entityId: number;
