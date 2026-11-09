@@ -5,7 +5,6 @@
   [style.color]="textColor">
 
   <div class="menu-scroll-wrapper">
-
     <div class="menu-items mx-md-5 px-md-4 mx-2 mt-2">
 
       <div
@@ -24,49 +23,40 @@
 
         </button>
 
-      </div>
-
-    </div>
-
-  </div>
-
-  <!-- Dropdown outside the scroll container -->
-  <ng-container *ngFor="let section of sections; trackBy: trackBySection">
-
-    <div
-      class="menu-dropdown"
-      *ngIf="expandedMenu === section.sectionId">
-
-      <div
-        *ngIf="loadingSections[section.sectionId]"
-        class="menu-loading">
-        {{ 'Loading' | localize }}...
-      </div>
-
-      <ng-container *ngIf="!loadingSections[section.sectionId]">
-
-        <button
-          type="button"
-          class="dropdown-item"
-          *ngFor="let block of getBlocks(section.sectionId)"
-          (click)="openItem(block)">
-
-          {{ block.name || block.title || block.code }}
-
-        </button>
-
         <div
-          class="menu-empty"
-          *ngIf="getBlocks(section.sectionId).length === 0">
+          class="menu-dropdown"
+          *ngIf="expandedMenu === section.sectionId">
 
-          {{ 'No menu items found' | localize }}
+          <div
+            *ngIf="loadingSections[section.sectionId]"
+            class="menu-loading">
+            {{ 'Loading' | localize }}...
+          </div>
+
+          <ng-container *ngIf="!loadingSections[section.sectionId]">
+
+            <button
+              type="button"
+              class="dropdown-item"
+              *ngFor="let block of getBlocks(section.sectionId)"
+              (click)="openItem(block)">
+
+              {{ block.name || block.title || block.code }}
+
+            </button>
+
+            <div
+              class="menu-empty"
+              *ngIf="getBlocks(section.sectionId).length === 0">
+              {{ 'No menu items found' | localize }}
+            </div>
+
+          </ng-container>
 
         </div>
 
-      </ng-container>
+      </div>
 
     </div>
-
-  </ng-container>
-
+  </div>
 </nav>
