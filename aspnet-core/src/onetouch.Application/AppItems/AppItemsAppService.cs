@@ -767,17 +767,10 @@ namespace onetouch.AppItems
                     foreach (var item in output.AppItem.EntityAttachments)
                     { item.Url = imagesUrl + (appItem.TenantId.HasValue ? appItem.TenantId.ToString() : "-1") + @"/" + item.FileName; }
 
-                    // UK English item creation stores the displayed RRP price level as "RRP";
-                    // other locales store it as "MSRP". Include both aliases when building
-                    // the item/variation price range so the API does not return its default 0s.
                     var itemPrices = allItems
-                        .SelectMany(item => item.ItemPricesFkList ?? new List<AppItemPrices>())
-                        .Where(price =>
-                            (string.Equals(price.Code, "MSRP", StringComparison.OrdinalIgnoreCase) ||
-                             string.Equals(price.Code, "RRP", StringComparison.OrdinalIgnoreCase)) &&
-                            string.Equals(price.CurrencyCode, currencyCode, StringComparison.OrdinalIgnoreCase) &&
-                            price.Price != 0)
-                        .Select(price => price.Price)
+                        .Select(item => GetRetailPrice(item.ItemPricesFkList, currencyCode))
+                        .Where(price => price.HasValue && price.Value != 0)
+                        .Select(price => price.Value)
                         .ToList();
 
                     if (itemPrices.Count > 0)
@@ -1236,6 +1229,17 @@ namespace onetouch.AppItems
                 var elapsed_time = stopwatch.ElapsedMilliseconds;
                 return output;
             }
+        }
+
+        private static decimal? GetRetailPrice(IEnumerable<AppItemPrices> prices, string currencyCode)
+        {
+            return prices?
+                .Where(x => (string.Equals(x.Code, "MSRP", StringComparison.OrdinalIgnoreCase) ||
+                             string.Equals(x.Code, "RRP", StringComparison.OrdinalIgnoreCase)) &&
+                            x.CurrencyCode == currencyCode)
+                .OrderBy(x => string.Equals(x.Code, "MSRP", StringComparison.OrdinalIgnoreCase) ? 0 : 1)
+                .Select(x => (decimal?)x.Price)
+                .FirstOrDefault();
         }
 
         #region get class/category/depts by page objects/names
