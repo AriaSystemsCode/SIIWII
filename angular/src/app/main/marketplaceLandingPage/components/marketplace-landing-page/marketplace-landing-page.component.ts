@@ -219,9 +219,9 @@ fourBlocksResponsiveOptions = [
     5: 'MRCTA',
     6: 'PF',
     7: 'SM',
-    // 0: 'MENU',
+    0: 'MENU',
     // 0: 'IMGS',
-    0: 'FOUR_BLOCKS',
+    // 0: 'FOUR_BLOCKS',
 
 
   };
@@ -263,7 +263,6 @@ fourBlocksResponsiveOptions = [
   }
 
   async redirectTo() {
-    console.log(this.defaultUrl, 'defau')
 
     if (this.appSession.tenantId && !this.appSession.user.accountId)
       await this.askForCompleteProfile();

@@ -1,10 +1,10 @@
 <div class="contacts d-flex flex-column mt-lg-2 mt-md-5 mt-2 pt-lg-0 pt-5">
 
   <!-- MENU: Render once for all MENU sections -->
-  <!-- <app-landing-page-menu *ngIf="menuSections.length" [sections]="menuSections"
+  <app-landing-page-menu *ngIf="menuSections.length" [sections]="menuSections"
     [backgroundColor]="menuSections[0]?.inputs?.backgroundColor || '#fff'"
     [textColor]="menuSections[0]?.inputs?.textColor || '#4A0D4A'">
-  </app-landing-page-menu> -->
+  </app-landing-page-menu>
 
 
   <div [class.mt-5]="menuSections.length > 0  && !isAuthenticated">
@@ -72,7 +72,7 @@
         <!-- FOUR BLOCKS -->
 
         <!-- FOUR BLOCKS GROUP -->
-        <div *ngSwitchCase="'FOUR_BLOCKS_GROUP'" class="four-blocks-carousel-wrapper px-5">
+        <!-- <div *ngSwitchCase="'FOUR_BLOCKS_GROUP'" class="four-blocks-carousel-wrapper px-5">
 
           <p-carousel [value]="getFourBlocksSections(s)" [numVisible]="3" [numScroll]="1" [circular]="false"
             [showIndicators]="false" [showNavigators]="getFourBlocksSections(s).length > 3"
@@ -93,7 +93,7 @@
 
           </p-carousel>
 
-        </div>
+        </div> -->
 
 
       </ng-container>

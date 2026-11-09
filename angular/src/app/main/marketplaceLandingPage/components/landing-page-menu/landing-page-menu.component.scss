@@ -1,105 +1,115 @@
 
-@media (min-width: 567px) {
+:host {
+  display: block;
+}
+
+.landing-menu,
+.landing-menu-full {
+  position: absolute;
+  top: 62px;
+  height: 60px;
+  z-index: 20;
+  box-sizing: border-box;
+}
+
 .landing-menu {
-  width: 96%;
-      position: absolute;
-    top: 62px;
-    height: 60px;
-    left: 70px;
-    z-index: 20;
+  width: calc(100% - 70px);
+  left: 70px;
 }
 
 .landing-menu-full {
   width: 100%;
-      position: absolute;
-    top: 62px;
-    height: 60px;
-    // left: 70px;
-    z-index: 20;
+  left: 0;
 }
 
-
-}
-
-
-@media (max-width: 567px) {
-.landing-menu {
+.menu-scroll-wrapper {
   width: 100%;
-      position: absolute;
-    top: 62px;
-    height: 60px;
-    left: 0px;
-    z-index: 20;
-}
-
-.landing-menu-full {
-  width: 100%;
-      position: absolute;
-    top: 62px;
-    height: 60px;
-    // left: 70px;
-    z-index: 20;
-}
-
-
+  height: 100%;
+  position: relative;
 }
 
 .menu-items {
   display: flex;
   align-items: center;
-  flex-wrap: wrap;
-  gap: 22px;
-  padding: 12px 0;
+  gap: 24px;
+  height: 100%;
+  padding: 0 32px;
 }
 
 .menu-item {
-  position: relative;
+  flex: 0 0 auto;
 }
 
 .menu-trigger {
   display: flex;
   align-items: center;
-  gap: 7px;
-  padding: 6px 0;
-  border: none;
+  justify-content: center;
+  position: relative;
+
+  border: 0;
   background: transparent;
+  padding: 12px 0;
+
   font-size: 13px;
   font-weight: 600;
-  cursor: pointer;
   white-space: nowrap;
+  cursor: pointer;
 
-  .pi {
-    font-size: 11px;
+  transition: opacity 0.2s ease;
+
+  &:hover {
+    opacity: 0.75;
+  }
+
+  &.active::after {
+    content: '';
+    position: absolute;
+    bottom: 5px;
+    left: 0;
+    right: 0;
+    height: 2px;
+    border-radius: 2px;
+    background: currentColor;
   }
 }
 
 .menu-dropdown {
   position: absolute;
-  top: 100%;
-  left: 0;
+  top: calc(100% - 2px);
+  left: 32px;
+  z-index: 1000;
+
   min-width: 200px;
   max-width: 300px;
+  max-height: 60vh;
+  overflow-y: auto;
+
   padding: 6px;
   background: #fff;
   color: #333;
-  border-radius: 6px;
-  box-shadow: 0 5px 20px rgba(0, 0, 0, .18);
-  z-index: 1000;
+
+  border: 1px solid #eee;
+  border-radius: 10px;
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.14);
 }
 
 .dropdown-item {
   display: block;
   width: 100%;
-  padding: 10px 12px;
-  text-align: left;
-  border: none;
+  padding: 11px 14px;
+
+  border: 0;
+  border-radius: 6px;
   background: transparent;
   color: #333;
-  cursor: pointer;
+
+  text-align: left;
   font-size: 13px;
+  cursor: pointer;
 
   &:hover {
-    background: #f3f4f6;
+    background: #f5f0f7;
+    color: #56365c;
   }
 }
 
@@ -110,24 +120,87 @@
   color: #777;
 }
 
-@media (max-width: 767px) {
+/* Tablet */
+@media (min-width: 768px) and (max-width: 991px) {
   .menu-items {
-    flex-wrap: nowrap;
+    gap: 20px;
+    padding: 0 20px;
+  }
+}
+
+/* Mobile */
+@media (max-width: 767px) {
+
+  .landing-menu,
+  .landing-menu-full {
+    width: 100%;
+    left: 0;
+    height: 52px;
+  }
+
+  .menu-scroll-wrapper {
     overflow-x: auto;
-    margin-left: 12px !important;
-    margin-right: 12px !important;
-    gap: 16px;
+    overflow-y: hidden;
+
+    -webkit-overflow-scrolling: touch;
+    scroll-behavior: smooth;
+    overscroll-behavior-x: contain;
+    scrollbar-width: none;
+
+    &::-webkit-scrollbar {
+      display: none;
+    }
+  }
+
+  .menu-items {
+    width: max-content;
+    min-width: 100%;
+    height: 52px;
+
+    flex-wrap: nowrap;
+    gap: 22px;
+
+    padding: 0 18px;
+    margin: 0;
+
+    box-sizing: border-box;
   }
 
   .menu-trigger {
-    font-size: 12px;
+    height: 52px;
+    padding: 0 2px;
+
+    font-size: 13px;
+    font-weight: 600;
+  }
+
+  .menu-trigger.active::after {
+    bottom: 5px;
+    height: 3px;
   }
 
   .menu-dropdown {
-    position: fixed;
+    position: absolute;
+    top: 100%;
     left: 12px;
-    right: 30px;
-    top: auto;
+    right: 12px;
+
+    width: auto;
+    min-width: 0;
     max-width: none;
+    max-height: 55vh;
+
+    border-radius: 12px;
+    padding: 8px;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .menu-scroll-wrapper {
+    scroll-behavior: auto;
+  }
+
+  .menu-trigger {
+    transition: none;
   }
 }
