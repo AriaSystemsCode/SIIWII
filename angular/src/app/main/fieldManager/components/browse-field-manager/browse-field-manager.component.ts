@@ -1,12 +1,12 @@
-import { Component, HostListener, Injector, OnInit, ViewChild } from '@angular/core';
+import { Component, HostListener, Injector, OnDestroy, OnInit, ViewChild } from '@angular/core';
 import { Router } from '@angular/router';
 import { CreateOrEditFieldManagerComponent } from '../create-or-edit-field-manager/create-or-edit-field-manager.component';
 import { ViewFieldManagerComponent } from '../view-field-manager/view-field-manager.component';
 import { ExistingFieldsModalComponent } from '../existing-fields-modal/existing-fields-modal.component';
 import { AppComponentBase } from '@shared/common/app-component-base';
 import { FieldManagerService } from '../../field-manager.service';
-import { forkJoin, Observable, of } from 'rxjs';
-import { catchError, finalize } from 'rxjs/operators';
+import { forkJoin, Observable, of, Subject, timer } from 'rxjs';
+import { catchError, distinctUntilChanged, finalize, map, switchMap, takeUntil } from 'rxjs/operators';
 import { AppFieldListDto, FieldManagerPermissionDto, ObjectTypeTreeNodeDto } from '@shared/service-proxies/service-proxies';
 import { LazyLoadEvent } from 'primeng/api';
 import Swal from 'sweetalert2';
@@ -19,7 +19,7 @@ type FieldGroup = { value: string, label: string, fields: GroupedField[] };
     templateUrl: './browse-field-manager.component.html',
     styleUrls: ['./browse-field-manager.component.scss']
 })
-export class BrowseFieldManagerComponent extends AppComponentBase implements OnInit {
+export class BrowseFieldManagerComponent extends AppComponentBase implements OnInit, OnDestroy {
     @ViewChild('createOrEditFieldManagerModal', { static: true }) createOrEditFieldManagerModal!: CreateOrEditFieldManagerComponent;
     @ViewChild('viewFieldManagerModal', { static: true }) viewFieldManagerModal!: ViewFieldManagerComponent;
     @ViewChild('existingFieldsModal', { static: true }) existingFieldsModal!: ExistingFieldsModalComponent;
@@ -57,6 +57,9 @@ export class BrowseFieldManagerComponent extends AppComponentBase implements OnI
         isTenant: false
     });
     private fieldsRequest = 0;
+    private readonly searchTextChanges = new Subject<{ searchText: string; immediate: boolean }>();
+    private readonly searchComponentDestroy$ = new Subject<void>();
+    private appliedFilterText = '';
     selectedEntityPath: ObjectTypeTreeNodeDto[] = [];
 
     readonly groupOptions = [
@@ -76,6 +79,18 @@ export class BrowseFieldManagerComponent extends AppComponentBase implements OnI
     }
 
     ngOnInit(): void {
+        this.searchTextChanges.pipe(
+            switchMap(change => change.immediate
+                ? of(change.searchText)
+                : timer(1500).pipe(map(() => change.searchText))),
+            distinctUntilChanged(),
+            takeUntil(this.searchComponentDestroy$)
+        ).subscribe(searchText => {
+            this.appliedFilterText = searchText;
+            this.first = 0;
+            this.loadFields();
+        });
+
         this.showMainSpinner();
         forkJoin({
             permissions: this.fieldManagerService.getPagePermissions().pipe(catchError(() => {
@@ -93,8 +108,18 @@ export class BrowseFieldManagerComponent extends AppComponentBase implements OnI
         });
     }
 
+    ngOnDestroy(): void {
+        this.searchComponentDestroy$.next();
+        this.searchComponentDestroy$.complete();
+    }
+
     get displayedFields(): AppFieldListDto[] {
         return this.fields;
+    }
+
+    get canShowEntityActions(): boolean {
+        return this.activePanel === 'entity' && this.selectedEntityId !== null &&
+            this.selectedEntityPath.length > 1;
     }
 
     tablesDisplay(tables: string[] | undefined): string {
@@ -103,7 +128,7 @@ export class BrowseFieldManagerComponent extends AppComponentBase implements OnI
     }
 
     get filteredFields(): AppFieldListDto[] {
-        const filter = this.filterText.trim().toLowerCase();
+        const filter = this.appliedFilterText.toLowerCase();
         return this.displayedFields.filter(field => {
             if (this.extraDataFilter === 'only' && !field.isExtraField) {
                 return false;
@@ -273,8 +298,7 @@ export class BrowseFieldManagerComponent extends AppComponentBase implements OnI
     }
 
     onSearchChange(): void {
-        this.first = 0;
-        this.loadFields();
+        this.searchTextChanges.next({ searchText: this.filterText.trim(), immediate: false });
     }
 
     onExtraDataFilterChange(): void {
@@ -472,7 +496,6 @@ export class BrowseFieldManagerComponent extends AppComponentBase implements OnI
     private loadFields(): void {
         const request = ++this.fieldsRequest;
         this.loading = true;
-        this.showMainSpinner();
         const node = this.activePanel === 'entity' ? this.selectedNode : null;
         const isStandard = this.extraDataFilter === 'all'
             ? undefined
@@ -498,13 +521,12 @@ export class BrowseFieldManagerComponent extends AppComponentBase implements OnI
             node,
             skipCount,
             maxResultCount,
-            this.filterText.trim() || undefined,
+            this.appliedFilterText || undefined,
             isStandard,
             this.sorting
         ).pipe(finalize(() => {
             if (request === this.fieldsRequest) {
                 this.loading = false;
-                this.hideMainSpinner();
             }
         })).subscribe({
             next: result => {
