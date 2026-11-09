@@ -3242,33 +3242,44 @@ namespace onetouch.AppItems
         }
         [AbpAuthorize(AppPermissions.Pages_AppItems_Publish)]
         [UnitOfWork(IsDisabled = true)]
-        public async Task<long> SyncSelectedProduct(Guid key)
+        public async Task<string> SyncSelectedProduct(Guid key)
         {
             var timer = Stopwatch.StartNew();
             List<long> itemIds;
             Dictionary<long, List<long>> publishedIds;
-            using (var selectionUnitOfWork = UnitOfWorkManager.Begin(new UnitOfWorkOptions { IsTransactional = false }))
+            try
             {
-                // Read the tenant's selection before disabling the marketplace tenant filters.
-                var selectedItems = await (from selection in _appItemSelectorRepository.GetAll()
-                                           join item in _appItemRepository.GetAll() on selection.SelectedId equals item.Id
-                                           where selection.Key == key && item.SSIN != null && item.SSIN != ""
-                                           select new AppItem { Id = item.Id, SSIN = item.SSIN, Code = item.Code, TenantId = item.TenantId })
-                    .AsNoTracking().Distinct().ToListAsync();
-                using (UnitOfWorkManager.Current.DisableFilter(AbpDataFilters.MustHaveTenant, AbpDataFilters.MayHaveTenant))
+                using (var selectionUnitOfWork = UnitOfWorkManager.Begin(new UnitOfWorkOptions { IsTransactional = false }))
                 {
-                    publishedIds = await ResolvePublishedProductIds(selectedItems);
-                    // An explicit sync must also repair legacy products whose timestamps
-                    // were never advanced when their data changed, just like SyncProduct.
-                    itemIds = selectedItems.Where(item => publishedIds[item.Id].Count > 0)
-                        .Select(item => item.Id).ToList();
-                    Logger.Info($"Bulk sync selection: {selectedItems.Count} selected, {itemIds.Count} published products to sync.");
+                    // Read the tenant's selection before disabling the marketplace tenant filters.
+                    var selectedItems = await (from selection in _appItemSelectorRepository.GetAll()
+                                               join item in _appItemRepository.GetAll() on selection.SelectedId equals item.Id
+                                               where selection.Key == key && item.SSIN != null && item.SSIN != ""
+                                               select new AppItem { Id = item.Id, SSIN = item.SSIN, Code = item.Code, TenantId = item.TenantId })
+                        .AsNoTracking().Distinct().ToListAsync();
+                    using (UnitOfWorkManager.Current.DisableFilter(AbpDataFilters.MustHaveTenant, AbpDataFilters.MayHaveTenant))
+                    {
+                        publishedIds = await ResolvePublishedProductIds(selectedItems);
+                        // An explicit sync must also repair legacy products whose timestamps
+                        // were never advanced when their data changed, just like SyncProduct.
+                        itemIds = selectedItems.Where(item => publishedIds[item.Id].Count > 0)
+                            .Select(item => item.Id).ToList();
+                        Logger.Info($"Bulk sync selection: {selectedItems.Count} selected, {itemIds.Count} published products to sync.");
+                    }
+                    await selectionUnitOfWork.CompleteAsync();
                 }
-                await selectionUnitOfWork.CompleteAsync();
+            }
+            catch (Exception ex)
+            {
+                Logger.Error("Failed to prepare the selected products for sync.", ex);
+                return $"Product sync could not be started: {ex.GetBaseException().Message}";
             }
 
+            if (itemIds.Count == 0)
+                return "No published products were found in the selection. Share products before syncing them.";
+
             long returnCount = 0;
-            var failedCount = 0;
+            var failures = new List<string>();
             foreach (var itemId in itemIds)
             {
                 var itemTimer = Stopwatch.StartNew();
@@ -3286,16 +3297,17 @@ namespace onetouch.AppItems
                 }
                 catch (Exception ex)
                 {
-                    failedCount++;
+                    var reason = ex.GetBaseException().Message;
+                    failures.Add($"Product {itemId}: {reason}");
                     Logger.Error($"Failed to sync selected product {itemId} after {itemTimer.ElapsedMilliseconds} ms.", ex);
                 }
             }
 
-            Logger.Info($"Bulk product sync completed in {timer.ElapsedMilliseconds} ms: {returnCount} synced, {failedCount} failed.");
-            if (failedCount > 0)
-                throw new UserFriendlyException($"{returnCount} products synced. {failedCount} products could not be synced. Please retry the selection or contact support.");
+            Logger.Info($"Bulk product sync completed in {timer.ElapsedMilliseconds} ms: {returnCount} synced, {failures.Count} failed.");
+            if (failures.Count > 0)
+                return $"{returnCount} products synced; {failures.Count} failed. {string.Join("; ", failures)}";
 
-            return returnCount;
+            return $"{returnCount} products synced successfully.";
         }
         [AbpAuthorize(AppPermissions.Pages_AppItems_Publish)]
         public async Task UnHideProduct(long appItemId)
