@@ -588,6 +588,10 @@ export class TopBarComponent extends ThemesLayoutBaseComponent implements OnInit
       onImgErr(evt: Event) {
         (evt.target as HTMLImageElement).src = '/assets/placeholders/_logo-placeholder.png';
       }
+
+      onLogoClick(): void {
+  this.router.navigateByUrl(this.defaultHomeUrl);
+}
     ngOnDestroy(): void {
         if (this.profilePicSub) {
           this.profilePicSub.unsubscribe();
