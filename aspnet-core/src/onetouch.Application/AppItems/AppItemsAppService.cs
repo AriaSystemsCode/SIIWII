@@ -3476,12 +3476,23 @@ namespace onetouch.AppItems
         [AbpAuthorize(AppPermissions.Pages_AppItems_Publish)]
         public async Task ShareProduct(SharingItemOptions input)
         {
+            var publishTimer = Stopwatch.StartNew();
+            long lastPhaseMilliseconds = 0;
+            void LogPhase(string phase)
+            {
+                var elapsed = publishTimer.ElapsedMilliseconds;
+                Logger.Info($"Product {input.AppItemId} {(input.SyncProduct ? "sync" : "share")}: {phase} in {elapsed - lastPhaseMilliseconds} ms (total {elapsed} ms).");
+                lastPhaseMilliseconds = elapsed;
+            }
             using (UnitOfWorkManager.Current.DisableFilter(AbpDataFilters.MustHaveTenant, AbpDataFilters.MayHaveTenant))
             {
                 var x = UnitOfWorkManager.Current.GetDbContext<onetouchDbContext>(null, null);
 
                 if (await TryUpdateMarketplaceSharingOptions(input))
+                {
+                    LogPhase("sharing settings updated");
                     return;
+                }
 
                 if (!input.SyncProduct)
                     await UpdateMarketplaceSharingLevelForItemAndChildren(input.AppItemId, input.SharingLevel);
@@ -3532,6 +3543,7 @@ namespace onetouch.AppItems
                         .Include(a => a.AppItemSizeScalesDetails).AsNoTracking().Where(a => a.AppItemId == input.AppItemId).ToListAsync();
                     appItem.ItemPricesFkList = await _appItemPricesRepository.GetAll().AsNoTracking().Where(a => a.AppItemId == input.AppItemId).ToListAsync();
                     EnsureDefaultPrices(appItem.ItemPricesFkList);
+                    LogPhase($"source loaded ({appItem.ParentFkList.Count} variations)");
                     var itemObjectId = await _helper.SystemTables.GetObjectListingId();
                     List<AppMarketplaceItems.AppMarketplaceItems> children = new List<AppMarketplaceItems.AppMarketplaceItems>();
                     //XX
@@ -3573,6 +3585,7 @@ namespace onetouch.AppItems
                         .Include(a => a.ItemSizeScaleHeadersFkList).ThenInclude(a => a.AppItemSizeScalesDetails)
                         .Where(x => x.SSIN == appItem.SSIN || x.Code == appItem.SSIN ||
                             (x.ManufacturerCode == appItem.Code && x.TenantOwner == appItem.TenantId)).FirstOrDefaultAsync();
+                    LogPhase("marketplace loaded");
 
                     if (marketplaceItem == null || marketplaceItem.Id == 0)
                     {
@@ -3928,6 +3941,7 @@ namespace onetouch.AppItems
                         }
                     }
 
+                    LogPhase("parent saved");
                     var publishedMarketplaceParentId = marketplaceItem.Id;
                     //Delete removed child items
                     if (marketplaceItem != null && publishedEntityId != 0 && children != null && children.Count > 0)  //&& marketplaceItem.ParentFkList != null
@@ -3947,6 +3961,7 @@ namespace onetouch.AppItems
                     }
 
 
+                    LogPhase("variations loaded and old collections removed");
                     foreach (var child in appItem.ParentFkList)
                     {
                         if (string.IsNullOrWhiteSpace(child.SSIN))
@@ -4172,6 +4187,7 @@ namespace onetouch.AppItems
                             $"Pending marketplace rows=[{string.Join("; ", pendingMarketplaceItems)}].", ex);
                         throw;
                     }
+                    LogPhase("variations saved");
                     //send notification to the users
 
                 }
