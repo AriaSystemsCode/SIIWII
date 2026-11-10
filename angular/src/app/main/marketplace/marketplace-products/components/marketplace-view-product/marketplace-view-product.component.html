@@ -299,7 +299,7 @@
                         { breakpoint: '1199px', numVisible: 3, numScroll: 3 },
                         { breakpoint: '991px',  numVisible: 2, numScroll: 2 },
                         { breakpoint: '575px',  numVisible: 1, numScroll: 1 }
-                      ]" (onPage)="onRelatedPage($event)" class="p-4 m-2 rounded">
+                      ]" (onPage)="onRelatedPage()" class="p-4 m-2 rounded">
                         <ng-template pTemplate="item" let-product>
                             <!-- Ghost page (loading placeholder) -->
                             <div *ngIf="product?.__ghost" class="px-2 my-2">
@@ -634,7 +634,7 @@
                         { breakpoint: '1199px', numVisible: 3, numScroll: 3 },
                         { breakpoint: '991px',  numVisible: 2, numScroll: 2 },
                         { breakpoint: '575px',  numVisible: 1, numScroll: 1 }
-                      ]" (onPage)="onRelatedPage($event)" class="p-4 m-2 rounded">
+                      ]" (onPage)="onRelatedPage()" class="p-4 m-2 rounded">
                                 <ng-template pTemplate="item" let-product>
                                     <!-- Ghost page (loading placeholder) -->
                                     <div *ngIf="product?.__ghost" class="px-2 my-2">

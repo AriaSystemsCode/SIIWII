@@ -126,7 +126,7 @@
         </Item2>
       </Controls>
     </Item7>
-    <Item8 Ref="81" ControlType="GroupHeaderBand" Name="GroupHeader3" HeightF="1908.9613" Dpi="254">
+    <Item8 Ref="81" ControlType="GroupHeaderBand" Name="GroupHeader3" PageBreak="AfterBand" HeightF="1908.9613" Dpi="254">
       <GroupFields>
         <Item1 Ref="82" FieldName="ItemCode" />
       </GroupFields>

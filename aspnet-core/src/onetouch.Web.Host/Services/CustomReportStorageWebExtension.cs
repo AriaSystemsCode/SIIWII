@@ -144,6 +144,17 @@ namespace onetouch.Web.Services
                     byte[] reportBytes = File.ReadAllBytes(tenantReportPath);
                     using (MemoryStream ms = new MemoryStream(reportBytes))
                         report = XtraReport.FromStream(ms);
+
+                    // Apply the page break to saved copies of the color variations layout too.
+                    if (report.FindControl("subreport1", true) is XRSubreport colorSubreport &&
+                        colorSubreport.ReportSource is XtraReport colorReport &&
+                        colorReport.FindControl("xrPictureBox1", true) is XRPictureBox &&
+                        colorReport.FindControl("label7", true) is XRLabel &&
+                        report.Bands.OfType<GroupHeaderBand>().FirstOrDefault(band => band.Name == "GroupHeader3") is GroupHeaderBand productHeader &&
+                        productHeader.PageBreak == PageBreak.None)
+                    {
+                        productHeader.PageBreak = PageBreak.AfterBand;
+                    }
                 }
                 if (report == null && ReportsFactory.Reports.ContainsKey(reportName))
                 {
