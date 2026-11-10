@@ -66,6 +66,7 @@ internal static class PublicationComparisonChecks
         Check(context.Entry(timestampOnly).Properties.Where(property => property.IsModified).Select(property => property.Metadata.Name)
             .SequenceEqual(new[] { "TimeStamp" }), "A version-only update changed unrelated product fields.");
         CheckApplicationMappings(context, comparison);
+        CheckRelatedProductMapping();
         CheckImageCopies();
         Console.WriteLine("PASS: publication comparisons detect content changes, preserve ownership, honor stored precision, and reuse unchanged images.");
     }
@@ -157,6 +158,30 @@ internal static class PublicationComparisonChecks
                     AppItemSizeScalesDetails = new List<AppMarketplaceItemSizeScaleDetails> { new() { Id = id + 10, SizeScaleId = id + 9, SizeCode = "S", SizeRatio = 1 } } }
             }
         };
+    }
+
+    private static void CheckRelatedProductMapping()
+    {
+        var sourceRelationships = new List<AppEntitiesRelationship>
+        {
+            new() { RelatedEntityId = 408100, RelatedEntityCode = "00000000001" },
+            new() { RelatedEntityId = 410641, RelatedEntityCode = "00000000006" },
+            new() { RelatedEntityId = 999999, RelatedEntityCode = "UNPUBLISHED" }
+        };
+        var publishedTargets = new Dictionary<long, (long Id, string Code)>
+        {
+            [408100] = (405647, "00002490-000000007536"),
+            [410641] = (410276, "00002490-000000008178")
+        };
+        var method = typeof(AppItemsAppService).GetMethod("MapPublishedRelationships", BindingFlags.Static | BindingFlags.NonPublic)!;
+        var mapped = (IList<AppEntitiesRelationship>)method.Invoke(null,
+            new object[] { sourceRelationships, publishedTargets, "PUBLISHED-ROOT" })!;
+        Check(mapped.Select(item => item.RelatedEntityId).SequenceEqual(new long[] { 405647, 410276 }),
+            "Selected related products did not map to both published products in order.");
+        Check(mapped.All(item => item.EntityCode == "PUBLISHED-ROOT") &&
+            mapped[1].RelatedEntityCode == "00002490-000000008178", "Published relationship codes were incorrect.");
+        Check(sourceRelationships[1].RelatedEntityId == 410641 && sourceRelationships[1].RelatedEntityCode == "00000000006",
+            "Mapping changed the source product's selected relationships.");
     }
 
     private static void CheckImageCopies()
