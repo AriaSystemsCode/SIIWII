@@ -876,7 +876,10 @@ namespace onetouch
                 .ForMember(a => a.ItemPricesFkList, b => b.MapFrom(ent => ent.ItemPricesFkList))
                 .ForMember(a => a.ItemSizeScaleHeadersFkList, b => b.MapFrom(ent => ent.ItemSizeScaleHeadersFkList))
                 .ForMember(a => a.ItemPricesFkList, b => b.MapFrom(ent => ent.ItemPricesFkList))
-                .ForMember(a => a.ParentFkList, b => b.MapFrom(ent => (ent.ParentId == null & ent.ParentFk != null) ? ent.ParentFk : null))
+                // Seller AppItem IDs and marketplace item IDs belong to different tables.
+                .ForMember(a => a.ParentId, b => b.Ignore())
+                .ForMember(a => a.ParentFk, b => b.Ignore())
+                .ForMember(a => a.ParentFkList, b => b.Ignore())
                 .ForMember(a => a.ManufacturerCode, b => b.MapFrom(ent => ent.Code)); //
             configuration.CreateMap<AppItemPrices, AppMarketplaceItemPrices>();
             configuration.CreateMap<AppMarketplaceItemPrices, AppItemPrices>();

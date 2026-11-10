@@ -108,6 +108,7 @@ internal static class PublicationComparisonChecks
         normalizer.Invoke(null, new object[] { desired, source, published, null!, null! });
         Check((bool)comparison.Invoke(null, new object[] { context, desired, published, true })!, "The application's actual mapping could not recognize an unchanged product.");
         source.ParentId = 700;
+        source.ParentFk = new AppItem { Id = 700, Name = "Seller parent" };
         source.Name = "Variation name";
         published.ParentId = 800;
         var parentSource = new AppItem { Name = "Parent name", EntityFk = new AppEntity { Notes = "Parent notes" } };
@@ -116,6 +117,11 @@ internal static class PublicationComparisonChecks
         published.Notes = parentSource.EntityFk.Notes;
         published.SharingLevel = parentPublished.SharingLevel;
         desired = mapper.Map<AppMarketplaceItems>(source);
+        var publishedVariation = new AppMarketplaceItems { Id = 801, ParentId = parentPublished.Id, ParentFk = parentPublished };
+        mapper.Map(source, publishedVariation);
+        Check(parentPublished.Id == 800 && publishedVariation.ParentId == 800 &&
+            ReferenceEquals(publishedVariation.ParentFk, parentPublished),
+            "Mapping a seller variation changed its existing marketplace parent.");
         normalizer.Invoke(null, new object[] { desired, source, published, parentSource, parentPublished });
         Check(!(bool)comparison.Invoke(null, new object[] { context, desired, published, false })!, "A legacy variation code mismatch was overlooked.");
         published.Code = source.SSIN;
