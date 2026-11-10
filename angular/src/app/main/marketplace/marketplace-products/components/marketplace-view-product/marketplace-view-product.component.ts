@@ -12,6 +12,7 @@ import {
     AppMarketplaceItemsServiceProxy,
     AppTransactionServiceProxy,
     CurrencyInfoDto,
+    GetAppMarketItemForViewDto,
     GetAppMarketplaceItemDetailForViewDto,
     MarketplaceExtraDataAttrDto,
     MessageServiceProxy,
@@ -24,6 +25,7 @@ import { UserClickService } from "@shared/utils/user-click.service";
 import { MessageService } from "abp-ng2-module";
 import * as moment from "moment";
 import {  ConfirmationService } from "primeng/api";
+import { Subscription } from "rxjs";
 import { finalize } from "rxjs/operators";
 import Swal from "sweetalert2";
 import { Location } from '@angular/common';
@@ -90,7 +92,8 @@ export class MarketplaceViewProductComponent
     IsConnected : boolean = false
     overRating: OverAllRatingDto
     isAuthenticated = this.appSession?.user
-    relatedItems:any
+    relatedItems: GetAppMarketItemForViewDto[] = [];
+    private relatedItemsRequest: Subscription;
     Warningmessage:string
     refreshRatingFlag = false;
     relatedTotal = 0;             
@@ -1026,12 +1029,16 @@ export class MarketplaceViewProductComponent
     }
 
     getRelatedProducts(initial = false) {
+        const itemSSIN = this.productDetails?.ssin || this.productDetails?.code ||
+            this.productBodyData?.ssin || this.productBodyData?.code;
+        if (!itemSSIN || this.loadingMore) return;
+
         const skipCount = initial ? 0 : this.relatedItems.length;
         const maxResultCount = this.pageSize;
     
         this.loadingMore = true;
     
-        this._AppMarketplaceItemsServiceProxy
+        this.relatedItemsRequest = this._AppMarketplaceItemsServiceProxy
         .getAppItemRelatedItems(
             /* contactSSIN */ undefined,
             /* accountSSIN */ undefined,
@@ -1053,7 +1060,7 @@ export class MarketplaceViewProductComponent
             /* startShipToDate */ undefined,
             /* brands */ null,
             /* currencyCode */ this.productBodyData?.currencyCode ?? null,
-            /* itemSSIN */ this.productDetails?.ssin ?? this.productDetails?.code ?? this.productBodyData?.ssin ?? this.productBodyData?.code ?? null,
+            /* itemSSIN */ itemSSIN,
             /* categoryFilters */ null,
             undefined,
 
@@ -1086,19 +1093,12 @@ export class MarketplaceViewProductComponent
     }
     
 
-    onRelatedPage(e: { first: number; rows: number }) {
-        const startIndex = e.first;
-        const pageSize   = e.rows;          // == this.pageSize
-        const ui         = this.relatedItemsUi;
-        const current    = ui[startIndex];
-        const hasMore    = this.relatedItems.length < this.relatedTotal;
-    
-        // If current page starts with a ghost, load the next page
-        if (current?.__ghost && hasMore && !this.loadingMore) {
-        this.getRelatedProducts(false);
+    onRelatedPage() {
+        if (this.relatedItems.length < this.relatedTotal && !this.loadingMore) {
+            this.getRelatedProducts(false);
         }
     }
-    
+
     private resetProductViewState(): void {
         this.productDetails = null;
         this.productImages = [];
@@ -1111,7 +1111,7 @@ export class MarketplaceViewProductComponent
         this.currentIndex = 0;
         this.isColorView = false;
     
-        // related products reset
+        this.relatedItemsRequest?.unsubscribe();
         this.relatedItems = [];
         this.relatedTotal = 0;
     }
@@ -1129,6 +1129,7 @@ export class MarketplaceViewProductComponent
         });
     }
     ngOnDestroy() {
+        this.relatedItemsRequest?.unsubscribe();
         this.unsubscribeToAllSubscriptions();
         localStorage.removeItem("productData");
 
