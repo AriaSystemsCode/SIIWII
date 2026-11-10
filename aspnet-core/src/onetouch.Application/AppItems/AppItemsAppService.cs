@@ -3586,6 +3586,7 @@ namespace onetouch.AppItems
                         .Where(x => x.SSIN == appItem.SSIN || x.Code == appItem.SSIN ||
                             (x.ManufacturerCode == appItem.Code && x.TenantOwner == appItem.TenantId)).FirstOrDefaultAsync();
                     LogPhase("marketplace loaded");
+                    var publishedRelatedItems = await ResolvePublishedRelatedItems(appItem);
 
                     if (marketplaceItem == null || marketplaceItem.Id == 0)
                     {
@@ -3778,36 +3779,8 @@ namespace onetouch.AppItems
                             clas.Id = 0;
                         }
                     }
-                    if (marketplaceItem.EntitiesRelationships != null)
-                    {
-                        foreach (var rela in marketplaceItem.EntitiesRelationships)
-                        {
-                            rela.Id = 0;
-                            //check if the related item publisehd or not
-                            //rela.RelatedEntityId
-                            var appItemForEntity = _appItemRepository.GetAll()
-                                .Where(e => e.EntityId == rela.RelatedEntityId).FirstOrDefault();
-                            if (appItemForEntity != null)
-                            {
-                                var appMarketplaceItem = await _appMarketplaceItem.GetAll()
-                                .Where(x => x.Code == appItemForEntity.SSIN || (x.ManufacturerCode == appItemForEntity.Code && x.TenantOwner == appItemForEntity.TenantId)).FirstOrDefaultAsync();
-                                if (appMarketplaceItem != null)
-                                {
-                                    rela.RelatedEntityId = appMarketplaceItem.Id;
-                                    rela.RelatedEntityCode = appMarketplaceItem.Code;
-                                }
-                                else
-                                {
-                                    rela.RelatedEntityId = 0;
-                                }
-                            }
-                        }
-                        var notSharedRelated = marketplaceItem.EntitiesRelationships.Where(e => e.RelatedEntityId == 0).ToList();
-                        foreach (var rela in notSharedRelated)
-                        { marketplaceItem.EntitiesRelationships.Remove(rela); }
-
-
-                    }
+                    marketplaceItem.EntitiesRelationships = MapPublishedRelationships(
+                        appItem.EntityFk.EntitiesRelationships, publishedRelatedItems, marketplaceItem.Code);
 
 
                     if (!input.SyncProduct && marketplaceItem != null && publishedEntityId != 0)
