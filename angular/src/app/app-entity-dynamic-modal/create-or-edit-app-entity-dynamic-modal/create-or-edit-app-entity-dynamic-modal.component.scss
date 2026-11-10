@@ -517,3 +517,23 @@
         padding-right: 0.75rem;
     }
 }
+
+
+
+.section-color-picker {
+    width: 48px;
+    height: 40px;
+    padding: 3px;
+    border: 1px solid #ddd;
+    border-radius: 6px;
+    cursor: pointer;
+    flex-shrink: 0;
+}
+
+.section-color-preview {
+    width: 40px;
+    height: 40px;
+    border: 1px solid #ddd;
+    border-radius: 6px;
+    flex-shrink: 0;
+}

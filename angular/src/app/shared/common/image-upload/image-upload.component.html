@@ -18,7 +18,7 @@
 
     <!-- 🖼 IMAGE PREVIEW -->
     <app-image-display
-      *ngIf="image && !isPdf"
+      *ngIf="image && !isPdf && !isExcel" 
       [staticWidth]="staticWidth"
       [staticHeight]="staticHeight"
       [image]="image"
@@ -42,8 +42,37 @@
       </div>
     </ng-container>
 
+
+<!-- EXCEL PREVIEW -->
+<ng-container *ngIf="isExcel">
+  <div
+    class="d-flex flex-column align-items-center
+           justify-content-center h-100 w-100 p-3">
+
+    <i
+      class="fas fa-file-excel text-success mb-2"
+      style="font-size: 42px;">
+    </i>
+
+    <span
+      class="text-truncate text-center w-100"
+      [title]="excelFileName">
+      {{ excelFileName }}
+    </span>
+
+    <button
+      type="button"
+      class="btn btn-link btn-sm mt-2"
+      (click)="downloadExcel($event)">
+      {{ 'Download' | localize }}
+    </button>
+
+  </div>
+</ng-container>
+
+
     <div
-      *ngIf="!image && !isPdf"
+      *ngIf="!image && !isPdf && !isExcel"
       class="align-items-center d-flex flex-column h-100 justify-content-center w-100 pl-1 pr-1"
     >
       <div *ngIf="!fromReview">
@@ -85,7 +114,7 @@
     />
     <img
       src="assets/profile/Remove_image.svg"
-      *ngIf="image || isPdf"
+      *ngIf="image || isPdf || isExcel"
       class="image-upload-remove"
       (click)="emitRemoveImage($event)"
     />

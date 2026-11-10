@@ -62,6 +62,15 @@ export class ImageUploadComponent extends AppComponentBase implements OnChanges 
   @Input() customExtentionsImgs : boolean;
    @Input() selectedOrientation: 'Portrait' | 'Landscape' = 'Portrait';
 
+
+   @Input() allowExcel: boolean = true;
+
+isExcel = false;
+excelFileName: string | null = null;
+
+private excelObjectUrl: string | null = null;
+
+
   constructor(injector: Injector) {
     super(injector);
     this.inputID = this.guid();
@@ -69,6 +78,10 @@ export class ImageUploadComponent extends AppComponentBase implements OnChanges 
 
   ngOnChanges(changes: SimpleChanges): void {
     // when the sycAttachmentCategory is passed directly from parent
+      if (changes['allowExcel']) {
+    this.detectSupportedExtensions();
+  }
+
     if (
       changes['sycAttachmentCategory'] &&
       this.sycAttachmentCategory &&
@@ -87,105 +100,168 @@ export class ImageUploadComponent extends AppComponentBase implements OnChanges 
       this.applyAspectFromCategory(this.sycAttachmentCategory);
     }
   }
-  
-  
-  
 
-  async fileChange($event: { target: { files: FileList; value: any } }) {
-    const inputEl = $event.target as HTMLInputElement;
-    const imgFile = inputEl.files && inputEl.files[0];
-    const resetInput = () => (inputEl.value = null);
-  
-    if (!imgFile) {
-      return;
+async fileChange($event: any) {
+  const inputEl = $event.target as HTMLInputElement;
+  const selectedFile = inputEl.files?.[0];
+
+  const resetInput = () => {
+    if (inputEl) {
+      inputEl.value = '';
     }
-  
-    // 👇 Detect PDF
-    const isPdfFile =
-      imgFile.type === 'application/pdf' ||
-      imgFile.name.toLowerCase().endsWith('.pdf');
-  
-    // 🔒 Validate extension ONLY for non-PDF files
-    if (!isPdfFile && this.acceptedExtensionsArr?.length) {
-      const isValidExtension = this.hasValidExtension(
-        imgFile.name,
-        this.acceptedExtensionsArr
-      );
-      if (!isValidExtension) {
-        this.message.warn(this.l('UnsupportedExtension'));
-        resetInput();
-        return;
-      }
-    }
-  
-    //  Max file size (applies to both images & PDFs)
-    if (this.checkImageSize(imgFile.size)) {
-      this.message.error(this.l('MaxFileSizeExceeded'));
-      resetInput();
-      return;
-    }
-  
-    // 📄 PDF branch
-    if (isPdfFile) {
-      // cleanup previous PDF url if any
-      if (this.rawPdfUrl) {
-        URL.revokeObjectURL(this.rawPdfUrl);
-      }
-  
-      this.isPdf = true;
-      this.image = undefined;
-      this.imgFile = imgFile;
-  
-      // create object URL for opening in new tab
-      this.rawPdfUrl = URL.createObjectURL(imgFile);
-      this.pdfObjectUrl = this.rawPdfUrl;
-  
-      // emit with file, image = null
-      this.imageBrowseDone.emit({ file: this.imgFile, image: null });
-  
-      resetInput();
-      return;
-    }
-  
-    // 🖼 IMAGE branch
-    this.isPdf = false;
-    this.pdfObjectUrl = null;
-  
-    const renderedImage = await this.renderImageAndGetDimensions(imgFile);
-    const currentAspectRatio = renderedImage.width / renderedImage.height;
-    const buffer = 0.2;
-  
-    if (
+  };
+
+  if (!selectedFile) {
+    return;
+  }
+
+  const isPdfFile =
+    selectedFile.type === 'application/pdf' ||
+    selectedFile.name.toLowerCase().endsWith('.pdf');
+
+  const isExcelFile = this.isExcelFile(selectedFile);
+
+  const isImageFile =
+    selectedFile.type.startsWith('image/') ||
+    /\.(png|jpg|jpeg|gif|webp|bmp)$/i.test(selectedFile.name);
+
+  // Validate file type
+  if (
+    (isExcelFile && !this.allowExcel) ||
+    (!isPdfFile && !isExcelFile && !isImageFile)
+  ) {
+    this.message.warn(this.l('UnsupportedExtension'));
+    resetInput();
+    return;
+  }
+
+  // Validate configured extensions for images.
+  // Excel and PDF are allowed separately.
+  if (
+    isImageFile &&
+    this.acceptedExtensionsArr?.length &&
+    !this.hasValidExtension(
+      selectedFile.name,
+      this.acceptedExtensionsArr
+    )
+  ) {
+    this.message.warn(this.l('UnsupportedExtension'));
+    resetInput();
+    return;
+  }
+
+  // Validate file size
+  if (this.checkImageSize(selectedFile.size)) {
+    this.message.error(this.l('MaxFileSizeExceeded'));
+    resetInput();
+    return;
+  }
+
+  // Clear previous object URLs
+  if (this.rawPdfUrl) {
+    URL.revokeObjectURL(this.rawPdfUrl);
+    this.rawPdfUrl = null;
+  }
+
+  if (this.excelObjectUrl) {
+    URL.revokeObjectURL(this.excelObjectUrl);
+    this.excelObjectUrl = null;
+  }
+
+  this.isPdf = false;
+  this.isExcel = false;
+  this.pdfObjectUrl = null;
+  this.excelFileName = null;
+
+  // EXCEL
+  if (isExcelFile) {
+    this.isExcel = true;
+    this.image = undefined;
+    this.imgFile = selectedFile;
+    this.excelFileName = selectedFile.name;
+
+    this.excelObjectUrl = URL.createObjectURL(selectedFile);
+
+    this.imageBrowseDone.emit({
+      file: selectedFile,
+      image: null
+    });
+
+    resetInput();
+    return;
+  }
+
+  // PDF
+  if (isPdfFile) {
+    this.isPdf = true;
+    this.image = undefined;
+    this.imgFile = selectedFile;
+
+    this.rawPdfUrl = URL.createObjectURL(selectedFile);
+    this.pdfObjectUrl = this.rawPdfUrl;
+
+    this.imageBrowseDone.emit({
+      file: selectedFile,
+      image: null
+    });
+
+    resetInput();
+    return;
+  }
+
+  // IMAGE
+  const renderedImage =
+    await this.renderImageAndGetDimensions(selectedFile);
+
+  const currentAspectRatio =
+    renderedImage.width / renderedImage.height;
+
+  const buffer = 0.2;
+
+  if (
+    !this.acceptedAspectRatio ||
+    (
       this.acceptedAspectRatio - buffer < currentAspectRatio &&
       this.acceptedAspectRatio + buffer > currentAspectRatio
-    ) {
-      //  Aspect ratio is within tolerance
-      this.image = (renderedImage as any).src;
-      this.imgFile = imgFile;
-      this.imageBrowseDone.emit({ file: this.imgFile, image: this.image });
-    } else {
+    )
+  ) {
+    this.image = renderedImage.src;
+    this.imgFile = selectedFile;
 
-      const { onCropDone, data } = this.openImageCropper(
-        $event as any,
-        this.acceptedAspectRatio
-      );
-  
-      const subs = onCropDone.subscribe(() => {
-        if (data.isCropDone) {
-          this.image = data.croppedImageAsBase64 as string;
-          this.imgFile = new File([data.croppedImage], imgFile.name, {
-            type: imgFile.type || 'image/png',
-          });
-  
-          this.imageBrowseDone.emit({ file: this.imgFile, image: this.image });
-        }
-        subs.unsubscribe();
-      });
-    }
-  
-    resetInput();
+    this.imageBrowseDone.emit({
+      file: this.imgFile,
+      image: this.image
+    });
+  } else {
+    const { onCropDone, data } = this.openImageCropper(
+      $event as any,
+      this.acceptedAspectRatio
+    );
+
+    const subs = onCropDone.subscribe(() => {
+      if (data.isCropDone) {
+        this.image = data.croppedImageAsBase64 as string;
+
+        this.imgFile = new File(
+          [data.croppedImage],
+          selectedFile.name,
+          {
+            type: selectedFile.type || 'image/png'
+          }
+        );
+
+        this.imageBrowseDone.emit({
+          file: this.imgFile,
+          image: this.image
+        });
+      }
+
+      subs.unsubscribe();
+    });
   }
-  
+
+  resetInput();
+}
 
   onPdfThumbClick(event: MouseEvent): void {
    
@@ -197,26 +273,50 @@ export class ImageUploadComponent extends AppComponentBase implements OnChanges 
     }
   }
 
-  emitRemoveImage($event: MouseEvent) {
+  // emitRemoveImage($event: MouseEvent) {
  
-    $event.preventDefault();
-    $event.stopPropagation();
+  //   $event.preventDefault();
+  //   $event.stopPropagation();
 
 
-    if (this.rawPdfUrl) {
-      URL.revokeObjectURL(this.rawPdfUrl);
-      this.rawPdfUrl = null;
-    }
+  //   if (this.rawPdfUrl) {
+  //     URL.revokeObjectURL(this.rawPdfUrl);
+  //     this.rawPdfUrl = null;
+  //   }
 
-    this.isPdf = false;
-    this.pdfObjectUrl = null;
-    this.image = undefined;
-    this.imgFile = undefined;
+  //   this.isPdf = false;
+  //   this.pdfObjectUrl = null;
+  //   this.image = undefined;
+  //   this.imgFile = undefined;
 
-    this.removeImage.emit();
+  //   this.removeImage.emit();
+  // }
+
+emitRemoveImage($event: MouseEvent) {
+  $event.preventDefault();
+  $event.stopPropagation();
+
+  if (this.rawPdfUrl) {
+    URL.revokeObjectURL(this.rawPdfUrl);
+    this.rawPdfUrl = null;
   }
 
+  if (this.excelObjectUrl) {
+    URL.revokeObjectURL(this.excelObjectUrl);
+    this.excelObjectUrl = null;
+  }
 
+  this.isPdf = false;
+  this.isExcel = false;
+
+  this.pdfObjectUrl = null;
+  this.excelFileName = null;
+
+  this.image = undefined;
+  this.imgFile = undefined;
+
+  this.removeImage.emit();
+}
 
   async renderImageAndGetDimensions(file: File): Promise<HTMLImageElement> {
     return new Promise((resolve) => {
@@ -232,26 +332,68 @@ export class ImageUploadComponent extends AppComponentBase implements OnChanges 
     });
   }
 
-  detectSupportedExtensions() {
-    this.acceptedExtensionsArr = [];
-    this.acceptedExtensions = '';
+  // detectSupportedExtensions() {
+  //   this.acceptedExtensionsArr = [];
+  //   this.acceptedExtensions = '';
   
 
-    if (this.customExtentionsImgs) {
-      this.acceptedExtensionsArr = ['.png', '.jpg', '.jpeg'];
-      this.acceptedExtensions = 'PNG, JPG, JPEG';
-      return;
-    }
+  //   if (this.customExtentionsImgs) {
+  //     this.acceptedExtensionsArr = ['.png', '.jpg', '.jpeg'];
+  //     this.acceptedExtensions = 'PNG, JPG, JPEG';
+  //     return;
+  //   }
   
    
-    if (this.sycAttachmentCategory?.sycAttachmentTypeDto?.length) {
-      this.sycAttachmentCategory.sycAttachmentTypeDto.forEach((item, index) => {
-        const ext = `.${String(item.extension).toLowerCase()}`;
+  //   if (this.sycAttachmentCategory?.sycAttachmentTypeDto?.length) {
+  //     this.sycAttachmentCategory.sycAttachmentTypeDto.forEach((item, index) => {
+  //       const ext = `.${String(item.extension).toLowerCase()}`;
+  //       this.acceptedExtensionsArr.push(ext);
+  //       this.acceptedExtensions += (index ? ',' : '') + ext;
+  //     });
+  //   }
+  // }
+
+
+detectSupportedExtensions() {
+  this.acceptedExtensionsArr = [];
+  this.acceptedExtensions = '';
+
+  if (this.customExtentionsImgs) {
+    this.acceptedExtensionsArr = [
+      '.png',
+      '.jpg',
+      '.jpeg'
+    ];
+  } else if (
+    this.sycAttachmentCategory?.sycAttachmentTypeDto?.length
+  ) {
+    this.sycAttachmentCategory.sycAttachmentTypeDto.forEach(
+      item => {
+        const ext = `.${String(item.extension)
+          .replace(/^\./, '')
+          .toLowerCase()}`;
+
         this.acceptedExtensionsArr.push(ext);
-        this.acceptedExtensions += (index ? ',' : '') + ext;
-      });
-    }
+      }
+    );
   }
+
+  // Add Excel support
+  if (this.allowExcel) {
+    this.acceptedExtensionsArr.push('.xlsx', '.xls');
+  }
+
+  // Keep existing PDF support
+  this.acceptedExtensionsArr.push('.pdf');
+
+  this.acceptedExtensionsArr = [
+    ...new Set(this.acceptedExtensionsArr)
+  ];
+
+  this.acceptedExtensions =
+    this.acceptedExtensionsArr.join(',');
+}
+
   
 
   hasValidExtension(fileName: string, exts: string[]) {
@@ -305,7 +447,7 @@ export class ImageUploadComponent extends AppComponentBase implements OnChanges 
   
         // choose based on selected radio
         let selectedCat: SycAttachmentCategoryDto;
-  debugger
+  
         switch (this.attachmentTypeCode) {
           case 'LOGO':
             selectedCat = this.sycAttachmentCategoryLogo;
@@ -338,5 +480,23 @@ export class ImageUploadComponent extends AppComponentBase implements OnChanges 
     }
   
  
+    isExcelFile(file: File): boolean {
+  return /\.(xlsx|xls)$/i.test(file.name);
+}
+
+
+downloadExcel(event: MouseEvent): void {
+  event.preventDefault();
+  event.stopPropagation();
+
+  if (!this.excelObjectUrl || !this.excelFileName) {
+    return;
+  }
+
+  const link = document.createElement('a');
+  link.href = this.excelObjectUrl;
+  link.download = this.excelFileName;
+  link.click();
+}
   
 }

@@ -51,6 +51,14 @@
 
 </div>
 
-<div *ngIf="loading" class="slider-loading">
-  {{ 'Loading' | localize }}...
-</div>
+  <div
+    *ngIf="loading"
+    class="section-loading d-flex justify-content-center align-items-center">
+
+    <div class="spinner-border purple-spinner" role="status">
+      <span class="sr-only">
+        {{ 'Loading' | localize }}
+      </span>
+    </div>
+
+  </div>

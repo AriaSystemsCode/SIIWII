@@ -67,6 +67,9 @@ export class LandingPageBlocksService {
   isPdf(path?: string) { return !!path && /\.pdf($|\?)/i.test(path); }
   isImg(path?: string) { return !!path && /\.(jpe?g|png|webp|gif|svg)($|\?)/i.test(path); }
   isVideo(path?: string) { return !!path && /\.(mp4|webm|ogg)($|\?)/i.test(path); }
+    isExcel(path?: string) { return !!path && /\.(xlsx?|xlsm|xlsb|xls)($|\?)/i.test(path); }
+  /** Files that open on click instead of being previewed (PDF, Excel). */
+  isDocFile(path?: string) { return this.isPdf(path) || this.isExcel(path); }
 
   onImgErr(evt: Event): void {
     (evt.target as HTMLImageElement).src = this.placeholderUrl;
@@ -84,25 +87,52 @@ export class LandingPageBlocksService {
     return imgAtt ? this.fullUrl(imgAtt.url || imgAtt.fileName) : null;
   }
 
-   hasPdfAttachment(b: PageSettingDto): boolean {
-    return !!this.getAttachmentPdfUrl(b);
-  }
+  //  hasPdfAttachment(b: PageSettingDto): boolean {
+  //   return !!this.getAttachmentPdfUrl(b);
+  // }
 
-  getAttachmentPdfUrl(b: PageSettingDto): string | null {
+  // getAttachmentPdfUrl(b: PageSettingDto): string | null {
+  //   if (!b) return null;
+
+  //   const pdfAtt = b.entityAttachments?.find(att => this.isPdf(att?.url || att?.fileName));
+  //   if (pdfAtt) return this.fullUrl(pdfAtt.url || pdfAtt.fileName);
+
+  //   // block.image itself may be the pdf (as in block 653385)
+  //   return this.isPdf(b.image) ? this.fullUrl(b.image) : null;
+  // }
+
+    /** First PDF/Excel file on the block (entityAttachments first, then block.image). */
+  getAttachmentFileUrl(b: PageSettingDto): string | null {
     if (!b) return null;
 
-    const pdfAtt = b.entityAttachments?.find(att => this.isPdf(att?.url || att?.fileName));
-    if (pdfAtt) return this.fullUrl(pdfAtt.url || pdfAtt.fileName);
+    const att = b.entityAttachments?.find(a => this.isDocFile(a?.url || a?.fileName));
+    if (att) return this.fullUrl(att.url || att.fileName);
 
-    // block.image itself may be the pdf (as in block 653385)
-    return this.isPdf(b.image) ? this.fullUrl(b.image) : null;
+    return this.isDocFile(b.image) ? this.fullUrl(b.image) : null;
   }
+
+  hasAttachmentFile(b: PageSettingDto): boolean {
+    return !!this.getAttachmentFileUrl(b);
+  }
+
+  /** Icon shown when the block has a file but no image preview. */
+  getAttachmentFileIcon(b: PageSettingDto): string {
+    return this.isExcel(this.getAttachmentFileUrl(b) ?? '')
+      ? 'assets/Items/excel-Icon.png'
+      : 'assets/Items/pdf-Icon.png';
+  }
+
+  // aliases so existing templates/components keep working
+  hasPdfAttachment(b: PageSettingDto): boolean { return this.hasAttachmentFile(b); }
+  getAttachmentPdfUrl(b: PageSettingDto): string | null { return this.getAttachmentFileUrl(b); }
 
   getAttachmentClickUrl(b: PageSettingDto): string | null {
     if (!b) return null;
 
-    const pdfUrl = this.getAttachmentPdfUrl(b);
-    if (pdfUrl) return pdfUrl;
+    // const pdfUrl = this.getAttachmentPdfUrl(b);
+    // if (pdfUrl) return pdfUrl;
+        const fileUrl = this.getAttachmentFileUrl(b);
+    if (fileUrl) return fileUrl;
 
     if ((b as any).link) return (b as any).link;
     if (b.externalUrl) return b.externalUrl;

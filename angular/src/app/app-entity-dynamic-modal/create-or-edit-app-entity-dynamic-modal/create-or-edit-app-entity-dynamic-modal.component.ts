@@ -98,6 +98,8 @@ export class CreateOrEditAppEntityDynamicModalComponent
     currentLang: string;
 isArabic: boolean = false;
 
+excelFileMap: { [index: number]: string } = {};
+
     constructor(
         injector: Injector,
         private _appEntitiesServiceProxy: AppEntitiesServiceProxy,
@@ -881,6 +883,8 @@ if(!this._displayVisualTypes)
         if (!output) {
             return;
         }
+const isExcel = /\.(xlsx|xls)$/i.test(output.file.name);
+
 
         const isPdf =
             output.file.type === 'application/pdf' ||
@@ -915,30 +919,54 @@ if(!this._displayVisualTypes)
         att.guid = guid;
         att.index = index;
 
-        if (isPdf) {
-            // clear image preview for this slot
-            this.attachmentsSrcs[index] = undefined;
+        // if (isPdf) {
+        //     // clear image preview for this slot
+        //     this.attachmentsSrcs[index] = undefined;
 
-            // free previous PDF URL if exists
-            if (this.pdfRawUrl[index]) {
-                URL.revokeObjectURL(this.pdfRawUrl[index]);
-            }
+        //     // free previous PDF URL if exists
+        //     if (this.pdfRawUrl[index]) {
+        //         URL.revokeObjectURL(this.pdfRawUrl[index]);
+        //     }
 
-            const rawUrl = URL.createObjectURL(output.file);
-            this.pdfRawUrl[index] = rawUrl;
-            this.pdfSafeMap[index] =
-                this.sanitizer.bypassSecurityTrustResourceUrl(rawUrl);
-        } else {
-            // set image preview for this slot
-            this.attachmentsSrcs[index] = output.image;
+        //     const rawUrl = URL.createObjectURL(output.file);
+        //     this.pdfRawUrl[index] = rawUrl;
+        //     this.pdfSafeMap[index] =
+        //         this.sanitizer.bypassSecurityTrustResourceUrl(rawUrl);
+        // } else {
+        //     // set image preview for this slot
+        //     this.attachmentsSrcs[index] = output.image;
 
-            // clean any PDF data for this index
-            if (this.pdfRawUrl[index]) {
-                URL.revokeObjectURL(this.pdfRawUrl[index]);
-                delete this.pdfRawUrl[index];
-            }
-            delete this.pdfSafeMap[index];
-        }
+        //     // clean any PDF data for this index
+        //     if (this.pdfRawUrl[index]) {
+        //         URL.revokeObjectURL(this.pdfRawUrl[index]);
+        //         delete this.pdfRawUrl[index];
+        //     }
+        //     delete this.pdfSafeMap[index];
+        // }
+
+        if (isPdf || isExcel) {
+  this.attachmentsSrcs[index] = undefined;
+
+  if (isPdf) {
+    const rawUrl = URL.createObjectURL(output.file);
+
+    this.pdfRawUrl[index] = rawUrl;
+
+    this.pdfSafeMap[index] =
+      this.sanitizer.bypassSecurityTrustResourceUrl(rawUrl);
+
+    delete this.excelFileMap[index];
+  } else {
+    this.excelFileMap[index] = output.file.name;
+
+    delete this.pdfSafeMap[index];
+  }
+} else {
+  this.attachmentsSrcs[index] = output.image;
+
+  delete this.pdfSafeMap[index];
+  delete this.excelFileMap[index];
+}
 
         if (existingIndex === -1) {
             this.appEntity.entityAttachments.push(att);
@@ -974,11 +1002,11 @@ if(!this._displayVisualTypes)
         }
     }
 
-    get maxAllowedAttachments(): number {
-        return this.entityObjectType?.code === 'MARKETPLACESECTIONBLOCK'
-            ? 2
-            : 1;
-    }
+   get maxAllowedAttachments(): number {
+  return this.entityObjectType?.code === 'MARKETPLACESECTIONBLOCK'
+    ? 2
+    : 1;
+}
 
     private initAttachmentSlots(): void {
         
@@ -988,28 +1016,54 @@ if(!this._displayVisualTypes)
     }
 
 
-    showUploadSlot(i: number): boolean {
-        const hasImageOrPdf = (idx: number) =>
-            !!this.attachmentsSrcs?.[idx] || !!this.pdfSafeMap?.[idx];
+    // showUploadSlot(i: number): boolean {
+    //     const hasImageOrPdf = (idx: number) =>
+    //         !!this.attachmentsSrcs?.[idx] || !!this.pdfSafeMap?.[idx];
 
-        if (!this.canUploadMultipleAttachments || this.maxAllowedAttachments === 1) {
+    //     if (!this.canUploadMultipleAttachments || this.maxAllowedAttachments === 1) {
 
-            return i === 0 && !hasImageOrPdf(0);
-        }
+    //         return i === 0 && !hasImageOrPdf(0);
+    //     }
 
-        if (i >= this.maxAllowedAttachments) {
-            return false;
-        }
+    //     if (i >= this.maxAllowedAttachments) {
+    //         return false;
+    //     }
 
-        const allPreviousFilled = Array.from({ length: i }).every((_, idx) =>
-            hasImageOrPdf(idx)
-        );
+    //     const allPreviousFilled = Array.from({ length: i }).every((_, idx) =>
+    //         hasImageOrPdf(idx)
+    //     );
 
-        const currentEmpty = !hasImageOrPdf(i);
+    //     const currentEmpty = !hasImageOrPdf(i);
 
-        return allPreviousFilled && currentEmpty;
-    }
+    //     return allPreviousFilled && currentEmpty;
+    // }
 
+
+showUploadSlot(i: number): boolean {
+  const hasAttachment = (idx: number): boolean =>
+    !!this.attachmentsSrcs?.[idx] ||
+    !!this.pdfSafeMap?.[idx] ||
+    !!this.excelFileMap?.[idx];
+
+  if (i >= this.maxAllowedAttachments) {
+    return false;
+  }
+
+  if (i === 0) {
+    return !hasAttachment(0);
+  }
+
+  // Second slot is for the document's optional thumbnail
+  if (i === 1) {
+    const firstIsDocument =
+      !!this.pdfSafeMap[0] ||
+      !!this.excelFileMap[0];
+
+    return firstIsDocument && !hasAttachment(1);
+  }
+
+  return false;
+}
 
 
     get displaySlots(): number[] {
@@ -1046,6 +1100,35 @@ toggleLastFields(enable: boolean): void {
     }
   });
 }
+
+
+
+onExtraAttributeColorChange(
+    event: Event,
+    extraAttr: FilteredExtraAttribute
+): void {
+
+    const value = (event.target as HTMLInputElement).value;
+
+    extraAttr.selectedValues = value;
+
+    this.notLookupExtraAttributeOnChange(value, extraAttr);
+}
+
+onExtraAttributeColorValueChange(
+    value: string,
+    extraAttr: FilteredExtraAttribute
+): void {
+
+    extraAttr.selectedValues = value;
+
+    // Save only valid HEX colors
+    if (/^#[0-9A-Fa-f]{6}$/.test(value)) {
+        this.notLookupExtraAttributeOnChange(value, extraAttr);
+    }
+}
+
+
 
 }
 

@@ -148,9 +148,9 @@ fourBlocksResponsiveOptions = [
               };
 
 
-            case 'MENU':
+            case 'Menu':
               return {
-                type: 'MENU',
+                type: 'Menu',
                 order: r._order,
                 sectionId: r.id,
                 inputs: {
@@ -161,9 +161,9 @@ fourBlocksResponsiveOptions = [
               };
 
 
-            case 'IMGS':
+            case 'IASCTA':
               return {
-                type: 'IMGS',
+                type: 'IASCTA',
                 order: r._order,
                 sectionId: r.id,
                 inputs: {
@@ -172,9 +172,9 @@ fourBlocksResponsiveOptions = [
                 }
               };
 
-            case 'FOUR_BLOCKS':
+            case 'FBS':
               return {
-                type: 'FOUR_BLOCKS',
+                type: 'FBS',
                 order: r._order,
                 sectionId: r.id,
                 blockTypeIsSingleOrMixed: r.blockTypeIsSingleOrMixed,
@@ -199,10 +199,16 @@ fourBlocksResponsiveOptions = [
         this.sectionsFlat = flat;
 
         this.menuSections = flat.filter(
-          section => section.type === 'MENU'
+          section => section.type.toLocaleUpperCase() === 'MENU'
         );
 
         this.renderSections = this.buildRenderSections(flat);
+        console.log(
+  'FBS Groups:',
+  this.renderSections.filter(
+    item => item.type === 'FOUR_BLOCKS_GROUP'
+  )
+);
       });
 
 
@@ -211,7 +217,7 @@ fourBlocksResponsiveOptions = [
 
   private TYPE_TO_SECTION: Record<number, SectionType> = {
 
-    // 0: 'ASSB',
+    0: 'ASSB',
     1: 'ASMB',
     2: 'ASSB',
     3: 'CSMP',
@@ -219,9 +225,9 @@ fourBlocksResponsiveOptions = [
     5: 'MRCTA',
     6: 'PF',
     7: 'SM',
-    0: 'MENU',
-    // 0: 'IMGS',
-    // 0: 'FOUR_BLOCKS',
+    8: 'Menu',
+    9: 'IASCTA',
+    10: 'FBS',
 
 
   };
@@ -291,50 +297,48 @@ fourBlocksResponsiveOptions = [
     });
   }
 
-  
 private buildRenderSections(
   sections: SectionItem[]
 ): LandingRenderItem[] {
 
   const result: LandingRenderItem[] = [];
-  let currentGroup: SectionItem[] = [];
 
-  const flushGroup = () => {
-    if (!currentGroup.length) return;
+  // Collect all FBS sections, sorted by order
+  const fbsSections = sections
+    .filter(section => section.type === 'FBS')
+    .sort((a, b) => a.order - b.order);
 
-    result.push({
-      type: 'FOUR_BLOCKS_GROUP',
-      order: currentGroup[0].order,
-      sections: [...currentGroup]
-    });
-
-    currentGroup = [];
-  };
+  let fbsGroupAdded = false;
 
   for (const section of sections) {
 
-    // MENU is displayed separately
-    if (section.type === 'MENU') {
+    // Menu is rendered separately
+    if (section.type === 'Menu') {
       continue;
     }
 
-    if (section.type === 'FOUR_BLOCKS') {
-      currentGroup.push(section);
+    if (section.type === 'FBS') {
+
+      // Insert one carousel containing all FBS sections
+      if (!fbsGroupAdded) {
+        result.push({
+          type: 'FOUR_BLOCKS_GROUP',
+          order: section.order,
+          sections: fbsSections
+        });
+
+        fbsGroupAdded = true;
+      }
+
       continue;
     }
 
-    // Other section interrupts the group
-    flushGroup();
+    // Other sections remain unchanged
     result.push(section);
   }
 
-  flushGroup();
-
   return result;
 }
-
-
-
 getFourBlocksSections(
   item: LandingRenderItem
 ): SectionItem[] {

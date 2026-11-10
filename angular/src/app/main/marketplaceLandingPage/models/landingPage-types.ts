@@ -7,9 +7,9 @@ export type SectionType =
   | 'PF'
   | 'SM'
   | 'MRCTA'
-  | 'MENU'
-  | 'IMGS'
-  | 'FOUR_BLOCKS';
+  | 'Menu'
+  | 'IASCTA'
+  | 'FBS';
 
 export interface SectionConfig {
   type: SectionType;

@@ -1,5 +1,5 @@
 
-<div class="four-blocks-section">
+<div class="four-blocks-section"   *ngIf="!loading">
 
   <div class="section-header">
     <h4 [style.text-align]="textAlign">
@@ -7,9 +7,7 @@
     </h4>
   </div>
 
-  <div *ngIf="loading" class="section-loader">
-    <div class="spinner-border" role="status"></div>
-  </div>
+
 
   <div class="four-blocks-grid"
        *ngIf="!loading && blocks.length">
@@ -31,7 +29,17 @@
 
 </div>
 
+  <div
+    *ngIf="loading"
+    class="section-loading d-flex justify-content-center align-items-center">
 
+    <div class="spinner-border purple-spinner" role="status">
+      <span class="sr-only">
+        {{ 'Loading' | localize }}
+      </span>
+    </div>
+
+  </div>
 
 <app-view-event
   #viewEventModal

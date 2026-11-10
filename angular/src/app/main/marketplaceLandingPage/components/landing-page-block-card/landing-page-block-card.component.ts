@@ -57,14 +57,24 @@ export class LandingPageBlockCardComponent {
 
     // ATTACHMENT: image preview (block.image or first image in entityAttachments),
     // PDF icon if only a PDF exists
-    if (this.blockType === 'ATTACHMENT') {
+    // if (this.blockType === 'ATTACHMENT') {
+    //   const img = this.blocksService.getAttachmentImage(b);
+    //   if (img) return img;
+    //   return this.blocksService.hasPdfAttachment(b) ? this.pdfIcon : this.placeholder;
+    // }
+
+    // // Other types: block.image unless it is a PDF
+    // if (b.image && !this.blocksService.isPdf(b.image)) return this.url(b.image);
+        if (this.blockType === 'ATTACHMENT') {
       const img = this.blocksService.getAttachmentImage(b);
       if (img) return img;
-      return this.blocksService.hasPdfAttachment(b) ? this.pdfIcon : this.placeholder;
+      return this.blocksService.hasAttachmentFile(b)
+        ? this.blocksService.getAttachmentFileIcon(b)
+        : this.placeholder;
     }
 
-    // Other types: block.image unless it is a PDF
-    if (b.image && !this.blocksService.isPdf(b.image)) return this.url(b.image);
+    // Other types: block.image unless it is a PDF/Excel file
+    if (b.image && !this.blocksService.isDocFile(b.image)) return this.url(b.image);
 
     // image inside entityAttachments
     const imgAtt = b.entityAttachments?.find(a =>
