@@ -3560,6 +3560,8 @@ namespace onetouch.AppItems
                         marketplaceItem = ObjectMapper.Map<onetouch.AppMarketplaceItems.AppMarketplaceItems>(appItem);
                         marketplaceItem.Id = 0;
                         marketplaceItem.ObjectId = itemObjectId;
+                        marketplaceItem.ParentFk = null;
+                        marketplaceItem.ParentId = null;
                         //XX
                         if (marketplaceItem.Variations != null)
                             //XX
@@ -3672,7 +3674,10 @@ namespace onetouch.AppItems
                         marketplaceItem.ItemSizeScaleHeadersFkList = null;
                         await CurrentUnitOfWork.SaveChangesAsync();
                         //SS
+                        var marketplaceParentId = marketplaceItem.ParentId;
                         ObjectMapper.Map(appItem, marketplaceItem);
+                        marketplaceItem.ParentFk = null;
+                        marketplaceItem.ParentId = marketplaceParentId;
                         marketplaceItem.ItemSizeScaleHeadersFkList = null;
                         marketplaceItem.ParentFkList = null;
                         marketplaceItem.Code = code;
@@ -3752,12 +3757,18 @@ namespace onetouch.AppItems
                             //rela.RelatedEntityId
                             var appItemForEntity = _appItemRepository.GetAll()
                                 .Where(e => e.EntityId == rela.RelatedEntityId).FirstOrDefault();
-                            if (appItemForEntity != null)
+                            if (appItemForEntity == null)
+                                rela.RelatedEntityId = 0;
+                            else
                             {
                                 var appMarketplaceItem = await _appMarketplaceItem.GetAll()
-                                .Where(x => x.Code == appItemForEntity.SSIN || (x.ManufacturerCode == appItemForEntity.Code && x.TenantOwner == appItemForEntity.TenantId)).FirstOrDefaultAsync();
+                                .Where(x => x.TenantOwner == appItemForEntity.TenantId &&
+                                    (x.SSIN == appItemForEntity.SSIN || x.Code == appItemForEntity.SSIN || x.ManufacturerCode == appItemForEntity.Code))
+                                .OrderByDescending(x => x.SSIN == appItemForEntity.SSIN || x.Code == appItemForEntity.SSIN)
+                                .ThenBy(x => x.Id).FirstOrDefaultAsync();
                                 if (appMarketplaceItem != null)
                                 {
+                                    rela.RelatedEntityFk = null;
                                     rela.RelatedEntityId = appMarketplaceItem.Id;
                                     rela.RelatedEntityCode = appMarketplaceItem.Code;
                                 }
