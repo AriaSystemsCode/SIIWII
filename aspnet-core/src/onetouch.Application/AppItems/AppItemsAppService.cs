@@ -4053,6 +4053,7 @@ namespace onetouch.AppItems
                             await CurrentUnitOfWork.SaveChangesAsync();
                     }
                     LogPhase("parent saved");
+                    var publishedMarketplaceParentId = marketplaceItem.Id;
                     //Delete removed child items
                     if (marketplaceItem != null && publishedEntityId != 0 && children != null && children.Count > 0)  //&& marketplaceItem.ParentFkList != null
                     {
@@ -4216,7 +4217,7 @@ namespace onetouch.AppItems
 
                         publishChild.Id = publishId;
                         publishChild.ObjectId = itemObjectId;
-                        publishChild.ParentId = marketplaceItem.Id;
+                        publishChild.ParentId = publishedMarketplaceParentId;
                         publishChild.Notes = child.EntityFk.Notes;
                         publishChild.Name = child.Name;
                         publishChild.Name = marketplaceItem.Name;
@@ -4247,7 +4248,34 @@ namespace onetouch.AppItems
                             publishChild = await _appMarketplaceItem.UpdateAsync(publishChild);
                         }
                     }
-                    await CurrentUnitOfWork.SaveChangesAsync();
+                    try
+                    {
+                        await CurrentUnitOfWork.SaveChangesAsync();
+                    }
+                    catch (DbUpdateException ex) when (ex.InnerException is Microsoft.Data.SqlClient.SqlException sqlException &&
+                        sqlException.Number == 547 &&
+                        sqlException.Message.Contains("FK_AppMarketplaceItems_AppMarketplaceItems_ParentId"))
+                    {
+                        var pendingMarketplaceItems = x.ChangeTracker.Entries<AppMarketplaceItems.AppMarketplaceItems>()
+                            .Where(entry => entry.State != EntityState.Unchanged && entry.State != EntityState.Detached)
+                            .Select(entry =>
+                            {
+                                var parentId = entry.Property(item => item.ParentId);
+                                return $"Id={entry.Entity.Id}, Code={entry.Entity.Code}, State={entry.State}, " +
+                                    $"ParentId={entry.Entity.ParentId?.ToString() ?? "NULL"}, " +
+                                    $"OriginalParentId={parentId.OriginalValue?.ToString() ?? "NULL"}, " +
+                                    $"ParentIdModified={parentId.IsModified}, " +
+                                    $"ParentFkId={entry.Entity.ParentFk?.Id.ToString() ?? "NULL"}";
+                            });
+                        var failedMarketplaceIds = ex.Entries
+                            .Where(entry => entry.Entity is AppMarketplaceItems.AppMarketplaceItems)
+                            .Select(entry => ((AppMarketplaceItems.AppMarketplaceItems)entry.Entity).Id);
+                        Logger.Error($"Sync/share of source item {input.AppItemId} failed while saving variations. " +
+                            $"Marketplace parent Id={marketplaceItem.Id}. " +
+                            $"Failed entry Ids=[{string.Join(", ", failedMarketplaceIds)}]. " +
+                            $"Pending marketplace rows=[{string.Join("; ", pendingMarketplaceItems)}].", ex);
+                        throw;
+                    }
                     x.ChangeTracker.Clear();
                     LogPhase("variations saved");
                     //send notification to the users
