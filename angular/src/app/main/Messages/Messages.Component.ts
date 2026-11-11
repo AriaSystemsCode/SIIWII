@@ -78,6 +78,8 @@ selectedMessageAfterRefresh: number | null = null;
 
   currentLang:string
   isArabic:boolean
+
+  selectedEntityObjectTypeCode: string | null = null;
     constructor(
         injector: Injector,
         private _downloadService: FileDownloadService,
@@ -153,20 +155,68 @@ selectedMessageAfterRefresh: number | null = null;
     newCommentAddedHandler(event){
       //  this.selectMessage(this.messagesDetails[0].messages);
         // this.getMesssage();
+
+         if (!event) {
+        return;
     }
-    selectMessagetype(messagetypeIndex: number, messagetype: string): void {
-        this.filterText = "";
-        this.messageTypeIndex = messagetypeIndex;
-        this.messageType = messagetype;
-        this.messages = [];
-        this.skipCount = 0;
-        this.maxResultCount = 5;
-        this.noOfItemsToShowInitially = 5;
-        this.messagesDetails = [];
-        this.selectedMessage = 0;
-        this.selectedMessageIndx=0;
-        this.getMesssage();
+
+    this.refreshSelectedMessage();
     }
+   selectMessagetype(
+    messagetypeIndex: number,
+    messagetype: string
+): void {
+
+    this.filterText = "";
+    this.messageTypeIndex =  messagetypeIndex;
+    this.messageType =  messagetype;
+
+    if (messagetypeIndex === 1) {
+        this.messageCategoryFilter = "MESSAGE";
+
+    } else {
+        this.messageCategoryFilter =   null;
+    }
+    this.messages = [];
+    this.itemsToShow = [];
+    this.messagesDetails = [];
+
+    this.skipCount = 0;
+    this.maxResultCount = 5;
+    this.noOfItemsToShowInitially = 5;
+
+    this.totalCount = 0;
+    this.isFullListDisplayed = false;
+
+    this.selectedMessage = 0;
+    this.selectedMessageIndx = 0;
+
+    this.selectedMessageAfterRefresh =  null;
+
+    this.displayMessageDetails = false;
+
+    this.highlightFirstMsg = true;
+
+    if (messagetypeIndex === 1) {
+
+        setTimeout(() => {
+
+            this.clearActiveTab();
+
+            const firstTab =
+                document.getElementById(
+                    "firstTabBtn"
+                );
+
+            firstTab?.classList.add(
+                "active-tab"
+            );
+
+        });
+    }
+
+    this.getMesssage(true);
+}
 
     getMesssage(search?: boolean): void {
         if (this.messageTypeIndex != 1)
@@ -297,21 +347,37 @@ selectedMessageAfterRefresh: number | null = null;
     }
 
 
-getPrimaryMessage(event) {
-    this.clearActiveTab();
-    event.target.closest('button').classList.add('active-tab');
+getPrimaryMessage(event): void {
 
-    this.messageCategoryFilter = "MESSAGE";
+    this.clearActiveTab();
+
+    event.target
+        .closest('button')
+        ?.classList
+        .add('active-tab');
+
+    this.messageCategoryFilter =   "MESSAGE";
 
     this.messages = [];
+    this.itemsToShow = [];
     this.messagesDetails = [];
 
     this.skipCount = 0;
     this.maxResultCount = 5;
     this.noOfItemsToShowInitially = 5;
+
+    this.totalCount = 0;
     this.isFullListDisplayed = false;
 
-    this.getMesssage();
+    this.selectedMessage = 0;
+    this.selectedMessageIndx = 0;
+
+    this.selectedMessageAfterRefresh =   null;
+    this.displayMessageDetails = false;
+
+    this.highlightFirstMsg = true;
+
+    this.getMesssage(true);
 }
     
     // getUpdatesMessage(event, messageType) {
@@ -323,23 +389,42 @@ getPrimaryMessage(event) {
     //     this.messagesDetails = [];
     //     this.getMesssage();
     // }
-    getUpdatesMessage(event, messageType) {
+   getUpdatesMessage(
+    event,
+    messageType: string
+): void {
+
     this.showMainSpinner();
 
     this.clearActiveTab();
-    event.target.closest('button').classList.add('active-tab');
 
-    this.messageCategoryFilter = messageType;
+    event.target
+        .closest('button')
+        ?.classList
+        .add('active-tab');
+
+    this.messageCategoryFilter =     messageType;
 
     this.messages = [];
+    this.itemsToShow = [];
     this.messagesDetails = [];
 
     this.skipCount = 0;
     this.maxResultCount = 5;
     this.noOfItemsToShowInitially = 5;
+
+    this.totalCount = 0;
     this.isFullListDisplayed = false;
 
-    this.getMesssage();
+    this.selectedMessage = 0;
+    this.selectedMessageIndx = 0;
+
+    this.selectedMessageAfterRefresh =    null;
+    this.displayMessageDetails = false;
+
+    this.highlightFirstMsg = true;
+
+    this.getMesssage(true);
 }
     getMentionsMessage(event) {
         this.clearActiveTab();
@@ -409,6 +494,8 @@ getPrimaryMessage(event) {
  
       
     selectMessage(message: MessagesDto): void {
+          this.selectedEntityObjectTypeCode =
+        message?.entityObjectTypeCode?.toUpperCase() || null;
         this.showMainSpinner();
         this.showSideBar=false;
         this.showHideSideBarTitle = !this.showSideBar ? this.l("ShowData")  : this.l("HideData") ;
@@ -571,7 +658,6 @@ getPrimaryMessage(event) {
         else return this.selectedMessage === message.id;
     }
 
-
     refreshData(event) {
     if (event) {
         this.selectedMessageAfterRefresh = this.selectedMessage;
@@ -596,6 +682,76 @@ onReplyMessage(event: MouseEvent): void {
         false,
         msg.mesasgeObjectType
     );
+}
+
+isImageFile(fileName: string): boolean {
+    return /\.(jpg|jpeg|png|svg|gif|webp)$/i.test(fileName || '');
+}
+
+isPdfFile(fileName: string): boolean {
+    return /\.pdf$/i.test(fileName || '');
+}
+
+isExcelFile(fileName: string): boolean {
+    return /\.(xls|xlsx|csv)$/i.test(fileName || '');
+}
+
+isWordFile(fileName: string): boolean {
+    return /\.(doc|docx)$/i.test(fileName || '');
+}
+
+isPowerPointFile(fileName: string): boolean {
+    return /\.(ppt|pptx)$/i.test(fileName || '');
+}
+
+isOtherFile(fileName: string): boolean {
+    return !this.isImageFile(fileName)
+        && !this.isPdfFile(fileName)
+        && !this.isExcelFile(fileName)
+        && !this.isWordFile(fileName)
+        && !this.isPowerPointFile(fileName);
+}
+downloadAttachment(item: any): void {
+  const fileUrl = `${this.attachmentBaseUrl}/${item.url}`;
+
+  const link = document.createElement('a');
+  link.href = fileUrl;
+  link.download = item.displayName || item.fileName;
+  link.target = '_blank';
+
+  document.body.appendChild(link);
+  link.click();
+  document.body.removeChild(link);
+}
+
+refreshSelectedMessage(): void {
+    const selectedId =
+        this.selectedMessage ||
+        this.messagesDetails?.[0]?.messages?.id;
+
+    if (!selectedId) {
+        this.getMesssage(true);
+        return;
+    }
+
+    const selectedMessage =
+        this.messages.find(x => x.id === selectedId) ||
+        this.messagesDetails?.[0]?.messages;
+
+    if (!selectedMessage) {
+        this.getMesssage(true);
+        return;
+    }
+
+    this.selectMessage(selectedMessage);
+}
+
+get selectedThreadIsComment(): boolean {
+    return this.selectedEntityObjectTypeCode === 'COMMENT';
+}
+
+get selectedThreadIsMessage(): boolean {
+    return this.selectedEntityObjectTypeCode !== 'COMMENT';
 }
     ngOnDestroy() {
       

@@ -69,6 +69,8 @@ namespace onetouch.AppEntities
         private readonly IRepository<AppEntityState, long> _appEntityStateRepository;
         private readonly ISycEntityObjectTypesAppService _SycEntityObjectTypesAppService;
         private readonly Helper _helper;
+        private readonly IRepository<AppMarketplaceContacts.AppMarketplaceContact, long> _appMarketplaceContactsRepository;
+        private readonly IRepository<AppContactRelationshipInfo, long> _appContactRelationshipInfoRepository;
         //private readonly ISycEntityObjectTypesAppService _SycEntityObjectTypesAppService;
         //MMT
         private readonly IRepository<AppEntityReactionsCount, long> _appEntityReactionsCount;
@@ -80,7 +82,10 @@ namespace onetouch.AppEntities
         private readonly IRepository<AppMarketplaceTransactionContacts, long> _appMarketplaceTransactionContactsRepository;
         private readonly IRepository<AppTransactionContacts, long> _appTransactionContactsRepository;
         //T-SII-20221013.0006,1 MMT 11/02/2022 Notify the destination tenant that another tenant connected to him[End]
-
+        //MMT 05-14-2026[Start]
+        //private readonly IRepository<AppMarketplaceContacts.AppMarketplaceContact, long> _appMarketplaceContactsRepository;
+        //private readonly IRepository<AppContactRelationshipInfo, long> _appContactRelationshipInfoRepository;
+        //MMT 05-14-2026[End]
         public AppEntitiesAppService(IRepository<AppEntity, long> appEntityRepository
             , IAppEntitiesExcelExporter appEntitiesExcelExporter
             , IRepository<SycEntityObjectType, long> lookup_sycEntityObjectTypeRepository
@@ -102,7 +107,9 @@ namespace onetouch.AppEntities
             IRepository<AppPost, long> appPostRepository, IProfileAppService iProfileAppService, IAppNotifier appNotifier
             , IRepository<AppEntityState, long> appEntityStateRepository, IRepository<AppMarketplaceTransactionContacts, long> appMarketplaceTransactionContactsRepository
             , IRepository<AppTransactionContacts, long> appTransactionContactsRepository
-            , ISycEntityObjectTypesAppService sycEntityObjectTypesAppService
+            , ISycEntityObjectTypesAppService sycEntityObjectTypesAppService,
+            IRepository<AppMarketplaceContacts.AppMarketplaceContact, long> appMarketplaceContactsRepository,
+            IRepository<AppContactRelationshipInfo, long> appContactRelationshipInfoRepository
             )
         {
             _SycEntityObjectTypesAppService = sycEntityObjectTypesAppService;
@@ -133,6 +140,8 @@ namespace onetouch.AppEntities
             _appMarketplaceTransactionContactsRepository = appMarketplaceTransactionContactsRepository;
             _appTransactionContactsRepository = appTransactionContactsRepository;
             //T-SII-20221013.0006,1 MMT 11/02/2022 Notify the destination tenant that another tenant connected to him[End]
+            _appMarketplaceContactsRepository = appMarketplaceContactsRepository;
+            _appContactRelationshipInfoRepository =appContactRelationshipInfoRepository;
         }
 
         public async Task<PagedResultDto<GetAppEntityForViewDto>> GetAll(GetAllAppEntitiesInput input)
@@ -179,7 +188,7 @@ namespace onetouch.AppEntities
             var pagedAndFilteredAppEntities = filteredAppEntities
                 .OrderBy(input.Sorting ?? "id asc")
                 .PageBy(input);
-
+            
             var appEntities = from o in pagedAndFilteredAppEntities
                               join o1 in _lookup_sycEntityObjectTypeRepository.GetAll() on o.EntityObjectTypeId equals o1.Id into j1
                               from s1 in j1.DefaultIfEmpty()
@@ -203,7 +212,8 @@ namespace onetouch.AppEntities
                                       EntityExtraData = (input.IncludeExtraDataFilter && o.EntityExtraData!=null)
                                                         ?ObjectMapper.Map<List<AppEntityExtraDataDto>>(o.EntityExtraData): null,
                                       Id = o.Id,
-                                      IsHostRecord = o.TenantId == null
+                                      IsHostRecord = o.TenantId == null,
+                                      TenantId=o.TenantId
                                       
                                   },
                                   
@@ -214,10 +224,21 @@ namespace onetouch.AppEntities
                               };
 
             var totalCount = await filteredAppEntities.CountAsync();
-
+            var entitiesList = await appEntities.ToListAsync();
+            if (AbpSession.TenantId != null)
+            {
+                
+                var defTenantValue = entitiesList.Any(z => z.AppEntity.TenantId == AbpSession.TenantId && z.AppEntity.IsDefault == true);
+                if (defTenantValue)
+                {
+                    var hostdefValue = entitiesList.FirstOrDefault(z => z.AppEntity.TenantId == null && z.AppEntity.IsDefault == true);
+                    if (hostdefValue != null)
+                        hostdefValue.AppEntity.IsDefault = false;
+                }
+            }
             return new PagedResultDto<GetAppEntityForViewDto>(
                 totalCount,
-                await appEntities.ToListAsync()
+                entitiesList
             );
         }
 
@@ -325,7 +346,6 @@ namespace onetouch.AppEntities
             }
         }
 
-
         public bool checkArray(long[] ids, string names)
         {
             return false;
@@ -406,13 +426,8 @@ namespace onetouch.AppEntities
 
         public async Task<string> GetAppEntityState(long id)
         {
-            var obj = _appEntityStateRepository.FirstOrDefaultAsync(e => e.EntityId == id).Result;
-            if (obj != null)
-            { return obj.JsonString; }
-            else
-            { return ""; }
-
-            return "";
+            var obj = await _appEntityStateRepository.FirstOrDefaultAsync(e => e.EntityId == id);
+            return obj?.JsonString ?? "";
         }
 
         public async Task SetAppEntityState(long id, string jsonString)
@@ -793,49 +808,49 @@ namespace onetouch.AppEntities
                 //                  (imagesUrl + (appEntity.EntityAttachments.FirstOrDefault().AttachmentFk.TenantId == null ? "-1" : appEntity.EntityAttachments.FirstOrDefault().AttachmentFk.TenantId.ToString()) + @"/" + appEntity.EntityAttachments.FirstOrDefault().AttachmentFk.Attachment.ToString()) : ""
                 //})
                 //.ToListAsync();
-                return await _appEntityRepository
-                        .GetAll()
-                        .Include(x => x.EntityAttachments)
-                            .ThenInclude(z => z.AttachmentFk)
-                        .Include(x => x.EntityExtraData)
-                        .Include(x => x.EntityObjectStatusFk)
-                        .Where(x =>
-                            x.EntityObjectTypeCode == code &&
-                            (x.TenantId == AbpSession.TenantId || x.TenantId == null))
-                        .OrderBy(x => x.Name)
-                        .Select(appEntity => new LookupLabelDto
-                        {
-                            Value = appEntity.Id,
+                                                        return await _appEntityRepository
+                                            .GetAll()
+                                            .Include(x => x.EntityAttachments)
+                                                .ThenInclude(z => z.AttachmentFk)
+                                            .Include(x => x.EntityExtraData)
+                                            .Include(x => x.EntityObjectStatusFk)
+                                            .Where(x =>
+                                                x.EntityObjectTypeCode == code &&
+                                                (x.TenantId == AbpSession.TenantId || x.TenantId == null))
+                                            .OrderBy(x => x.Name)
+                                            .Select(appEntity => new LookupLabelDto
+                                            {
+                                                Value = appEntity.Id,
 
-                            // I49
-                            EntityObjectStatusId = appEntity.EntityObjectStatusId,
-                            Status = appEntity.EntityObjectStatusFk != null
-                                ? appEntity.EntityObjectStatusFk.Name
-                                : string.Empty,
+                                                // I49
+                                                EntityObjectStatusId = appEntity.EntityObjectStatusId,
+                                                Status = appEntity.EntityObjectStatusFk != null
+                                                    ? appEntity.EntityObjectStatusFk.Name
+                                                    : string.Empty,
 
-                            Label = appEntity.Name,
-                            Code = appEntity.Code,
-                            IsHostRecord = appEntity.TenantId == null,
+                                                Label = appEntity.Name,
+                                                Code = appEntity.Code,
+                                                IsHostRecord = appEntity.TenantId == null,
 
-                            // Hexa code (same logic, cleaner)
-                            HexaCode = appEntity.EntityExtraData
-                                .Where(z => z.AttributeId == 39)
-                                .Select(z => z.AttributeValue)
-                                .FirstOrDefault(),
+                                                // Hexa code (same logic, cleaner)
+                                                HexaCode = appEntity.EntityExtraData
+                                                    .Where(z => z.AttributeId == 39)
+                                                    .Select(z => z.AttributeValue)
+                                                    .FirstOrDefault(),
 
-                            // Image (same logic, no repeated FirstOrDefault)
-                            Image = appEntity.EntityAttachments
-                                .Where(a => a.AttachmentFk != null)
-                                .Select(a =>
-                                    imagesUrl +
-                                    (a.AttachmentFk.TenantId == null
-                                        ? "-1"
-                                        : a.AttachmentFk.TenantId.ToString()) +
-                                    "/" +
-                                    a.AttachmentFk.Attachment)
-                                .FirstOrDefault()
-                        })
-                        .ToListAsync();
+                                                // Image (same logic, no repeated FirstOrDefault)
+                                                Image = appEntity.EntityAttachments
+                                                    .Where(a => a.AttachmentFk != null)
+                                                    .Select(a =>
+                                                        imagesUrl +
+                                                        (a.AttachmentFk.TenantId == null
+                                                            ? "-1"
+                                                            : a.AttachmentFk.TenantId.ToString()) +
+                                                        "/" +
+                                                        a.AttachmentFk.Attachment)
+                                                    .FirstOrDefault()
+                                            })
+                                            .ToListAsync();
 
             }
         }
@@ -863,40 +878,113 @@ namespace onetouch.AppEntities
         [AbpAllowAnonymous]
         public async Task<PagedResultDto<LookupLabelDto>> GetAllEntitiesByTypeCodeWithPaging(GetAllAppEntitiesInput input)
         {
-            //var languageId = await _helper.SystemTables.GetEntityObjectTypeLanguageId(); *Abdo : Not used variable 
             using (UnitOfWorkManager.Current.DisableFilter(AbpDataFilters.MustHaveTenant, AbpDataFilters.MayHaveTenant))
             {
-                var filteredAppEntities = _appEntityRepository.GetAll().Include(x => x.EntityAttachments).ThenInclude(z=>z.AttachmentFk).Include(z=>z.EntityExtraData)
-                .Where(x => x.EntityObjectTypeCode == input.SycEntityObjectTypeNameFilter &&
-                (x.TenantId == AbpSession.TenantId || x.TenantId == null))
-                .WhereIf(!string.IsNullOrWhiteSpace(input.NameFilter), x => false || x.Name.Contains(input.NameFilter));// *Abdo : is added to filter by name "Red" as  example
+                var filteredAppEntities = _appEntityRepository.GetAll()
+                    .AsNoTracking()
+                    .Where(x => x.EntityObjectTypeCode == input.SycEntityObjectTypeNameFilter &&
+                        (x.TenantId == AbpSession.TenantId || x.TenantId == null))
+                    .WhereIf(!string.IsNullOrWhiteSpace(input.NameFilter),
+                        x => x.Name.Contains(input.NameFilter));
 
-            var pagedAndFilteredAppEntities = filteredAppEntities
-              .OrderBy(input.Sorting ?? "Name asc")
-              .PageBy(input);
+                var totalCount = await filteredAppEntities.CountAsync();
+                var pagedAndFilteredAppEntities = filteredAppEntities;
 
-            string imagesUrl = _appConfiguration[$"Attachment:Path"].Replace(_appConfiguration[$"Attachment:Omitt"], "") + @"/";
+                if (!string.IsNullOrWhiteSpace(input.NameFilter))
+                {
+                    var filter = input.NameFilter.Trim().ToLower();
 
-            var appEntities = from o in pagedAndFilteredAppEntities
-                              select new LookupLabelDto()
-                              {
-                                  Value = o.Id,
-                                  Label = o.Name.ToString(),
-                                  Code = o.Code,
-                                  IsHostRecord = o.TenantId == null,
-                                  HexaCode = (o.EntityExtraData!=null && o.EntityExtraData.Where(z=>z.AttributeId ==39).FirstOrDefault()!=null) ? o.EntityExtraData.Where(z => z.AttributeId == 39).FirstOrDefault().AttributeValue:"",
-                                  Image = (o.EntityAttachments!= null && o.EntityAttachments.FirstOrDefault() !=null && o.EntityAttachments.FirstOrDefault().AttachmentFk !=null) ? 
-                                  (imagesUrl + (o.EntityAttachments.FirstOrDefault().AttachmentFk.TenantId==null? "-1": o.EntityAttachments.FirstOrDefault().AttachmentFk.TenantId.ToString()) + @"/" + o.EntityAttachments.FirstOrDefault().AttachmentFk.Attachment.ToString()):""
-        };
-
-
-            var totalCount = await filteredAppEntities.CountAsync();
-
-            return new PagedResultDto<LookupLabelDto>(
-                totalCount,
-                await appEntities.ToListAsync()
-            );
+                    pagedAndFilteredAppEntities = pagedAndFilteredAppEntities
+                        .OrderByDescending(x => x.Name.ToLower().StartsWith(filter))
+                        .ThenBy(x => x.Name);
                 }
+                else
+                {
+                    pagedAndFilteredAppEntities = pagedAndFilteredAppEntities
+                        .OrderBy(input.Sorting ?? "Name asc");
+                }
+
+                pagedAndFilteredAppEntities = pagedAndFilteredAppEntities.PageBy(input);
+                var appEntities = await pagedAndFilteredAppEntities
+                    .Select(o => new LookupLabelDto
+                    {
+                        Value = o.Id,
+                        Label = o.Name,
+                        Code = o.Code,
+                        IsHostRecord = o.TenantId == null,
+                        HexaCode = string.Empty,
+                        Image = string.Empty
+                    })
+                    .ToListAsync();
+
+                if (appEntities.Count == 0)
+                {
+                    return new PagedResultDto<LookupLabelDto>(totalCount, appEntities);
+                }
+
+                var entityIds = appEntities.Select(x => x.Value).ToList();
+                var imagesUrl = _appConfiguration["Attachment:Path"]
+                    .Replace(_appConfiguration["Attachment:Omitt"], "") + "/";
+
+                var attachments = await _appEntityAttachmentRepository.GetAll()
+                    .AsNoTracking()
+                    .Where(x => entityIds.Contains(x.EntityId) && x.AttachmentFk != null)
+                    .OrderByDescending(x => x.IsDefault)
+                    .ThenBy(x => x.Id)
+                    .Select(x => new
+                    {
+                        x.EntityId,
+                        x.AttachmentFk.TenantId,
+                        FileName = x.AttachmentFk.Attachment
+                    })
+                    .ToListAsync();
+
+                var imageByEntityId = attachments
+                    .GroupBy(x => x.EntityId)
+                    .ToDictionary(
+                        x => x.Key,
+                        x =>
+                        {
+                            var attachment = x.First();
+                            var attachmentTenantId = attachment.TenantId?.ToString() ?? "-1";
+                            return imagesUrl + attachmentTenantId + "/" + attachment.FileName;
+                        });
+
+                Dictionary<long, string> hexaCodeByEntityId = null;
+                if (input.IncludeExtraDataFilter)
+                {
+                    var hexaCodes = await _appEntityExtraDataRepository.GetAll()
+                        .AsNoTracking()
+                        .Where(x => entityIds.Contains(x.EntityId) && x.AttributeId == 39)
+                        .OrderBy(x => x.Id)
+                        .Select(x => new
+                        {
+                            x.EntityId,
+                            x.AttributeValue
+                        })
+                        .ToListAsync();
+
+                    hexaCodeByEntityId = hexaCodes
+                        .GroupBy(x => x.EntityId)
+                        .ToDictionary(x => x.Key, x => x.First().AttributeValue);
+                }
+
+                foreach (var appEntity in appEntities)
+                {
+                    if (imageByEntityId.TryGetValue(appEntity.Value, out var image))
+                    {
+                        appEntity.Image = image;
+                    }
+
+                    if (hexaCodeByEntityId != null &&
+                        hexaCodeByEntityId.TryGetValue(appEntity.Value, out var hexaCode))
+                    {
+                        appEntity.HexaCode = hexaCode;
+                    }
+                }
+
+                return new PagedResultDto<LookupLabelDto>(totalCount, appEntities);
+            }
         }
 
         public async Task<List<LookupLabelDto>> GetLineSheetColorSort()
@@ -1160,6 +1248,283 @@ namespace onetouch.AppEntities
         //I46 {End}
         public async Task<long> SaveEntity(AppEntityDto input)
         {
+            return await SaveEntity(input, null, null);
+        }
+
+        public async Task<long> SaveEntityWithLookupCache(AppEntityDto input, IDictionary<long, long?> attributeValueEntityObjectTypeCache, IDictionary<string, long?> entityObjectTypeCodeCache)
+        {
+            return await SaveEntity(input, attributeValueEntityObjectTypeCache, entityObjectTypeCodeCache);
+        }
+
+        public async Task<AppEntity> SaveVariationEntityLean(
+            AppEntityDto input,
+            IDictionary<long, long?> attributeValueEntityObjectTypeCache,
+            IDictionary<string, long?> entityObjectTypeCodeCache,
+            IDictionary<long, AppEntity> existingVariationEntitiesById = null,
+            IDictionary<string, AppEntity> variationEntitiesByUniqueKey = null)
+        {
+            if (string.IsNullOrEmpty(input.Code))
+                input.Code = System.Guid.NewGuid().ToString();
+
+            AppEntity entity;
+            if (input.Id != 0)
+            {
+                if (existingVariationEntitiesById == null || !existingVariationEntitiesById.TryGetValue(input.Id, out entity))
+                {
+                    entity = await _appEntityRepository.GetAll()
+                        .Include(x => x.EntityExtraData)
+                        .Include(x => x.EntityAttachments).ThenInclude(x => x.AttachmentFk)
+                        .FirstOrDefaultAsync(x => x.Id == input.Id);
+                }
+            }
+            else
+            {
+                var inputTenantId = input.TenantId == -1 ? AbpSession.TenantId : input.TenantId;
+                var uniqueKey = GetVariationEntityUniqueKey(inputTenantId, input.EntityObjectTypeCode, input.Code);
+                if (variationEntitiesByUniqueKey == null || !variationEntitiesByUniqueKey.TryGetValue(uniqueKey, out entity))
+                {
+                    entity = null;
+                    if (variationEntitiesByUniqueKey == null)
+                    {
+                        entity = await _appEntityRepository.GetAll()
+                            .Include(x => x.EntityExtraData)
+                            .Include(x => x.EntityAttachments).ThenInclude(x => x.AttachmentFk)
+                            .FirstOrDefaultAsync(x =>
+                                x.Code == input.Code &&
+                                x.TenantId == inputTenantId &&
+                                x.ObjectCode == null &&
+                                x.EntityObjectTypeCode == input.EntityObjectTypeCode);
+                    }
+                }
+
+                if (entity == null)
+                {
+                    entity = new AppEntity
+                    {
+                        EntityExtraData = new List<AppEntityExtraData>(),
+                        EntityAttachments = new List<AppEntityAttachment>()
+                    };
+                }
+            }
+
+            if (entity.EntityExtraData == null)
+                entity.EntityExtraData = new List<AppEntityExtraData>();
+            if (entity.EntityAttachments == null)
+                entity.EntityAttachments = new List<AppEntityAttachment>();
+
+            entity.ObjectId = input.ObjectId;
+            entity.EntityObjectStatusId = input.EntityObjectStatusId;
+            if (entity.EntityObjectStatusId == null)
+                entity.EntityObjectStatusCode = null;
+            entity.EntityObjectTypeId = input.EntityObjectTypeId;
+            entity.EntityObjectTypeCode = input.EntityObjectTypeCode;
+            entity.Name = input.Name;
+            entity.Code = input.Code;
+            entity.Notes = input.Notes;
+            entity.SSIN = input.SSIN;
+            entity.TenantOwner = int.Parse(input.TenantOwner.ToString());
+            entity.TimeStamp = input.TimeStamp;
+            if (entity.TenantId == null || entity.TenantId == 0)
+                entity.TenantId = input.TenantId == -1 ? AbpSession.TenantId : input.TenantId;
+            entity.IsDefault = input.IsDefault;
+
+            await SyncVariationExtraData(entity, input, attributeValueEntityObjectTypeCache, entityObjectTypeCodeCache);
+            SyncVariationAttachments(entity, input);
+
+            if (entity.Id == 0)
+                entity = await _appEntityRepository.InsertAsync(entity);
+
+            var entityUniqueKey = GetVariationEntityUniqueKey(entity.TenantId, entity.EntityObjectTypeCode, entity.Code);
+            if (variationEntitiesByUniqueKey != null && !variationEntitiesByUniqueKey.ContainsKey(entityUniqueKey))
+                variationEntitiesByUniqueKey.Add(entityUniqueKey, entity);
+
+            return entity;
+        }
+
+        public string GetVariationEntityUniqueKey(int? tenantId, string entityObjectTypeCode, string code)
+        {
+            return $"{tenantId}|{entityObjectTypeCode}|{code}";
+        }
+
+        private async Task SyncVariationExtraData(
+            AppEntity entity,
+            AppEntityDto input,
+            IDictionary<long, long?> attributeValueEntityObjectTypeCache,
+            IDictionary<string, long?> entityObjectTypeCodeCache)
+        {
+            var submittedExtraData = input.EntityExtraData ?? new List<AppEntityExtraDataDto>();
+            var matchedExistingIds = new HashSet<long>();
+
+            foreach (var item in submittedExtraData)
+            {
+                var extraData = item.Id != 0
+                    ? entity.EntityExtraData.FirstOrDefault(x => x.Id == item.Id)
+                    : null;
+
+                extraData ??= entity.EntityExtraData.FirstOrDefault(x =>
+                    x.AttributeId == item.AttributeId &&
+                    x.EntityObjectTypeCode == item.EntityObjectTypeCode);
+
+                if (extraData == null)
+                {
+                    extraData = ObjectMapper.Map<AppEntityExtraData>(item);
+                    entity.EntityExtraData.Add(extraData);
+                }
+                else
+                {
+                    var existingExtraDataId = extraData.Id;
+                    if (item.Id == 0)
+                        item.Id = existingExtraDataId;
+                    ObjectMapper.Map(item, extraData);
+                    extraData.Id = existingExtraDataId;
+                    if (extraData.Id != 0)
+                        matchedExistingIds.Add(extraData.Id);
+                }
+
+                extraData.EntityId = entity.Id;
+                extraData.EntityCode = entity.Code;
+                if (extraData.AttributeValueId == 0)
+                    extraData.AttributeValueId = null;
+
+                if (extraData.AttributeValueId != null)
+                {
+                    var attributeValueId = (long)extraData.AttributeValueId;
+                    if (!attributeValueEntityObjectTypeCache.TryGetValue(attributeValueId, out var entityObjectTypeId))
+                    {
+                        entityObjectTypeId = await _appEntityRepository.GetAll()
+                            .Where(x => x.Id == attributeValueId)
+                            .Select(x => (long?)x.EntityObjectTypeId)
+                            .FirstOrDefaultAsync();
+                        attributeValueEntityObjectTypeCache.Add(attributeValueId, entityObjectTypeId);
+                    }
+                    if (entityObjectTypeId != null)
+                        extraData.EntityObjectTypeId = entityObjectTypeId;
+                }
+                else if (!string.IsNullOrEmpty(extraData.EntityObjectTypeCode))
+                {
+                    if (!entityObjectTypeCodeCache.TryGetValue(extraData.EntityObjectTypeCode, out var entityObjectTypeId))
+                    {
+                        entityObjectTypeId = await _appEntityRepository.GetAll()
+                            .Where(x => x.EntityObjectTypeCode == extraData.EntityObjectTypeCode)
+                            .Select(x => (long?)x.EntityObjectTypeId)
+                            .FirstOrDefaultAsync();
+                        entityObjectTypeCodeCache.Add(extraData.EntityObjectTypeCode, entityObjectTypeId);
+                    }
+                    if (entityObjectTypeId != null)
+                        extraData.EntityObjectTypeId = entityObjectTypeId;
+                }
+                else
+                {
+                    extraData.EntityObjectTypeId = null;
+                }
+            }
+
+            foreach (var existingExtraData in entity.EntityExtraData.Where(x => x.Id != 0).ToList())
+            {
+                var stillSubmitted = submittedExtraData.Any(x =>
+                    x.Id == existingExtraData.Id ||
+                    (x.Id == 0 &&
+                     x.AttributeId == existingExtraData.AttributeId &&
+                     x.EntityObjectTypeCode == existingExtraData.EntityObjectTypeCode));
+
+                if (!stillSubmitted && !matchedExistingIds.Contains(existingExtraData.Id))
+                    await _appEntityExtraDataRepository.DeleteAsync(existingExtraData.Id);
+            }
+        }
+
+        private void SyncVariationAttachments(AppEntity entity, AppEntityDto input)
+        {
+            if (input.EntityAttachments == null)
+                return;
+
+            var submittedAttachmentIds = input.EntityAttachments.Select(x => x.Id).ToHashSet();
+            foreach (var existingAttachment in entity.EntityAttachments.Where(x => x.Id != 0 && !submittedAttachmentIds.Contains(x.Id)).ToList())
+            {
+                _appEntityAttachmentRepository.Delete(existingAttachment);
+                if (existingAttachment.AttachmentFk != null)
+                    _appAttachmentRepository.Delete(existingAttachment.AttachmentFk);
+            }
+
+            foreach (var item in input.EntityAttachments)
+            {
+                if ((input.Id == 0 || input.Id == null) && string.IsNullOrEmpty(item.guid))
+                    item.guid = item.FileName;
+
+                var filename = GetAttachmentFileName(item);
+                var existing = item.Id > 0
+                    ? entity.EntityAttachments.FirstOrDefault(x => x.Id == item.Id)
+                    : null;
+
+                if (existing == null && !string.IsNullOrEmpty(filename))
+                {
+                    var attachment = new AppAttachment
+                    {
+                        Name = item.guid == null ? item.DisplayName : item.FileName,
+                        Attachment = filename,
+                        TenantId = entity.TenantId
+                    };
+
+                    entity.EntityAttachments.Add(new AppEntityAttachment
+                    {
+                        AttachmentCategoryId = (int)item.AttachmentCategoryId,
+                        EntityId = entity.Id,
+                        EntityCode = entity.Code,
+                        AttachmentFk = attachment,
+                        IsDefault = item.IsDefault,
+                        IsPublic = item.IsPublic,
+                        Attributes = item.Attributes
+                    });
+                    MoveVariationAttachmentFile(input, entity, filename);
+                    continue;
+                }
+
+                if (existing?.AttachmentFk != null)
+                {
+                    existing.AttachmentFk.Name = item.DisplayName;
+                    if (!string.IsNullOrEmpty(filename))
+                        existing.AttachmentFk.Attachment = filename;
+                    existing.IsDefault = item.IsDefault;
+                    existing.IsPublic = item.IsPublic;
+                    existing.Attributes = item.Attributes;
+                }
+
+                if (!string.IsNullOrEmpty(filename))
+                    MoveVariationAttachmentFile(input, entity, filename);
+            }
+        }
+
+        private void MoveVariationAttachmentFile(AppEntityDto input, AppEntity entity, string filename)
+        {
+            var sourceTenantId = input.AttachmentSourceTenantId != null &&
+                                 input.AttachmentSourceTenantId > -2
+                ? input.AttachmentSourceTenantId
+                : AbpSession.TenantId;
+            MoveFile(filename, sourceTenantId, entity.TenantId);
+        }
+
+        private static string GetAttachmentFileName(AppEntityAttachmentDto item)
+        {
+            var extension = "";
+            if (!string.IsNullOrEmpty(item.FileName) && item.FileName.Split(".").Length > 1)
+                extension = item.FileName.Split(".")[item.FileName.Split(".").Length - 1];
+
+            if (item.guid != null && !item.guid.EndsWith("." + extension))
+                return item.guid + (extension == "" ? "" : "." + extension);
+
+            if (item.guid != null)
+                return item.guid;
+
+            if (item.Id > 0 && string.IsNullOrEmpty(item.Url) && string.IsNullOrEmpty(item.guid))
+                return item.FileName;
+
+            if (item.Id == 0 && !string.IsNullOrEmpty(item.FileName))
+                return item.FileName;
+
+            return "";
+        }
+
+        private async Task<long> SaveEntity(AppEntityDto input, IDictionary<long, long?> attributeValueEntityObjectTypeCache, IDictionary<string, long?> entityObjectTypeCodeCache)
+        {
             using (UnitOfWorkManager.Current.DisableFilter(AbpDataFilters.MustHaveTenant, AbpDataFilters.MayHaveTenant))
             {
                 AppEntity entity;
@@ -1339,18 +1704,34 @@ namespace onetouch.AppEntities
                             //mmt30
                             if (extraData.AttributeValueId != 0 && extraData.AttributeValueId != null)
                             {
-                                var type = await _appEntityRepository.FirstOrDefaultAsync(x => x.Id == extraData.AttributeValueId);
-                                if (type!=null)
-                                    extraData.EntityObjectTypeId = type.EntityObjectTypeId;
+                                var attributeValueId = (long)extraData.AttributeValueId;
+                                if (attributeValueEntityObjectTypeCache == null || !attributeValueEntityObjectTypeCache.TryGetValue(attributeValueId, out var entityObjectTypeId))
+                                {
+                                    entityObjectTypeId = await _appEntityRepository.GetAll()
+                                        .Where(x => x.Id == attributeValueId)
+                                        .Select(x => (long?)x.EntityObjectTypeId)
+                                        .FirstOrDefaultAsync();
+                                    attributeValueEntityObjectTypeCache?.Add(attributeValueId, entityObjectTypeId);
+                                }
+                                if (entityObjectTypeId != null)
+                                    extraData.EntityObjectTypeId = entityObjectTypeId;
 
                             }
                             else
                             {
                                 if (!string.IsNullOrEmpty(extraData.EntityObjectTypeCode))
                                 {
-                                    var type = await _appEntityRepository.FirstOrDefaultAsync(x => x.EntityObjectTypeCode == extraData.EntityObjectTypeCode);
-                                    if (type != null)
-                                        extraData.EntityObjectTypeId = type.EntityObjectTypeId;
+                                    var entityObjectTypeCode = extraData.EntityObjectTypeCode;
+                                    if (entityObjectTypeCodeCache == null || !entityObjectTypeCodeCache.TryGetValue(entityObjectTypeCode, out var entityObjectTypeId))
+                                    {
+                                        entityObjectTypeId = await _appEntityRepository.GetAll()
+                                            .Where(x => x.EntityObjectTypeCode == entityObjectTypeCode)
+                                            .Select(x => (long?)x.EntityObjectTypeId)
+                                            .FirstOrDefaultAsync();
+                                        entityObjectTypeCodeCache?.Add(entityObjectTypeCode, entityObjectTypeId);
+                                    }
+                                    if (entityObjectTypeId != null)
+                                        extraData.EntityObjectTypeId = entityObjectTypeId;
                                 }
                                 else
                                 extraData.EntityObjectTypeId = null;
@@ -1986,6 +2367,16 @@ namespace onetouch.AppEntities
 
             int oldReaction = 0;
             var userId = long.Parse(AbpSession.UserId.ToString());
+            
+            var myTenantObjectName = "host";
+            if (AbpSession.TenantId != null)
+            {
+                var myTenantObject = await TenantManager.GetByIdAsync(int.Parse(AbpSession.TenantId.ToString()));
+                if (myTenantObject != null)
+                {
+                    myTenantObjectName = myTenantObject.TenancyName;
+                }
+            }
 
             #region user reaction part
             AppEntityUserReactions appEntityUserReaction = await _appEntityUserReactions.GetAll().FirstOrDefaultAsync(x => x.UserId == userId && x.EntityId == entitlyId && x.InteractionType == 'R');
@@ -1999,6 +2390,7 @@ namespace onetouch.AppEntities
                     appEntityUserReaction.ReactionSelected = reaction;
                     appEntityUserReaction.ActionTime = DateTime.Now;
                     appEntityUserReaction.InteractionType = 'R';
+                   
                     if (AbpSession.TenantId != null)
                         appEntityUserReaction.TenantId = int.Parse(AbpSession.TenantId.ToString());
 
@@ -2020,20 +2412,20 @@ namespace onetouch.AppEntities
                                     var notifyUser = await UserManager.FindByIdAsync(entityObject.CreatorUserId.ToString());
                                     if (notifyUser != null)
                                     {
-                                        var myTenantObject = await TenantManager.GetByIdAsync(int.Parse(AbpSession.TenantId.ToString()));
+                                        //var myTenantObject = await TenantManager.GetByIdAsync(int.Parse(AbpSession.TenantId.ToString()));
                                         //T-SII-20220413.0001,1 MMT 05/15/2023 -The notification message Enhachment[Start]
                                         var post = _appPostRepository.GetAll ().Where(x=>x.AppEntityId == entitlyId  ).FirstOrDefault ();
                                         if (post != null)
                                         {
                                             await _appNotifier.SendMessageAsync(new Abp.UserIdentifier(entityObject.TenantId, long.Parse(notifyUser.Id.ToString())),
-                                                "User " + myUser.FullName + "@" + myTenantObject.Name + " reacted to your <a> post </a>" +(post.Description.Length > 30 ? post.Description.Substring (0,30): post.Description), Abp.Notifications.NotificationSeverity.Info,
+                                                "User " + myUser.FullName + "@" + myTenantObjectName + " reacted to your <a> post </a>" +(post.Description.Length > 30 ? post.Description.Substring (0,30): post.Description), Abp.Notifications.NotificationSeverity.Info,
                                                 new Abp.Domain.Entities.EntityIdentifier(typeof(AppPost), post.Id ));
                                         }
                                         else
                                         {
                                             //T-SII-20220413.0001,1 MMT 05/15/2023 -The notification message Enhachment[End]
                                             await _appNotifier.SendMessageAsync(new Abp.UserIdentifier(entityObject.TenantId, long.Parse(notifyUser.Id.ToString())),
-                                                "User " + myUser.FullName + "@" + myTenantObject.Name + " reacted to your post" + entityObject.Name, Abp.Notifications.NotificationSeverity.Info);
+                                                "User " + myUser.FullName + "@" + myTenantObjectName + " reacted to your post" + entityObject.Name, Abp.Notifications.NotificationSeverity.Info);
                                         }
                                     }
                                 }
@@ -2066,10 +2458,10 @@ namespace onetouch.AppEntities
                                     var myUser = await UserManager.FindByIdAsync(AbpSession.UserId.ToString());
                                     if (notifyUser != null)
                                     {
-                                        var myTenantObject = await TenantManager.GetByIdAsync(int.Parse(AbpSession.TenantId.ToString()));
+                                        //var myTenantObject = await TenantManager.GetByIdAsync(int.Parse(AbpSession.TenantId.ToString()));
 
                                         await _appNotifier.SendMessageAsync(new Abp.UserIdentifier(entityObject.TenantId, long.Parse(notifyUser.Id.ToString())),
-                                            "User " + myUser.FullName + "@" + myTenantObject.Name + " re-reacted to your post" + entityObject.Name, Abp.Notifications.NotificationSeverity.Info);
+                                            "User " + myUser.FullName + "@" + myTenantObjectName + " re-reacted to your post" + entityObject.Name, Abp.Notifications.NotificationSeverity.Info);
                                     }
                                 }
                             }
@@ -2367,22 +2759,49 @@ namespace onetouch.AppEntities
         }
         private async Task<UserInformationDto> GetUserInformation(long userId)
         {
+            var user = await UserManager.GetUserByIdAsync(userId);
+            if (user == null)
+                return null;
+            string businessAccSSIN = "";
+            string personalAccSSIN = "";
+            var buisnessAccount = await _appMarketplaceContactsRepository
+                .GetAll().Where(z => z.TenantOwner == user.TenantId
+                && z.IsProfileData == true && z.ParentId == null && z.SharingLevel==1).FirstOrDefaultAsync();
+            if (buisnessAccount!=null)
+            {
+                businessAccSSIN = buisnessAccount.SSIN;
+            }
+            var activeRelationshipStatusId = await _helper.SystemTables.GetEntityObjectStatusRelationshipActive();
             var attPhotoId = await _helper.SystemTables.GetAttachmentCategoryId("LOGO");
-            var contactEntityExtraData = _appEntityExtraDataRepository.GetAll().FirstOrDefault(x => x.AttributeId == 715 && x.AttributeValue == userId.ToString());
+            var contactEntityExtraData = _appEntityExtraDataRepository.GetAll()
+                .Include(z=>z.EntityFk)
+                .FirstOrDefault(x => x.AttributeId == 715 && x.AttributeValue == userId.ToString());
             if (contactEntityExtraData != null)
             {
+                personalAccSSIN = contactEntityExtraData.EntityFk.SSIN;
                 UserInformationDto userInformationDto = new UserInformationDto();
-                var contact = _appContactRepository.GetAll().Include(x => x.AccountFk).Include(x => x.EntityFk).ThenInclude(x => x.EntityAttachments).ThenInclude(x => x.AttachmentFk)
+                /*var contact = _appContactRepository.GetAll().Include(x => x.AccountFk).Include(x => x.EntityFk).ThenInclude(x => x.EntityAttachments).ThenInclude(x => x.AttachmentFk)
                     .Include(x => x.EntityFk).ThenInclude(x => x.EntityExtraData)
-                    .FirstOrDefault(x => x.EntityId == contactEntityExtraData.EntityId);
+                    .FirstOrDefault(x => x.EntityId == contactEntityExtraData.EntityId);*/
+                var contact = await _appMarketplaceContactsRepository.GetAll().Include(z=>z.EntityAttachments).ThenInclude(x => x.AttachmentFk)
+                    .Include(z=>z.EntityExtraData)
+                    .Where(z => z.SSIN == personalAccSSIN).FirstOrDefaultAsync();
                 if (contact != null)
                 {
-                    if (contact.EntityFk.EntityAttachments.Count > 0 && contact.EntityFk.EntityAttachments.FirstOrDefault(x => x.AttachmentCategoryId == attPhotoId) != null)
-                        userInformationDto.UserImage = string.IsNullOrEmpty(contact.EntityFk.EntityAttachments.FirstOrDefault(x => x.AttachmentCategoryId == attPhotoId).AttachmentFk.Attachment) ?
+                    if (contact.EntityAttachments.Count > 0 && contact.EntityAttachments.FirstOrDefault(x => x.AttachmentCategoryId == attPhotoId) != null)
+                        userInformationDto.UserImage = string.IsNullOrEmpty(contact.EntityAttachments.FirstOrDefault(x => x.AttachmentCategoryId == attPhotoId).AttachmentFk.Attachment) ?
                                                  ""
-                                                 : "attachments/" + (contact.EntityFk.TenantId == null ? "-1" : contact.EntityFk.TenantId.ToString()) + "/" + contact.EntityFk.EntityAttachments.FirstOrDefault(x => x.AttachmentCategoryId == attPhotoId).AttachmentFk.Attachment;
-                    userInformationDto.JobTitle = contact.EntityFk.EntityExtraData.FirstOrDefault(x => x.AttributeId == 706) == null ? "" : contact.EntityFk.EntityExtraData.FirstOrDefault(x => x.AttributeId == 706).AttributeValue;
-                    userInformationDto.AccountName = contact.AccountFk== null?"":contact.AccountFk.Name;
+                                                 : "attachments/" + (contact.TenantId == null ? "-1" : contact.TenantId.ToString()) + "/" + contact.EntityAttachments.FirstOrDefault(x => x.AttachmentCategoryId == attPhotoId).AttachmentFk.Attachment;
+                    //userInformationDto.JobTitle = contact.EntityFk.EntityExtraData.FirstOrDefault(x => x.AttributeId == 706) == null ? "" : contact.EntityFk.EntityExtraData.FirstOrDefault(x => x.AttributeId == 706).AttributeValue;
+                    var relationship = await _appContactRelationshipInfoRepository.GetAll().Include(z=>z.EntityExtraData)
+                        .Where(z => z.RequesterContactSSIN == businessAccSSIN && z.RecipientContactSSIN == personalAccSSIN
+                        && z.EntityObjectTypeCode == "B00P" && z.EntityObjectStatusId == activeRelationshipStatusId).FirstOrDefaultAsync();
+                    if (relationship != null && relationship.EntityExtraData !=null)
+                    {
+                        userInformationDto.JobTitle = relationship.EntityExtraData.FirstOrDefault(x => x.AttributeId == 706) == null ? "" : relationship.EntityExtraData.FirstOrDefault(x => x.AttributeId == 706).AttributeValue;
+
+                    }
+                    userInformationDto.AccountName = buisnessAccount.Name;// contact.AccountFk== null?"":contact.AccountFk.Name;
                     userInformationDto.UserName = contact.Name;
                 }
                 return userInformationDto;
@@ -2594,7 +3013,7 @@ namespace onetouch.AppEntities
             }
             return "";
         }
-        public async Task<List<ContactInformationOutputDto>> GetContactsToMention(long entityId,string? filter)
+        public async Task<List<ContactInformationOutputDto>> GetContactsToMention(long entityId, string? filter)
         {
 
             List<ContactInformationOutputDto> outputList = new List<ContactInformationOutputDto>();
@@ -2607,71 +3026,136 @@ namespace onetouch.AppEntities
                     {
                         var presonEntityObjectTypeId = await _helper.SystemTables.GetEntityObjectTypePersonId();
 
-                        var transactionContacts = _appTransactionContactsRepository.GetAll().Where(z => z.TransactionId == entityId && z.CompanySSIN != null && z.ContactSSIN!=null); //&& z.CompanySSIN !=null
-
-                        /*var appEntities = _appEntityRepository.GetAll().Include(z => z.EntityExtraData.Where(s => s.AttributeId == 715))
-                                  .Where(z => z.TenantId == null && z.EntityObjectTypeId == presonEntityObjectTypeId && z.TenantOwner != null);*/
-
-                        var contactsList = _appContactRepository.GetAll().Include(z => z.EntityFk).ThenInclude(z => z.EntityExtraData.Where(s => s.AttributeId == 715))
-                                  .Where(z => z.TenantId == null && z.ParentId != null && z.EntityFk.EntityObjectTypeId == presonEntityObjectTypeId);
-
-
-                        var contact = from t in transactionContacts
-                                      join
-                                      c in contactsList
-                                      on t.ContactSSIN equals c.SSIN into j
-                                      from e in j.DefaultIfEmpty()
-                                      select new { e.AccountId };
-
-                        var transactionContactsList =await  contact.Distinct().ToListAsync();
-                        
-                        /*var newContact = from x in contact
-                                         join y in appEntities
-                                         on x.contact.TenantOwner equals y.TenantOwner into j1
-                                         from z in j1.DefaultIfEmpty()
-                                         select new { contact = z };*/
-                        foreach (var acc in transactionContactsList)
+                        var transactionContacts = _appTransactionContactsRepository.GetAll().Where(z => z.TransactionId == entityId && z.CompanySSIN != null && z.ContactSSIN != null); //&& z.CompanySSIN !=null
+                        var transactionCompanies = transactionContacts.Select(z => z.CompanySSIN).Distinct().ToList();
+                        //List<AppMarketplaceContacts.AppMarketplaceContact> members = new List<AppMarketplaceContacts.AppMarketplaceContact>();
+                        var activeRelationshipStatusId = await _helper.SystemTables.GetEntityObjectStatusRelationshipActive();
+                        var businessEntityObjectTypeId = await _helper.SystemTables.GetEntityObjectTypeParetnerId();
+                        if (transactionCompanies != null && transactionCompanies.Count > 0)
                         {
-                            var contacts = await _appContactRepository.GetAll().Include(z => z.EntityFk).ThenInclude(z => z.EntityExtraData.Where(s => s.AttributeId == 715))
-                                .Where(z => z.TenantId == null &&  z.AccountId==acc.AccountId).ToListAsync();
-                            //await newContact.WhereIf(!string.IsNullOrEmpty(filter), z => z.contact.Name.Contains(filter)).OrderBy(z => z.contact.Id).ToListAsync();
-
-                            if (contacts != null && contacts.Count() > 0)
+                            foreach (var company in transactionCompanies)
                             {
+                                var companyOnMarketplace = _appMarketplaceContactsRepository.GetAll()
+                                    .Where(z => z.SSIN == company && z.EntityObjectTypeId == businessEntityObjectTypeId)
+                                    .FirstOrDefault();
+                                if (companyOnMarketplace == null)
+                                    continue;
 
-                                foreach (var con in contacts)
+                                var relatedMembers =
+                                    _appContactRelationshipInfoRepository.GetAll()
+                                    .Where(s => s.RequesterContactSSIN == company && s.ConsiderAsTeamMember == true &&
+                                   s.RecipientContactTypeId == presonEntityObjectTypeId && s.EntityObjectStatusId == activeRelationshipStatusId)
+                                   .Select(s => s.RecipientContactSSIN).ToList();
+                                if (relatedMembers != null && relatedMembers.Count > 0)
                                 {
-                                    if (con == null || con.EntityFk.EntityExtraData == null || con.EntityFk.EntityExtraData.Count == 0 || 
-                                        con.EntityFk.EntityExtraData.FirstOrDefault().AttributeValue == null)
-
-                                        continue;
-
-                                    try
+                                    foreach (var member in relatedMembers)
                                     {
-                                        var user = UserManager.GetUserById(long.Parse(con.EntityFk.EntityExtraData.FirstOrDefault().AttributeValue));
-                                        if (user != null)
+                                        //var marketplaceMember = _appMarketplaceContactsRepository.GetAll()
+                                        //  .Include(z => z.EntityExtraData.Where(z => z.AttributeId == 715)).Where(z => z.SSIN == member).FirstOrDefault();
+                                        var marketplaceMember = _appContactRepository.GetAll().Include(z => z.EntityFk)
+                                               .ThenInclude(z => z.EntityExtraData.Where(z => z.AttributeId == 715)).Where(z => z.TenantId == companyOnMarketplace.TenantOwner && z.SSIN == member).FirstOrDefault();
+                                        if (marketplaceMember != null)
                                         {
-                                            //ContactRoleEnum role = (ContactRoleEnum)Enum.Parse(typeof(ContactRoleEnum), con.role);
-                                            var tenantObj = TenantManager.GetById(int.Parse(user.TenantId.ToString()));
-                                            if (outputList.FirstOrDefault(z => z.UserId == long.Parse(con.EntityFk.EntityExtraData.FirstOrDefault().AttributeValue)) == null)
-                                                outputList.Add(new ContactInformationOutputDto
+                                            //members.Add(marketplaceMember);
+                                            if (marketplaceMember.EntityFk.EntityExtraData != null &&
+                                                marketplaceMember.EntityFk.EntityExtraData.Count > 0 &&
+                                                !string.IsNullOrEmpty(marketplaceMember.EntityFk.EntityExtraData.FirstOrDefault().AttributeValue) &&
+                                                long.Parse(marketplaceMember.EntityFk.EntityExtraData.FirstOrDefault().AttributeValue) != 0)
+                                            {
+                                                var user = UserManager.GetUserById(long.Parse(marketplaceMember.EntityFk.EntityExtraData.FirstOrDefault().AttributeValue));
+                                                if (user != null)
                                                 {
-                                                    Id = con.Id,
-                                                    Email = con.EMailAddress,
-                                                    Name = con.Name,
-                                                    UserId = long.Parse(con.EntityFk.EntityExtraData.FirstOrDefault().AttributeValue),
-                                                    UserImage = user != null && user.ProfilePictureId != null ? Guid.Parse(user.ProfilePictureId.ToString()) : null,
-                                                    UserName = user.UserName,
-                                                    TenantId = int.Parse(user.TenantId.ToString()),
-                                                    TenantName = tenantObj != null ? tenantObj.TenancyName : "SIIWII"
-                                                    // CanBeRemoved = (role == ContactRoleEnum.Creator || role == ContactRoleEnum.Seller || role == ContactRoleEnum.Buyer) ? false : true
-                                                });
+                                                    //ContactRoleEnum role = (ContactRoleEnum)Enum.Parse(typeof(ContactRoleEnum), con.role);
+                                                    var tenantObj = TenantManager.GetById(int.Parse(user.TenantId.ToString()));
+                                                    if (outputList.FirstOrDefault(z => z.UserId == long.Parse(marketplaceMember.EntityFk.EntityExtraData.FirstOrDefault().AttributeValue)) == null)
+                                                    {
+                                                        outputList.Add(new ContactInformationOutputDto
+                                                        {
+                                                            Id = marketplaceMember.Id,
+                                                            Email = marketplaceMember.EMailAddress,
+                                                            Name = marketplaceMember.Name,
+                                                            UserId = long.Parse(marketplaceMember.EntityFk.EntityExtraData.FirstOrDefault().AttributeValue),
+                                                            UserImage = user != null && user.ProfilePictureId != null ? Guid.Parse(user.ProfilePictureId.ToString()) : null,
+                                                            UserName = user.UserName,
+                                                            TenantId = int.Parse(user.TenantId.ToString()),
+                                                            TenantName = tenantObj != null ? tenantObj.TenancyName : "SIIWII"
+                                                            // CanBeRemoved = (role == ContactRoleEnum.Creator || role == ContactRoleEnum.Seller || role == ContactRoleEnum.Buyer) ? false : true
+                                                        });
+                                                    }
+                                                }
 
+                                            }
                                         }
                                     }
-                                    catch { }
+
                                 }
                             }
+
+
+
+                            /*var appEntities = _appEntityRepository.GetAll().Include(z => z.EntityExtraData.Where(s => s.AttributeId == 715))
+                                      .Where(z => z.TenantId == null && z.EntityObjectTypeId == presonEntityObjectTypeId && z.TenantOwner != null);*/
+
+                            //var contactsList = _appContactRepository.GetAll().Include(z => z.EntityFk).ThenInclude(z => z.EntityExtraData.Where(s => s.AttributeId == 715))
+                            //.Where(z => z.TenantId == AbpSession.TenantId && z.EntityFk.EntityObjectTypeId == presonEntityObjectTypeId);
+
+
+                            //var contact = from t in transactionContacts
+                            //              join
+                            //              c in contactsList
+                            //              on t.ContactSSIN equals c.SSIN into j
+                            //              from e in j.DefaultIfEmpty()
+                            //              select new { e.AccountId };
+
+                            //var transactionContactsList =await  contact.Distinct().ToListAsync();
+
+                            /*var newContact = from x in contact
+                                             join y in appEntities
+                                             on x.contact.TenantOwner equals y.TenantOwner into j1
+                                             from z in j1.DefaultIfEmpty()
+                                             select new { contact = z };*/
+                            //foreach (var acc in transactionContactsList)
+                            //{
+                            // var contacts = await _appContactRepository.GetAll().Include(z => z.EntityFk).ThenInclude(z => z.EntityExtraData.Where(s => s.AttributeId == 715))
+                            //    .Where(z => z.TenantId == AbpSession.TenantId &&  z.AccountId==acc.AccountId).ToListAsync();
+                            //await newContact.WhereIf(!string.IsNullOrEmpty(filter), z => z.contact.Name.Contains(filter)).OrderBy(z => z.contact.Id).ToListAsync();
+
+                            // if (contacts != null && contacts.Count() > 0)
+                            // {
+
+                            // foreach (var con in contacts)
+                            // {
+                            //if (con == null || con.EntityFk.EntityExtraData == null || con.EntityFk.EntityExtraData.Count == 0 || 
+                            //     con.EntityFk.EntityExtraData.FirstOrDefault().AttributeValue == null)
+
+                            //   continue;
+
+                            //try
+                            //{
+                            //   var user = UserManager.GetUserById(long.Parse(con.EntityFk.EntityExtraData.FirstOrDefault().AttributeValue));
+                            //if (user != null)
+                            //{
+                            //    //ContactRoleEnum role = (ContactRoleEnum)Enum.Parse(typeof(ContactRoleEnum), con.role);
+                            //    var tenantObj = TenantManager.GetById(int.Parse(user.TenantId.ToString()));
+                            //    if (outputList.FirstOrDefault(z => z.UserId == long.Parse(con.EntityFk.EntityExtraData.FirstOrDefault().AttributeValue)) == null)
+                            //        outputList.Add(new ContactInformationOutputDto
+                            //        {
+                            //            Id = con.Id,
+                            //            Email = con.EMailAddress,
+                            //            Name = con.Name,
+                            //            UserId = long.Parse(con.EntityFk.EntityExtraData.FirstOrDefault().AttributeValue),
+                            //            UserImage = user != null && user.ProfilePictureId != null ? Guid.Parse(user.ProfilePictureId.ToString()) : null,
+                            //            UserName = user.UserName,
+                            //            TenantId = int.Parse(user.TenantId.ToString()),
+                            //            TenantName = tenantObj != null ? tenantObj.TenancyName : "SIIWII"
+                            //            // CanBeRemoved = (role == ContactRoleEnum.Creator || role == ContactRoleEnum.Seller || role == ContactRoleEnum.Buyer) ? false : true
+                            //        });
+
+                            //}
+                            // }
+                            // catch { }
+                            //}
+                            // }
                         }
                     }
                 }
@@ -2772,56 +3256,56 @@ namespace onetouch.AppEntities
             }
             return returnObject;
         }
-        ////I40[Start]
-        ////public async Task<PagedResultDto<ExtraDataAttrDto>> GetAppEntityExtraDataWithPaging(long entityId, long entityObjectTypeId)
-        ////{
-        ////    using (UnitOfWorkManager.Current.DisableFilter(AbpDataFilters.MustHaveTenant, AbpDataFilters.MayHaveTenant))
-        ////    {
-        ////        GetAllEntityObjectTypeOutput entityObjectExtraAttribute = null;
-        ////        var entityObjectExtraAttributeReturn = await _SycEntityObjectTypesAppService.GetAllWithExtraAttributes(entityObjectTypeId);
-        ////        if (entityObjectExtraAttributeReturn != null)
-        ////        {
-        ////            entityObjectExtraAttribute = entityObjectExtraAttributeReturn.FirstOrDefault();
-        ////        }
+        //I40[Start]
+        //public async Task<PagedResultDto<ExtraDataAttrDto>> GetAppEntityExtraDataWithPaging(long entityId, long entityObjectTypeId)
+        //{
+        //    using (UnitOfWorkManager.Current.DisableFilter(AbpDataFilters.MustHaveTenant, AbpDataFilters.MayHaveTenant))
+        //    {
+        //        GetAllEntityObjectTypeOutput entityObjectExtraAttribute = null;
+        //        var entityObjectExtraAttributeReturn = await _SycEntityObjectTypesAppService.GetAllWithExtraAttributes(entityObjectTypeId);
+        //        if (entityObjectExtraAttributeReturn != null)
+        //        {
+        //            entityObjectExtraAttribute = entityObjectExtraAttributeReturn.FirstOrDefault();
+        //        }
 
 
 
-        ////        if (entityId != 0 && entityObjectExtraAttribute != null && entityObjectExtraAttribute.ExtraAttributes != null && entityObjectExtraAttribute.ExtraAttributes.ExtraAttributes != null)
-        ////        {
-        ////            var extraAttributedefintion = entityObjectExtraAttribute.ExtraAttributes.ExtraAttributes;
-        ////            *Abdo End
-        ////           get all extra data type, AttributeId
-        ////            var attributesIds = extraAttributedefintion.Where(r => r.Usage.ToUpper().Trim() == recommandedOrAdditional.ToString().ToUpper()).Select(r => r.AttributeId).ToList();
-        ////            var attributesIds = extraAttributedefintion.OrderBy(r => r.Usage.ToUpper().Trim()).Select(r => r.AttributeId).ToList();
-        ////            var usedExtraDataPagedPerAttribute = GetAppEntityAttrDistinctWithPaging(new GetAppEntityAttributesWithAttributeIdsInput { MaxResultCount = 10000, SkipCount = 0, Sorting = null, AttributeIds = attributesIds, EntityId = entityId }).Result.Items.ToList();
+        //        if (entityId != 0 && entityObjectExtraAttribute != null && entityObjectExtraAttribute.ExtraAttributes != null && entityObjectExtraAttribute.ExtraAttributes.ExtraAttributes != null)
+        //        {
+        //            var extraAttributedefintion = entityObjectExtraAttribute.ExtraAttributes.ExtraAttributes;
+        //            // *Abdo End
+        //            //get all extra data type, AttributeId
+        //            //var attributesIds = extraAttributedefintion.Where(r => r.Usage.ToUpper().Trim() == recommandedOrAdditional.ToString().ToUpper()).Select(r => r.AttributeId).ToList();
+        //            var attributesIds = extraAttributedefintion.OrderBy(r => r.Usage.ToUpper().Trim()).Select(r => r.AttributeId).ToList();
+        //            var usedExtraDataPagedPerAttribute = GetAppEntityAttrDistinctWithPaging(new GetAppEntityAttributesWithAttributeIdsInput { MaxResultCount = 10000, SkipCount = 0, Sorting = null, AttributeIds = attributesIds, EntityId = entityId }).Result.Items.ToList();
 
-        ////            List<ExtraDataAttrDto> returnedList = new List<ExtraDataAttrDto>();
+        //            List<ExtraDataAttrDto> returnedList = new List<ExtraDataAttrDto>();
 
-        ////            foreach (var EntityExtraData in extraAttributedefintion)
-        ////            {
-        ////                if (usedExtraDataPagedPerAttribute.Contains(EntityExtraData.AttributeId))
-        ////                {
-        ////                    var extraDataAttrDtoPagedlocal = GetAppEntityExtraWithPaging(new GetAppEntityAttributesWithAttributeIdsInput { MaxResultCount = 10000, SkipCount = 0, AttributeIds = new List<long>() { EntityExtraData.AttributeId }, EntityId = entityId }).Result.Items.ToList();
-        ////                    var extraDataSelectedValues = extraDataAttrDtoPagedlocal.Select(r => new ExtraDataSelectedValues { value = (r.AttributeValueFkName != null ? r.AttributeValueFkName : r.AttributeValue) });
+        //            foreach (var EntityExtraData in extraAttributedefintion)
+        //            {
+        //                if (usedExtraDataPagedPerAttribute.Contains(EntityExtraData.AttributeId))
+        //                {
+        //                    var extraDataAttrDtoPagedlocal = GetAppEntityExtraWithPaging(new GetAppEntityAttributesWithAttributeIdsInput { MaxResultCount = 10000, SkipCount = 0, AttributeIds = new List<long>() { EntityExtraData.AttributeId }, EntityId = entityId }).Result.Items.ToList();
+        //                    var extraDataSelectedValues = extraDataAttrDtoPagedlocal.Select(r => new ExtraDataSelectedValues { value = (r.AttributeValueFkName != null ? r.AttributeValueFkName : r.AttributeValue) });
 
-        ////                    if (extraDataSelectedValues.ToList().Count > 0)
-        ////                    {
-        ////                        var extraDataAttrDto = new ExtraDataAttrDto();
-        ////                        extraDataAttrDto.extraAttrUsage = EntityExtraData.Usage;
-        ////                        extraDataAttrDto.extraAttrName = EntityExtraData.Name;
-        ////                        extraDataAttrDto.extraAttrDataType = EntityExtraData.DataType; // Abdo added this 
-        ////                        extraDataAttrDto.selectedValues = extraDataSelectedValues.ToList();
-        ////                        extraDataAttrDto.extraAttributeId = EntityExtraData.AttributeId;
-        ////                        { returnedList.Add(extraDataAttrDto); }
-        ////                    }
-        ////                }
+        //                    if (extraDataSelectedValues.ToList().Count > 0)
+        //                    {
+        //                        var extraDataAttrDto = new ExtraDataAttrDto();
+        //                        extraDataAttrDto.extraAttrUsage = EntityExtraData.Usage;
+        //                        extraDataAttrDto.extraAttrName = EntityExtraData.Name;
+        //                        extraDataAttrDto.extraAttrDataType = EntityExtraData.DataType; // Abdo added this 
+        //                        extraDataAttrDto.selectedValues = extraDataSelectedValues.ToList();
+        //                        extraDataAttrDto.extraAttributeId = EntityExtraData.AttributeId;
+        //                        { returnedList.Add(extraDataAttrDto); }
+        //                    }
+        //                }
 
-        ////            }
-        ////            return new PagedResultDto<ExtraDataAttrDto>(usedExtraDataPagedPerAttribute.Count, returnedList);
-        ////        }
-        ////        return new PagedResultDto<ExtraDataAttrDto>(0, new List<ExtraDataAttrDto>());
-        ////    }
-        ////}
-        ////I40[End]
+        //            }
+        //            return new PagedResultDto<ExtraDataAttrDto>(usedExtraDataPagedPerAttribute.Count, returnedList);
+        //        }
+        //        return new PagedResultDto<ExtraDataAttrDto>(0, new List<ExtraDataAttrDto>());
+        //    }
+        //}
+        //I40[End]
     }
 }

@@ -7,7 +7,7 @@
   <div class="modal-dialog modal-xl modalCenter">
     <div class="modal-content text-center">
        <div class="border-bottom pb-3">
-        <div class="row pt-4  pb-3" style="justify-content: center;"> 
+      <div class="row pt-4 pb-3 justify-content-center"> 
      <img src="../../../../assets/accounts/importAccounts/tick-successfully.svg"  />
  </div>
  <h4>{{("Import"+ImportTypes[importType]+"successfully") | localize}}</h4>
@@ -16,7 +16,7 @@
 </div>
 
  <div class="pt-3">
-    <a class="_download font-weight-bold" (click)="downloadLogFile()" style="color: #4A0D4A !important;"> {{"DownloadtheImportlogfile" | localize}} </a>
+   <a class="_download success-download-link font-weight-bold" (click)="downloadLogFile()"> {{"DownloadtheImportlogfile" | localize}} </a>
     <button class="btn btn-secondary  _Btn mr-2 pointer mt-4 " (click)="close()">
         {{"Close" | localize}}  
     </button>

@@ -39,6 +39,48 @@
     gap: 12px;
 }
 
+.sarch {
+    gap: 7px;
+}
+
+.no-data-placeholder {
+    margin-top: 150px !important;
+}
+
+.mobile-search-span {
+    width: 40%;
+}
+
+.mobile-filter-btn {
+    width: 60%;
+}
+
+.currency-list {
+    overflow-y: scroll;
+    height: 200px;
+}
+
+::ng-deep .mobile-filters-dialog {
+    width: 40vw;
+}
+
+.toolbar-group {
+    min-width: 0;
+}
+
+.toolbar-group-search {
+    flex: 1 1 auto;
+}
+
+.toolbar-group-search .group-srch {
+    width: 100%;
+    min-width: 220px;
+}
+
+.products-content-col {
+    min-width: 0;
+}
+
 .cur {
     width: 97px;
 }
@@ -64,6 +106,25 @@
         border-radius: 10px;
 
 
+    }
+
+    .toolbar-group-share {
+        flex: 1 1 240px;
+        margin-right: 0;
+    }
+
+    .toolbar-group-search {
+        flex: 1 1 100%;
+        justify-content: flex-start !important;
+        flex-wrap: wrap;
+    }
+
+    .sarch {
+        width: 100%;
+    }
+
+    .product-filters-col {
+        padding-right: 12px !important;
     }
 
 }
@@ -237,15 +298,29 @@
         .quickFilters {
             display: flex;
             justify-content: flex-start;
+            align-items: stretch;
+            flex-wrap: wrap;
             gap: 10px;
             margin: 10px 0px;
+        }
+
+        .quickFilters .p-input-icon-right,
+        .quickFilters .filter-btn {
+            width: 100% !important;
         }
 
         .btn-filters {
             display: flex;
             justify-content: flex-start;
+            flex-wrap: wrap;
             gap: 10px;
             margin-bottom: 10px;
+        }
+
+        .btn-filters .filter-btn,
+        .btn-filters .filterBtn,
+        .btn-filters .resBtn {
+            width: calc(50% - 5px) !important;
         }
 
         .filter-btn {
@@ -260,6 +335,27 @@
             flex-wrap: wrap;
             gap: 8px;
         }
+    }
+}
+
+@media only screen and (max-width: 767px) {
+    .web .main-c {
+        align-items: stretch !important;
+    }
+
+    .web .sarch {
+        justify-content: flex-start !important;
+    }
+
+    .web .group-srch {
+        width: 100%;
+    }
+
+    .web .sortBy,
+    .web .p-dropdown,
+    .web .filterBtn,
+    .web .resBtn {
+        width: 100%;
     }
 }
 

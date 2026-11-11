@@ -82,6 +82,7 @@ namespace onetouch.AppItems.Dtos
         public string OriginalCode { get; set; }
         public long? SycIdentifierId { get; set; }
         public string? SSIN { set; get; }
+        public bool SkipGenerateSsin { set; get; }
         //MMT
         //MMT-IT41[Start]
         public IList<LookupLabelDto> NonLookupValues { set; get; }
@@ -214,6 +215,8 @@ namespace onetouch.AppItems.Dtos
 
     public class AppItemForViewDto : GetAppItemDto
     {
+        public string SSIN { get; set; }
+
         public DateOnly ShipDate { get; set; }
         public DateOnly SoldOutDate { get; set; }
         public String MaterialContent { get; set; }
@@ -402,6 +405,8 @@ namespace onetouch.AppItems.Dtos
         public virtual string Message { get; set; }
 
         public IList<ItemSharingDto> ItemSharing { get; set; }
+
+        public virtual long NumberOfSubscribers { get; set; }
 
     }
     //mmt33-2

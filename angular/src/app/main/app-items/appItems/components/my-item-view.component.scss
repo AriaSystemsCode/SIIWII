@@ -1,0 +1,16 @@
+.my-item-view-wrapper {
+	width: 100%;
+	min-width: 0;
+}
+
+@media (max-width: 1024px) {
+	.my-item-view-wrapper {
+		padding: 0 0.5rem;
+	}
+}
+
+@media (max-width: 576px) {
+	.my-item-view-wrapper {
+		padding: 0;
+	}
+}

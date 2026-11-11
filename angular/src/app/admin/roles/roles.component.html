@@ -1,6 +1,6 @@
 <div [@routerTransition]>
     <div class="kt-content  kt-grid__item kt-grid__item--fluid kt-grid kt-grid--hor">
-        <div class="kt-subheader kt-grid__item">
+        <div class="kt-subheader kt-grid__item"   [ngClass]="isArabic ? 'addMTMob':''">
             <div [class]="containerClass">
                 <div class="kt-subheader__main">
                     <h3 class="kt-subheader__title">
@@ -21,7 +21,7 @@
         </div>
 
         <div [class]="containerClass + ' kt-grid__item kt-grid__item--fluid'">
-            <div class="kt-portlet">
+            <div  [ngClass]="isArabic ? 'addMT body-sec':'body-sec mt-lg-5'" class="h-100vh">
                 <div class="kt-portlet__body">
                     <div class="kt-form">
                         <div class="row">
@@ -46,17 +46,17 @@
 
                                 <ng-template pTemplate="header">
                                     <tr>
-                                        <th style="width: 130px"
+                                        <th  class="w-130" [ngClass]="isArabic ? 'alignStart':''"
                                             [hidden]="!(['Pages.Administration.Roles.Edit', 'Pages.Administration.Roles.Delete'] | permissionAny)">
                                             {{'Actions' | localize}}</th>
-                                        <th>{{'RoleName' | localize}}</th>
-                                        <th>{{'CreationTime' | localize}}</th>
+                                        <th [ngClass]="isArabic ? 'alignStart':''">{{'RoleName' | localize}}</th>
+                                        <th [ngClass]="isArabic ? 'alignStart':''">{{'CreationTime' | localize}}</th>
                                     </tr>
                                 </ng-template>
 
                                 <ng-template pTemplate="body" let-record="$implicit">
                                     <tr>
-                                        <td
+                                        <td [ngClass]="isArabic ? 'alignStart':''"
                                             [hidden]="!(['Pages.Administration.Roles.Edit', 'Pages.Administration.Roles.Delete'] | permissionAny)">
                                             <div class="btn-group dropdown" dropdown>
                                                 <button dropdownToggle
@@ -82,7 +82,7 @@
                                                 </ul>
                                             </div>
                                         </td>
-                                        <td>
+                                        <td [ngClass]="isArabic ? 'alignStart':''">
                                             <span class="p-column-title">{{'RoleName' | localize}}</span>
                                             <span>
                                                 {{record.displayName}}
@@ -101,7 +101,7 @@
                                                 </span>
                                             </span>
                                         </td>
-                                        <td>
+                                        <td [ngClass]="isArabic ? 'alignStart':''">
                                             <span class="p-column-title">{{'CreationTime' | localize}}</span>
                                             {{record.creationTime | momentFormat:'L'}}
                                         </td>

@@ -66,9 +66,16 @@ dynamicInputsComponents!: QueryList<dynamicInputs>;
       });
     }
   }
+private getSelectedRelationshipCode(): string {
+  const selectedConnection = this.connectionsInfo?.find(
+    x => x.relationEntityId === this.relationId
+  );
 
+  return selectedConnection?.relationshipCode || 'BTB';
+}
   getAppItemTypeExtraAttributesById() {
-   this._sycEntityObjectTypesServiceProxy.getAllWithExtraAttributesByCode('BTB', 'MARKETPLACECONTACTRELATIONSHIP').pipe(finalize(() => {
+     const relationshipCode = this.getSelectedRelationshipCode();
+   this._sycEntityObjectTypesServiceProxy.getAllWithExtraAttributesByCode(relationshipCode, 'MARKETPLACECONTACTRELATIONSHIP').pipe(finalize(() => {
       this._sycEntityObjectTypesServiceProxy.getAllWithExtraAttributes(
         this.entityObjectTypeId)
         .subscribe((res) => {
@@ -80,7 +87,7 @@ dynamicInputsComponents!: QueryList<dynamicInputs>;
             this.usageList = Object.keys(this.groupedByUsage);
             this.selectedUsage = this.usageList[0];
 
-            // ✅ Initialize extraAttributes before using it
+            //  Initialize extraAttributes before using it
             this.selectedTransTypeData = res[0]; // ensure defineExtraAttributes uses correct data
             this.defineExtraAttributes();
 
@@ -90,7 +97,8 @@ dynamicInputsComponents!: QueryList<dynamicInputs>;
           }
         });
     })).subscribe((res) => {
-      this.entityObjectTypeId = res.find(x => x.code === 'BTB')?.id ?? 747;
+      this.entityObjectTypeId =
+        res.find(x => x.code === relationshipCode)?.id ?? 747;
     });
   }
 

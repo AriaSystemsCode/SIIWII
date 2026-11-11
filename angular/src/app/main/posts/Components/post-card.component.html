@@ -8,7 +8,7 @@
 >
   <div *ngIf="post">
     <!-- Header -->
-    <div class="row pb-4">
+    <div class="row pb-4 position-relative">
       <div class="col-1 mr-4 mr-lg-0 mr-md-0">
         <img
           [src]="
@@ -51,7 +51,7 @@
       </div>
 
       <!-- Actions -->
-      <div *ngIf="post.canEdit || isHost" class="text-right PositionRight pr-4">
+      <div *ngIf="post.canEdit || isHost" class=" pr-4" [ngClass]="isArabic ? 'PositionLeft':'PositionRight'">
         <div class="dropdown" dropdown>
           <button
             class="btn btn-secondary dropdown-toggle p-0"
@@ -192,7 +192,7 @@
   <div class="col-8 col-sm-9">
       <h5>
           {{"LetsView" | localize }}
-          {{ getAppEntityForViewDto.relatedEntityTypeCode | titlecase }} !
+          {{ getAppEntityForViewDto.relatedEntityTypeCode | titlecase |localize }} !
       </h5>
   </div>
   <div class="col-2">
@@ -201,7 +201,7 @@
           (click)="viewRelatedEntity()"
       >
           {{"View" | localize }}
-          {{ getAppEntityForViewDto.relatedEntityTypeCode | titlecase }}
+          {{ getAppEntityForViewDto.relatedEntityTypeCode | titlecase  |localize }}
       </button>
   </div>
 </div>

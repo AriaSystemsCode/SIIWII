@@ -13,6 +13,7 @@ import { SelectAppItemTypeComponent } from "@app/app-item-type/select-app-item-t
 import { Subscription } from "rxjs";
 import { ImportTypes } from "../models/ImportTypes";
 import { finalize } from "rxjs/operators";
+import Swal from "sweetalert2";
 
 @Component({
   selector: "BrowseFolderModal",
@@ -27,6 +28,7 @@ export class BrowseFolderComponent extends AppComponentBase implements OnInit {
   templateFileName: string;
   templateVersion: string;
   templateDate: string;
+  templateLoading: boolean = false;
   importType: ImportTypes;
   ImportTypes = ImportTypes;
   itemType: string = "";
@@ -67,24 +69,17 @@ export class BrowseFolderComponent extends AppComponentBase implements OnInit {
   }
 
   show(importType: ImportTypes, importService: any, hasImages: boolean) {
-    this.spinnerService.show();
     this.hasImages = hasImages;
     this.itemType = "";
     this.itemTypeId = 0;
+    this.templateUrl = "";
+    this.templateFileName = "";
+    this.templateVersion = "";
+    this.templateDate = "";
     this.importServiceProxy = this.injector.get(importService);
     this.importType = importType;
-    this.importServiceProxy
-      .getExcelTemplate(this.itemTypeId)
-      .pipe(finalize(() => this.spinnerService.hide()))
-      .subscribe((result) => {
-        this.templateUrl = result.excelTemplateFullPath;
-        this.templateFileName = result.excelTemplateFile;
-        this.templateVersion = this.l(result.excelTemplateVersion);
-        this.templateDate = this.l(result.excelTemplateDate);
-        this.modal.show();
-      });
-
-
+    this.modal.show();
+    this.loadExcelTemplate();
   }
 
   hide() {
@@ -99,6 +94,23 @@ export class BrowseFolderComponent extends AppComponentBase implements OnInit {
     event.stopPropagation();
 
     const input = event.target as HTMLInputElement;
+
+    if(this.importType == ImportTypes.price){
+      const invalidFiles = Array.from(input.files).filter(file => {
+        const ext = file.name.split('.').pop()?.toLowerCase();
+        return ext !== 'csv';
+      });
+  
+      if (invalidFiles.length > 0) {
+        Swal.fire(
+          " ",
+          "Invalid file format, the supported format is csv.",
+          "error"
+        );
+        input.value = '';
+        return;
+      }
+    }
 
     this.fileevent = event;
     if (input.files && input.files.length > 0) {
@@ -148,6 +160,7 @@ export class BrowseFolderComponent extends AppComponentBase implements OnInit {
     this.formTouched = true;
     this.itemTypeId = selected.data.sycEntityObjectType.id;
     this.itemType = selected.data.sycEntityObjectType.name;
+    this.loadExcelTemplate();
   }
   // <!-- Iteration-8 -->
 
@@ -161,8 +174,13 @@ export class BrowseFolderComponent extends AppComponentBase implements OnInit {
   }
 
   extractFolderName(file: File): string {
+    if( this.importType==ImportTypes.price)
+        return file?.name;
+
     const pathParts = file.webkitRelativePath.split('/');
     return pathParts.length > 1 ? pathParts[0] : 'Main Folder';
+
+    name
   }
 
   getTotalSizeInMB(files: FileList): number {
@@ -205,16 +223,33 @@ export class BrowseFolderComponent extends AppComponentBase implements OnInit {
   }
 
   downloadTemplate() {
+    if (this.templateLoading || !this.templateUrl) {
+      return;
+    }
+
+    let attach = AppConsts.attachmentBaseUrl
+    let fullURL = `${attach}/${this.templateUrl}`;
+
+    //let fullURL = `${url}`; // FOR Local Use
+    this._downloadService.download(fullURL,
+      this.templateFileName);
+  }
+
+  private loadExcelTemplate() {
+    this.templateLoading = true;
+    this.templateUrl = "";
+    this.templateFileName = "";
+    this.templateVersion = "";
+    this.templateDate = "";
+
     this.importServiceProxy
       .getExcelTemplate(this.itemTypeId)
+      .pipe(finalize(() => this.templateLoading = false))
       .subscribe((result) => {
         this.templateUrl = result.excelTemplateFullPath;
-        let attach = AppConsts.attachmentBaseUrl
-        let fullURL = `${attach}/${this.templateUrl}`;
-
-        //let fullURL = `${url}`; // FOR Local Use
-        this._downloadService.download(fullURL,
-          this.templateFileName);
+        this.templateFileName = result.excelTemplateFile;
+        this.templateVersion = this.l(result.excelTemplateVersion);
+        this.templateDate = this.l(result.excelTemplateDate);
       });
   }
 

@@ -1074,7 +1074,7 @@ this.showMainSpinner();
         let att: AppEntityAttachmentDto = new AppEntityAttachmentDto();
       //  att.index = index;
         att.fileName = file?.name;
-        //att.isPublic=false;
+                att.isPublic = true;
         let extraAttrId = this.defaultExtraAttrForAttachments?.attributeId;
        // let optionValue = this.activeAttachmentOption.lookupData.value;
        let optionValue;
@@ -2458,19 +2458,20 @@ let index = this.activeAttachmentOption.attachmentSrcs?.length ? this.activeAtta
          }
         
     }
-    setVisibleinMarketplaceImage(index) {
+    setVisibleinMarketplaceImage(index: number, isChecked: boolean) {
         if (this.activeAttachmentOption.defaultImageIndex === index) 
             return;
         this.formTouched = true;
         this.activeAttachmentOption?.entityAttachments?.map((item, i) => {
             if (index == i) {
-                item.isPublic = !item.isPublic;
+                item.isPublic = isChecked;
                 return item;
             }
         });
     }
 
     getAttachRealIndex(i: number): number {
+        debugger;
         const src = this.activeAttachmentOption.attachmentSrcs[i];
         let index = this.activeAttachmentOption.entityAttachments.findIndex(y => y?.url === src);
       

@@ -65,6 +65,8 @@ export class UpCommingEventComponent
                 undefined,
                 undefined,
                 undefined,
+                undefined,
+                undefined,
                 undefined,undefined,
                 0,
                 this.maxResultCount

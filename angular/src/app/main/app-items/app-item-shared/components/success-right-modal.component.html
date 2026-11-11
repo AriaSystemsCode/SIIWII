@@ -8,8 +8,8 @@
     aria-hidden="true"
 >
     <div
-        class="modal-dialog right-modal"
-        [ngClass]="active ? 'slide-right-in' : 'slide-right-out'"
+        class="modal-dialog"
+            [ngClass]="(active ? 'slide-right-in' : 'slide-right-out') + ' ' + (isArabic ? 'left-modal' : 'right-modal')"
         role="document"
     >
         <div class="modal-content">
@@ -24,9 +24,9 @@
                         </div>
                     </div>
                     <h5>{{l("AddedSuccessfully")}}</h5>
-                    <p>
-                        {{this.l('YourListingIsNowAddedToThe{0}List',listName)}}
-                    </p>
+                   <p>
+    {{ l('YourListingIsNowAddedToTheList', listName) }}
+</p>
                     <button
                         type="button"
                         class="bg-secondary btn btn-light rounded-lg w-50"

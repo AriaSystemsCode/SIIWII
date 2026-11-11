@@ -8,6 +8,31 @@
     cursor: pointer;
 }
 
+.cursor-not-allowed {
+    cursor: not-allowed;
+}
+
+.products-picker-btn {
+    border: none;
+    background: transparent;
+}
+
+.picker-icon {
+    bottom: -26%;
+}
+
+.picker-icon-ltr {
+    right: -3%;
+}
+
+.picker-icon-rtl {
+    left: -3%;
+}
+
+.selected-products-label {
+    color: #9e9e9e;
+}
+
 input:focus
 {
     border: 1px solid #D5D4DC !important;
@@ -78,5 +103,23 @@ color: #9E9E9E;
     .handleW {
       width: 100%;
     }
+
+    .picker-icon {
+        bottom: -18%;
+    }
+
+    .contBtn {
+        width: 100%;
+    }
+
+    .text-right.pr-5 {
+        padding-right: 0 !important;
+    }
   }
+
+@media (max-width: 1024px) {
+    .wizard-wrapper .d-lg-flex {
+        row-gap: 16px;
+    }
+}
   

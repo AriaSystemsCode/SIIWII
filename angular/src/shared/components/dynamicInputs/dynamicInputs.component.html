@@ -127,8 +127,7 @@
                     {{ "No" | localize }}
                   </label>
                 </ng-template>
-                <a *ngIf="extraAttr.selectedValues" class="ml-5 pointer text-black-50 font-weight-bold"
-                  (click)="reset(extraAttr)">Reset</a>
+                <a *ngIf="extraAttr.selectedValues" class="ml-5 pointer text-black-50 font-weight-bold" (click)="reset(extraAttr)">{{ 'Reset' | localize }}</a>
               </div>
             </div>
 
@@ -138,8 +137,8 @@
               <input type="color" class="form-control form-control-color col-1" [disabled]="!canChange"
                 [(ngModel)]="extraAttr.selectedValues" (ngModelChange)="onAnyInputChange()" />
               <span>{{ extraAttr.selectedValues | localize }}</span>
-              <i class="pi pi-times" style="cursor: pointer;" *ngIf="extraAttr.selectedValues"
-                (click)="clearExtraAttr(extraAttr)"></i>
+              <i class="pi pi-times clear-inline-icon" *ngIf="extraAttr.selectedValues"
+                 (click)="clearExtraAttr(extraAttr)"></i>
             </div>
 
             <!-- File upload -->
@@ -147,23 +146,23 @@
               <div class="upload-box" *ngIf="!extraAttr.selectedValues" (click)="fileInput.click()">
                 <div class="upload-content">
                   <i class="pi pi-upload upload-icon"></i>
-                  <span class="upload-text">Upload File</span>
+                  <span class="upload-text">{{ 'UploadFile' | localize }}</span>
                 </div>
-                <small class="upload-note">*Select a JPG | JPEG | PNG | GIF File</small>
-                <input type="file" #fileInput class="d-none" accept=".jpg,.jpeg,.png,.gif" [disabled]="!canChange"
-                  (change)="onFileSelected($event, extraAttr)" />
+                <small class="upload-note">*{{ 'SelectImageFileTypes' | localize }}</small>
+                <input type="file" #fileInput class="d-none" accept=".jpg,.jpeg,.png,.gif"
+                       (change)="onFileSelected($event, extraAttr)" />
               </div>
               <div *ngIf="extraAttr.selectedValues">
                 <div class="uploaded-preview mt-2 d-flex align-items-center">
-                  <i class="pi pi-check-circle text-success me-2" style="color: #4A0D4A !important;"></i>
-                  <span class="mr-2">{{ extraAttr?.selectedValues?.name?.split('|')[0] ||
-                    extraAttr?.selectedValues?.split('|')[0] }}</span>
-                  <i class="pi pi-times text-danger" style="cursor: pointer;" (click)="clearExtraAttr(extraAttr)"></i>
+                  <i class="pi pi-check-circle me-2 upload-preview__success-icon"></i>
+                  <span class="mr-2">{{ extraAttr?.selectedValues?.name?.split('|')[0] || extraAttr?.selectedValues?.split('|')[0] }}</span>
+                  <i class="pi pi-times text-danger clear-inline-icon" (click)="clearExtraAttr(extraAttr)"></i>
                 </div>
-                <div class="mt-1" style="text-align: right;">
-                  <button type="button" class="btn btn-sm uploadBtn me-2" *ngIf="extraAttr?.showUploadBtn"
-                    (click)="onUploadFile(extraAttr.selectedValues)">
-                    <i class="pi pi-upload me-1"></i> Upload
+                <div class="mt-1 upload-actions">
+                  <button type="button" class="btn btn-sm uploadBtn me-2"
+                          *ngIf="extraAttr?.showUploadBtn"
+                          (click)="onUploadFile(extraAttr.selectedValues)">
+                    <i class="pi pi-upload me-1"></i> {{ 'Upload' | localize }}
                   </button>
                 </div>
               </div>
@@ -185,7 +184,7 @@
               <div class="tab-content p-3 border rounded bg-light">
                 <div *ngIf="selectedTheme">
                   <h6 class="fw-semibold">{{ selectedTheme.name }}</h6>
-                  <p class="mb-0">Preview or apply this theme.</p>
+                  <p class="mb-0">{{ 'PreviewOrApplyThisTheme' | localize }}</p>
                 </div>
               </div>
             </div>

@@ -11,6 +11,7 @@ import { SelectBranchModalComponent } from '@app/select-branch/select-branch-mod
 import { CreateOrEditUserModalComponent } from '@app/admin/users/create-or-edit-user-modal.component';
 import { ActivatedRoute } from '@node_modules/@angular/router';
 import Swal from 'sweetalert2';
+import { UpdateLogoService } from '@shared/utils/update-logo.service';
 
 @Component({
   selector: 'app-view-member-profile',
@@ -64,7 +65,7 @@ export class ViewMemberProfileComponent extends AppComponentBase implements OnIn
   memberIslink: boolean = false;
   showUserList: boolean = false;
 
-  constructor(injector: Injector, private _AccountsServiceProxy: AccountsServiceProxy,  private _userService: UserServiceProxy,private route: ActivatedRoute) {
+  constructor(injector: Injector, private _AccountsServiceProxy: AccountsServiceProxy,  private _userService: UserServiceProxy,private route: ActivatedRoute,private  UpdateLogoService:UpdateLogoService) {
     super(injector);
     this.accountInfoTemp = new CreateOrEditAccountInfoDto();
 
@@ -264,8 +265,9 @@ export class ViewMemberProfileComponent extends AppComponentBase implements OnIn
     const userId = Number(rawId);
 
     if (Number.isNaN(userId) || userId <= 0) {
-      this.message.error('Invalid linked user id: ' + rawId);
-      return;
+      // this.message.error('Invalid linked user id: ' + rawId);
+      // return;
+      this.CreateUserName()
     }
 
     this.createOrEditUserModal.user = new UserEditDto();
@@ -465,7 +467,7 @@ export class ViewMemberProfileComponent extends AppComponentBase implements OnIn
     if (user.memberId) {
       // User already linked
       this._AccountsServiceProxy.getAppContactForView(user.memberId)
-        .pipe(finalize(() => this.hideMainSpinner()))
+        .pipe(finalize(() => {this.hideMainSpinner();}))
         .subscribe(result => {
           Swal.fire({
             title: "",
@@ -502,7 +504,14 @@ export class ViewMemberProfileComponent extends AppComponentBase implements OnIn
         this.memberIslink = true;
         this.hideMainSpinner();
       }))
-      .subscribe();
+      .subscribe({
+        next: () => {
+          this.UpdateLogoService.updateProfilePicture();
+          this.refresh(true);
+  
+        },
+        
+      });
   }
   private getAttributeStringFromDto(
     dto: CreateOrEditAccountInfoDto | undefined,

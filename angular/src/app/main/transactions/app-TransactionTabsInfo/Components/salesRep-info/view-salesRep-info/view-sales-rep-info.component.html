@@ -2,10 +2,10 @@
     <div *ngFor="let salesRep of salesReps ;let salesRepIndex = index">
         <div class="header  d-flex align-items-center justify-content-between p-2">
             <h6 *ngIf="salesRepIndex>0"><span class="headertxt"> {{'SalesRep' | localize}} {{salesRepIndex}} : </span></h6>
-            <div *ngIf="salesRepIndex==0">
+            <div *ngIf="salesRepIndex==0" class="d-flex justify-content-end align-items-center">
                 <button (click)="showEditMode()" class="previewbtn text-center btn float-right" *ngIf="canChange">
                     <img src="../../../../../assets/shoppingCart/edit.png" class="imgIcon" />
-                    <span class="mx-1 text-white"> Edit</span>
+                    <span class="mx-1 text-white"> {{'Edit' | localize}}</span>
 
                 </button>
             </div>

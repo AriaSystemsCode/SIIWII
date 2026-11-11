@@ -101,6 +101,8 @@ namespace onetouch.AppMarketplaceContacts.Dtos
 		public List<ConnectionType> AvailableConnections { get; set; }
         public List<ConnectionInfo> ConnectionsInfo { get; set; }
         //MMT10
+        public bool IsProfileData { get; set; }
+		public long? ConnectedAccountId { get; set; }
     }
 	//I40[Start]
 	public class ConnectionType
@@ -123,7 +125,8 @@ namespace onetouch.AppMarketplaceContacts.Dtos
         public string ConnectedLabel { set; get; }
         public string Visibility { set; get; }
 		public string RelationshipCode { set; get; }
-
+		public string RequestorRole { set; get; }
+        public string RecipientRole { set; get; }
     }
         //I49{End}
 }

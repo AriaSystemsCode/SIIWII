@@ -40,6 +40,21 @@ border-radius: 4px;
 
 
 
+.body-sec{
+    background-color: #fff;
+    border-radius: 6px;
+    min-height: 100vh;
+    padding: 15px;
+}
 
+@media (min-width: 1024px) {
+.addMT{
+margin-top: 140px;
+}
+}
 
-
+@media (max-width: 540px) {
+.addMTMob{
+margin-top: 75px;
+}
+}

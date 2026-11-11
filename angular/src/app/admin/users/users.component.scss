@@ -78,3 +78,58 @@ body .p-fileupload .p-fileupload-buttonbar {
         background-color: #f4f5f8 !important;
     }
 }
+
+
+
+
+ .body-sec {
+      background-color: #fff;
+      border-radius: 6px;
+      min-height: 100vh;
+      padding: 17px;
+    }
+
+    @media (min-width: 1024px) {
+      .addMT {
+        margin-top: 140px !important;
+      }
+    }
+
+    @media (max-width: 540px) {
+      .addMTMob {
+        margin-top: 75px !important;
+      }
+    }
+
+    .alignStart{
+    text-align: start !important ;
+    }
+
+
+    .w-150  {
+    width : 150px ;
+    }
+
+     .wPX100  {
+    width : 100px;
+    }
+
+
+     .w-250  {
+    width : 250px ;
+    }
+
+       .w-130  {
+    width : 130px ;
+    }
+
+
+           .w-200  {
+    width : 200px ;
+    }
+
+    .btn-primary {
+        background-color: #4A0D4A !important;
+        color: #fff !important;
+        border: 1px solid #4A0D4A !important;
+    }

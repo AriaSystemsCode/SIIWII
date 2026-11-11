@@ -332,3 +332,57 @@ color: #FFFFFF;
         border-bottom-left-radius: 8px
     }
 }
+
+.attachments-files {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+}
+
+.attachment-item {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+
+    padding: 8px 10px;
+
+    border: 1px solid #eeeeee;
+    border-radius: 6px;
+}
+
+.attachment-info {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+
+    min-width: 0;
+}
+
+.attachment-name {
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
+.icon-file {
+    width: 24px;
+    height: 24px;
+    object-fit: contain;
+}
+
+.attachment-remove {
+    border: none;
+    background: transparent;
+
+    padding: 4px 8px;
+
+    cursor: pointer;
+}
+
+.attachment-remove i {
+    font-size: 14px;
+}
+
+.attachment-remove:hover {
+    opacity: 0.7;
+}

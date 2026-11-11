@@ -149,17 +149,16 @@ export class EventsBrowseFiltersComponent extends AppComponentBase implements On
 
   
   onLookupSearch(q: string, kind: any, componentRef: any) {
-    const query = q?.trim() || undefined;
-  
-    switch (kind) {
-      case 'country':
-        this.countryFilter = query;
-        // this.resetMeta(this.countryFilterMetaData);
-        this.getCountriesList(componentRef);
-        break;
+  const query = q?.trim() || undefined;
 
-    }
+  if (kind === 'country') {
+    this.countryFilter = query;
+    this.countryFilterMetaData.listSkipCount = 0;
+    this.countryFilterMetaData.list = [];
+    this.countryFilterMetaData.displayedList = [];
+    this.getCountriesList(componentRef);
   }
+}
 
 
 }

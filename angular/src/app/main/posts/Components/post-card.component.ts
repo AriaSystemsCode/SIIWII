@@ -64,6 +64,9 @@ import {
 
     private _scrollHandler = () => this.detectHiddenSections();
     private _scrollBound = false;
+
+      currentLang:string
+  isArabic:boolean
   
     constructor(
       private _postService: AppPostsServiceProxy,
@@ -73,6 +76,8 @@ import {
     ) {
       super(injector);
       this.isHost = !this.appSession.tenantId;
+         this.currentLang = abp.utils.getCookieValue('Abp.Localization.CultureName')
+        this.currentLang == 'ar' || this.currentLang == 'ar-EG'  ? this.isArabic = true : this.isArabic = false
     }
 
     ngOnChanges(changes: SimpleChanges) {

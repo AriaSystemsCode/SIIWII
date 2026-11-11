@@ -54,8 +54,7 @@ export class CreateOrEditEventComponent
     @ViewChild("step2Form", { static: true }) step2Form: NgForm;
     @ViewChild("createOrEditAddressModal", { static: true })
     createOrEditAddressModal: CreateOrEditAddressModalComponent;
-    /* @ViewChild("googleMapModal", { static: true })
-    googleMapModal: GoogleMapComponent; */
+
     @ViewChild("selectAddressModal", { static: true })
     selectAddressModal: SelectAddressModalComponent;
     @Output() createPostEvent = new EventEmitter<CreateOrEditAppEventDto>();
@@ -456,7 +455,14 @@ this.bsConfig = {
     selectAddress() {
         this.selectAddressModal.show(undefined, this.accountId);
     }
-    addressSelected(address: AppAddressDto) {
+    addressSelected(selection: AppAddressDto | { address: AppAddressDto; wasUpdated: boolean }) {
+        const address = selection instanceof AppAddressDto
+            ? selection
+            : selection.address;
+
+        if (!address) {
+            return;
+        }
         this.eventAddress = "";
         if(this.event?.address?.id){
             this.event.address = new AppEntityAddressDto();
@@ -534,9 +540,6 @@ this.bsConfig = {
     createOrEditaddressCanceled() {
         this.selectAddressModal.show(undefined, this.accountId);
     }
-    /* showAddressOnMap() {
-        this.googleMapModal.show(this.eventAddress);
-    } */
 
     async getAttachmentCategories(){
         await this.getSycAttachmentCategoriesByCodes(['LOGO',"BANNER"]).subscribe((result)=>{
@@ -544,4 +547,14 @@ this.bsConfig = {
             this.sycAttachmentCategoryBanner = result[1]
         })
     }
+
+    onStartDateChange(value: Date): void {
+    if (!value) {
+        return;
+    }
+
+    if (!this.toDate || this.toDate.getTime() < value.getTime()) {
+        this.toDate = new Date(value.getTime());
+    }
+}
 }

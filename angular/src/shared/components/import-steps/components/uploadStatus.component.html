@@ -59,10 +59,8 @@
         </div>
 
         <div *ngIf="importType == ImportTypes.Items">
-          <ng-container *ngIf="records?.length > 0; else noData">
-
-            <!-- Tabs -->
-            <ul class="tabs no-gutters d-flex justify-content-center">
+          <!-- Keep selected import tabs visible even when their records are on a later page. -->
+          <ul class="tabs no-gutters d-flex justify-content-center">
               <li
                 *ngIf="hasImageRecords"
                 [class.active]="activeRecordType === 'Image'"
@@ -78,31 +76,31 @@
                 class="tab-item text-center py-2">
                 Product Data
               </li>
-            </ul>
-            
+          </ul>
 
-            <div class="table-scroll-container" #tableScrollContainer>
-              <table class="browser-table min-width-table" style="min-width: 1000px;">
+          <ng-container *ngIf="records?.length > 0; else noData">
+
+            <div class="table-scroll-container" #tableScrollContainer (scroll)="onRecordsScroll($event)">
+              <table class="browser-table min-width-table">
                 <thead>
                   <tr>
                     <th class="sticky-action-col sticky-header" *ngIf="importType == ImportTypes.Items">Actions
                     </th>
-                    <th *ngFor="let column of uploadStatsColumnsName" class="sticky-header"
-                      [hidden]="column.showFor && column.showFor !== activeRecordType">
+                    <th *ngFor="let column of visibleColumns; trackBy: trackByColumnName" class="sticky-header">
                       {{ column.name }}
                     </th>
                   </tr>
                 </thead>
                 <tbody>
-                  <tr #rowRef *ngFor="let record of records; let i = index" [attr.data-record-id]="record.id"
+                  <tr #rowRef *ngFor="let record of records; let i = index; trackBy: trackByRecordId" [attr.data-record-id]="record.id"
                     [class.in-action]="record._inAction" [class.active-record]="activeRecord === record"
                     [class.disabled-row]="currentActionRecord && record !== currentActionRecord">
                     <td class="sticky-action-col" *ngIf="importType == ImportTypes.Items"
                       [class.pointer-events-none]="currentActionRecord && record !== currentActionRecord">
                       <div class="dropdown" #dropdownRef>
                         <!-- IF not in action mode -->
-                        <span class="pointer dropdownPointer" *ngIf="!record._inAction"
-                          (click)="toggleMenu(record, $event)" style="font-size: 20px;">
+                        <span class="pointer dropdownPointer actions-menu-trigger" *ngIf="!record._inAction"
+                          (click)="toggleMenu(record, $event)">
                           ⋮
                         </span>
 
@@ -119,10 +117,10 @@
 
                         <ul class="fixed-dropdown-menu"
                           *ngIf="record.showActions && (!currentActionRecord || currentActionRecord === record)"
-                          [ngClass]="{'drop-up': record.dropdownPosition?.dropUp}"
                           [ngStyle]="{
                             top: record.dropdownPosition?.top + 'px',
-                            left: record.dropdownPosition?.left + 'px'
+                            left: record.dropdownPosition?.left + 'px',
+                            'max-height': record.dropdownPosition?.maxHeight + 'px'
                           }">
                           <ng-container *ngIf="record.recordType !== 'Image'">
                             <li (click)="handleAction(record, UploadActionEnum.ValidateDataRecord)">
@@ -170,26 +168,22 @@
                     </td>
 
                     <!-- Dynamic Columns -->
-                    <td *ngFor="let column of uploadStatsColumnsName" #imgPreview #codeCellRef
-                      [hidden]="column.showFor && column.showFor !== activeRecordType"
-                      [ngClass]="getStatusClass(column.name, getRecordValue(record, mapColumnNameToKey(column.name)))">
+                    <td *ngFor="let column of visibleColumns; trackBy: trackByColumnName" #imgPreview #codeCellRef
+                      [ngClass]="getStatusClass(column.name, getRecordValue(record, column.key))">
                       <ng-container [ngSwitch]="column.name">
                         <!-- Checkbox for "Image is Default" column -->
                         <div *ngSwitchCase="'Image is Default'">
-                          <input type="checkbox" [checked]="getRecordValue(record, mapColumnNameToKey(column.name))"
+                          <input type="checkbox" [checked]="getRecordValue(record, column.key)"
                             [disabled]="!record._inAction"
-                            (change)="setRecordValue(record, mapColumnNameToKey(column.name), $event.target.checked)" />
+                            (change)="setRecordValue(record, column.key, $event.target.checked)" />
                         </div>
-
-                        <img *ngSwitchCase="'Image Preview'" [src]="record.previewUrl" width="50"  class="ml-4"/>
 
                         <!-- Text only -->
                         <span *ngSwitchCase="'Record Type'">{{ record.recordType || '—' }}</span>
                         <span *ngSwitchCase="'Status'">{{ record.status || '—' }}</span>
 
                         <!--Record Status -->
-                        <ul *ngSwitchCase="'Record Status'"
-                          style="padding-left: 1rem; margin: 0; list-style-type: none;">
+                        <ul *ngSwitchCase="'Record Status'" class="record-status-list">
                           <ng-container *ngIf="record.fieldsErrors?.length > 0; else showErrorMessage">
                             <li *ngFor="let error of record.fieldsErrors">
                               {{ error?.errorMessage ? error.errorMessage : (error || '—') }}
@@ -355,16 +349,16 @@
                               <ng-template #editableInput>
                                 <!-- Special case for Price Currency Code -->
                                 <ng-container *ngIf="column.name === 'Price Currency Code'; else normalEditableInput">
-                                  <input type="text" class="form-control text-uppercase"
-                                    [attr.data-record-id]="record.id" style="text-transform: uppercase;"
-                                    [ngModel]="getRecordValue(record, mapColumnNameToKey(column.name))"
-                                    (ngModelChange)="setRecordValue(record, mapColumnNameToKey(column.name), $event?.toUpperCase())"
+                                  <input type="text" class="form-control text-uppercase force-uppercase"
+                                    [attr.data-record-id]="record.id"
+                                    [ngModel]="getRecordValue(record, column.key)"
+                                    (ngModelChange)="setRecordValue(record, column.key, $event?.toUpperCase())"
                                     [ngClass]="{
                                                 'border-danger': isRequiredColumnForCreateNewCase(record, column.name) &&
-                                                                 !getRecordValue(record, mapColumnNameToKey(column.name))
+                                                                 !getRecordValue(record, column.key)
                                               }" />
                                   <small class="text-danger" *ngIf="isRequiredColumnForCreateNewCase(record, column.name) &&
-                                        !getRecordValue(record, mapColumnNameToKey(column.name))">
+                                        !getRecordValue(record, column.key)">
                                     {{ getExampleTextForCases(record, column.name) }}
                                   </small>
                                 </ng-container>
@@ -372,15 +366,15 @@
                                 <!-- Fallback to normal input -->
                                 <ng-template #normalEditableInput>
                                   <input type="text" class="form-control" [attr.data-record-id]="record.id"
-                                    [ngModel]="getRecordValue(record, mapColumnNameToKey(column.name))"
-                                    (ngModelChange)="setRecordValue(record, mapColumnNameToKey(column.name), $event)"
+                                    [ngModel]="getRecordValue(record, column.key)"
+                                    (ngModelChange)="setRecordValue(record, column.key, $event)"
                                     [ngClass]="{
                                           'border-danger': isRequiredColumnForCreateNewCase(record, column.name) &&
-                                                           !getRecordValue(record, mapColumnNameToKey(column.name))
+                                                           !getRecordValue(record, column.key)
                                         }" />
                                   <small class="text-danger"
                                     *ngIf="isRequiredColumnForCreateNewCase(record, column.name) &&
-                                                                  !getRecordValue(record, mapColumnNameToKey(column.name))">
+                                                                  !getRecordValue(record, column.key)">
                                     {{ getExampleTextForCases(record, column.name) }}
                                   </small>
                                 </ng-template>
@@ -396,15 +390,15 @@
 
                             <ng-container *ngIf="record._isDataRecord; else normalMode">
                               <input type="text" class="form-control"
-                                [ngModel]="getRecordValue(record, mapColumnNameToKey(column.name))"
-                                (ngModelChange)="setRecordValue(record, mapColumnNameToKey(column.name), $event)" />
+                                [ngModel]="getRecordValue(record, column.key)"
+                                (ngModelChange)="setRecordValue(record, column.key, $event)" />
                             </ng-container>
 
                             <ng-template #normalMode>
                               <ng-container *ngIf="column.name === 'Product Description'; else normalTextInput">
-                                <div class="form-control"
+                                <div class="form-control readonly-display-field"
                                   [innerHTML]="getSafeHtml(getRecordValue(record, 'productDescription'))"
-                                  style="background-color: #f4f4f4 !important; opacity: 1; cursor: not-allowed;height: auto;">
+                                  >
                                 </div>
                               </ng-container>
 
@@ -463,15 +457,15 @@
                                 </ng-container>
 
                                 <input *ngIf="column.name === 'Price Currency Code'" type="text"
-                                  class="form-control link-parent-input" style="text-transform: uppercase;"
+                                  class="form-control link-parent-input force-uppercase"
                                   [ngModel]="getRecordValue(record, 'priceCurrencyCode')"
                                   (ngModelChange)="setRecordValue(record, 'priceCurrencyCode', $event?.toUpperCase())" />
 
 
 
-                                <input type="text" class="form-control" style="width: fit-content;"
-                                  [ngModel]="getRecordValue(record, mapColumnNameToKey(column.name))"
-                                  (ngModelChange)="setRecordValue(record, mapColumnNameToKey(column.name), $event)"
+                                <input type="text" class="form-control fit-content-input"
+                                  [ngModel]="getRecordValue(record, column.key)"
+                                  (ngModelChange)="setRecordValue(record, column.key, $event)"
                                   [disabled]="!(column.name === 'Code' && (record._isLinkingParent || record._isLinkingItemColor || record._isLinkNewParent ||  record._isLinkNewItemColor))"
                                   [ngClass]="{
                                      'link-parent-input': column.name === 'Code' && 
@@ -491,7 +485,7 @@
 
                         <!-- image input -->
                         <!-- <img *ngSwitchCase="'Image Preview'" [src]="getImageUrl(getRecordValue(record, 'imagePreview'))"
-                      width="60" height="60" style="object-fit: cover; border-radius: 4px;" /> -->
+                      width="60" height="60" class="legacy-image-preview" /> -->
 
                         <a *ngSwitchCase="'Image Preview'" class="selectImageActive">
                           <ng-container *ngIf="getImageSource(record) as src; else fallback">
@@ -502,8 +496,8 @@
                               [ngStyle]="{
                                 'object-fit': 'cover',
                                 'border-radius.px': 4,
-                                'width.px': 60,
-                                'height.px': 60 / acceptedAspectRatio
+                                'width.px': 36,
+                                'height.px': 36 / acceptedAspectRatio
                               }"
                             />
                           </ng-container>
@@ -523,12 +517,12 @@
         </div>
         <ng-template #noData>
           <div class="text-center text-muted py-5">
-            <ng-container *ngIf="!hasDataRecords || this.importType != ImportTypes.Items ">
-              No Data Records
+            <ng-container *ngIf="loadingMoreRecords; else emptyRecords">
+              Loading {{ activeRecordType === 'Image' ? 'Image' : 'Data' }} Records...
             </ng-container>
-            <ng-container *ngIf="!hasImageRecords &&  this.importType == ImportTypes.Items">
-              No Image Records
-            </ng-container>
+            <ng-template #emptyRecords>
+              No {{ activeRecordType === 'Image' ? 'Image' : 'Data' }} Records
+            </ng-template>
           </div>
         </ng-template>
 

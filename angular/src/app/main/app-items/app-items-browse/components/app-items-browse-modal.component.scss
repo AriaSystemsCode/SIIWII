@@ -75,3 +75,34 @@
   margin-right: 0 !important;
   margin-left: 0.5rem !important;
 }
+
+@media (max-width: 1024px) {
+  .browse-product-dialog {
+    height: 86vh;
+  }
+
+  .browse-modal-header {
+    padding: 0.75rem 1rem;
+  }
+
+  .browse-modal-body {
+    margin-right: 0 !important;
+  }
+}
+
+@media (max-width: 768px) {
+  .browse-product-dialog {
+    width: calc(100vw - 1rem);
+    max-width: calc(100vw - 1rem);
+    margin: 0.5rem;
+    height: 88vh;
+  }
+
+  .browse-close-btn {
+    top: 4px;
+  }
+
+  .rtl-modal .browse-close-btn {
+    left: 0.5rem;
+  }
+}

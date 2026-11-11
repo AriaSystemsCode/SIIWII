@@ -82,11 +82,19 @@ export class CreateOrEditAppEntityDynamicModalComponent
     statusValues: SycEntityObjectStatusLookupTableDto[]
     hideAddToLookupOption = false;
     imageAttachmentType: 'IMAGE' | 'BANNER' | 'LOGO' = 'LOGO';
+
+
     imageTypeOptions = [
         { label: this.l('Logo'),   value: 'LOGO'   },
         { label: this.l('Image'),  value: 'IMAGE'  },
         { label: this.l('Banner'), value: 'BANNER' },
       ];
+
+  orientationOptions = [
+        { label: this.l('Portrait'),   value: 'Portrait'   },
+        { label: this.l('Landscape'),  value: 'Landscape'  }
+      ];
+      selectedOrientation='Portrait'
     currentLang: string;
 isArabic: boolean = false;
 
@@ -119,6 +127,9 @@ isArabic: boolean = false;
         this.currentLang = abp.utils.getCookieValue('Abp.Localization.CultureName');
         this.isArabic = this.currentLang === 'ar' || this.currentLang === 'ar-EG';
         this.entityObjectType = entityObjectType;
+        this.imageAttachmentType = this.imageAttachmentType ?? 'LOGO';
+        this.selectedOrientation = this.selectedOrientation ?? 'Portrait';
+        
         this.displayVisualTypes();
         this.getStatusOptions();
         this.saving = false;
@@ -653,7 +664,7 @@ isArabic: boolean = false;
       
          if (
     this.entityObjectType.code === 'MARKETPLACESECTION' &&
-    extraAttrDefinition.attributeId === 1006 &&
+    (extraAttrDefinition.attributeId === 1006 || extraAttrDefinition.attributeId === 1026) &&
     value !== ''
   ) {
     this.setStringValue(1009, 'Single Type Blocks');
@@ -696,7 +707,9 @@ isArabic: boolean = false;
 
     openCreateAppEntityListModal(extraAttr: FilteredExtraAttribute) {
         let config: ModalOptions = new ModalOptions();
-        config.class = "right-modal slide-right-in";
+        config.class = this.isArabic
+            ? "left-modal slide-left-in ngLeft"
+            : "right-modal slide-right-in";
         let modalDefaultData: Partial<AppEntityListDynamicModalComponent> = {
             entityObjectType: {
                 name: extraAttr.name,
@@ -810,6 +823,7 @@ isArabic: boolean = false;
     setSolid(value: boolean) {
         this.visual.solid = value;
         this.visual.image = !value;
+        this.imageAttachmentType = this.imageAttachmentType ?? 'LOGO';
     }
 
     dropdownOptions(validEntries) {
@@ -818,7 +832,7 @@ isArabic: boolean = false;
       displayVisualTypes(): boolean {
         //i49- what else ? 
        // const hiddenTypes = ['CHARGES', 'TRANSACTIONCHARGES','SHIPVIA', 'CHARGETYPES'];
-        const showenTypes = ['COLOR', 'MARKETPLACESECTIONBLOCK','MARKETPLACESECTION'];
+        const showenTypes = ['COLOR', 'BACKGROUND', 'MARKETPLACESECTIONBLOCK', 'MARKETPLACESECTION','BRAND','PATTERN','LANDINGPAGESETTINGS'];
 
         this._displayVisualTypes = showenTypes.includes(
     this.entityObjectType.code.toString().toUpperCase()
@@ -1005,11 +1019,17 @@ if(!this._displayVisualTypes)
 
 
     isBlockTypeLocked(extraAttr: FilteredExtraAttribute): boolean {
-  if (this.entityObjectType.code !== 'MARKETPLACESECTION') return false;
-  if (extraAttr?.attributeId !== 1009) return false;
+  if (
+    this.entityObjectType?.code !== 'MARKETPLACESECTION' ||
+    extraAttr?.attributeId !== 1009
+  ) {
+    return false;
+  }
 
-  const triggerAttr = this.extraAttributes?.find(x => x.attributeId === 1006);
-  return !!triggerAttr?.selectedValues;
+  const attr1006 = this.extraAttributes?.find(x => x.attributeId === 1006);
+  const attr1026 = this.extraAttributes?.find(x => x.attributeId === 1026);
+
+  return !!attr1006?.selectedValues || !!attr1026?.selectedValues;
 }
 
 toggleLastFields(enable: boolean): void {

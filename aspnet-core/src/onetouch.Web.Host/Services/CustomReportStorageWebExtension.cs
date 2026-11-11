@@ -122,21 +122,32 @@ namespace onetouch.Web.Services
                 var dir = Path.Combine(ReportDirectory, tenantId.ToString());
                 Directory.CreateDirectory(dir);
 
-                if (Directory.EnumerateFiles(dir).Select(Path.GetFileNameWithoutExtension).Contains(reportName))
+                var tenantReportPath = Path.Combine(dir, reportName + FileExtension);
+                var defaultReportPath = Path.Combine(ReportDirectory, reportName + FileExtension);
+
+                // Seed a new tenant with the default report layout on first use.
+                // Existing tenant-specific layouts are never overwritten.
+                if (!File.Exists(tenantReportPath) && File.Exists(defaultReportPath))
                 {
-                    //report = File.ReadAllBytes(Path.Combine(dir, reportName + FileExtension));
-                    byte[] reportBytes = File.ReadAllBytes(Path.Combine(dir, reportName + FileExtension));
+                    try
+                    {
+                        File.Copy(defaultReportPath, tenantReportPath, overwrite: false);
+                    }
+                    catch (IOException) when (File.Exists(tenantReportPath))
+                    {
+                        // Another concurrent request seeded the tenant first.
+                    }
+                }
+
+                if (File.Exists(tenantReportPath))
+                {
+                    byte[] reportBytes = File.ReadAllBytes(tenantReportPath);
                     using (MemoryStream ms = new MemoryStream(reportBytes))
                         report = XtraReport.FromStream(ms);
                 }
-                if (ReportsFactory.Reports.ContainsKey(reportName))
+                if (report == null && ReportsFactory.Reports.ContainsKey(reportName))
                 {
-                    using (MemoryStream ms = new MemoryStream())
-                    {
-                        ReportsFactory.Reports[reportName]().SaveLayoutToXml(ms);
-                        //report = ms.ToArray();
-                        report = ReportsFactory.Reports[reportName]();
-                    }
+                    report = ReportsFactory.Reports[reportName]();
                 }
 
                 if (report != null)
@@ -173,12 +184,29 @@ namespace onetouch.Web.Services
                                 switch (parameterName.ToUpper())
                                 {
                                     case "ATTACHMENTBASEURL":
-                                        var attachmentPath = _appConfiguration[$"Attachment:Path"];
-                                        attachmentPath = attachmentPath.Replace(_appConfiguration[$"Attachment:Omitt"].ToString(),"");
-                                        attachmentPath = attachmentPath.Replace(@"\", @"/");
+                                        var reportParameters = report.Parameters
+                                            .ToDynamicList<DevExpress.XtraReports.Parameters.Parameter>();
+                                        var attachmentClientUrlParameter = reportParameters.Find(x =>
+                                            string.Equals(x.Name, "attachmentClientUrl", StringComparison.OrdinalIgnoreCase));
+                                        var attachmentBaseUrlParameter = reportParameters.Find(x =>
+                                            string.Equals(x.Name, "attachmentBaseUrl", StringComparison.OrdinalIgnoreCase));
 
-                                        report.Parameters["attachmentClientUrl"].Value = attachmentPath;
-                                        report.Parameters["attachmentBaseUrl"].Value = parameters.Get("attachmentBaseUrl");
+                                        if (attachmentClientUrlParameter != null)
+                                        {
+                                            var attachmentPath = _appConfiguration["Attachment:Path"] ?? string.Empty;
+                                            var attachmentPathPartToOmit = _appConfiguration["Attachment:Omitt"];
+                                            if (!string.IsNullOrEmpty(attachmentPathPartToOmit))
+                                            {
+                                                attachmentPath = attachmentPath.Replace(attachmentPathPartToOmit, string.Empty);
+                                            }
+
+                                            attachmentClientUrlParameter.Value = attachmentPath.Replace(@"\", @"/");
+                                        }
+
+                                        if (attachmentBaseUrlParameter != null)
+                                        {
+                                            attachmentBaseUrlParameter.Value = parameters.Get("attachmentBaseUrl");
+                                        }
                                         break;
 
                                     case "ORDERCONFIRMATIONROLE":
@@ -277,11 +305,23 @@ namespace onetouch.Web.Services
                         {
                             using (var stream = new MemoryStream())
                             {
-                                //report.ExportToPdf(stream);
+                                report.ExportToPdf(stream);
                                 stream.Position = 0;
-                                //var attachment = new Attachment(stream, System.Net.Mime.MediaTypeNames.Application.Pdf);
-                                var attachment = new Attachment(stream, "LineSheet.pdf");
-                                _userEmailer.SendEmailAsync(userId, (int)tenantId, subject, to, cc, bcc, body, attachment);
+                                using (var attachment = new Attachment(
+                                    stream,
+                                    "LineSheet.pdf",
+                                    System.Net.Mime.MediaTypeNames.Application.Pdf))
+                                {
+                                    _userEmailer.SendEmailAsync(
+                                        userId,
+                                        (int)tenantId,
+                                        subject,
+                                        to,
+                                        cc,
+                                        bcc,
+                                        body,
+                                        attachment).GetAwaiter().GetResult();
+                                }
                             }
                         }
                     }
@@ -371,6 +411,7 @@ namespace onetouch.Web.Services
             var dir = Path.Combine(ReportDirectory, tenantId.ToString());
             if (!IsWithinReportsFolder(reportName, dir))
                 throw new DevExpress.XtraReports.Web.ClientControls.FaultException("Invalid report name.");
+            Directory.CreateDirectory(dir);
             report.SaveLayoutToXml(Path.Combine(dir, reportName + FileExtension));
         }
 

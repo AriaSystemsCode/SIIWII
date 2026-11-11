@@ -129,3 +129,20 @@ input.form-control.m-input {
 ::ng-deep .Login_container {
     text-align: justify !important;
 }
+
+@media only screen and (min-width:1023px)  {
+    .maxWd {
+        width: 80%;
+    }
+ 
+ }
+
+
+.password-toggle-icon {
+    cursor: pointer;
+    z-index: 5;
+}
+
+.w-28 {
+    width: 28px !important;
+}

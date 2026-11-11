@@ -2362,6 +2362,8 @@ namespace onetouch.Migrations
 
                     b.HasIndex("ObjectId");
 
+                    b.HasIndex("TenantOwner");
+
                     b.ToTable("AppEntities", t =>
                         {
                             t.HasTrigger("AppEntities_Trigger");
@@ -7432,7 +7434,7 @@ namespace onetouch.Migrations
                         .HasColumnType("nvarchar(max)");
 
                     b.Property<string>("RecipientContactSSIN")
-                        .HasColumnType("nvarchar(max)");
+                        .HasColumnType("nvarchar(450)");
 
                     b.Property<string>("RecipientContactTypeCode")
                         .HasColumnType("nvarchar(max)");
@@ -7456,7 +7458,7 @@ namespace onetouch.Migrations
                         .HasColumnType("nvarchar(max)");
 
                     b.Property<string>("RequesterContactSSIN")
-                        .HasColumnType("nvarchar(max)");
+                        .HasColumnType("nvarchar(450)");
 
                     b.Property<string>("RequesterContactTypeCode")
                         .HasColumnType("nvarchar(max)");
@@ -7469,6 +7471,10 @@ namespace onetouch.Migrations
 
                     b.Property<int>("SharingLevel")
                         .HasColumnType("int");
+
+                    b.HasIndex("RecipientContactSSIN");
+
+                    b.HasIndex("RequesterContactSSIN");
 
                     b.ToTable("AppContactRelationshipInfo", t =>
                         {
@@ -7650,6 +7656,9 @@ namespace onetouch.Migrations
 
                     b.Property<long>("StockAvailability")
                         .HasColumnType("bigint");
+
+                    b.Property<decimal>("TaxRate")
+                        .HasColumnType("decimal(18,2)");
 
                     b.Property<string>("Variations")
                         .HasColumnType("nvarchar(max)");
@@ -8630,11 +8639,19 @@ namespace onetouch.Migrations
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
+                    b.HasOne("onetouch.MultiTenancy.Tenant", "TenantOwnerFk")
+                        .WithMany()
+                        .HasForeignKey("TenantOwner")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
                     b.Navigation("EntityObjectStatusFk");
 
                     b.Navigation("EntityObjectTypeFk");
 
                     b.Navigation("ObjectFk");
+
+                    b.Navigation("TenantOwnerFk");
                 });
 
             modelBuilder.Entity("onetouch.AppEntities.AppEntityAddress", b =>

@@ -65,6 +65,7 @@ namespace onetouch.AppEntities
 		Task<long> SaveContact(AppContactDto input);
 
 		Task<long> SaveEntity(AppEntityDto input);
+		Task<long> SaveEntityWithLookupCache(AppEntityDto input, IDictionary<long, long?> attributeValueEntityObjectTypeCache, IDictionary<string, long?> entityObjectTypeCodeCache);
 		Task<PagedResultDto<AppEntityCategoryDto>> GetAppEntityCategoriesWithPaging(GetAppEntityAttributesInput input);
 		Task<PagedResultDto<AppEntityCategoryDto>> GetAppEntityDepartmentsWithPaging(GetAppEntityAttributesInput input);
 		Task<PagedResultDto<AppEntityClassificationDto>> GetAppEntityClassificationsWithPaging(GetAppEntityAttributesInput input);

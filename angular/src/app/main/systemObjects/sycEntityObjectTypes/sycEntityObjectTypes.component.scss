@@ -1,0 +1,54 @@
+.entity-object-types__toolbar-btn {
+    border-radius: 5px;
+}
+
+.entity-object-types__toolbar-btn--secondary {
+    background-color: #fff;
+}
+
+.entity-object-types__search-input {
+    min-height: 46px;
+}
+
+.entity-object-types__search-btn {
+    min-width: 52px;
+}
+
+.entity-object-types-tree {
+    min-width: 50rem;
+}
+
+.entity-object-types-tree__col {
+    width: 150px;
+}
+
+.entity-object-types-tree__col--actions {
+    width: 130px;
+}
+
+@media screen and (max-width: 991px) {
+    .kt-subheader__toolbar .kt-subheader__wrapper {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 0.75rem;
+    }
+
+    .entity-object-types-tree {
+        min-width: 100%;
+    }
+}
+
+@media screen and (max-width: 767px) {
+    .entity-object-types__toolbar-btn {
+        width: 100%;
+    }
+
+    .input-group {
+        flex-wrap: nowrap;
+    }
+
+    .entity-object-types__search-btn {
+        padding-left: 1rem;
+        padding-right: 1rem;
+    }
+}

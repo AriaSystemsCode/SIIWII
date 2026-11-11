@@ -44,7 +44,7 @@ export class MarketplaceProductsComponent
     @Input() accountDataForView: any
     @Input() marketplaceAccCurrency: string
 
-    isFilterHidden: boolean = false;
+    isFilterHidden: boolean = true;
     sellerData: any;
     isSellerIdExists: boolean = false;
     currencies: CurrencyInfoDto[];
@@ -80,9 +80,14 @@ export class MarketplaceProductsComponent
     appItemListId: any;
     selectedDepartments: any;
 
-    isAuthenticate = this.appSession?.user
-    selectedCategories: number[] = [];
-    sellerSSinSetting: string
+    isAuthenticate= this.appSession?.user
+    selectedCategories: number[] = []; 
+
+     
+    brandIdFromUrl: number | null = null;
+    catIdFromUrl: number | null = null;
+    sellerSSinSetting:string
+   
 
 
     constructor(
@@ -196,17 +201,19 @@ export class MarketplaceProductsComponent
                 this.sellerSSinSetting = (res as any)?.value ?? (res as any) ?? null;
 
                 this.route.queryParamMap.subscribe((params) => {
+
+                    // merege
                     const q = params.get('q');
                     if (q !== null) this.searchInput = q;
 
                     const brandParams = params.getAll('brand');
                     if (brandParams?.length) this.brands = brandParams.map(v => +v);
 
-                    const deptParam = params.get('dept');
-                    if (deptParam) {
-                        const id = +deptParam;
-                        this.selectedDepartments = [id];
-                        if (this.filters) this.filters.preselectDeptId = id;
+                    const deptParams = params.getAll('dept');
+                    if (deptParams?.length) {
+                        const ids = deptParams.map(v => +v).filter(id => !!id);
+                        this.selectedDepartments = ids;
+                        if (this.filters) this.filters.preselectDeptId = ids[0];
                     }
 
                     const listParam = params.get('proList');
@@ -216,11 +223,11 @@ export class MarketplaceProductsComponent
                         if (this.filters) this.filters.catalogId = id ?? null;
                     }
 
-                    const catParam = params.get('cat');
-                    if (catParam) {
-                        const id = +catParam;
-                        this.selectedCategories = [id];
-                        if (this.filters) this.filters.preselectCategoryId = id;
+                    const catParams = params.getAll('cat');
+                    if (catParams?.length) {
+                        const ids = catParams.map(v => +v).filter(id => !!id);
+                        this.selectedCategories = ids;
+                        if (this.filters) this.filters.preselectCategoryId = ids[0];
                     }
 
                     this.getAllProducts();
@@ -423,6 +430,7 @@ export class MarketplaceProductsComponent
 
     }
 
+
     handleSortingChange(data: any) {
         this.getAllProducts();
     }
@@ -444,10 +452,10 @@ export class MarketplaceProductsComponent
 
 
     private updateUrlQueryParams(partial: {
-        dept?: string | null;
+        dept?: string | string[] | null;
         proList?: string | null;
         q?: string | null;
-        cat?: string | null;
+        cat?: string | string[] | null;
         brand?: string | string[] | null;
     }) {
         this._router.navigate([], {
@@ -467,13 +475,21 @@ export class MarketplaceProductsComponent
 
 
     selectDepartment(value) {
-        if (!value) {
+        this.appItemListId = null;
+        if (this.filters) {
+            this.filters.catalogId = null;
+        }
+
+        const ids = Array.isArray(value)
+            ? value.map(id => +id).filter(id => !!id)
+            : (value?.node?.data?.sycEntityObjectCategory?.id ? [+value.node.data.sycEntityObjectCategory.id] : []);
+
+        if (!ids.length) {
             this.selectedDepartments = [];
-            this.updateUrlQueryParams({ dept: null });
+            this.updateUrlQueryParams({ dept: null, proList: null });
         } else {
-            const id = value.node.data.sycEntityObjectCategory.id;
-            this.selectedDepartments = [id];
-            this.updateUrlQueryParams({ dept: String(id) });
+            this.selectedDepartments = ids;
+            this.updateUrlQueryParams({ dept: ids.map(id => String(id)), proList: null });
         }
         this.getAllProducts();
     }
@@ -532,40 +548,98 @@ export class MarketplaceProductsComponent
 
         this.getAllProducts();
     }
-    resetProducts($event) {
+    // resetProducts($event) {
+    //    if (this.filters) {
+    //     this.filters.resetFilters();
+    // }
+    //     (this.seletedOption = { label: this.l("Public And Shared With Me"), value: 2 }),
+    //         (this.selectedCurrrency =
+    //             localStorage.getItem("currencyCode") == "undefined" || JSON.parse(localStorage.getItem("currencyCode")) === null
+    //                 ? this.tenantDefaultCurrency
+    //                 : JSON.parse(localStorage.getItem("currencyCode")));
+    //     this.currency =
+    //         localStorage.getItem("currencyCode") == "undefined" || JSON.parse(localStorage.getItem("currencyCode")) === null
+    //             ? this.tenantDefaultCurrency?.code
+    //             : JSON.parse(localStorage.getItem("currencyCode")).code;
+    //     this.tentantID = this.appSession?.tenant?.id;
+    //     this.selectedSort = { label: "Product Name", value: "name" };
+    //     this.searchInput = "";
+    //     this.paginator.changePageToFirst($event);
+    //     this.appItemListId = ''
+    //     this.selectedCategories = [];
+    //     this.brands = []
+    //     this.skipCount = 0;
+    //     this.maxResultCount = 12;
+    //     this.selectedDepartments = []
+    //     this.onlyAvialbleStock = undefined
+    //     localStorage.removeItem("productFilters");
+    //     this.getAllProducts();
+    // }
+    resetProducts($event?: any): void {
+
+    if (this.filters) {
         this.filters.resetFilters();
-        (this.seletedOption = { label: "Public And Shared With Me", value: 2 }),
-            (this.selectedCurrrency =
-                localStorage.getItem("currencyCode") == "undefined" || JSON.parse(localStorage.getItem("currencyCode")) === null
-                    ? this.tenantDefaultCurrency
-                    : JSON.parse(localStorage.getItem("currencyCode")));
-        this.currency =
-            localStorage.getItem("currencyCode") == "undefined" || JSON.parse(localStorage.getItem("currencyCode")) === null
-                ? this.tenantDefaultCurrency?.code
-                : JSON.parse(localStorage.getItem("currencyCode")).code;
-        this.tentantID = this.appSession?.tenant?.id;
-        this.selectedSort = { label: "Product Name", value: "name" };
-        this.searchInput = "";
-        this.paginator.changePageToFirst($event);
-        this.appItemListId = ''
-        this.selectedCategories = [];
-        this.brands = []
-        this.skipCount = 0;
-        this.maxResultCount = 12;
-        this.selectedDepartments = []
-        this.onlyAvialbleStock = undefined
-        localStorage.removeItem("productFilters");
-        this.getAllProducts();
     }
+
+    this.seletedOption = {
+        label: this.l("Public And Shared With Me"),
+        value: 2
+    };
+
+    // Reset currency to tenant default
+    const defaultCode = this.tenantDefaultCurrency?.code || 'USD';
+
+    this.selectedCurrrency =
+        this.currencies?.find(c => c.code === defaultCode)
+        || this.tenantDefaultCurrency
+        || { code: defaultCode };
+
+    this.currency = defaultCode;
+
+    // Save default currency to localStorage
+    localStorage.setItem("currencyCode", defaultCode);
+
+    this.tentantID = this.appSession?.tenant?.id;
+
+    this.selectedSort = {
+        label: this.l("ProductName"),
+        value: "name"
+    };
+
+    this.searchInput = "";
+
+    if (this.paginator) {
+        this.paginator.changePageToFirst($event);
+    }
+
+    this.appItemListId = '';
+    this.selectedCategories = [];
+    this.brands = [];
+    this.skipCount = 0;
+    this.maxResultCount = 12;
+    this.selectedDepartments = [];
+    this.onlyAvialbleStock = undefined;
+
+    localStorage.removeItem("productFilters");
+
+    this.getAllProducts();
+}
     selectCategory(value: any) {
-        if (!value) {
+        this.appItemListId = null;
+        if (this.filters) {
+            this.filters.catalogId = null;
+        }
+
+        const ids = Array.isArray(value)
+            ? value.map(id => +id).filter(id => !!id)
+            : (value?.node?.data?.sycEntityObjectCategory?.id ? [+value.node.data.sycEntityObjectCategory.id] : []);
+
+        if (!ids.length) {
             this.selectedCategories = [];
-            this.updateUrlQueryParams({ cat: null });
+            this.updateUrlQueryParams({ cat: null, proList: null });
         } else {
-            const node = value.node?.data?.sycEntityObjectCategory;
-            const id = node?.id;
-            this.selectedCategories = id ? [id] : [];
-            this.updateUrlQueryParams({ cat: id ? String(id) : null });
+            this.selectedCategories = ids;
+            this.updateUrlQueryParams({ cat: ids.map(id => String(id)), proList: null });
         }
         this.getAllProducts();
     }

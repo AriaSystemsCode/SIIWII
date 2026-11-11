@@ -10,6 +10,28 @@
     margin-top: 14px;
 }
 
+.print-option-item {
+    gap: 5px;
+}
+
+.input-text-no-top {
+    padding-top: 0 !important;
+}
+
+.subject-row {
+    padding-top: 4px !important;
+}
+
+.subject-input {
+    padding: 6px;
+}
+
+.email-body-input {
+    height: 180px;
+    border: 1px solid #d5d4dc !important;
+    border-radius: 8px;
+}
+
 .InputText {
     text-align: left;
     font: Regular 10px/16px Poppins;
@@ -97,3 +119,37 @@ input:focus ,textarea:focus
         font-weight: 600;
         font-size: 16px;
     }
+
+@media (max-width: 992px) {
+    .print-option-item {
+        justify-content: flex-start;
+    }
+
+    .email-body-input {
+        margin-left: 0 !important;
+        width: 100%;
+    }
+
+    .subject-row {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 8px;
+    }
+
+    .subject-input {
+        margin-left: 0 !important;
+    }
+}
+
+@media (max-width: 576px) {
+    .btnPrev,
+    .btnCont {
+        min-width: 120px;
+        width: auto;
+    }
+
+    .d-flex.flex-row.justify-content-between.pr-5.w-100 {
+        padding-right: 0 !important;
+        gap: 10px;
+    }
+}

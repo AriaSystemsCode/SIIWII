@@ -1,9 +1,6 @@
-<div
-  class="d-flex justify-content-center image-upload-container"
-  [ngStyle]="{ 'width.px': staticWidth, 'height.px': staticHeight }"
->
+<div class="d-flex justify-content-center image-upload-container">
   <label
-    class="p-0 mb-0 w-100 h-100"
+    class="p-0 mb-0 w-100 h-100 inputBorder"
     for="image{{ inputID }}"
     [ngClass]="fromReview ? '' : 'uploadfilecontainer'"
     (drop)="fileChange($event)"
@@ -16,7 +13,7 @@
       (change)="fileChange($event)"
       [accept]="acceptedExtensions"
       [disabled]="isDisabled"
-      [ngStyle]="{ cursor: isDisabled ? 'not-allowed' : 'pointer' }"
+      [ngClass]="{ 'input-file--disabled': isDisabled }"
     />
 
     <!-- 🖼 IMAGE PREVIEW -->
@@ -36,11 +33,11 @@
         <img
           src="assets/placeholders/pdf-placeholder.png"
           class="pdf-thumb mb-2"
-          alt="PDF"
+        alt="{{ 'PDF' | localize }}"
           (click)="onPdfThumbClick($event)"
         />
         <span class="text-primary">
-          {{ 'Open PDF' | localize }}
+          {{ 'OpenPDF' | localize }}
         </span>
       </div>
     </ng-container>
@@ -53,7 +50,16 @@
         {{ l('ClickOrDrop') }}
       </div>
       <div *ngIf="sycAttachmentCategory?.aspectRatio && showGuidelines">
-        {{ l('AspectRatio?', sycAttachmentCategory?.aspectRatio) }}
+      {{
+      selectedOrientation === 'Landscape'
+      ? l(
+      'AspectRatio?',
+      sycAttachmentCategory?.aspectRatio?.split(':')[1] +
+      ':' +
+      sycAttachmentCategory?.aspectRatio?.split(':')[0]
+      )
+      : l('AspectRatio?', sycAttachmentCategory?.aspectRatio)
+      }}
       </div>
       <div *ngIf="sycAttachmentCategory?.maxFileSize && showGuidelines">
         {{ l('MaxSize?', sycAttachmentCategory?.maxFileSize) }} MB
@@ -75,7 +81,7 @@
       *ngIf="fromReview"
       src="assets/placeholders/imageAttach.png"
       class="mr-2 iconImg"
-      alt="Image Attach"
+      alt="{{ 'ImageAttach' | localize }}"
     />
     <img
       src="assets/profile/Remove_image.svg"

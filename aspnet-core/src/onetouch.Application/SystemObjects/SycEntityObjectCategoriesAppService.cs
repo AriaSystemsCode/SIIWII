@@ -1,4 +1,4 @@
-﻿using onetouch.SystemObjects;
+using onetouch.SystemObjects;
 using System.Collections.Generic;
 using System;
 using System.Linq;
@@ -388,11 +388,13 @@ namespace onetouch.SystemObjects
             if (!string.IsNullOrEmpty(tmpInput.Filter))
             //T-SII-20250307.0003,1 MMT 09/25/2025 departments filter works only in the product add mode[End]
             {
-                return await  GetAllDepartmentsByFilterWithChildsForProduct(tmpInput.Filter);
+                return await  GetAllDepartmentsByFilterWithChildsForProduct(tmpInput.Filter, tmpInput.IncludeResultCount);
             }
             //MMT2024
             PagedResultDto<TreeNode<GetSycEntityObjectCategoryForViewDto>> allParents = await GetAll(tmpInput);
-            return allParents;
+            return tmpInput.IncludeResultCount
+                ? await PrepareProductCategoryResult(allParents, tmpInput.ObjectId)
+                : allParents;
          }
 
 
@@ -525,7 +527,9 @@ namespace onetouch.SystemObjects
                     totalCount,
                     sycEntityObjectCategoriesvar);
 
-                return sycEntityObjectCategoriesPages;
+                return input.IncludeResultCount
+                    ? await PrepareProductCategoryResult(sycEntityObjectCategoriesPages, input.ObjectId)
+                    : sycEntityObjectCategoriesPages;
             }
         }
 
@@ -910,7 +914,7 @@ namespace onetouch.SystemObjects
         //MMT36
         //MMT24
       
-        private async Task<PagedResultDto<TreeNode<GetSycEntityObjectCategoryForViewDto>>> GetAllDepartmentsByFilterWithChildsForProduct(string filter)
+        private async Task<PagedResultDto<TreeNode<GetSycEntityObjectCategoryForViewDto>>> GetAllDepartmentsByFilterWithChildsForProduct(string filter, bool includeResultCount)
         {
             GetAllSycEntityObjectCategoriesInput tmpInput = new GetAllSycEntityObjectCategoriesInput
             {
@@ -930,8 +934,219 @@ namespace onetouch.SystemObjects
                 item.Expanded = true;
             }
 
-            return allParents;
+            return includeResultCount
+                ? await PrepareProductCategoryResult(allParents, tmpInput.ObjectId)
+                : allParents;
 
+        }
+        private async Task<PagedResultDto<TreeNode<GetSycEntityObjectCategoryForViewDto>>> PrepareProductCategoryResult(PagedResultDto<TreeNode<GetSycEntityObjectCategoryForViewDto>> categories, long itemObjectId)
+        {
+            await SetProductResultCounts(categories.Items, itemObjectId);
+
+            var items = NormalizeProductCategoryNodes(categories.Items)
+                .Where(z => z.resultCount != 0)
+                .ToList();
+            SetProductCategoryLabels(items);
+
+            return new PagedResultDto<TreeNode<GetSycEntityObjectCategoryForViewDto>>(items.Count, items);
+        }
+
+        private async Task SetProductResultCounts(IReadOnlyList<TreeNode<GetSycEntityObjectCategoryForViewDto>> categories, long itemObjectId)
+        {
+            if (categories == null || categories.Count == 0)
+            {
+                return;
+            }
+
+            var categoryNodes = categories
+                .SelectMany(GetTreeNodes)
+                .Where(z => z?.Data?.SycEntityObjectCategory != null)
+                .ToList();
+
+            var categoryIds = categoryNodes
+                .Select(z => z.Data.SycEntityObjectCategory.Id)
+                .Distinct()
+                .ToList();
+
+            if (categoryIds.Count == 0)
+            {
+                return;
+            }
+
+            using (UnitOfWorkManager.Current.DisableFilter(AbpDataFilters.MustHaveTenant, AbpDataFilters.MayHaveTenant))
+            {
+            var allCategories = await _sycEntityObjectCategoryRepository.GetAll()
+                .AsNoTracking()
+                .Where(category => category.TenantId == null || category.TenantId == AbpSession.TenantId)
+                .Select(category => new
+                {
+                    category.Id,
+                    category.ParentId
+                })
+                .ToListAsync();
+
+            var childrenByParentId = allCategories
+                .Where(category => category.ParentId.HasValue)
+                .GroupBy(category => category.ParentId.Value)
+                .ToDictionary(group => group.Key, group => group.Select(category => category.Id).ToList());
+
+            var descendantIdsByCategoryId = categoryIds
+                .ToDictionary(categoryId => categoryId, categoryId => GetCategoryIdsWithDescendants(categoryId, childrenByParentId));
+
+            var allCategoryIdsForCount = descendantIdsByCategoryId
+                .SelectMany(z => z.Value)
+                .Distinct()
+                .ToList();
+
+            var personEntityObjectTypeId = await _helper.SystemTables.GetEntityObjectTypePersonId();
+            var visibleSellerTenantIds = _appContactRepository.GetAll()
+                .AsNoTracking()
+                .Where(a => a.TenantId != null
+                    && a.ParentId == null
+                    && a.PartnerId == null
+                    && a.IsProfileData == true
+                    && a.EntityFk.EntityObjectTypeId != personEntityObjectTypeId)
+                .Select(a => a.TenantId.Value);
+            var exchangeCurrencyCodes = _context.SycCurrencyExchanges
+                .AsNoTracking()
+                .Select(a => a.CurrencyCode);
+
+            var eligibleMarketplaceItemIds = _context.AppMarketplaceItems
+                .AsNoTracking()
+                .Where(z => z.ParentId == null
+                    && (z.SharingLevel == 1
+                        || (z.SharingLevel == 2 && z.ItemSharingFkList.Any(c => c.SharedUserId == AbpSession.UserId))
+                        || z.TenantOwner == AbpSession.TenantId)
+                    && visibleSellerTenantIds.Contains(z.TenantOwner)
+                    && z.ItemPricesFkList.Any(p => p.Code == "MSRP"
+                        && (p.CurrencyCode == "USD"
+                            || (p.IsDefault && exchangeCurrencyCodes.Contains(p.CurrencyCode)))))
+                .Select(z => z.Id);
+
+            var productCategoryPairs = await _context.AppEntityCategories
+                .AsNoTracking()
+                .Where(c => allCategoryIdsForCount.Contains(c.EntityObjectCategoryId)
+                    && eligibleMarketplaceItemIds.Contains(c.EntityId))
+                .Select(c => new
+                {
+                    CategoryId = c.EntityObjectCategoryId,
+                    ProductId = c.EntityId
+                })
+                .Distinct()
+                .ToListAsync();
+
+            var productIdsByCategoryId = productCategoryPairs
+                .GroupBy(z => z.CategoryId)
+                .ToDictionary(z => z.Key, z => z.Select(r => r.ProductId).Distinct().ToList());
+
+            foreach (var category in categoryNodes)
+            {
+                var categoryId = category.Data.SycEntityObjectCategory.Id;
+                category.resultCount = descendantIdsByCategoryId.TryGetValue(categoryId, out var countCategoryIds)
+                    ? countCategoryIds
+                        .Where(productIdsByCategoryId.ContainsKey)
+                        .SelectMany(id => productIdsByCategoryId[id])
+                        .Distinct()
+                        .LongCount()
+                    : 0;
+            }
+            }
+        }
+
+        private HashSet<long> GetCategoryIdsWithDescendants(long categoryId, Dictionary<long, List<long>> childrenByParentId)
+        {
+            var result = new HashSet<long> { categoryId };
+            var pending = new Queue<long>();
+            pending.Enqueue(categoryId);
+
+            while (pending.Count > 0)
+            {
+                var parentId = pending.Dequeue();
+                if (!childrenByParentId.TryGetValue(parentId, out var childIds))
+                {
+                    continue;
+                }
+
+                foreach (var childId in childIds)
+                {
+                    if (result.Add(childId))
+                    {
+                        pending.Enqueue(childId);
+                    }
+                }
+            }
+
+            return result;
+        }
+
+        private IReadOnlyList<TreeNode<GetSycEntityObjectCategoryForViewDto>> NormalizeProductCategoryNodes(IReadOnlyList<TreeNode<GetSycEntityObjectCategoryForViewDto>> categories)
+        {
+            return (categories ?? new List<TreeNode<GetSycEntityObjectCategoryForViewDto>>())
+                .Where(z => z?.Data?.SycEntityObjectCategory != null)
+                .GroupBy(z => z.Data.SycEntityObjectCategory.Id)
+                .Select(z =>
+                {
+                    var category = z.First();
+                    if (category.Children != null)
+                    {
+                        category.Children = NormalizeProductCategoryNodes(category.Children)
+                            .Where(c => c.resultCount != 0)
+                            .ToList();
+                    }
+
+                    return category;
+                })
+                .ToList();
+        }
+
+        private void SetProductCategoryLabels(IReadOnlyList<TreeNode<GetSycEntityObjectCategoryForViewDto>> categories)
+        {
+            foreach (var category in categories ?? new List<TreeNode<GetSycEntityObjectCategoryForViewDto>>())
+            {
+                if (category.resultCount > 0)
+                {
+                    category.label = $"{GetProductCategoryBaseLabel(category)} ({category.resultCount})";
+                }
+
+                if (category.Children != null)
+                {
+                    SetProductCategoryLabels(category.Children);
+                }
+            }
+        }
+
+        private string GetProductCategoryBaseLabel(TreeNode<GetSycEntityObjectCategoryForViewDto> category)
+        {
+            var label = string.IsNullOrWhiteSpace(category.label)
+                ? category.Data?.SycEntityObjectCategory?.Name
+                : category.label;
+
+            if (string.IsNullOrWhiteSpace(label))
+            {
+                return string.Empty;
+            }
+
+            return System.Text.RegularExpressions.Regex.Replace(label, @"\s\(\d+\)$", string.Empty);
+        }
+
+        private IEnumerable<TreeNode<GetSycEntityObjectCategoryForViewDto>> GetTreeNodes(TreeNode<GetSycEntityObjectCategoryForViewDto> category)
+        {
+            if (category == null)
+            {
+                yield break;
+            }
+
+            yield return category;
+
+            if (category.Children == null)
+            {
+                yield break;
+            }
+
+            foreach (var child in category.Children.SelectMany(GetTreeNodes))
+            {
+                yield return child;
+            }
         }
         private async Task LoadFilteredChilds(TreeNode<GetSycEntityObjectCategoryForViewDto> parent, string filter)
         {

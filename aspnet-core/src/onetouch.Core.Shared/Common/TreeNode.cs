@@ -14,5 +14,8 @@ namespace onetouch.Common
         public string label { get; set; }
 
         public long? totalChildrenCount { get; set; }
+
+        [System.Text.Json.Serialization.JsonIgnore(Condition = System.Text.Json.Serialization.JsonIgnoreCondition.WhenWritingNull)]
+        public long? resultCount { get; set; }
     }
 }

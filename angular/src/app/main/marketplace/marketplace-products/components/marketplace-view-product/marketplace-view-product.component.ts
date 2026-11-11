@@ -26,6 +26,7 @@ import * as moment from "moment";
 import {  ConfirmationService } from "primeng/api";
 import { finalize } from "rxjs/operators";
 import Swal from "sweetalert2";
+import { Location } from '@angular/common';
 
 
 @Component({
@@ -107,6 +108,7 @@ export class MarketplaceViewProductComponent
         private appItemsAppservice: AppItemsServiceProxy,
          private messageServiceProxy: MessageServiceProxy,
          private route: ActivatedRoute,  
+         private location: Location,
         injector: Injector
     ) {
         super(injector);
@@ -671,12 +673,12 @@ export class MarketplaceViewProductComponent
         if (this.isFromSellerRoom) {
             Swal.fire({
                 title: "",
-                text: "Are you sure you want to add ordered quantities to you cart ?",
+                text: this.l("Are you sure you want to add ordered quantities to you cart ?"),
                 icon: "info",
                 showCancelButton: true,
                 confirmButtonText:
-                    "Yes",
-                cancelButtonText: "No",
+                   this.l("Yes") ,
+                cancelButtonText: this.l("No") ,
                 allowOutsideClick: false,
                 allowEscapeKey: false,
                 backdrop: true,
@@ -745,12 +747,12 @@ export class MarketplaceViewProductComponent
                             .pipe(finalize(() => {
                                 Swal.fire({
                                     title: "",
-                                    text: `Quantities have been added to the cart and purchase order # ${this.orderNo} has been created?`,
+                                    text: `Do you want to add quantities to the cart and create purchase order # ${this.orderNo} ?`,
                                     icon: "info",
                                     showCancelButton: true,
                                     confirmButtonText:
-                                        "Yes",
-                                    cancelButtonText: "No",
+                                       this.l("Yes") ,
+                                    cancelButtonText: this.l("No") ,
                                     allowOutsideClick: false,
                                     allowEscapeKey: false,
                                     backdrop: true,
@@ -893,24 +895,27 @@ export class MarketplaceViewProductComponent
     }
 
     goToShowroom() {
-        localStorage.removeItem("productFilters");
-        sessionStorage.setItem(
-            "SellerSSIN",
-            JSON.stringify(this.productData.sellerSSIN)
-        );
+        // localStorage.removeItem("productFilters");
+        // sessionStorage.setItem(
+        //     "SellerSSIN",
+        //     JSON.stringify(this.productData.sellerSSIN)
+        // );
         // localStorage.setItem(
         //     "currencyCode",
         //     JSON.stringify(this.productBodyData.currencyCode)
         // );
-        localStorage.setItem("fromSellerRoom", JSON.stringify(true));
+        // localStorage.setItem("fromSellerRoom", JSON.stringify(true));
 
-        localStorage.setItem("fromMarketPlace", JSON.stringify(false));
+        // localStorage.setItem("fromMarketPlace", JSON.stringify(false));
         this.router.navigateByUrl("app/main/marketplace/products");
+      
     }
 
     backToResult() {
 
-        this.router.navigateByUrl("app/main/marketplace/products");
+        // this.router.navigateByUrl("app/main/marketplace/products");
+        this.location.back();
+
     }
 
     onEditpecialPrice(updatedSpecialPrice) {

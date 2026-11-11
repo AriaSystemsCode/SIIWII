@@ -791,8 +791,9 @@ media-grid {
 
 .modal-image {
   max-width: 100%;
-  height: auto;
   border-radius: 8px;
+      max-height: 400px;
+    object-fit: cover;
 }
 
 .nav-button {

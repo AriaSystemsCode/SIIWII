@@ -32,6 +32,8 @@ export class SelectAppItemTypeComponent
     showMoreListDataButton: boolean;
     lastSelection: TreeNodeOfGetSycEntityObjectTypeForViewDto;
 
+    currentLang: string
+    isArabic: boolean
     constructor(
         injector: Injector,
         public currentModalRef: BsModalRef,
@@ -41,11 +43,13 @@ export class SelectAppItemTypeComponent
     }
 
     ngOnInit(): void {
+        this.currentLang = abp.utils.getCookieValue('Abp.Localization.CultureName')
+        this.currentLang == 'ar' || this.currentLang == 'ar-EG'  ? this.isArabic = true : this.isArabic = false
         this.getAppItemTypesList();
     }
 
     close() {
-        this.currentModalRef.setClass("right-modal slide-right-out");
+       this.isArabic?this.currentModalRef.setClass("right-left slide-left-out") :  this.currentModalRef.setClass("right-modal slide-right-out");
         this.selectionDone = false;
         this.currentModalRef.hide();
     }

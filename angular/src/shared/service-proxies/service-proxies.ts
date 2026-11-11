@@ -5147,6 +5147,62 @@ export class AccountsServiceProxy {
     }
 
     /**
+     * @param body (optional) 
+     * @return Success
+     */
+    _SaveFromExcel(body: AccountExcelResultsDTO | undefined): Observable<ExcelLogDto> {
+        let url_ = this.baseUrl + "/api/services/app/Accounts/_SaveFromExcel";
+        url_ = url_.replace(/[?&]$/, "");
+
+        const content_ = JSON.stringify(body);
+
+        let options_ : any = {
+            body: content_,
+            observe: "response",
+            responseType: "blob",
+            headers: new HttpHeaders({
+                "Content-Type": "application/json-patch+json",
+                "Accept": "text/plain"
+            })
+        };
+
+        return this.http.request("post", url_, options_).pipe(_observableMergeMap((response_ : any) => {
+            return this.process_SaveFromExcel(response_);
+        })).pipe(_observableCatch((response_: any) => {
+            if (response_ instanceof HttpResponseBase) {
+                try {
+                    return this.process_SaveFromExcel(response_ as any);
+                } catch (e) {
+                    return _observableThrow(e) as any as Observable<ExcelLogDto>;
+                }
+            } else
+                return _observableThrow(response_) as any as Observable<ExcelLogDto>;
+        }));
+    }
+
+    protected process_SaveFromExcel(response: HttpResponseBase): Observable<ExcelLogDto> {
+        const status = response.status;
+        const responseBlob =
+            response instanceof HttpResponse ? response.body :
+            (response as any).error instanceof Blob ? (response as any).error : undefined;
+
+        let _headers: any = {}; if (response.headers) { for (let key of response.headers.keys()) { _headers[key] = response.headers.get(key); }}
+        if (status === 200) {
+            return blobToText(responseBlob).pipe(_observableMergeMap((_responseText: string) => {
+            let result200: any = null;
+            let resultData200 = _responseText === "" ? null : JSON.parse(_responseText, this.jsonParseReviver);
+            result200 = ExcelLogDto.fromJS(resultData200);
+            return _observableOf(result200);
+            }));
+        } else if (status !== 200 && status !== 204) {
+            return blobToText(responseBlob).pipe(_observableMergeMap((_responseText: string) => {
+            return throwException("An unexpected server error occurred.", status, _responseText, _headers);
+            }));
+        }
+        return _observableOf(null as any);
+    }
+
+    /**
      * @param typeId (optional) 
      * @return Success
      */
@@ -9118,6 +9174,180 @@ export class AppEntitiesServiceProxy {
      * @param body (optional) 
      * @return Success
      */
+    saveEntityWithLookupCache(body: AppEntityDto | undefined): Observable<number> {
+        let url_ = this.baseUrl + "/api/services/app/AppEntities/SaveEntityWithLookupCache";
+        url_ = url_.replace(/[?&]$/, "");
+
+        const content_ = JSON.stringify(body);
+
+        let options_ : any = {
+            body: content_,
+            observe: "response",
+            responseType: "blob",
+            headers: new HttpHeaders({
+                "Content-Type": "application/json-patch+json",
+                "Accept": "text/plain"
+            })
+        };
+
+        return this.http.request("post", url_, options_).pipe(_observableMergeMap((response_ : any) => {
+            return this.processSaveEntityWithLookupCache(response_);
+        })).pipe(_observableCatch((response_: any) => {
+            if (response_ instanceof HttpResponseBase) {
+                try {
+                    return this.processSaveEntityWithLookupCache(response_ as any);
+                } catch (e) {
+                    return _observableThrow(e) as any as Observable<number>;
+                }
+            } else
+                return _observableThrow(response_) as any as Observable<number>;
+        }));
+    }
+
+    protected processSaveEntityWithLookupCache(response: HttpResponseBase): Observable<number> {
+        const status = response.status;
+        const responseBlob =
+            response instanceof HttpResponse ? response.body :
+            (response as any).error instanceof Blob ? (response as any).error : undefined;
+
+        let _headers: any = {}; if (response.headers) { for (let key of response.headers.keys()) { _headers[key] = response.headers.get(key); }}
+        if (status === 200) {
+            return blobToText(responseBlob).pipe(_observableMergeMap((_responseText: string) => {
+            let result200: any = null;
+            let resultData200 = _responseText === "" ? null : JSON.parse(_responseText, this.jsonParseReviver);
+                result200 = resultData200 !== undefined ? resultData200 : <any>null;
+    
+            return _observableOf(result200);
+            }));
+        } else if (status !== 200 && status !== 204) {
+            return blobToText(responseBlob).pipe(_observableMergeMap((_responseText: string) => {
+            return throwException("An unexpected server error occurred.", status, _responseText, _headers);
+            }));
+        }
+        return _observableOf(null as any);
+    }
+
+    /**
+     * @param body (optional) 
+     * @return Success
+     */
+    saveVariationEntityLean(body: AppEntityDto | undefined): Observable<AppEntity> {
+        let url_ = this.baseUrl + "/api/services/app/AppEntities/SaveVariationEntityLean";
+        url_ = url_.replace(/[?&]$/, "");
+
+        const content_ = JSON.stringify(body);
+
+        let options_ : any = {
+            body: content_,
+            observe: "response",
+            responseType: "blob",
+            headers: new HttpHeaders({
+                "Content-Type": "application/json-patch+json",
+                "Accept": "text/plain"
+            })
+        };
+
+        return this.http.request("post", url_, options_).pipe(_observableMergeMap((response_ : any) => {
+            return this.processSaveVariationEntityLean(response_);
+        })).pipe(_observableCatch((response_: any) => {
+            if (response_ instanceof HttpResponseBase) {
+                try {
+                    return this.processSaveVariationEntityLean(response_ as any);
+                } catch (e) {
+                    return _observableThrow(e) as any as Observable<AppEntity>;
+                }
+            } else
+                return _observableThrow(response_) as any as Observable<AppEntity>;
+        }));
+    }
+
+    protected processSaveVariationEntityLean(response: HttpResponseBase): Observable<AppEntity> {
+        const status = response.status;
+        const responseBlob =
+            response instanceof HttpResponse ? response.body :
+            (response as any).error instanceof Blob ? (response as any).error : undefined;
+
+        let _headers: any = {}; if (response.headers) { for (let key of response.headers.keys()) { _headers[key] = response.headers.get(key); }}
+        if (status === 200) {
+            return blobToText(responseBlob).pipe(_observableMergeMap((_responseText: string) => {
+            let result200: any = null;
+            let resultData200 = _responseText === "" ? null : JSON.parse(_responseText, this.jsonParseReviver);
+            result200 = AppEntity.fromJS(resultData200);
+            return _observableOf(result200);
+            }));
+        } else if (status !== 200 && status !== 204) {
+            return blobToText(responseBlob).pipe(_observableMergeMap((_responseText: string) => {
+            return throwException("An unexpected server error occurred.", status, _responseText, _headers);
+            }));
+        }
+        return _observableOf(null as any);
+    }
+
+    /**
+     * @param tenantId (optional) 
+     * @param entityObjectTypeCode (optional) 
+     * @param code (optional) 
+     * @return Success
+     */
+    getVariationEntityUniqueKey(tenantId: number | null | undefined, entityObjectTypeCode: string | null | undefined, code: string | null | undefined): Observable<string> {
+        let url_ = this.baseUrl + "/api/services/app/AppEntities/GetVariationEntityUniqueKey?";
+        if (tenantId !== undefined && tenantId !== null)
+            url_ += "tenantId=" + encodeURIComponent("" + tenantId) + "&";
+        if (entityObjectTypeCode !== undefined && entityObjectTypeCode !== null)
+            url_ += "entityObjectTypeCode=" + encodeURIComponent("" + entityObjectTypeCode) + "&";
+        if (code !== undefined && code !== null)
+            url_ += "code=" + encodeURIComponent("" + code) + "&";
+        url_ = url_.replace(/[?&]$/, "");
+
+        let options_ : any = {
+            observe: "response",
+            responseType: "blob",
+            headers: new HttpHeaders({
+                "Accept": "text/plain"
+            })
+        };
+
+        return this.http.request("get", url_, options_).pipe(_observableMergeMap((response_ : any) => {
+            return this.processGetVariationEntityUniqueKey(response_);
+        })).pipe(_observableCatch((response_: any) => {
+            if (response_ instanceof HttpResponseBase) {
+                try {
+                    return this.processGetVariationEntityUniqueKey(response_ as any);
+                } catch (e) {
+                    return _observableThrow(e) as any as Observable<string>;
+                }
+            } else
+                return _observableThrow(response_) as any as Observable<string>;
+        }));
+    }
+
+    protected processGetVariationEntityUniqueKey(response: HttpResponseBase): Observable<string> {
+        const status = response.status;
+        const responseBlob =
+            response instanceof HttpResponse ? response.body :
+            (response as any).error instanceof Blob ? (response as any).error : undefined;
+
+        let _headers: any = {}; if (response.headers) { for (let key of response.headers.keys()) { _headers[key] = response.headers.get(key); }}
+        if (status === 200) {
+            return blobToText(responseBlob).pipe(_observableMergeMap((_responseText: string) => {
+            let result200: any = null;
+            let resultData200 = _responseText === "" ? null : JSON.parse(_responseText, this.jsonParseReviver);
+                result200 = resultData200 !== undefined ? resultData200 : <any>null;
+    
+            return _observableOf(result200);
+            }));
+        } else if (status !== 200 && status !== 204) {
+            return blobToText(responseBlob).pipe(_observableMergeMap((_responseText: string) => {
+            return throwException("An unexpected server error occurred.", status, _responseText, _headers);
+            }));
+        }
+        return _observableOf(null as any);
+    }
+
+    /**
+     * @param body (optional) 
+     * @return Success
+     */
     saveContact(body: AppContactDto | undefined): Observable<number> {
         let url_ = this.baseUrl + "/api/services/app/AppEntities/SaveContact";
         url_ = url_.replace(/[?&]$/, "");
@@ -11399,6 +11629,8 @@ export class AppEventsServiceProxy {
      * @param locationFilter (optional) 
      * @param appEntityNameFilter (optional) 
      * @param cityFilter (optional) 
+     * @param countryCodeFilter (optional) 
+     * @param countryIDFilter (optional) 
      * @param stateFilter (optional) 
      * @param postalFilter (optional) 
      * @param tenantId (optional) 
@@ -11409,7 +11641,7 @@ export class AppEventsServiceProxy {
      * @param maxResultCount (optional) 
      * @return Success
      */
-    getAll(filterType: EventsFilterTypesEnum, filter: string | null | undefined, isOnLineFilter: boolean | null | undefined, isPublishedFilter: boolean | null | undefined, creatorUserIdFilter: number | null | undefined, idFilter: number | null | undefined, entityIdFilter: number | null | undefined, includeAttachments: boolean | undefined, timeZoneFilter: string | null | undefined, maxFromDateFilter: moment.Moment | null | undefined, minFromDateFilter: moment.Moment | null | undefined, maxToDateFilter: moment.Moment | null | undefined, minToDateFilter: moment.Moment | null | undefined, maxFromTimeFilter: moment.Moment | null | undefined, minFromTimeFilter: moment.Moment | null | undefined, maxToTimeFilter: moment.Moment | null | undefined, minToTimeFilter: moment.Moment | null | undefined, privacyFilter: boolean | null | undefined, guestCanInviteFriendsFilter: boolean | null | undefined, locationFilter: string | null | undefined, appEntityNameFilter: string | null | undefined, cityFilter: string | null | undefined, stateFilter: string | null | undefined, postalFilter: string | null | undefined, tenantId: number | null | undefined, noOfEventsToReturn: number | null | undefined, filterCondition: string | null | undefined, sorting: string | null | undefined, skipCount: number | undefined, maxResultCount: number | undefined): Observable<PagedResultDtoOfGetAppEventForViewDto> {
+    getAll(filterType: EventsFilterTypesEnum, filter: string | null | undefined, isOnLineFilter: boolean | null | undefined, isPublishedFilter: boolean | null | undefined, creatorUserIdFilter: number | null | undefined, idFilter: number | null | undefined, entityIdFilter: number | null | undefined, includeAttachments: boolean | undefined, timeZoneFilter: string | null | undefined, maxFromDateFilter: moment.Moment | null | undefined, minFromDateFilter: moment.Moment | null | undefined, maxToDateFilter: moment.Moment | null | undefined, minToDateFilter: moment.Moment | null | undefined, maxFromTimeFilter: moment.Moment | null | undefined, minFromTimeFilter: moment.Moment | null | undefined, maxToTimeFilter: moment.Moment | null | undefined, minToTimeFilter: moment.Moment | null | undefined, privacyFilter: boolean | null | undefined, guestCanInviteFriendsFilter: boolean | null | undefined, locationFilter: string | null | undefined, appEntityNameFilter: string | null | undefined, cityFilter: string | null | undefined, countryCodeFilter: string[] | null | undefined, countryIDFilter: number[] | null | undefined, stateFilter: string | null | undefined, postalFilter: string | null | undefined, tenantId: number | null | undefined, noOfEventsToReturn: number | null | undefined, filterCondition: string | null | undefined, sorting: string | null | undefined, skipCount: number | undefined, maxResultCount: number | undefined): Observable<PagedResultDtoOfGetAppEventForViewDto> {
         let url_ = this.baseUrl + "/api/services/app/AppEvents/GetAll?";
         if (filterType === undefined || filterType === null)
             throw new Error("The parameter 'filterType' must be defined and cannot be null.");
@@ -11459,6 +11691,10 @@ export class AppEventsServiceProxy {
             url_ += "AppEntityNameFilter=" + encodeURIComponent("" + appEntityNameFilter) + "&";
         if (cityFilter !== undefined && cityFilter !== null)
             url_ += "CityFilter=" + encodeURIComponent("" + cityFilter) + "&";
+        if (countryCodeFilter !== undefined && countryCodeFilter !== null)
+            countryCodeFilter && countryCodeFilter.forEach(item => { url_ += "CountryCodeFilter=" + encodeURIComponent("" + item) + "&"; });
+        if (countryIDFilter !== undefined && countryIDFilter !== null)
+            countryIDFilter && countryIDFilter.forEach(item => { url_ += "CountryIDFilter=" + encodeURIComponent("" + item) + "&"; });
         if (stateFilter !== undefined && stateFilter !== null)
             url_ += "StateFilter=" + encodeURIComponent("" + stateFilter) + "&";
         if (postalFilter !== undefined && postalFilter !== null)
@@ -13884,13 +14120,14 @@ export class AppItemsServiceProxy {
      * @param departmentFlag (optional) 
      * @param entityId (optional) 
      * @param excludeIds (optional) 
+     * @param includeResultCount (optional) 
      * @param filterCondition (optional) 
      * @param sorting (optional) 
      * @param skipCount (optional) 
      * @param maxResultCount (optional) 
      * @return Success
      */
-    getAllWithChildsExceptSelectedForProductWithPaging(filter: string | null | undefined, codeFilter: string | null | undefined, nameFilter: string | null | undefined, sydObjectNameFilter: string | null | undefined, sycEntityObjectCategoryNameFilter: string | null | undefined, eagger: boolean | undefined, objectId: number | undefined, parentId: number | undefined, departmentFlag: boolean | undefined, entityId: number | undefined, excludeIds: number[] | null | undefined, filterCondition: string | null | undefined, sorting: string | null | undefined, skipCount: number | undefined, maxResultCount: number | undefined): Observable<PagedResultDtoOfTreeNodeOfGetSycEntityObjectCategoryForViewDto> {
+    getAllWithChildsExceptSelectedForProductWithPaging(filter: string | null | undefined, codeFilter: string | null | undefined, nameFilter: string | null | undefined, sydObjectNameFilter: string | null | undefined, sycEntityObjectCategoryNameFilter: string | null | undefined, eagger: boolean | undefined, objectId: number | undefined, parentId: number | undefined, departmentFlag: boolean | undefined, entityId: number | undefined, excludeIds: number[] | null | undefined, includeResultCount: boolean | undefined, filterCondition: string | null | undefined, sorting: string | null | undefined, skipCount: number | undefined, maxResultCount: number | undefined): Observable<PagedResultDtoOfTreeNodeOfGetSycEntityObjectCategoryForViewDto> {
         let url_ = this.baseUrl + "/api/services/app/AppItems/GetAllWithChildsExceptSelectedForProductWithPaging?";
         if (filter !== undefined && filter !== null)
             url_ += "Filter=" + encodeURIComponent("" + filter) + "&";
@@ -13924,6 +14161,10 @@ export class AppItemsServiceProxy {
             url_ += "EntityId=" + encodeURIComponent("" + entityId) + "&";
         if (excludeIds !== undefined && excludeIds !== null)
             excludeIds && excludeIds.forEach(item => { url_ += "ExcludeIds=" + encodeURIComponent("" + item) + "&"; });
+        if (includeResultCount === null)
+            throw new Error("The parameter 'includeResultCount' cannot be null.");
+        else if (includeResultCount !== undefined)
+            url_ += "IncludeResultCount=" + encodeURIComponent("" + includeResultCount) + "&";
         if (filterCondition !== undefined && filterCondition !== null)
             url_ += "FilterCondition=" + encodeURIComponent("" + filterCondition) + "&";
         if (sorting !== undefined && sorting !== null)
@@ -13994,13 +14235,14 @@ export class AppItemsServiceProxy {
      * @param departmentFlag (optional) 
      * @param entityId (optional) 
      * @param excludeIds (optional) 
+     * @param includeResultCount (optional) 
      * @param filterCondition (optional) 
      * @param sorting (optional) 
      * @param skipCount (optional) 
      * @param maxResultCount (optional) 
      * @return Success
      */
-    getAppItemRelatedProductsWithPaging(filter: string | null | undefined, codeFilter: string | null | undefined, nameFilter: string | null | undefined, sydObjectNameFilter: string | null | undefined, sycEntityObjectCategoryNameFilter: string | null | undefined, eagger: boolean | undefined, objectId: number | undefined, parentId: number | undefined, departmentFlag: boolean | undefined, entityId: number | undefined, excludeIds: number[] | null | undefined, filterCondition: string | null | undefined, sorting: string | null | undefined, skipCount: number | undefined, maxResultCount: number | undefined): Observable<PagedResultDtoOfAppItemLookupDto> {
+    getAppItemRelatedProductsWithPaging(filter: string | null | undefined, codeFilter: string | null | undefined, nameFilter: string | null | undefined, sydObjectNameFilter: string | null | undefined, sycEntityObjectCategoryNameFilter: string | null | undefined, eagger: boolean | undefined, objectId: number | undefined, parentId: number | undefined, departmentFlag: boolean | undefined, entityId: number | undefined, excludeIds: number[] | null | undefined, includeResultCount: boolean | undefined, filterCondition: string | null | undefined, sorting: string | null | undefined, skipCount: number | undefined, maxResultCount: number | undefined): Observable<PagedResultDtoOfAppItemLookupDto> {
         let url_ = this.baseUrl + "/api/services/app/AppItems/GetAppItemRelatedProductsWithPaging?";
         if (filter !== undefined && filter !== null)
             url_ += "Filter=" + encodeURIComponent("" + filter) + "&";
@@ -14034,6 +14276,10 @@ export class AppItemsServiceProxy {
             url_ += "EntityId=" + encodeURIComponent("" + entityId) + "&";
         if (excludeIds !== undefined && excludeIds !== null)
             excludeIds && excludeIds.forEach(item => { url_ += "ExcludeIds=" + encodeURIComponent("" + item) + "&"; });
+        if (includeResultCount === null)
+            throw new Error("The parameter 'includeResultCount' cannot be null.");
+        else if (includeResultCount !== undefined)
+            url_ += "IncludeResultCount=" + encodeURIComponent("" + includeResultCount) + "&";
         if (filterCondition !== undefined && filterCondition !== null)
             url_ += "FilterCondition=" + encodeURIComponent("" + filterCondition) + "&";
         if (sorting !== undefined && sorting !== null)
@@ -15249,6 +15495,302 @@ export class AppItemsServiceProxy {
             let result200: any = null;
             let resultData200 = _responseText === "" ? null : JSON.parse(_responseText, this.jsonParseReviver);
             result200 = AppItemExcelResultsDTO.fromJS(resultData200);
+            return _observableOf(result200);
+            }));
+        } else if (status !== 200 && status !== 204) {
+            return blobToText(responseBlob).pipe(_observableMergeMap((_responseText: string) => {
+            return throwException("An unexpected server error occurred.", status, _responseText, _headers);
+            }));
+        }
+        return _observableOf(null as any);
+    }
+
+    /**
+     * @param resultKey (optional) 
+     * @param skipCount (optional) 
+     * @param maxResultCount (optional) 
+     * @param recordType (optional) 
+     * @return Success
+     */
+    getValidateExcelResultPage(resultKey: string | null | undefined, skipCount: number | undefined, maxResultCount: number | undefined, recordType: string | null | undefined): Observable<AppItemExcelResultsDTO> {
+        let url_ = this.baseUrl + "/api/services/app/AppItems/GetValidateExcelResultPage?";
+        if (resultKey !== undefined && resultKey !== null)
+            url_ += "resultKey=" + encodeURIComponent("" + resultKey) + "&";
+        if (skipCount === null)
+            throw new Error("The parameter 'skipCount' cannot be null.");
+        else if (skipCount !== undefined)
+            url_ += "skipCount=" + encodeURIComponent("" + skipCount) + "&";
+        if (maxResultCount === null)
+            throw new Error("The parameter 'maxResultCount' cannot be null.");
+        else if (maxResultCount !== undefined)
+            url_ += "maxResultCount=" + encodeURIComponent("" + maxResultCount) + "&";
+        if (recordType !== undefined && recordType !== null)
+            url_ += "recordType=" + encodeURIComponent("" + recordType) + "&";
+        url_ = url_.replace(/[?&]$/, "");
+
+        let options_ : any = {
+            observe: "response",
+            responseType: "blob",
+            headers: new HttpHeaders({
+                "Accept": "text/plain"
+            })
+        };
+
+        return this.http.request("get", url_, options_).pipe(_observableMergeMap((response_ : any) => {
+            return this.processGetValidateExcelResultPage(response_);
+        })).pipe(_observableCatch((response_: any) => {
+            if (response_ instanceof HttpResponseBase) {
+                try {
+                    return this.processGetValidateExcelResultPage(response_ as any);
+                } catch (e) {
+                    return _observableThrow(e) as any as Observable<AppItemExcelResultsDTO>;
+                }
+            } else
+                return _observableThrow(response_) as any as Observable<AppItemExcelResultsDTO>;
+        }));
+    }
+
+    protected processGetValidateExcelResultPage(response: HttpResponseBase): Observable<AppItemExcelResultsDTO> {
+        const status = response.status;
+        const responseBlob =
+            response instanceof HttpResponse ? response.body :
+            (response as any).error instanceof Blob ? (response as any).error : undefined;
+
+        let _headers: any = {}; if (response.headers) { for (let key of response.headers.keys()) { _headers[key] = response.headers.get(key); }}
+        if (status === 200) {
+            return blobToText(responseBlob).pipe(_observableMergeMap((_responseText: string) => {
+            let result200: any = null;
+            let resultData200 = _responseText === "" ? null : JSON.parse(_responseText, this.jsonParseReviver);
+            result200 = AppItemExcelResultsDTO.fromJS(resultData200);
+            return _observableOf(result200);
+            }));
+        } else if (status !== 200 && status !== 204) {
+            return blobToText(responseBlob).pipe(_observableMergeMap((_responseText: string) => {
+            return throwException("An unexpected server error occurred.", status, _responseText, _headers);
+            }));
+        }
+        return _observableOf(null as any);
+    }
+
+    /**
+     * @param guidFile (optional) 
+     * @param body (optional) 
+     * @return Success
+     */
+    validatePriceCSV(guidFile: string | null | undefined, body: string[] | null | undefined): Observable<AppItemExcelResultsDTO> {
+        let url_ = this.baseUrl + "/api/services/app/AppItems/ValidatePriceCSV?";
+        if (guidFile !== undefined && guidFile !== null)
+            url_ += "guidFile=" + encodeURIComponent("" + guidFile) + "&";
+        url_ = url_.replace(/[?&]$/, "");
+
+        const content_ = JSON.stringify(body);
+
+        let options_ : any = {
+            body: content_,
+            observe: "response",
+            responseType: "blob",
+            headers: new HttpHeaders({
+                "Content-Type": "application/json-patch+json",
+                "Accept": "text/plain"
+            })
+        };
+
+        return this.http.request("post", url_, options_).pipe(_observableMergeMap((response_ : any) => {
+            return this.processValidatePriceCSV(response_);
+        })).pipe(_observableCatch((response_: any) => {
+            if (response_ instanceof HttpResponseBase) {
+                try {
+                    return this.processValidatePriceCSV(response_ as any);
+                } catch (e) {
+                    return _observableThrow(e) as any as Observable<AppItemExcelResultsDTO>;
+                }
+            } else
+                return _observableThrow(response_) as any as Observable<AppItemExcelResultsDTO>;
+        }));
+    }
+
+    protected processValidatePriceCSV(response: HttpResponseBase): Observable<AppItemExcelResultsDTO> {
+        const status = response.status;
+        const responseBlob =
+            response instanceof HttpResponse ? response.body :
+            (response as any).error instanceof Blob ? (response as any).error : undefined;
+
+        let _headers: any = {}; if (response.headers) { for (let key of response.headers.keys()) { _headers[key] = response.headers.get(key); }}
+        if (status === 200) {
+            return blobToText(responseBlob).pipe(_observableMergeMap((_responseText: string) => {
+            let result200: any = null;
+            let resultData200 = _responseText === "" ? null : JSON.parse(_responseText, this.jsonParseReviver);
+            result200 = AppItemExcelResultsDTO.fromJS(resultData200);
+            return _observableOf(result200);
+            }));
+        } else if (status !== 200 && status !== 204) {
+            return blobToText(responseBlob).pipe(_observableMergeMap((_responseText: string) => {
+            return throwException("An unexpected server error occurred.", status, _responseText, _headers);
+            }));
+        }
+        return _observableOf(null as any);
+    }
+
+    /**
+     * @param csvFilePath (optional) 
+     * @param body (optional) 
+     * @return Success
+     */
+    updateCsvStatusFromErrorLog(csvFilePath: string | null | undefined, body: AppItemtExcelRecordDTO[] | null | undefined): Observable<void> {
+        let url_ = this.baseUrl + "/api/services/app/AppItems/UpdateCsvStatusFromErrorLog?";
+        if (csvFilePath !== undefined && csvFilePath !== null)
+            url_ += "csvFilePath=" + encodeURIComponent("" + csvFilePath) + "&";
+        url_ = url_.replace(/[?&]$/, "");
+
+        const content_ = JSON.stringify(body);
+
+        let options_ : any = {
+            body: content_,
+            observe: "response",
+            responseType: "blob",
+            headers: new HttpHeaders({
+                "Content-Type": "application/json-patch+json",
+            })
+        };
+
+        return this.http.request("put", url_, options_).pipe(_observableMergeMap((response_ : any) => {
+            return this.processUpdateCsvStatusFromErrorLog(response_);
+        })).pipe(_observableCatch((response_: any) => {
+            if (response_ instanceof HttpResponseBase) {
+                try {
+                    return this.processUpdateCsvStatusFromErrorLog(response_ as any);
+                } catch (e) {
+                    return _observableThrow(e) as any as Observable<void>;
+                }
+            } else
+                return _observableThrow(response_) as any as Observable<void>;
+        }));
+    }
+
+    protected processUpdateCsvStatusFromErrorLog(response: HttpResponseBase): Observable<void> {
+        const status = response.status;
+        const responseBlob =
+            response instanceof HttpResponse ? response.body :
+            (response as any).error instanceof Blob ? (response as any).error : undefined;
+
+        let _headers: any = {}; if (response.headers) { for (let key of response.headers.keys()) { _headers[key] = response.headers.get(key); }}
+        if (status === 200) {
+            return blobToText(responseBlob).pipe(_observableMergeMap((_responseText: string) => {
+            return _observableOf(null as any);
+            }));
+        } else if (status !== 200 && status !== 204) {
+            return blobToText(responseBlob).pipe(_observableMergeMap((_responseText: string) => {
+            return throwException("An unexpected server error occurred.", status, _responseText, _headers);
+            }));
+        }
+        return _observableOf(null as any);
+    }
+
+    /**
+     * @param body (optional) 
+     * @return Success
+     */
+    savePriceFromCSV(body: AppItemExcelResultsDTO | undefined): Observable<ExcelLogDto> {
+        let url_ = this.baseUrl + "/api/services/app/AppItems/SavePriceFromCSV";
+        url_ = url_.replace(/[?&]$/, "");
+
+        const content_ = JSON.stringify(body);
+
+        let options_ : any = {
+            body: content_,
+            observe: "response",
+            responseType: "blob",
+            headers: new HttpHeaders({
+                "Content-Type": "application/json-patch+json",
+                "Accept": "text/plain"
+            })
+        };
+
+        return this.http.request("post", url_, options_).pipe(_observableMergeMap((response_ : any) => {
+            return this.processSavePriceFromCSV(response_);
+        })).pipe(_observableCatch((response_: any) => {
+            if (response_ instanceof HttpResponseBase) {
+                try {
+                    return this.processSavePriceFromCSV(response_ as any);
+                } catch (e) {
+                    return _observableThrow(e) as any as Observable<ExcelLogDto>;
+                }
+            } else
+                return _observableThrow(response_) as any as Observable<ExcelLogDto>;
+        }));
+    }
+
+    protected processSavePriceFromCSV(response: HttpResponseBase): Observable<ExcelLogDto> {
+        const status = response.status;
+        const responseBlob =
+            response instanceof HttpResponse ? response.body :
+            (response as any).error instanceof Blob ? (response as any).error : undefined;
+
+        let _headers: any = {}; if (response.headers) { for (let key of response.headers.keys()) { _headers[key] = response.headers.get(key); }}
+        if (status === 200) {
+            return blobToText(responseBlob).pipe(_observableMergeMap((_responseText: string) => {
+            let result200: any = null;
+            let resultData200 = _responseText === "" ? null : JSON.parse(_responseText, this.jsonParseReviver);
+            result200 = ExcelLogDto.fromJS(resultData200);
+            return _observableOf(result200);
+            }));
+        } else if (status !== 200 && status !== 204) {
+            return blobToText(responseBlob).pipe(_observableMergeMap((_responseText: string) => {
+            return throwException("An unexpected server error occurred.", status, _responseText, _headers);
+            }));
+        }
+        return _observableOf(null as any);
+    }
+
+    /**
+     * @param resultKey (optional) 
+     * @param body (optional) 
+     * @return Success
+     */
+    saveFromExcelResult(resultKey: string | null | undefined, body: AppItemExcelResultsDTO | undefined): Observable<ExcelLogDto> {
+        let url_ = this.baseUrl + "/api/services/app/AppItems/SaveFromExcelResult?";
+        if (resultKey !== undefined && resultKey !== null)
+            url_ += "resultKey=" + encodeURIComponent("" + resultKey) + "&";
+        url_ = url_.replace(/[?&]$/, "");
+
+        const content_ = JSON.stringify(body);
+
+        let options_ : any = {
+            body: content_,
+            observe: "response",
+            responseType: "blob",
+            headers: new HttpHeaders({
+                "Content-Type": "application/json-patch+json",
+                "Accept": "text/plain"
+            })
+        };
+
+        return this.http.request("post", url_, options_).pipe(_observableMergeMap((response_ : any) => {
+            return this.processSaveFromExcelResult(response_);
+        })).pipe(_observableCatch((response_: any) => {
+            if (response_ instanceof HttpResponseBase) {
+                try {
+                    return this.processSaveFromExcelResult(response_ as any);
+                } catch (e) {
+                    return _observableThrow(e) as any as Observable<ExcelLogDto>;
+                }
+            } else
+                return _observableThrow(response_) as any as Observable<ExcelLogDto>;
+        }));
+    }
+
+    protected processSaveFromExcelResult(response: HttpResponseBase): Observable<ExcelLogDto> {
+        const status = response.status;
+        const responseBlob =
+            response instanceof HttpResponse ? response.body :
+            (response as any).error instanceof Blob ? (response as any).error : undefined;
+
+        let _headers: any = {}; if (response.headers) { for (let key of response.headers.keys()) { _headers[key] = response.headers.get(key); }}
+        if (status === 200) {
+            return blobToText(responseBlob).pipe(_observableMergeMap((_responseText: string) => {
+            let result200: any = null;
+            let resultData200 = _responseText === "" ? null : JSON.parse(_responseText, this.jsonParseReviver);
+            result200 = ExcelLogDto.fromJS(resultData200);
             return _observableOf(result200);
             }));
         } else if (status !== 200 && status !== 204) {
@@ -17021,6 +17563,7 @@ export class AppItemsServiceProxy {
 
     /**
      * @param input (optional) 
+     * @param recordIndex (optional) 
      * @param recordType (optional) 
      * @param parentCode (optional) 
      * @param code (optional) 
@@ -17085,10 +17628,14 @@ export class AppItemsServiceProxy {
      * @param image (optional) 
      * @return Success
      */
-    getAppItemForEditData(input: string | null | undefined, recordType: string | null | undefined, parentCode: string | null | undefined, code: string | null | undefined, name: string | null | undefined, fieldsErrors: string[] | null | undefined, excelDto_Actions: string | null | undefined, excelDto_ImagePreview: string | null | undefined, excelDto_ImageIsDefault: boolean | undefined, excelDto_ColorCode: string | null | undefined, excelDto_ColorName: string | null | undefined, excelDto_ColorHex: string | null | undefined, excelDto_ColorImage: string | null | undefined, excelDto_ColorSchema: string | null | undefined, excelDto_ColorNRF: string | null | undefined, excelDto_SizeName: string | null | undefined, excelDto_SizeScaleOrder: string | null | undefined, excelDto_SizeMarket: string | null | undefined, excelDto_SizeNRF: string | null | undefined, excelDto_MaterialContent: string | null | undefined, excelDto_SoldOutDate: string | undefined, excelDto_BrancdCode: string | null | undefined, excelDto_BrandName: string | null | undefined, excelDto_StartShipDate: string | null | undefined, excelDto_Id: number | undefined, excelDto_rowNumber: number | undefined, excelDto_RecordType: string, excelDto_ProductType: string, excelDto_ProductClassificationCode: string | null | undefined, excelDto_ProductClassificationDescription: string | null | undefined, excelDto_ProductCategoryCode: string | null | undefined, excelDto_ProductCategoryDescription: string | null | undefined, excelDto_Price: string | null | undefined, excelDto_PriceA: string | null | undefined, excelDto_PriceB: string | null | undefined, excelDto_PriceC: string | null | undefined, excelDto_PriceD: string | null | undefined, excelDto_Currency: string | null | undefined, excelDto_ParentCode: string | null | undefined, excelDto_ImageType: string | null | undefined, excelDto_ImageFolderName: string | null | undefined, excelDto_ParentId: number | undefined, excelDto_ExtraAttributesValues: AppItemImpExtrAttributes[] | null | undefined, excelDto_ExtraAttributes: ExtraAttribute[] | null | undefined, excelDto_Images: AppItemImage[] | null | undefined, excelDto_Code: string, excelDto_Name: string, excelDto_ProductDescription: string, excelDto_EntityObjectClassificaionID: number | null | undefined, excelDto_EntityObjectCategoryID: number | null | undefined, excelDto_SizeScaleName: string | null | undefined, excelDto_SizeRatioName: string | null | undefined, excelDto_SizeRatioValue: string | null | undefined, excelDto_NoOfDim: string | null | undefined, excelDto_D1Name: string | null | undefined, excelDto_D2Name: string | null | undefined, excelDto_D3Name: string | null | undefined, excelDto_D1Sizes: string | null | undefined, excelDto_D2Sizes: string | null | undefined, excelDto_D3Sizes: string | null | undefined, excelDto_D1Pos: string | null | undefined, excelDto_D2Pos: string | null | undefined, excelDto_D3Pos: string | null | undefined, excelDto_SizeCode: string | null | undefined, status: string | null | undefined, errorMessage: string | null | undefined, imageType: string | null | undefined, image: string | null | undefined): Observable<AppItemtExcelRecordDTO> {
+    getAppItemForEditData(input: string | null | undefined, recordIndex: number | undefined, recordType: string | null | undefined, parentCode: string | null | undefined, code: string | null | undefined, name: string | null | undefined, fieldsErrors: string[] | null | undefined, excelDto_Actions: string | null | undefined, excelDto_ImagePreview: string | null | undefined, excelDto_ImageIsDefault: boolean | undefined, excelDto_ColorCode: string | null | undefined, excelDto_ColorName: string | null | undefined, excelDto_ColorHex: string | null | undefined, excelDto_ColorImage: string | null | undefined, excelDto_ColorSchema: string | null | undefined, excelDto_ColorNRF: string | null | undefined, excelDto_SizeName: string | null | undefined, excelDto_SizeScaleOrder: string | null | undefined, excelDto_SizeMarket: string | null | undefined, excelDto_SizeNRF: string | null | undefined, excelDto_MaterialContent: string | null | undefined, excelDto_SoldOutDate: string | undefined, excelDto_BrancdCode: string | null | undefined, excelDto_BrandName: string | null | undefined, excelDto_StartShipDate: string | null | undefined, excelDto_Id: number | undefined, excelDto_rowNumber: number | undefined, excelDto_RecordType: string, excelDto_ProductType: string, excelDto_ProductClassificationCode: string | null | undefined, excelDto_ProductClassificationDescription: string | null | undefined, excelDto_ProductCategoryCode: string | null | undefined, excelDto_ProductCategoryDescription: string | null | undefined, excelDto_Price: string | null | undefined, excelDto_PriceA: string | null | undefined, excelDto_PriceB: string | null | undefined, excelDto_PriceC: string | null | undefined, excelDto_PriceD: string | null | undefined, excelDto_Currency: string | null | undefined, excelDto_ParentCode: string | null | undefined, excelDto_ImageType: string | null | undefined, excelDto_ImageFolderName: string | null | undefined, excelDto_ParentId: number | undefined, excelDto_ExtraAttributesValues: AppItemImpExtrAttributes[] | null | undefined, excelDto_ExtraAttributes: ExtraAttribute[] | null | undefined, excelDto_Images: AppItemImage[] | null | undefined, excelDto_Code: string, excelDto_Name: string, excelDto_ProductDescription: string, excelDto_EntityObjectClassificaionID: number | null | undefined, excelDto_EntityObjectCategoryID: number | null | undefined, excelDto_SizeScaleName: string | null | undefined, excelDto_SizeRatioName: string | null | undefined, excelDto_SizeRatioValue: string | null | undefined, excelDto_NoOfDim: string | null | undefined, excelDto_D1Name: string | null | undefined, excelDto_D2Name: string | null | undefined, excelDto_D3Name: string | null | undefined, excelDto_D1Sizes: string | null | undefined, excelDto_D2Sizes: string | null | undefined, excelDto_D3Sizes: string | null | undefined, excelDto_D1Pos: string | null | undefined, excelDto_D2Pos: string | null | undefined, excelDto_D3Pos: string | null | undefined, excelDto_SizeCode: string | null | undefined, status: string | null | undefined, errorMessage: string | null | undefined, imageType: string | null | undefined, image: string | null | undefined): Observable<AppItemtExcelRecordDTO> {
         let url_ = this.baseUrl + "/api/services/app/AppItems/GetAppItemForEditData?";
         if (input !== undefined && input !== null)
             url_ += "input=" + encodeURIComponent("" + input) + "&";
+        if (recordIndex === null)
+            throw new Error("The parameter 'recordIndex' cannot be null.");
+        else if (recordIndex !== undefined)
+            url_ += "RecordIndex=" + encodeURIComponent("" + recordIndex) + "&";
         if (recordType !== undefined && recordType !== null)
             url_ += "RecordType=" + encodeURIComponent("" + recordType) + "&";
         if (parentCode !== undefined && parentCode !== null)
@@ -17369,6 +17916,7 @@ export class AppItemsServiceProxy {
 
     /**
      * @param input (optional) 
+     * @param recordIndex (optional) 
      * @param recordType (optional) 
      * @param parentCode (optional) 
      * @param code (optional) 
@@ -17433,10 +17981,14 @@ export class AppItemsServiceProxy {
      * @param image (optional) 
      * @return Success
      */
-    getAppItemColorForEditData(input: string | null | undefined, recordType: string | null | undefined, parentCode: string | null | undefined, code: string | null | undefined, name: string | null | undefined, fieldsErrors: string[] | null | undefined, excelDto_Actions: string | null | undefined, excelDto_ImagePreview: string | null | undefined, excelDto_ImageIsDefault: boolean | undefined, excelDto_ColorCode: string | null | undefined, excelDto_ColorName: string | null | undefined, excelDto_ColorHex: string | null | undefined, excelDto_ColorImage: string | null | undefined, excelDto_ColorSchema: string | null | undefined, excelDto_ColorNRF: string | null | undefined, excelDto_SizeName: string | null | undefined, excelDto_SizeScaleOrder: string | null | undefined, excelDto_SizeMarket: string | null | undefined, excelDto_SizeNRF: string | null | undefined, excelDto_MaterialContent: string | null | undefined, excelDto_SoldOutDate: string | undefined, excelDto_BrancdCode: string | null | undefined, excelDto_BrandName: string | null | undefined, excelDto_StartShipDate: string | null | undefined, excelDto_Id: number | undefined, excelDto_rowNumber: number | undefined, excelDto_RecordType: string, excelDto_ProductType: string, excelDto_ProductClassificationCode: string | null | undefined, excelDto_ProductClassificationDescription: string | null | undefined, excelDto_ProductCategoryCode: string | null | undefined, excelDto_ProductCategoryDescription: string | null | undefined, excelDto_Price: string | null | undefined, excelDto_PriceA: string | null | undefined, excelDto_PriceB: string | null | undefined, excelDto_PriceC: string | null | undefined, excelDto_PriceD: string | null | undefined, excelDto_Currency: string | null | undefined, excelDto_ParentCode: string | null | undefined, excelDto_ImageType: string | null | undefined, excelDto_ImageFolderName: string | null | undefined, excelDto_ParentId: number | undefined, excelDto_ExtraAttributesValues: AppItemImpExtrAttributes[] | null | undefined, excelDto_ExtraAttributes: ExtraAttribute[] | null | undefined, excelDto_Images: AppItemImage[] | null | undefined, excelDto_Code: string, excelDto_Name: string, excelDto_ProductDescription: string, excelDto_EntityObjectClassificaionID: number | null | undefined, excelDto_EntityObjectCategoryID: number | null | undefined, excelDto_SizeScaleName: string | null | undefined, excelDto_SizeRatioName: string | null | undefined, excelDto_SizeRatioValue: string | null | undefined, excelDto_NoOfDim: string | null | undefined, excelDto_D1Name: string | null | undefined, excelDto_D2Name: string | null | undefined, excelDto_D3Name: string | null | undefined, excelDto_D1Sizes: string | null | undefined, excelDto_D2Sizes: string | null | undefined, excelDto_D3Sizes: string | null | undefined, excelDto_D1Pos: string | null | undefined, excelDto_D2Pos: string | null | undefined, excelDto_D3Pos: string | null | undefined, excelDto_SizeCode: string | null | undefined, status: string | null | undefined, errorMessage: string | null | undefined, imageType: string | null | undefined, image: string | null | undefined): Observable<AppItemtExcelRecordDTO> {
+    getAppItemColorForEditData(input: string | null | undefined, recordIndex: number | undefined, recordType: string | null | undefined, parentCode: string | null | undefined, code: string | null | undefined, name: string | null | undefined, fieldsErrors: string[] | null | undefined, excelDto_Actions: string | null | undefined, excelDto_ImagePreview: string | null | undefined, excelDto_ImageIsDefault: boolean | undefined, excelDto_ColorCode: string | null | undefined, excelDto_ColorName: string | null | undefined, excelDto_ColorHex: string | null | undefined, excelDto_ColorImage: string | null | undefined, excelDto_ColorSchema: string | null | undefined, excelDto_ColorNRF: string | null | undefined, excelDto_SizeName: string | null | undefined, excelDto_SizeScaleOrder: string | null | undefined, excelDto_SizeMarket: string | null | undefined, excelDto_SizeNRF: string | null | undefined, excelDto_MaterialContent: string | null | undefined, excelDto_SoldOutDate: string | undefined, excelDto_BrancdCode: string | null | undefined, excelDto_BrandName: string | null | undefined, excelDto_StartShipDate: string | null | undefined, excelDto_Id: number | undefined, excelDto_rowNumber: number | undefined, excelDto_RecordType: string, excelDto_ProductType: string, excelDto_ProductClassificationCode: string | null | undefined, excelDto_ProductClassificationDescription: string | null | undefined, excelDto_ProductCategoryCode: string | null | undefined, excelDto_ProductCategoryDescription: string | null | undefined, excelDto_Price: string | null | undefined, excelDto_PriceA: string | null | undefined, excelDto_PriceB: string | null | undefined, excelDto_PriceC: string | null | undefined, excelDto_PriceD: string | null | undefined, excelDto_Currency: string | null | undefined, excelDto_ParentCode: string | null | undefined, excelDto_ImageType: string | null | undefined, excelDto_ImageFolderName: string | null | undefined, excelDto_ParentId: number | undefined, excelDto_ExtraAttributesValues: AppItemImpExtrAttributes[] | null | undefined, excelDto_ExtraAttributes: ExtraAttribute[] | null | undefined, excelDto_Images: AppItemImage[] | null | undefined, excelDto_Code: string, excelDto_Name: string, excelDto_ProductDescription: string, excelDto_EntityObjectClassificaionID: number | null | undefined, excelDto_EntityObjectCategoryID: number | null | undefined, excelDto_SizeScaleName: string | null | undefined, excelDto_SizeRatioName: string | null | undefined, excelDto_SizeRatioValue: string | null | undefined, excelDto_NoOfDim: string | null | undefined, excelDto_D1Name: string | null | undefined, excelDto_D2Name: string | null | undefined, excelDto_D3Name: string | null | undefined, excelDto_D1Sizes: string | null | undefined, excelDto_D2Sizes: string | null | undefined, excelDto_D3Sizes: string | null | undefined, excelDto_D1Pos: string | null | undefined, excelDto_D2Pos: string | null | undefined, excelDto_D3Pos: string | null | undefined, excelDto_SizeCode: string | null | undefined, status: string | null | undefined, errorMessage: string | null | undefined, imageType: string | null | undefined, image: string | null | undefined): Observable<AppItemtExcelRecordDTO> {
         let url_ = this.baseUrl + "/api/services/app/AppItems/GetAppItemColorForEditData?";
         if (input !== undefined && input !== null)
             url_ += "input=" + encodeURIComponent("" + input) + "&";
+        if (recordIndex === null)
+            throw new Error("The parameter 'recordIndex' cannot be null.");
+        else if (recordIndex !== undefined)
+            url_ += "RecordIndex=" + encodeURIComponent("" + recordIndex) + "&";
         if (recordType !== undefined && recordType !== null)
             url_ += "RecordType=" + encodeURIComponent("" + recordType) + "&";
         if (parentCode !== undefined && parentCode !== null)
@@ -18708,12 +19260,16 @@ export class AppItemsListsServiceProxy {
      * @param id (optional) 
      * @return Success
      */
-    getAppItemsListForView(id: number | undefined): Observable<GetAppItemsListForEditOutput> {
+    getAppItemsListForView(id: number | undefined, isMarketplaceList: boolean | undefined): Observable<GetAppItemsListForEditOutput> {
         let url_ = this.baseUrl + "/api/services/app/AppItemsLists/GetAppItemsListForView?";
         if (id === null)
             throw new Error("The parameter 'id' cannot be null.");
         else if (id !== undefined)
             url_ += "id=" + encodeURIComponent("" + id) + "&";
+        if (isMarketplaceList === null)
+            throw new Error("The parameter 'isMarketplaceList' cannot be null.");
+        else if (isMarketplaceList !== undefined)
+            url_ += "isMarketplaceList=" + encodeURIComponent("" + isMarketplaceList) + "&";
         url_ = url_.replace(/[?&]$/, "");
 
         let options_ : any = {
@@ -19915,6 +20471,63 @@ export class AppItemsListsServiceProxy {
         if (status === 200) {
             return blobToText(responseBlob).pipe(_observableMergeMap((_responseText: string) => {
             return _observableOf(null as any);
+            }));
+        } else if (status !== 200 && status !== 204) {
+            return blobToText(responseBlob).pipe(_observableMergeMap((_responseText: string) => {
+            return throwException("An unexpected server error occurred.", status, _responseText, _headers);
+            }));
+        }
+        return _observableOf(null as any);
+    }
+
+    /**
+     * @param sharedItemListId (optional) 
+     * @return Success
+     */
+    getMainItemListID(sharedItemListId: number | undefined): Observable<number> {
+        let url_ = this.baseUrl + "/api/services/app/AppItemsLists/GetMainItemListID?";
+        if (sharedItemListId === null)
+            throw new Error("The parameter 'sharedItemListId' cannot be null.");
+        else if (sharedItemListId !== undefined)
+            url_ += "sharedItemListId=" + encodeURIComponent("" + sharedItemListId) + "&";
+        url_ = url_.replace(/[?&]$/, "");
+
+        let options_ : any = {
+            observe: "response",
+            responseType: "blob",
+            headers: new HttpHeaders({
+                "Accept": "text/plain"
+            })
+        };
+
+        return this.http.request("get", url_, options_).pipe(_observableMergeMap((response_ : any) => {
+            return this.processGetMainItemListID(response_);
+        })).pipe(_observableCatch((response_: any) => {
+            if (response_ instanceof HttpResponseBase) {
+                try {
+                    return this.processGetMainItemListID(response_ as any);
+                } catch (e) {
+                    return _observableThrow(e) as any as Observable<number>;
+                }
+            } else
+                return _observableThrow(response_) as any as Observable<number>;
+        }));
+    }
+
+    protected processGetMainItemListID(response: HttpResponseBase): Observable<number> {
+        const status = response.status;
+        const responseBlob =
+            response instanceof HttpResponse ? response.body :
+            (response as any).error instanceof Blob ? (response as any).error : undefined;
+
+        let _headers: any = {}; if (response.headers) { for (let key of response.headers.keys()) { _headers[key] = response.headers.get(key); }}
+        if (status === 200) {
+            return blobToText(responseBlob).pipe(_observableMergeMap((_responseText: string) => {
+            let result200: any = null;
+            let resultData200 = _responseText === "" ? null : JSON.parse(_responseText, this.jsonParseReviver);
+                result200 = resultData200 !== undefined ? resultData200 : <any>null;
+    
+            return _observableOf(result200);
             }));
         } else if (status !== 200 && status !== 204) {
             return blobToText(responseBlob).pipe(_observableMergeMap((_responseText: string) => {
@@ -30632,6 +31245,65 @@ export class AppUpdateItemSSINServiceProxy {
     }
 
     /**
+     * @param tenantId (optional) 
+     * @param currentTenant (optional) 
+     * @return Success
+     */
+    fixSSINMissingVariations(tenantId: number | null | undefined, currentTenant: boolean | undefined): Observable<FixSSINMissingVariationsResultDto> {
+        let url_ = this.baseUrl + "/api/services/app/AppUpdateItemSSIN/FixSSINMissingVariations?";
+        if (tenantId !== undefined && tenantId !== null)
+            url_ += "tenantId=" + encodeURIComponent("" + tenantId) + "&";
+        if (currentTenant === null)
+            throw new Error("The parameter 'currentTenant' cannot be null.");
+        else if (currentTenant !== undefined)
+            url_ += "currentTenant=" + encodeURIComponent("" + currentTenant) + "&";
+        url_ = url_.replace(/[?&]$/, "");
+
+        let options_ : any = {
+            observe: "response",
+            responseType: "blob",
+            headers: new HttpHeaders({
+                "Accept": "text/plain"
+            })
+        };
+
+        return this.http.request("post", url_, options_).pipe(_observableMergeMap((response_ : any) => {
+            return this.processFixSSINMissingVariations(response_);
+        })).pipe(_observableCatch((response_: any) => {
+            if (response_ instanceof HttpResponseBase) {
+                try {
+                    return this.processFixSSINMissingVariations(response_ as any);
+                } catch (e) {
+                    return _observableThrow(e) as any as Observable<FixSSINMissingVariationsResultDto>;
+                }
+            } else
+                return _observableThrow(response_) as any as Observable<FixSSINMissingVariationsResultDto>;
+        }));
+    }
+
+    protected processFixSSINMissingVariations(response: HttpResponseBase): Observable<FixSSINMissingVariationsResultDto> {
+        const status = response.status;
+        const responseBlob =
+            response instanceof HttpResponse ? response.body :
+            (response as any).error instanceof Blob ? (response as any).error : undefined;
+
+        let _headers: any = {}; if (response.headers) { for (let key of response.headers.keys()) { _headers[key] = response.headers.get(key); }}
+        if (status === 200) {
+            return blobToText(responseBlob).pipe(_observableMergeMap((_responseText: string) => {
+            let result200: any = null;
+            let resultData200 = _responseText === "" ? null : JSON.parse(_responseText, this.jsonParseReviver);
+            result200 = FixSSINMissingVariationsResultDto.fromJS(resultData200);
+            return _observableOf(result200);
+            }));
+        } else if (status !== 200 && status !== 204) {
+            return blobToText(responseBlob).pipe(_observableMergeMap((_responseText: string) => {
+            return throwException("An unexpected server error occurred.", status, _responseText, _headers);
+            }));
+        }
+        return _observableOf(null as any);
+    }
+
+    /**
      * @return Success
      */
     updateSSIN(): Observable<void> {
@@ -37133,6 +37805,67 @@ export class MessageServiceProxy {
             let resultData200 = _responseText === "" ? null : JSON.parse(_responseText, this.jsonParseReviver);
                 result200 = resultData200 !== undefined ? resultData200 : <any>null;
     
+            return _observableOf(result200);
+            }));
+        } else if (status !== 200 && status !== 204) {
+            return blobToText(responseBlob).pipe(_observableMergeMap((_responseText: string) => {
+            return throwException("An unexpected server error occurred.", status, _responseText, _headers);
+            }));
+        }
+        return _observableOf(null as any);
+    }
+
+    /**
+     * @param entityIds (optional) 
+     * @return Success
+     */
+    getMarketplaceItemReviewSummaries(entityIds: number[] | null | undefined): Observable<MarketplaceItemReviewSummaryDto[]> {
+        let url_ = this.baseUrl + "/api/services/app/Message/GetMarketplaceItemReviewSummaries?";
+        if (entityIds !== undefined && entityIds !== null)
+            entityIds && entityIds.forEach(item => { url_ += "entityIds=" + encodeURIComponent("" + item) + "&"; });
+        url_ = url_.replace(/[?&]$/, "");
+
+        let options_ : any = {
+            observe: "response",
+            responseType: "blob",
+            headers: new HttpHeaders({
+                "Accept": "text/plain"
+            })
+        };
+
+        return this.http.request("get", url_, options_).pipe(_observableMergeMap((response_ : any) => {
+            return this.processGetMarketplaceItemReviewSummaries(response_);
+        })).pipe(_observableCatch((response_: any) => {
+            if (response_ instanceof HttpResponseBase) {
+                try {
+                    return this.processGetMarketplaceItemReviewSummaries(response_ as any);
+                } catch (e) {
+                    return _observableThrow(e) as any as Observable<MarketplaceItemReviewSummaryDto[]>;
+                }
+            } else
+                return _observableThrow(response_) as any as Observable<MarketplaceItemReviewSummaryDto[]>;
+        }));
+    }
+
+    protected processGetMarketplaceItemReviewSummaries(response: HttpResponseBase): Observable<MarketplaceItemReviewSummaryDto[]> {
+        const status = response.status;
+        const responseBlob =
+            response instanceof HttpResponse ? response.body :
+            (response as any).error instanceof Blob ? (response as any).error : undefined;
+
+        let _headers: any = {}; if (response.headers) { for (let key of response.headers.keys()) { _headers[key] = response.headers.get(key); }}
+        if (status === 200) {
+            return blobToText(responseBlob).pipe(_observableMergeMap((_responseText: string) => {
+            let result200: any = null;
+            let resultData200 = _responseText === "" ? null : JSON.parse(_responseText, this.jsonParseReviver);
+            if (Array.isArray(resultData200)) {
+                result200 = [] as any;
+                for (let item of resultData200)
+                    result200!.push(MarketplaceItemReviewSummaryDto.fromJS(item));
+            }
+            else {
+                result200 = <any>null;
+            }
             return _observableOf(result200);
             }));
         } else if (status !== 200 && status !== 204) {
@@ -43876,13 +44609,14 @@ export class SycEntityObjectCategoriesServiceProxy {
      * @param departmentFlag (optional) 
      * @param entityId (optional) 
      * @param excludeIds (optional) 
+     * @param includeResultCount (optional) 
      * @param filterCondition (optional) 
      * @param sorting (optional) 
      * @param skipCount (optional) 
      * @param maxResultCount (optional) 
      * @return Success
      */
-    getAll(filter: string | null | undefined, codeFilter: string | null | undefined, nameFilter: string | null | undefined, sydObjectNameFilter: string | null | undefined, sycEntityObjectCategoryNameFilter: string | null | undefined, eagger: boolean | undefined, objectId: number | undefined, parentId: number | undefined, departmentFlag: boolean | undefined, entityId: number | undefined, excludeIds: number[] | null | undefined, filterCondition: string | null | undefined, sorting: string | null | undefined, skipCount: number | undefined, maxResultCount: number | undefined): Observable<PagedResultDtoOfTreeNodeOfGetSycEntityObjectCategoryForViewDto> {
+    getAll(filter: string | null | undefined, codeFilter: string | null | undefined, nameFilter: string | null | undefined, sydObjectNameFilter: string | null | undefined, sycEntityObjectCategoryNameFilter: string | null | undefined, eagger: boolean | undefined, objectId: number | undefined, parentId: number | undefined, departmentFlag: boolean | undefined, entityId: number | undefined, excludeIds: number[] | null | undefined, includeResultCount: boolean | undefined, filterCondition: string | null | undefined, sorting: string | null | undefined, skipCount: number | undefined, maxResultCount: number | undefined): Observable<PagedResultDtoOfTreeNodeOfGetSycEntityObjectCategoryForViewDto> {
         let url_ = this.baseUrl + "/api/services/app/SycEntityObjectCategories/GetAll?";
         if (filter !== undefined && filter !== null)
             url_ += "Filter=" + encodeURIComponent("" + filter) + "&";
@@ -43916,6 +44650,10 @@ export class SycEntityObjectCategoriesServiceProxy {
             url_ += "EntityId=" + encodeURIComponent("" + entityId) + "&";
         if (excludeIds !== undefined && excludeIds !== null)
             excludeIds && excludeIds.forEach(item => { url_ += "ExcludeIds=" + encodeURIComponent("" + item) + "&"; });
+        if (includeResultCount === null)
+            throw new Error("The parameter 'includeResultCount' cannot be null.");
+        else if (includeResultCount !== undefined)
+            url_ += "IncludeResultCount=" + encodeURIComponent("" + includeResultCount) + "&";
         if (filterCondition !== undefined && filterCondition !== null)
             url_ += "FilterCondition=" + encodeURIComponent("" + filterCondition) + "&";
         if (sorting !== undefined && sorting !== null)
@@ -43986,13 +44724,14 @@ export class SycEntityObjectCategoriesServiceProxy {
      * @param departmentFlag (optional) 
      * @param entityId (optional) 
      * @param excludeIds (optional) 
+     * @param includeResultCount (optional) 
      * @param filterCondition (optional) 
      * @param sorting (optional) 
      * @param skipCount (optional) 
      * @param maxResultCount (optional) 
      * @return Success
      */
-    getAllWithChildsForContactAsTreeViewWithPaging(filter: string | null | undefined, codeFilter: string | null | undefined, nameFilter: string | null | undefined, sydObjectNameFilter: string | null | undefined, sycEntityObjectCategoryNameFilter: string | null | undefined, eagger: boolean | undefined, objectId: number | undefined, parentId: number | undefined, departmentFlag: boolean | undefined, entityId: number | undefined, excludeIds: number[] | null | undefined, filterCondition: string | null | undefined, sorting: string | null | undefined, skipCount: number | undefined, maxResultCount: number | undefined): Observable<PagedResultDtoOfTreeviewItem> {
+    getAllWithChildsForContactAsTreeViewWithPaging(filter: string | null | undefined, codeFilter: string | null | undefined, nameFilter: string | null | undefined, sydObjectNameFilter: string | null | undefined, sycEntityObjectCategoryNameFilter: string | null | undefined, eagger: boolean | undefined, objectId: number | undefined, parentId: number | undefined, departmentFlag: boolean | undefined, entityId: number | undefined, excludeIds: number[] | null | undefined, includeResultCount: boolean | undefined, filterCondition: string | null | undefined, sorting: string | null | undefined, skipCount: number | undefined, maxResultCount: number | undefined): Observable<PagedResultDtoOfTreeviewItem> {
         let url_ = this.baseUrl + "/api/services/app/SycEntityObjectCategories/GetAllWithChildsForContactAsTreeViewWithPaging?";
         if (filter !== undefined && filter !== null)
             url_ += "Filter=" + encodeURIComponent("" + filter) + "&";
@@ -44026,6 +44765,10 @@ export class SycEntityObjectCategoriesServiceProxy {
             url_ += "EntityId=" + encodeURIComponent("" + entityId) + "&";
         if (excludeIds !== undefined && excludeIds !== null)
             excludeIds && excludeIds.forEach(item => { url_ += "ExcludeIds=" + encodeURIComponent("" + item) + "&"; });
+        if (includeResultCount === null)
+            throw new Error("The parameter 'includeResultCount' cannot be null.");
+        else if (includeResultCount !== undefined)
+            url_ += "IncludeResultCount=" + encodeURIComponent("" + includeResultCount) + "&";
         if (filterCondition !== undefined && filterCondition !== null)
             url_ += "FilterCondition=" + encodeURIComponent("" + filterCondition) + "&";
         if (sorting !== undefined && sorting !== null)
@@ -44198,13 +44941,14 @@ export class SycEntityObjectCategoriesServiceProxy {
      * @param departmentFlag (optional) 
      * @param entityId (optional) 
      * @param excludeIds (optional) 
+     * @param includeResultCount (optional) 
      * @param filterCondition (optional) 
      * @param sorting (optional) 
      * @param skipCount (optional) 
      * @param maxResultCount (optional) 
      * @return Success
      */
-    getAllWithChildsForContactWithPaging(filter: string | null | undefined, codeFilter: string | null | undefined, nameFilter: string | null | undefined, sydObjectNameFilter: string | null | undefined, sycEntityObjectCategoryNameFilter: string | null | undefined, eagger: boolean | undefined, objectId: number | undefined, parentId: number | undefined, departmentFlag: boolean | undefined, entityId: number | undefined, excludeIds: number[] | null | undefined, filterCondition: string | null | undefined, sorting: string | null | undefined, skipCount: number | undefined, maxResultCount: number | undefined): Observable<PagedResultDtoOfTreeNodeOfGetSycEntityObjectCategoryForViewDto> {
+    getAllWithChildsForContactWithPaging(filter: string | null | undefined, codeFilter: string | null | undefined, nameFilter: string | null | undefined, sydObjectNameFilter: string | null | undefined, sycEntityObjectCategoryNameFilter: string | null | undefined, eagger: boolean | undefined, objectId: number | undefined, parentId: number | undefined, departmentFlag: boolean | undefined, entityId: number | undefined, excludeIds: number[] | null | undefined, includeResultCount: boolean | undefined, filterCondition: string | null | undefined, sorting: string | null | undefined, skipCount: number | undefined, maxResultCount: number | undefined): Observable<PagedResultDtoOfTreeNodeOfGetSycEntityObjectCategoryForViewDto> {
         let url_ = this.baseUrl + "/api/services/app/SycEntityObjectCategories/GetAllWithChildsForContactWithPaging?";
         if (filter !== undefined && filter !== null)
             url_ += "Filter=" + encodeURIComponent("" + filter) + "&";
@@ -44238,6 +44982,10 @@ export class SycEntityObjectCategoriesServiceProxy {
             url_ += "EntityId=" + encodeURIComponent("" + entityId) + "&";
         if (excludeIds !== undefined && excludeIds !== null)
             excludeIds && excludeIds.forEach(item => { url_ += "ExcludeIds=" + encodeURIComponent("" + item) + "&"; });
+        if (includeResultCount === null)
+            throw new Error("The parameter 'includeResultCount' cannot be null.");
+        else if (includeResultCount !== undefined)
+            url_ += "IncludeResultCount=" + encodeURIComponent("" + includeResultCount) + "&";
         if (filterCondition !== undefined && filterCondition !== null)
             url_ += "FilterCondition=" + encodeURIComponent("" + filterCondition) + "&";
         if (sorting !== undefined && sorting !== null)
@@ -44415,13 +45163,14 @@ export class SycEntityObjectCategoriesServiceProxy {
      * @param departmentFlag (optional) 
      * @param entityId (optional) 
      * @param excludeIds (optional) 
+     * @param includeResultCount (optional) 
      * @param filterCondition (optional) 
      * @param sorting (optional) 
      * @param skipCount (optional) 
      * @param maxResultCount (optional) 
      * @return Success
      */
-    getAllWithChildsForProductWithPaging(filter: string | null | undefined, codeFilter: string | null | undefined, nameFilter: string | null | undefined, sydObjectNameFilter: string | null | undefined, sycEntityObjectCategoryNameFilter: string | null | undefined, eagger: boolean | undefined, objectId: number | undefined, parentId: number | undefined, departmentFlag: boolean | undefined, entityId: number | undefined, excludeIds: number[] | null | undefined, filterCondition: string | null | undefined, sorting: string | null | undefined, skipCount: number | undefined, maxResultCount: number | undefined): Observable<PagedResultDtoOfTreeNodeOfGetSycEntityObjectCategoryForViewDto> {
+    getAllWithChildsForProductWithPaging(filter: string | null | undefined, codeFilter: string | null | undefined, nameFilter: string | null | undefined, sydObjectNameFilter: string | null | undefined, sycEntityObjectCategoryNameFilter: string | null | undefined, eagger: boolean | undefined, objectId: number | undefined, parentId: number | undefined, departmentFlag: boolean | undefined, entityId: number | undefined, excludeIds: number[] | null | undefined, includeResultCount: boolean | undefined, filterCondition: string | null | undefined, sorting: string | null | undefined, skipCount: number | undefined, maxResultCount: number | undefined): Observable<PagedResultDtoOfTreeNodeOfGetSycEntityObjectCategoryForViewDto> {
         let url_ = this.baseUrl + "/api/services/app/SycEntityObjectCategories/GetAllWithChildsForProductWithPaging?";
         if (filter !== undefined && filter !== null)
             url_ += "Filter=" + encodeURIComponent("" + filter) + "&";
@@ -44455,6 +45204,10 @@ export class SycEntityObjectCategoriesServiceProxy {
             url_ += "EntityId=" + encodeURIComponent("" + entityId) + "&";
         if (excludeIds !== undefined && excludeIds !== null)
             excludeIds && excludeIds.forEach(item => { url_ += "ExcludeIds=" + encodeURIComponent("" + item) + "&"; });
+        if (includeResultCount === null)
+            throw new Error("The parameter 'includeResultCount' cannot be null.");
+        else if (includeResultCount !== undefined)
+            url_ += "IncludeResultCount=" + encodeURIComponent("" + includeResultCount) + "&";
         if (filterCondition !== undefined && filterCondition !== null)
             url_ += "FilterCondition=" + encodeURIComponent("" + filterCondition) + "&";
         if (sorting !== undefined && sorting !== null)
@@ -44628,13 +45381,14 @@ export class SycEntityObjectCategoriesServiceProxy {
      * @param departmentFlag (optional) 
      * @param entityId (optional) 
      * @param excludeIds (optional) 
+     * @param includeResultCount (optional) 
      * @param filterCondition (optional) 
      * @param sorting (optional) 
      * @param skipCount (optional) 
      * @param maxResultCount (optional) 
      * @return Success
      */
-    getAllChildsWithPaging(filter: string | null | undefined, codeFilter: string | null | undefined, nameFilter: string | null | undefined, sydObjectNameFilter: string | null | undefined, sycEntityObjectCategoryNameFilter: string | null | undefined, eagger: boolean | undefined, objectId: number | undefined, parentId: number | undefined, departmentFlag: boolean | undefined, entityId: number | undefined, excludeIds: number[] | null | undefined, filterCondition: string | null | undefined, sorting: string | null | undefined, skipCount: number | undefined, maxResultCount: number | undefined): Observable<PagedResultDtoOfTreeNodeOfGetSycEntityObjectCategoryForViewDto> {
+    getAllChildsWithPaging(filter: string | null | undefined, codeFilter: string | null | undefined, nameFilter: string | null | undefined, sydObjectNameFilter: string | null | undefined, sycEntityObjectCategoryNameFilter: string | null | undefined, eagger: boolean | undefined, objectId: number | undefined, parentId: number | undefined, departmentFlag: boolean | undefined, entityId: number | undefined, excludeIds: number[] | null | undefined, includeResultCount: boolean | undefined, filterCondition: string | null | undefined, sorting: string | null | undefined, skipCount: number | undefined, maxResultCount: number | undefined): Observable<PagedResultDtoOfTreeNodeOfGetSycEntityObjectCategoryForViewDto> {
         let url_ = this.baseUrl + "/api/services/app/SycEntityObjectCategories/GetAllChildsWithPaging?";
         if (filter !== undefined && filter !== null)
             url_ += "Filter=" + encodeURIComponent("" + filter) + "&";
@@ -44668,6 +45422,10 @@ export class SycEntityObjectCategoriesServiceProxy {
             url_ += "EntityId=" + encodeURIComponent("" + entityId) + "&";
         if (excludeIds !== undefined && excludeIds !== null)
             excludeIds && excludeIds.forEach(item => { url_ += "ExcludeIds=" + encodeURIComponent("" + item) + "&"; });
+        if (includeResultCount === null)
+            throw new Error("The parameter 'includeResultCount' cannot be null.");
+        else if (includeResultCount !== undefined)
+            url_ += "IncludeResultCount=" + encodeURIComponent("" + includeResultCount) + "&";
         if (filterCondition !== undefined && filterCondition !== null)
             url_ += "FilterCondition=" + encodeURIComponent("" + filterCondition) + "&";
         if (sorting !== undefined && sorting !== null)
@@ -45358,13 +46116,14 @@ export class SycEntityObjectCategoriesServiceProxy {
      * @param departmentFlag (optional) 
      * @param entityId (optional) 
      * @param excludeIds (optional) 
+     * @param includeResultCount (optional) 
      * @param filterCondition (optional) 
      * @param sorting (optional) 
      * @param skipCount (optional) 
      * @param maxResultCount (optional) 
      * @return Success
      */
-    getAllWithChildsForTransactionWithPaging(filter: string | null | undefined, codeFilter: string | null | undefined, nameFilter: string | null | undefined, sydObjectNameFilter: string | null | undefined, sycEntityObjectCategoryNameFilter: string | null | undefined, eagger: boolean | undefined, objectId: number | undefined, parentId: number | undefined, departmentFlag: boolean | undefined, entityId: number | undefined, excludeIds: number[] | null | undefined, filterCondition: string | null | undefined, sorting: string | null | undefined, skipCount: number | undefined, maxResultCount: number | undefined): Observable<PagedResultDtoOfTreeNodeOfGetSycEntityObjectCategoryForViewDto> {
+    getAllWithChildsForTransactionWithPaging(filter: string | null | undefined, codeFilter: string | null | undefined, nameFilter: string | null | undefined, sydObjectNameFilter: string | null | undefined, sycEntityObjectCategoryNameFilter: string | null | undefined, eagger: boolean | undefined, objectId: number | undefined, parentId: number | undefined, departmentFlag: boolean | undefined, entityId: number | undefined, excludeIds: number[] | null | undefined, includeResultCount: boolean | undefined, filterCondition: string | null | undefined, sorting: string | null | undefined, skipCount: number | undefined, maxResultCount: number | undefined): Observable<PagedResultDtoOfTreeNodeOfGetSycEntityObjectCategoryForViewDto> {
         let url_ = this.baseUrl + "/api/services/app/SycEntityObjectCategories/GetAllWithChildsForTransactionWithPaging?";
         if (filter !== undefined && filter !== null)
             url_ += "Filter=" + encodeURIComponent("" + filter) + "&";
@@ -45398,6 +46157,10 @@ export class SycEntityObjectCategoriesServiceProxy {
             url_ += "EntityId=" + encodeURIComponent("" + entityId) + "&";
         if (excludeIds !== undefined && excludeIds !== null)
             excludeIds && excludeIds.forEach(item => { url_ += "ExcludeIds=" + encodeURIComponent("" + item) + "&"; });
+        if (includeResultCount === null)
+            throw new Error("The parameter 'includeResultCount' cannot be null.");
+        else if (includeResultCount !== undefined)
+            url_ += "IncludeResultCount=" + encodeURIComponent("" + includeResultCount) + "&";
         if (filterCondition !== undefined && filterCondition !== null)
             url_ += "FilterCondition=" + encodeURIComponent("" + filterCondition) + "&";
         if (sorting !== undefined && sorting !== null)
@@ -65236,6 +65999,9 @@ export class AppContactAddressDto implements IAppContactAddressDto {
     countryId!: number;
     countryIdName!: string | undefined;
     addressFk!: AppAddressDto;
+    addressTypeCode!: string | undefined;
+    contactCode!: string | undefined;
+    addressCode!: string | undefined;
     id!: number;
 
     [key: string]: any;
@@ -65270,6 +66036,9 @@ export class AppContactAddressDto implements IAppContactAddressDto {
             this.countryId = _data["countryId"];
             this.countryIdName = _data["countryIdName"];
             this.addressFk = _data["addressFk"] ? AppAddressDto.fromJS(_data["addressFk"]) : <any>undefined;
+            this.addressTypeCode = _data["addressTypeCode"];
+            this.contactCode = _data["contactCode"];
+            this.addressCode = _data["addressCode"];
             this.id = _data["id"];
         }
     }
@@ -65302,6 +66071,9 @@ export class AppContactAddressDto implements IAppContactAddressDto {
         data["countryId"] = this.countryId;
         data["countryIdName"] = this.countryIdName;
         data["addressFk"] = this.addressFk ? this.addressFk.toJSON() : <any>undefined;
+        data["addressTypeCode"] = this.addressTypeCode;
+        data["contactCode"] = this.contactCode;
+        data["addressCode"] = this.addressCode;
         data["id"] = this.id;
         return data;
     }
@@ -65323,6 +66095,9 @@ export interface IAppContactAddressDto {
     countryId: number;
     countryIdName: string | undefined;
     addressFk: AppAddressDto;
+    addressTypeCode: string | undefined;
+    contactCode: string | undefined;
+    addressCode: string | undefined;
     id: number;
 
     [key: string]: any;
@@ -65579,6 +66354,7 @@ export class TreeNodeOfBranchForViewDto implements ITreeNodeOfBranchForViewDto {
     expanded!: boolean;
     label!: string | undefined;
     totalChildrenCount!: number | undefined;
+    resultCount!: number | undefined;
 
     [key: string]: any;
 
@@ -65607,6 +66383,7 @@ export class TreeNodeOfBranchForViewDto implements ITreeNodeOfBranchForViewDto {
             this.expanded = _data["expanded"];
             this.label = _data["label"];
             this.totalChildrenCount = _data["totalChildrenCount"];
+            this.resultCount = _data["resultCount"];
         }
     }
 
@@ -65633,6 +66410,7 @@ export class TreeNodeOfBranchForViewDto implements ITreeNodeOfBranchForViewDto {
         data["expanded"] = this.expanded;
         data["label"] = this.label;
         data["totalChildrenCount"] = this.totalChildrenCount;
+        data["resultCount"] = this.resultCount;
         return data;
     }
 }
@@ -65644,6 +66422,7 @@ export interface ITreeNodeOfBranchForViewDto {
     expanded: boolean;
     label: string | undefined;
     totalChildrenCount: number | undefined;
+    resultCount: number | undefined;
 
     [key: string]: any;
 }
@@ -66195,6 +66974,9 @@ export class CreateOrEditAccountInfoDto implements ICreateOrEditAccountInfoDto {
     extraDataAttributes!: ExtraDataAttrDto[] | undefined;
     recordType!: string | undefined;
     relationshipId!: number | undefined;
+    phone1CountryKey!: string | undefined;
+    phone2CountryKey!: string | undefined;
+    phone3CountryKey!: string | undefined;
     id!: number | undefined;
 
     [key: string]: any;
@@ -66304,6 +67086,9 @@ export class CreateOrEditAccountInfoDto implements ICreateOrEditAccountInfoDto {
             }
             this.recordType = _data["recordType"];
             this.relationshipId = _data["relationshipId"];
+            this.phone1CountryKey = _data["phone1CountryKey"];
+            this.phone2CountryKey = _data["phone2CountryKey"];
+            this.phone3CountryKey = _data["phone3CountryKey"];
             this.id = _data["id"];
         }
     }
@@ -66411,6 +67196,9 @@ export class CreateOrEditAccountInfoDto implements ICreateOrEditAccountInfoDto {
         }
         data["recordType"] = this.recordType;
         data["relationshipId"] = this.relationshipId;
+        data["phone1CountryKey"] = this.phone1CountryKey;
+        data["phone2CountryKey"] = this.phone2CountryKey;
+        data["phone3CountryKey"] = this.phone3CountryKey;
         data["id"] = this.id;
         return data;
     }
@@ -66475,6 +67263,9 @@ export interface ICreateOrEditAccountInfoDto {
     extraDataAttributes: ExtraDataAttrDto[] | undefined;
     recordType: string | undefined;
     relationshipId: number | undefined;
+    phone1CountryKey: string | undefined;
+    phone2CountryKey: string | undefined;
+    phone3CountryKey: string | undefined;
     id: number | undefined;
 
     [key: string]: any;
@@ -67176,6 +67967,8 @@ export class ConnectionInfo implements IConnectionInfo {
     connectedLabel!: string | undefined;
     visibility!: string | undefined;
     relationshipCode!: string | undefined;
+    requestorRole!: string | undefined;
+    recipientRole!: string | undefined;
 
     [key: string]: any;
 
@@ -67201,6 +67994,8 @@ export class ConnectionInfo implements IConnectionInfo {
             this.connectedLabel = _data["connectedLabel"];
             this.visibility = _data["visibility"];
             this.relationshipCode = _data["relationshipCode"];
+            this.requestorRole = _data["requestorRole"];
+            this.recipientRole = _data["recipientRole"];
         }
     }
 
@@ -67224,6 +68019,8 @@ export class ConnectionInfo implements IConnectionInfo {
         data["connectedLabel"] = this.connectedLabel;
         data["visibility"] = this.visibility;
         data["relationshipCode"] = this.relationshipCode;
+        data["requestorRole"] = this.requestorRole;
+        data["recipientRole"] = this.recipientRole;
         return data;
     }
 }
@@ -67236,6 +68033,8 @@ export interface IConnectionInfo {
     connectedLabel: string | undefined;
     visibility: string | undefined;
     relationshipCode: string | undefined;
+    requestorRole: string | undefined;
+    recipientRole: string | undefined;
 
     [key: string]: any;
 }
@@ -67872,6 +68671,9 @@ export class AppContactValidationInputDTO implements IAppContactValidationInputD
     extraDataAttributes!: ExtraDataAttrDto[] | undefined;
     recordType!: string | undefined;
     relationshipId!: number | undefined;
+    phone1CountryKey!: string | undefined;
+    phone2CountryKey!: string | undefined;
+    phone3CountryKey!: string | undefined;
     id!: number | undefined;
 
     [key: string]: any;
@@ -67986,6 +68788,9 @@ export class AppContactValidationInputDTO implements IAppContactValidationInputD
             }
             this.recordType = _data["recordType"];
             this.relationshipId = _data["relationshipId"];
+            this.phone1CountryKey = _data["phone1CountryKey"];
+            this.phone2CountryKey = _data["phone2CountryKey"];
+            this.phone3CountryKey = _data["phone3CountryKey"];
             this.id = _data["id"];
         }
     }
@@ -68098,6 +68903,9 @@ export class AppContactValidationInputDTO implements IAppContactValidationInputD
         }
         data["recordType"] = this.recordType;
         data["relationshipId"] = this.relationshipId;
+        data["phone1CountryKey"] = this.phone1CountryKey;
+        data["phone2CountryKey"] = this.phone2CountryKey;
+        data["phone3CountryKey"] = this.phone3CountryKey;
         data["id"] = this.id;
         return data;
     }
@@ -68163,6 +68971,9 @@ export interface IAppContactValidationInputDTO {
     extraDataAttributes: ExtraDataAttrDto[] | undefined;
     recordType: string | undefined;
     relationshipId: number | undefined;
+    phone1CountryKey: string | undefined;
+    phone2CountryKey: string | undefined;
+    phone3CountryKey: string | undefined;
     id: number | undefined;
 
     [key: string]: any;
@@ -71264,6 +72075,660 @@ export interface IAppEntityReactionsCount {
     [key: string]: any;
 }
 
+export enum SubscriptionPaymentType {
+    Manual = 0,
+    RecurringAutomatic = 1,
+    RecurringManual = 2,
+}
+
+export class Edition implements IEdition {
+    name!: string;
+    displayName!: string;
+    isDeleted!: boolean;
+    deleterUserId!: number | undefined;
+    deletionTime!: moment.Moment | undefined;
+    lastModificationTime!: moment.Moment | undefined;
+    lastModifierUserId!: number | undefined;
+    creationTime!: moment.Moment;
+    creatorUserId!: number | undefined;
+    id!: number;
+
+    [key: string]: any;
+
+    constructor(data?: IEdition) {
+        if (data) {
+            for (var property in data) {
+                if (data.hasOwnProperty(property))
+                    (<any>this)[property] = (<any>data)[property];
+            }
+        }
+    }
+
+    init(_data?: any) {
+        if (_data) {
+            for (var property in _data) {
+                if (_data.hasOwnProperty(property))
+                    this[property] = _data[property];
+            }
+            this.name = _data["name"];
+            this.displayName = _data["displayName"];
+            this.isDeleted = _data["isDeleted"];
+            this.deleterUserId = _data["deleterUserId"];
+            this.deletionTime = _data["deletionTime"] ? moment(_data["deletionTime"].toString()) : <any>undefined;
+            this.lastModificationTime = _data["lastModificationTime"] ? moment(_data["lastModificationTime"].toString()) : <any>undefined;
+            this.lastModifierUserId = _data["lastModifierUserId"];
+            this.creationTime = _data["creationTime"] ? moment(_data["creationTime"].toString()) : <any>undefined;
+            this.creatorUserId = _data["creatorUserId"];
+            this.id = _data["id"];
+        }
+    }
+
+    static fromJS(data: any): Edition {
+        data = typeof data === 'object' ? data : {};
+        let result = new Edition();
+        result.init(data);
+        return result;
+    }
+
+    toJSON(data?: any) {
+        data = typeof data === 'object' ? data : {};
+        for (var property in this) {
+            if (this.hasOwnProperty(property))
+                data[property] = this[property];
+        }
+        data["name"] = this.name;
+        data["displayName"] = this.displayName;
+        data["isDeleted"] = this.isDeleted;
+        data["deleterUserId"] = this.deleterUserId;
+        data["deletionTime"] = this.deletionTime ? this.deletionTime.toISOString() : <any>undefined;
+        data["lastModificationTime"] = this.lastModificationTime ? this.lastModificationTime.toISOString() : <any>undefined;
+        data["lastModifierUserId"] = this.lastModifierUserId;
+        data["creationTime"] = this.creationTime ? this.creationTime.toISOString() : <any>undefined;
+        data["creatorUserId"] = this.creatorUserId;
+        data["id"] = this.id;
+        return data;
+    }
+}
+
+export interface IEdition {
+    name: string;
+    displayName: string;
+    isDeleted: boolean;
+    deleterUserId: number | undefined;
+    deletionTime: moment.Moment | undefined;
+    lastModificationTime: moment.Moment | undefined;
+    lastModifierUserId: number | undefined;
+    creationTime: moment.Moment;
+    creatorUserId: number | undefined;
+    id: number;
+
+    [key: string]: any;
+}
+
+export class UserOrganizationUnit implements IUserOrganizationUnit {
+    tenantId!: number | undefined;
+    userId!: number;
+    organizationUnitId!: number;
+    isDeleted!: boolean;
+    creationTime!: moment.Moment;
+    creatorUserId!: number | undefined;
+    id!: number;
+
+    [key: string]: any;
+
+    constructor(data?: IUserOrganizationUnit) {
+        if (data) {
+            for (var property in data) {
+                if (data.hasOwnProperty(property))
+                    (<any>this)[property] = (<any>data)[property];
+            }
+        }
+    }
+
+    init(_data?: any) {
+        if (_data) {
+            for (var property in _data) {
+                if (_data.hasOwnProperty(property))
+                    this[property] = _data[property];
+            }
+            this.tenantId = _data["tenantId"];
+            this.userId = _data["userId"];
+            this.organizationUnitId = _data["organizationUnitId"];
+            this.isDeleted = _data["isDeleted"];
+            this.creationTime = _data["creationTime"] ? moment(_data["creationTime"].toString()) : <any>undefined;
+            this.creatorUserId = _data["creatorUserId"];
+            this.id = _data["id"];
+        }
+    }
+
+    static fromJS(data: any): UserOrganizationUnit {
+        data = typeof data === 'object' ? data : {};
+        let result = new UserOrganizationUnit();
+        result.init(data);
+        return result;
+    }
+
+    toJSON(data?: any) {
+        data = typeof data === 'object' ? data : {};
+        for (var property in this) {
+            if (this.hasOwnProperty(property))
+                data[property] = this[property];
+        }
+        data["tenantId"] = this.tenantId;
+        data["userId"] = this.userId;
+        data["organizationUnitId"] = this.organizationUnitId;
+        data["isDeleted"] = this.isDeleted;
+        data["creationTime"] = this.creationTime ? this.creationTime.toISOString() : <any>undefined;
+        data["creatorUserId"] = this.creatorUserId;
+        data["id"] = this.id;
+        return data;
+    }
+}
+
+export interface IUserOrganizationUnit {
+    tenantId: number | undefined;
+    userId: number;
+    organizationUnitId: number;
+    isDeleted: boolean;
+    creationTime: moment.Moment;
+    creatorUserId: number | undefined;
+    id: number;
+
+    [key: string]: any;
+}
+
+export class UserToken implements IUserToken {
+    tenantId!: number | undefined;
+    userId!: number;
+    loginProvider!: string | undefined;
+    name!: string | undefined;
+    value!: string | undefined;
+    expireDate!: moment.Moment | undefined;
+    id!: number;
+
+    [key: string]: any;
+
+    constructor(data?: IUserToken) {
+        if (data) {
+            for (var property in data) {
+                if (data.hasOwnProperty(property))
+                    (<any>this)[property] = (<any>data)[property];
+            }
+        }
+    }
+
+    init(_data?: any) {
+        if (_data) {
+            for (var property in _data) {
+                if (_data.hasOwnProperty(property))
+                    this[property] = _data[property];
+            }
+            this.tenantId = _data["tenantId"];
+            this.userId = _data["userId"];
+            this.loginProvider = _data["loginProvider"];
+            this.name = _data["name"];
+            this.value = _data["value"];
+            this.expireDate = _data["expireDate"] ? moment(_data["expireDate"].toString()) : <any>undefined;
+            this.id = _data["id"];
+        }
+    }
+
+    static fromJS(data: any): UserToken {
+        data = typeof data === 'object' ? data : {};
+        let result = new UserToken();
+        result.init(data);
+        return result;
+    }
+
+    toJSON(data?: any) {
+        data = typeof data === 'object' ? data : {};
+        for (var property in this) {
+            if (this.hasOwnProperty(property))
+                data[property] = this[property];
+        }
+        data["tenantId"] = this.tenantId;
+        data["userId"] = this.userId;
+        data["loginProvider"] = this.loginProvider;
+        data["name"] = this.name;
+        data["value"] = this.value;
+        data["expireDate"] = this.expireDate ? this.expireDate.toISOString() : <any>undefined;
+        data["id"] = this.id;
+        return data;
+    }
+}
+
+export interface IUserToken {
+    tenantId: number | undefined;
+    userId: number;
+    loginProvider: string | undefined;
+    name: string | undefined;
+    value: string | undefined;
+    expireDate: moment.Moment | undefined;
+    id: number;
+
+    [key: string]: any;
+}
+
+export class User implements IUser {
+    relatedTenantId!: number;
+    profilePictureId!: string | undefined;
+    shouldChangePasswordOnNextLogin!: boolean;
+    signInTokenExpireTimeUtc!: moment.Moment | undefined;
+    signInToken!: string | undefined;
+    googleAuthenticatorKey!: string | undefined;
+    organizationUnits!: UserOrganizationUnit[] | undefined;
+    normalizedUserName!: string;
+    normalizedEmailAddress!: string;
+    concurrencyStamp!: string | undefined;
+    tokens!: UserToken[] | undefined;
+    deleterUser!: User;
+    creatorUser!: User;
+    lastModifierUser!: User;
+    authenticationSource!: string | undefined;
+    userName!: string;
+    tenantId!: number | undefined;
+    emailAddress!: string;
+    name!: string;
+    surname!: string;
+    readonly fullName!: string | undefined;
+    password!: string;
+    emailConfirmationCode!: string | undefined;
+    passwordResetCode!: string | undefined;
+    lockoutEndDateUtc!: moment.Moment | undefined;
+    accessFailedCount!: number;
+    isLockoutEnabled!: boolean;
+    phoneNumber!: string | undefined;
+    isPhoneNumberConfirmed!: boolean;
+    securityStamp!: string | undefined;
+    isTwoFactorEnabled!: boolean;
+    logins!: UserLogin[] | undefined;
+    roles!: UserRole[] | undefined;
+    claims!: UserClaim[] | undefined;
+    permissions!: UserPermissionSetting[] | undefined;
+    settings!: Setting[] | undefined;
+    isEmailConfirmed!: boolean;
+    isActive!: boolean;
+    isDeleted!: boolean;
+    deleterUserId!: number | undefined;
+    deletionTime!: moment.Moment | undefined;
+    lastModificationTime!: moment.Moment | undefined;
+    lastModifierUserId!: number | undefined;
+    creationTime!: moment.Moment;
+    creatorUserId!: number | undefined;
+    id!: number;
+
+    [key: string]: any;
+
+    constructor(data?: IUser) {
+        if (data) {
+            for (var property in data) {
+                if (data.hasOwnProperty(property))
+                    (<any>this)[property] = (<any>data)[property];
+            }
+        }
+    }
+
+    init(_data?: any) {
+        if (_data) {
+            for (var property in _data) {
+                if (_data.hasOwnProperty(property))
+                    this[property] = _data[property];
+            }
+            this.relatedTenantId = _data["relatedTenantId"];
+            this.profilePictureId = _data["profilePictureId"];
+            this.shouldChangePasswordOnNextLogin = _data["shouldChangePasswordOnNextLogin"];
+            this.signInTokenExpireTimeUtc = _data["signInTokenExpireTimeUtc"] ? moment(_data["signInTokenExpireTimeUtc"].toString()) : <any>undefined;
+            this.signInToken = _data["signInToken"];
+            this.googleAuthenticatorKey = _data["googleAuthenticatorKey"];
+            if (Array.isArray(_data["organizationUnits"])) {
+                this.organizationUnits = [] as any;
+                for (let item of _data["organizationUnits"])
+                    this.organizationUnits!.push(UserOrganizationUnit.fromJS(item));
+            }
+            this.normalizedUserName = _data["normalizedUserName"];
+            this.normalizedEmailAddress = _data["normalizedEmailAddress"];
+            this.concurrencyStamp = _data["concurrencyStamp"];
+            if (Array.isArray(_data["tokens"])) {
+                this.tokens = [] as any;
+                for (let item of _data["tokens"])
+                    this.tokens!.push(UserToken.fromJS(item));
+            }
+            this.deleterUser = _data["deleterUser"] ? User.fromJS(_data["deleterUser"]) : <any>undefined;
+            this.creatorUser = _data["creatorUser"] ? User.fromJS(_data["creatorUser"]) : <any>undefined;
+            this.lastModifierUser = _data["lastModifierUser"] ? User.fromJS(_data["lastModifierUser"]) : <any>undefined;
+            this.authenticationSource = _data["authenticationSource"];
+            this.userName = _data["userName"];
+            this.tenantId = _data["tenantId"];
+            this.emailAddress = _data["emailAddress"];
+            this.name = _data["name"];
+            this.surname = _data["surname"];
+            (<any>this).fullName = _data["fullName"];
+            this.password = _data["password"];
+            this.emailConfirmationCode = _data["emailConfirmationCode"];
+            this.passwordResetCode = _data["passwordResetCode"];
+            this.lockoutEndDateUtc = _data["lockoutEndDateUtc"] ? moment(_data["lockoutEndDateUtc"].toString()) : <any>undefined;
+            this.accessFailedCount = _data["accessFailedCount"];
+            this.isLockoutEnabled = _data["isLockoutEnabled"];
+            this.phoneNumber = _data["phoneNumber"];
+            this.isPhoneNumberConfirmed = _data["isPhoneNumberConfirmed"];
+            this.securityStamp = _data["securityStamp"];
+            this.isTwoFactorEnabled = _data["isTwoFactorEnabled"];
+            if (Array.isArray(_data["logins"])) {
+                this.logins = [] as any;
+                for (let item of _data["logins"])
+                    this.logins!.push(UserLogin.fromJS(item));
+            }
+            if (Array.isArray(_data["roles"])) {
+                this.roles = [] as any;
+                for (let item of _data["roles"])
+                    this.roles!.push(UserRole.fromJS(item));
+            }
+            if (Array.isArray(_data["claims"])) {
+                this.claims = [] as any;
+                for (let item of _data["claims"])
+                    this.claims!.push(UserClaim.fromJS(item));
+            }
+            if (Array.isArray(_data["permissions"])) {
+                this.permissions = [] as any;
+                for (let item of _data["permissions"])
+                    this.permissions!.push(UserPermissionSetting.fromJS(item));
+            }
+            if (Array.isArray(_data["settings"])) {
+                this.settings = [] as any;
+                for (let item of _data["settings"])
+                    this.settings!.push(Setting.fromJS(item));
+            }
+            this.isEmailConfirmed = _data["isEmailConfirmed"];
+            this.isActive = _data["isActive"];
+            this.isDeleted = _data["isDeleted"];
+            this.deleterUserId = _data["deleterUserId"];
+            this.deletionTime = _data["deletionTime"] ? moment(_data["deletionTime"].toString()) : <any>undefined;
+            this.lastModificationTime = _data["lastModificationTime"] ? moment(_data["lastModificationTime"].toString()) : <any>undefined;
+            this.lastModifierUserId = _data["lastModifierUserId"];
+            this.creationTime = _data["creationTime"] ? moment(_data["creationTime"].toString()) : <any>undefined;
+            this.creatorUserId = _data["creatorUserId"];
+            this.id = _data["id"];
+        }
+    }
+
+    static fromJS(data: any): User {
+        data = typeof data === 'object' ? data : {};
+        let result = new User();
+        result.init(data);
+        return result;
+    }
+
+    toJSON(data?: any) {
+        data = typeof data === 'object' ? data : {};
+        for (var property in this) {
+            if (this.hasOwnProperty(property))
+                data[property] = this[property];
+        }
+        data["relatedTenantId"] = this.relatedTenantId;
+        data["profilePictureId"] = this.profilePictureId;
+        data["shouldChangePasswordOnNextLogin"] = this.shouldChangePasswordOnNextLogin;
+        data["signInTokenExpireTimeUtc"] = this.signInTokenExpireTimeUtc ? this.signInTokenExpireTimeUtc.toISOString() : <any>undefined;
+        data["signInToken"] = this.signInToken;
+        data["googleAuthenticatorKey"] = this.googleAuthenticatorKey;
+        if (Array.isArray(this.organizationUnits)) {
+            data["organizationUnits"] = [];
+            for (let item of this.organizationUnits)
+                data["organizationUnits"].push(item.toJSON());
+        }
+        data["normalizedUserName"] = this.normalizedUserName;
+        data["normalizedEmailAddress"] = this.normalizedEmailAddress;
+        data["concurrencyStamp"] = this.concurrencyStamp;
+        if (Array.isArray(this.tokens)) {
+            data["tokens"] = [];
+            for (let item of this.tokens)
+                data["tokens"].push(item.toJSON());
+        }
+        data["deleterUser"] = this.deleterUser ? this.deleterUser.toJSON() : <any>undefined;
+        data["creatorUser"] = this.creatorUser ? this.creatorUser.toJSON() : <any>undefined;
+        data["lastModifierUser"] = this.lastModifierUser ? this.lastModifierUser.toJSON() : <any>undefined;
+        data["authenticationSource"] = this.authenticationSource;
+        data["userName"] = this.userName;
+        data["tenantId"] = this.tenantId;
+        data["emailAddress"] = this.emailAddress;
+        data["name"] = this.name;
+        data["surname"] = this.surname;
+        data["fullName"] = this.fullName;
+        data["password"] = this.password;
+        data["emailConfirmationCode"] = this.emailConfirmationCode;
+        data["passwordResetCode"] = this.passwordResetCode;
+        data["lockoutEndDateUtc"] = this.lockoutEndDateUtc ? this.lockoutEndDateUtc.toISOString() : <any>undefined;
+        data["accessFailedCount"] = this.accessFailedCount;
+        data["isLockoutEnabled"] = this.isLockoutEnabled;
+        data["phoneNumber"] = this.phoneNumber;
+        data["isPhoneNumberConfirmed"] = this.isPhoneNumberConfirmed;
+        data["securityStamp"] = this.securityStamp;
+        data["isTwoFactorEnabled"] = this.isTwoFactorEnabled;
+        if (Array.isArray(this.logins)) {
+            data["logins"] = [];
+            for (let item of this.logins)
+                data["logins"].push(item.toJSON());
+        }
+        if (Array.isArray(this.roles)) {
+            data["roles"] = [];
+            for (let item of this.roles)
+                data["roles"].push(item.toJSON());
+        }
+        if (Array.isArray(this.claims)) {
+            data["claims"] = [];
+            for (let item of this.claims)
+                data["claims"].push(item.toJSON());
+        }
+        if (Array.isArray(this.permissions)) {
+            data["permissions"] = [];
+            for (let item of this.permissions)
+                data["permissions"].push(item.toJSON());
+        }
+        if (Array.isArray(this.settings)) {
+            data["settings"] = [];
+            for (let item of this.settings)
+                data["settings"].push(item.toJSON());
+        }
+        data["isEmailConfirmed"] = this.isEmailConfirmed;
+        data["isActive"] = this.isActive;
+        data["isDeleted"] = this.isDeleted;
+        data["deleterUserId"] = this.deleterUserId;
+        data["deletionTime"] = this.deletionTime ? this.deletionTime.toISOString() : <any>undefined;
+        data["lastModificationTime"] = this.lastModificationTime ? this.lastModificationTime.toISOString() : <any>undefined;
+        data["lastModifierUserId"] = this.lastModifierUserId;
+        data["creationTime"] = this.creationTime ? this.creationTime.toISOString() : <any>undefined;
+        data["creatorUserId"] = this.creatorUserId;
+        data["id"] = this.id;
+        return data;
+    }
+}
+
+export interface IUser {
+    relatedTenantId: number;
+    profilePictureId: string | undefined;
+    shouldChangePasswordOnNextLogin: boolean;
+    signInTokenExpireTimeUtc: moment.Moment | undefined;
+    signInToken: string | undefined;
+    googleAuthenticatorKey: string | undefined;
+    organizationUnits: UserOrganizationUnit[] | undefined;
+    normalizedUserName: string;
+    normalizedEmailAddress: string;
+    concurrencyStamp: string | undefined;
+    tokens: UserToken[] | undefined;
+    deleterUser: User;
+    creatorUser: User;
+    lastModifierUser: User;
+    authenticationSource: string | undefined;
+    userName: string;
+    tenantId: number | undefined;
+    emailAddress: string;
+    name: string;
+    surname: string;
+    fullName: string | undefined;
+    password: string;
+    emailConfirmationCode: string | undefined;
+    passwordResetCode: string | undefined;
+    lockoutEndDateUtc: moment.Moment | undefined;
+    accessFailedCount: number;
+    isLockoutEnabled: boolean;
+    phoneNumber: string | undefined;
+    isPhoneNumberConfirmed: boolean;
+    securityStamp: string | undefined;
+    isTwoFactorEnabled: boolean;
+    logins: UserLogin[] | undefined;
+    roles: UserRole[] | undefined;
+    claims: UserClaim[] | undefined;
+    permissions: UserPermissionSetting[] | undefined;
+    settings: Setting[] | undefined;
+    isEmailConfirmed: boolean;
+    isActive: boolean;
+    isDeleted: boolean;
+    deleterUserId: number | undefined;
+    deletionTime: moment.Moment | undefined;
+    lastModificationTime: moment.Moment | undefined;
+    lastModifierUserId: number | undefined;
+    creationTime: moment.Moment;
+    creatorUserId: number | undefined;
+    id: number;
+
+    [key: string]: any;
+}
+
+export class Tenant implements ITenant {
+    subscriptionEndDateUtc!: moment.Moment | undefined;
+    isInTrialPeriod!: boolean;
+    customCssId!: string | undefined;
+    logoId!: string | undefined;
+    logoFileType!: string | undefined;
+    subscriptionPaymentType!: SubscriptionPaymentType;
+    edition!: Edition;
+    editionId!: number | undefined;
+    creatorUser!: User;
+    lastModifierUser!: User;
+    deleterUser!: User;
+    tenancyName!: string;
+    name!: string;
+    connectionString!: string | undefined;
+    isActive!: boolean;
+    isDeleted!: boolean;
+    deleterUserId!: number | undefined;
+    deletionTime!: moment.Moment | undefined;
+    lastModificationTime!: moment.Moment | undefined;
+    lastModifierUserId!: number | undefined;
+    creationTime!: moment.Moment;
+    creatorUserId!: number | undefined;
+    id!: number;
+
+    [key: string]: any;
+
+    constructor(data?: ITenant) {
+        if (data) {
+            for (var property in data) {
+                if (data.hasOwnProperty(property))
+                    (<any>this)[property] = (<any>data)[property];
+            }
+        }
+    }
+
+    init(_data?: any) {
+        if (_data) {
+            for (var property in _data) {
+                if (_data.hasOwnProperty(property))
+                    this[property] = _data[property];
+            }
+            this.subscriptionEndDateUtc = _data["subscriptionEndDateUtc"] ? moment(_data["subscriptionEndDateUtc"].toString()) : <any>undefined;
+            this.isInTrialPeriod = _data["isInTrialPeriod"];
+            this.customCssId = _data["customCssId"];
+            this.logoId = _data["logoId"];
+            this.logoFileType = _data["logoFileType"];
+            this.subscriptionPaymentType = _data["subscriptionPaymentType"];
+            this.edition = _data["edition"] ? Edition.fromJS(_data["edition"]) : <any>undefined;
+            this.editionId = _data["editionId"];
+            this.creatorUser = _data["creatorUser"] ? User.fromJS(_data["creatorUser"]) : <any>undefined;
+            this.lastModifierUser = _data["lastModifierUser"] ? User.fromJS(_data["lastModifierUser"]) : <any>undefined;
+            this.deleterUser = _data["deleterUser"] ? User.fromJS(_data["deleterUser"]) : <any>undefined;
+            this.tenancyName = _data["tenancyName"];
+            this.name = _data["name"];
+            this.connectionString = _data["connectionString"];
+            this.isActive = _data["isActive"];
+            this.isDeleted = _data["isDeleted"];
+            this.deleterUserId = _data["deleterUserId"];
+            this.deletionTime = _data["deletionTime"] ? moment(_data["deletionTime"].toString()) : <any>undefined;
+            this.lastModificationTime = _data["lastModificationTime"] ? moment(_data["lastModificationTime"].toString()) : <any>undefined;
+            this.lastModifierUserId = _data["lastModifierUserId"];
+            this.creationTime = _data["creationTime"] ? moment(_data["creationTime"].toString()) : <any>undefined;
+            this.creatorUserId = _data["creatorUserId"];
+            this.id = _data["id"];
+        }
+    }
+
+    static fromJS(data: any): Tenant {
+        data = typeof data === 'object' ? data : {};
+        let result = new Tenant();
+        result.init(data);
+        return result;
+    }
+
+    toJSON(data?: any) {
+        data = typeof data === 'object' ? data : {};
+        for (var property in this) {
+            if (this.hasOwnProperty(property))
+                data[property] = this[property];
+        }
+        data["subscriptionEndDateUtc"] = this.subscriptionEndDateUtc ? this.subscriptionEndDateUtc.toISOString() : <any>undefined;
+        data["isInTrialPeriod"] = this.isInTrialPeriod;
+        data["customCssId"] = this.customCssId;
+        data["logoId"] = this.logoId;
+        data["logoFileType"] = this.logoFileType;
+        data["subscriptionPaymentType"] = this.subscriptionPaymentType;
+        data["edition"] = this.edition ? this.edition.toJSON() : <any>undefined;
+        data["editionId"] = this.editionId;
+        data["creatorUser"] = this.creatorUser ? this.creatorUser.toJSON() : <any>undefined;
+        data["lastModifierUser"] = this.lastModifierUser ? this.lastModifierUser.toJSON() : <any>undefined;
+        data["deleterUser"] = this.deleterUser ? this.deleterUser.toJSON() : <any>undefined;
+        data["tenancyName"] = this.tenancyName;
+        data["name"] = this.name;
+        data["connectionString"] = this.connectionString;
+        data["isActive"] = this.isActive;
+        data["isDeleted"] = this.isDeleted;
+        data["deleterUserId"] = this.deleterUserId;
+        data["deletionTime"] = this.deletionTime ? this.deletionTime.toISOString() : <any>undefined;
+        data["lastModificationTime"] = this.lastModificationTime ? this.lastModificationTime.toISOString() : <any>undefined;
+        data["lastModifierUserId"] = this.lastModifierUserId;
+        data["creationTime"] = this.creationTime ? this.creationTime.toISOString() : <any>undefined;
+        data["creatorUserId"] = this.creatorUserId;
+        data["id"] = this.id;
+        return data;
+    }
+}
+
+export interface ITenant {
+    subscriptionEndDateUtc: moment.Moment | undefined;
+    isInTrialPeriod: boolean;
+    customCssId: string | undefined;
+    logoId: string | undefined;
+    logoFileType: string | undefined;
+    subscriptionPaymentType: SubscriptionPaymentType;
+    edition: Edition;
+    editionId: number | undefined;
+    creatorUser: User;
+    lastModifierUser: User;
+    deleterUser: User;
+    tenancyName: string;
+    name: string;
+    connectionString: string | undefined;
+    isActive: boolean;
+    isDeleted: boolean;
+    deleterUserId: number | undefined;
+    deletionTime: moment.Moment | undefined;
+    lastModificationTime: moment.Moment | undefined;
+    lastModifierUserId: number | undefined;
+    creationTime: moment.Moment;
+    creatorUserId: number | undefined;
+    id: number;
+
+    [key: string]: any;
+}
+
 export class AppEntity implements IAppEntity {
     tenantId!: number | undefined;
     name!: string;
@@ -71290,6 +72755,7 @@ export class AppEntity implements IAppEntity {
     ssin!: string | undefined;
     timeStamp!: moment.Moment;
     isDefault!: boolean;
+    tenantOwnerFk!: Tenant;
     isDeleted!: boolean;
     deleterUserId!: number | undefined;
     deletionTime!: moment.Moment | undefined;
@@ -71369,6 +72835,7 @@ export class AppEntity implements IAppEntity {
             this.ssin = _data["ssin"];
             this.timeStamp = _data["timeStamp"] ? moment(_data["timeStamp"].toString()) : <any>undefined;
             this.isDefault = _data["isDefault"];
+            this.tenantOwnerFk = _data["tenantOwnerFk"] ? Tenant.fromJS(_data["tenantOwnerFk"]) : <any>undefined;
             this.isDeleted = _data["isDeleted"];
             this.deleterUserId = _data["deleterUserId"];
             this.deletionTime = _data["deletionTime"] ? moment(_data["deletionTime"].toString()) : <any>undefined;
@@ -71446,6 +72913,7 @@ export class AppEntity implements IAppEntity {
         data["ssin"] = this.ssin;
         data["timeStamp"] = this.timeStamp ? this.timeStamp.toISOString() : <any>undefined;
         data["isDefault"] = this.isDefault;
+        data["tenantOwnerFk"] = this.tenantOwnerFk ? this.tenantOwnerFk.toJSON() : <any>undefined;
         data["isDeleted"] = this.isDeleted;
         data["deleterUserId"] = this.deleterUserId;
         data["deletionTime"] = this.deletionTime ? this.deletionTime.toISOString() : <any>undefined;
@@ -71484,6 +72952,7 @@ export interface IAppEntity {
     ssin: string | undefined;
     timeStamp: moment.Moment;
     isDefault: boolean;
+    tenantOwnerFk: Tenant;
     isDeleted: boolean;
     deleterUserId: number | undefined;
     deletionTime: moment.Moment | undefined;
@@ -71777,6 +73246,7 @@ export class AppMarketplaceContact implements IAppMarketplaceContact {
     ssin!: string | undefined;
     timeStamp!: moment.Moment;
     isDefault!: boolean;
+    tenantOwnerFk!: Tenant;
     isDeleted!: boolean;
     deleterUserId!: number | undefined;
     deletionTime!: moment.Moment | undefined;
@@ -71907,6 +73377,7 @@ export class AppMarketplaceContact implements IAppMarketplaceContact {
             this.ssin = _data["ssin"];
             this.timeStamp = _data["timeStamp"] ? moment(_data["timeStamp"].toString()) : <any>undefined;
             this.isDefault = _data["isDefault"];
+            this.tenantOwnerFk = _data["tenantOwnerFk"] ? Tenant.fromJS(_data["tenantOwnerFk"]) : <any>undefined;
             this.isDeleted = _data["isDeleted"];
             this.deleterUserId = _data["deleterUserId"];
             this.deletionTime = _data["deletionTime"] ? moment(_data["deletionTime"].toString()) : <any>undefined;
@@ -72035,6 +73506,7 @@ export class AppMarketplaceContact implements IAppMarketplaceContact {
         data["ssin"] = this.ssin;
         data["timeStamp"] = this.timeStamp ? this.timeStamp.toISOString() : <any>undefined;
         data["isDefault"] = this.isDefault;
+        data["tenantOwnerFk"] = this.tenantOwnerFk ? this.tenantOwnerFk.toJSON() : <any>undefined;
         data["isDeleted"] = this.isDeleted;
         data["deleterUserId"] = this.deleterUserId;
         data["deletionTime"] = this.deletionTime ? this.deletionTime.toISOString() : <any>undefined;
@@ -72112,6 +73584,7 @@ export interface IAppMarketplaceContact {
     ssin: string | undefined;
     timeStamp: moment.Moment;
     isDefault: boolean;
+    tenantOwnerFk: Tenant;
     isDeleted: boolean;
     deleterUserId: number | undefined;
     deletionTime: moment.Moment | undefined;
@@ -72635,6 +74108,7 @@ export class TreeNodeOfGetSycEntityObjectClassificationForViewDto implements ITr
     expanded!: boolean;
     label!: string | undefined;
     totalChildrenCount!: number | undefined;
+    resultCount!: number | undefined;
 
     [key: string]: any;
 
@@ -72663,6 +74137,7 @@ export class TreeNodeOfGetSycEntityObjectClassificationForViewDto implements ITr
             this.expanded = _data["expanded"];
             this.label = _data["label"];
             this.totalChildrenCount = _data["totalChildrenCount"];
+            this.resultCount = _data["resultCount"];
         }
     }
 
@@ -72689,6 +74164,7 @@ export class TreeNodeOfGetSycEntityObjectClassificationForViewDto implements ITr
         data["expanded"] = this.expanded;
         data["label"] = this.label;
         data["totalChildrenCount"] = this.totalChildrenCount;
+        data["resultCount"] = this.resultCount;
         return data;
     }
 }
@@ -72700,6 +74176,7 @@ export interface ITreeNodeOfGetSycEntityObjectClassificationForViewDto {
     expanded: boolean;
     label: string | undefined;
     totalChildrenCount: number | undefined;
+    resultCount: number | undefined;
 
     [key: string]: any;
 }
@@ -72843,6 +74320,7 @@ export class TreeNodeOfGetSycEntityObjectCategoryForViewDto implements ITreeNode
     expanded!: boolean;
     label!: string | undefined;
     totalChildrenCount!: number | undefined;
+    resultCount!: number | undefined;
 
     [key: string]: any;
 
@@ -72871,6 +74349,7 @@ export class TreeNodeOfGetSycEntityObjectCategoryForViewDto implements ITreeNode
             this.expanded = _data["expanded"];
             this.label = _data["label"];
             this.totalChildrenCount = _data["totalChildrenCount"];
+            this.resultCount = _data["resultCount"];
         }
     }
 
@@ -72897,6 +74376,7 @@ export class TreeNodeOfGetSycEntityObjectCategoryForViewDto implements ITreeNode
         data["expanded"] = this.expanded;
         data["label"] = this.label;
         data["totalChildrenCount"] = this.totalChildrenCount;
+        data["resultCount"] = this.resultCount;
         return data;
     }
 }
@@ -72908,6 +74388,7 @@ export interface ITreeNodeOfGetSycEntityObjectCategoryForViewDto {
     expanded: boolean;
     label: string | undefined;
     totalChildrenCount: number | undefined;
+    resultCount: number | undefined;
 
     [key: string]: any;
 }
@@ -76050,6 +77531,9 @@ export class AppContactDto implements IAppContactDto {
     paymentTermsEndOfMonth!: boolean;
     paymentTermsEndOfMonthDays!: number;
     paymentTermsNetDueDays!: number;
+    phone1CountryKey!: string | undefined;
+    phone2CountryKey!: string | undefined;
+    phone3CountryKey!: string | undefined;
     id!: number;
 
     [key: string]: any;
@@ -76125,6 +77609,9 @@ export class AppContactDto implements IAppContactDto {
             this.paymentTermsEndOfMonth = _data["paymentTermsEndOfMonth"];
             this.paymentTermsEndOfMonthDays = _data["paymentTermsEndOfMonthDays"];
             this.paymentTermsNetDueDays = _data["paymentTermsNetDueDays"];
+            this.phone1CountryKey = _data["phone1CountryKey"];
+            this.phone2CountryKey = _data["phone2CountryKey"];
+            this.phone3CountryKey = _data["phone3CountryKey"];
             this.id = _data["id"];
         }
     }
@@ -76198,6 +77685,9 @@ export class AppContactDto implements IAppContactDto {
         data["paymentTermsEndOfMonth"] = this.paymentTermsEndOfMonth;
         data["paymentTermsEndOfMonthDays"] = this.paymentTermsEndOfMonthDays;
         data["paymentTermsNetDueDays"] = this.paymentTermsNetDueDays;
+        data["phone1CountryKey"] = this.phone1CountryKey;
+        data["phone2CountryKey"] = this.phone2CountryKey;
+        data["phone3CountryKey"] = this.phone3CountryKey;
         data["id"] = this.id;
         return data;
     }
@@ -76256,6 +77746,9 @@ export interface IAppContactDto {
     paymentTermsEndOfMonth: boolean;
     paymentTermsEndOfMonthDays: number;
     paymentTermsNetDueDays: number;
+    phone1CountryKey: string | undefined;
+    phone2CountryKey: string | undefined;
+    phone3CountryKey: string | undefined;
     id: number;
 
     [key: string]: any;
@@ -80247,6 +81740,7 @@ export interface IExtraAttribute {
 }
 
 export class AppItemForViewDto implements IAppItemForViewDto {
+    ssin!: string | undefined;
     shipDate!: string;
     soldOutDate!: string;
     materialContent!: string | undefined;
@@ -80322,6 +81816,7 @@ export class AppItemForViewDto implements IAppItemForViewDto {
                 if (_data.hasOwnProperty(property))
                     this[property] = _data[property];
             }
+            this.ssin = _data["ssin"];
             this.shipDate = _data["shipDate"];
             this.soldOutDate = _data["soldOutDate"];
             this.materialContent = _data["materialContent"];
@@ -80475,6 +81970,7 @@ export class AppItemForViewDto implements IAppItemForViewDto {
             if (this.hasOwnProperty(property))
                 data[property] = this[property];
         }
+        data["ssin"] = this.ssin;
         data["shipDate"] = this.shipDate;
         data["soldOutDate"] = this.soldOutDate;
         data["materialContent"] = this.materialContent;
@@ -80617,6 +82113,7 @@ export class AppItemForViewDto implements IAppItemForViewDto {
 }
 
 export interface IAppItemForViewDto {
+    ssin: string | undefined;
     shipDate: string;
     soldOutDate: string;
     materialContent: string | undefined;
@@ -80681,6 +82178,7 @@ export interface IAppItemForViewDto {
 export class GetAppItemDetailForViewDto implements IGetAppItemDetailForViewDto {
     appItem!: AppItemForViewDto;
     nonLookupValues!: LookupLabelDto[] | undefined;
+    tenantOwner!: number | undefined;
 
     [key: string]: any;
 
@@ -80705,6 +82203,7 @@ export class GetAppItemDetailForViewDto implements IGetAppItemDetailForViewDto {
                 for (let item of _data["nonLookupValues"])
                     this.nonLookupValues!.push(LookupLabelDto.fromJS(item));
             }
+            this.tenantOwner = _data["tenantOwner"];
         }
     }
 
@@ -80727,6 +82226,7 @@ export class GetAppItemDetailForViewDto implements IGetAppItemDetailForViewDto {
             for (let item of this.nonLookupValues)
                 data["nonLookupValues"].push(item.toJSON());
         }
+        data["tenantOwner"] = this.tenantOwner;
         return data;
     }
 }
@@ -80734,6 +82234,7 @@ export class GetAppItemDetailForViewDto implements IGetAppItemDetailForViewDto {
 export interface IGetAppItemDetailForViewDto {
     appItem: AppItemForViewDto;
     nonLookupValues: LookupLabelDto[] | undefined;
+    tenantOwner: number | undefined;
 
     [key: string]: any;
 }
@@ -81263,6 +82764,7 @@ export class CreateOrEditAppItemDto implements ICreateOrEditAppItemDto {
     originalCode!: string | undefined;
     sycIdentifierId!: number | undefined;
     ssin!: string | undefined;
+    skipGenerateSsin!: boolean;
     nonLookupValues!: LookupLabelDto[] | undefined;
     manufacturerCode!: string | undefined;
     tenantId!: number | undefined;
@@ -81418,6 +82920,7 @@ export class CreateOrEditAppItemDto implements ICreateOrEditAppItemDto {
             this.originalCode = _data["originalCode"];
             this.sycIdentifierId = _data["sycIdentifierId"];
             this.ssin = _data["ssin"];
+            this.skipGenerateSsin = _data["skipGenerateSsin"];
             if (Array.isArray(_data["nonLookupValues"])) {
                 this.nonLookupValues = [] as any;
                 for (let item of _data["nonLookupValues"])
@@ -81575,6 +83078,7 @@ export class CreateOrEditAppItemDto implements ICreateOrEditAppItemDto {
         data["originalCode"] = this.originalCode;
         data["sycIdentifierId"] = this.sycIdentifierId;
         data["ssin"] = this.ssin;
+        data["skipGenerateSsin"] = this.skipGenerateSsin;
         if (Array.isArray(this.nonLookupValues)) {
             data["nonLookupValues"] = [];
             for (let item of this.nonLookupValues)
@@ -81633,6 +83137,7 @@ export interface ICreateOrEditAppItemDto {
     originalCode: string | undefined;
     sycIdentifierId: number | undefined;
     ssin: string | undefined;
+    skipGenerateSsin: boolean;
     nonLookupValues: LookupLabelDto[] | undefined;
     manufacturerCode: string | undefined;
     tenantId: number | undefined;
@@ -81716,6 +83221,7 @@ export class PublishItemOptions implements IPublishItemOptions {
     sharingLevel!: number;
     message!: string | undefined;
     itemSharing!: ItemSharingDto[] | undefined;
+    numberOfSubscribers!: number;
 
     [key: string]: any;
 
@@ -81738,6 +83244,7 @@ export class PublishItemOptions implements IPublishItemOptions {
             this.itemListId = _data["itemListId"];
             this.sharingLevel = _data["sharingLevel"];
             this.message = _data["message"];
+            this.numberOfSubscribers = _data["numberOfSubscribers"];
             if (Array.isArray(_data["itemSharing"])) {
                 this.itemSharing = [] as any;
                 for (let item of _data["itemSharing"])
@@ -81763,6 +83270,7 @@ export class PublishItemOptions implements IPublishItemOptions {
         data["itemListId"] = this.itemListId;
         data["sharingLevel"] = this.sharingLevel;
         data["message"] = this.message;
+        data["numberOfSubscribers"] = this.numberOfSubscribers;
         if (Array.isArray(this.itemSharing)) {
             data["itemSharing"] = [];
             for (let item of this.itemSharing)
@@ -81778,6 +83286,7 @@ export interface IPublishItemOptions {
     sharingLevel: number;
     message: string | undefined;
     itemSharing: ItemSharingDto[] | undefined;
+    numberOfSubscribers: number;
 
     [key: string]: any;
 }
@@ -82425,6 +83934,7 @@ export interface IAppItemExcelDto {
 }
 
 export class AppItemtExcelRecordDTO implements IAppItemtExcelRecordDTO {
+    recordIndex!: number;
     recordType!: string | undefined;
     parentCode!: string | undefined;
     code!: string | undefined;
@@ -82453,6 +83963,7 @@ export class AppItemtExcelRecordDTO implements IAppItemtExcelRecordDTO {
                 if (_data.hasOwnProperty(property))
                     this[property] = _data[property];
             }
+            this.recordIndex = _data["recordIndex"];
             this.recordType = _data["recordType"];
             this.parentCode = _data["parentCode"];
             this.code = _data["code"];
@@ -82483,6 +83994,7 @@ export class AppItemtExcelRecordDTO implements IAppItemtExcelRecordDTO {
             if (this.hasOwnProperty(property))
                 data[property] = this[property];
         }
+        data["recordIndex"] = this.recordIndex;
         data["recordType"] = this.recordType;
         data["parentCode"] = this.parentCode;
         data["code"] = this.code;
@@ -82502,6 +84014,7 @@ export class AppItemtExcelRecordDTO implements IAppItemtExcelRecordDTO {
 }
 
 export interface IAppItemtExcelRecordDTO {
+    recordIndex: number;
     recordType: string | undefined;
     parentCode: string | undefined;
     code: string | undefined;
@@ -82532,6 +84045,11 @@ export class AppItemExcelResultsDTO implements IAppItemExcelResultsDTO {
     filePath!: string | undefined;
     errorMessage!: string | undefined;
     hasDuplication!: boolean;
+    resultKey!: string | undefined;
+    isPagedResult!: boolean;
+    pageSkipCount!: number;
+    pageMaxResultCount!: number;
+    totalDisplayRecords!: number;
 
     [key: string]: any;
 
@@ -82581,6 +84099,11 @@ export class AppItemExcelResultsDTO implements IAppItemExcelResultsDTO {
             this.filePath = _data["filePath"];
             this.errorMessage = _data["errorMessage"];
             this.hasDuplication = _data["hasDuplication"];
+            this.resultKey = _data["resultKey"];
+            this.isPagedResult = _data["isPagedResult"];
+            this.pageSkipCount = _data["pageSkipCount"];
+            this.pageMaxResultCount = _data["pageMaxResultCount"];
+            this.totalDisplayRecords = _data["totalDisplayRecords"];
         }
     }
 
@@ -82628,6 +84151,11 @@ export class AppItemExcelResultsDTO implements IAppItemExcelResultsDTO {
         data["filePath"] = this.filePath;
         data["errorMessage"] = this.errorMessage;
         data["hasDuplication"] = this.hasDuplication;
+        data["resultKey"] = this.resultKey;
+        data["isPagedResult"] = this.isPagedResult;
+        data["pageSkipCount"] = this.pageSkipCount;
+        data["pageMaxResultCount"] = this.pageMaxResultCount;
+        data["totalDisplayRecords"] = this.totalDisplayRecords;
         return data;
     }
 }
@@ -82648,6 +84176,11 @@ export interface IAppItemExcelResultsDTO {
     filePath: string | undefined;
     errorMessage: string | undefined;
     hasDuplication: boolean;
+    resultKey: string | undefined;
+    isPagedResult: boolean;
+    pageSkipCount: number;
+    pageMaxResultCount: number;
+    totalDisplayRecords: number;
 
     [key: string]: any;
 }
@@ -82962,6 +84495,7 @@ export class AppItemValidationInputDTO implements IAppItemValidationInputDTO {
     originalCode!: string | undefined;
     sycIdentifierId!: number | undefined;
     ssin!: string | undefined;
+    skipGenerateSsin!: boolean;
     nonLookupValues!: LookupLabelDto[] | undefined;
     manufacturerCode!: string | undefined;
     tenantId!: number | undefined;
@@ -83122,6 +84656,7 @@ export class AppItemValidationInputDTO implements IAppItemValidationInputDTO {
             this.originalCode = _data["originalCode"];
             this.sycIdentifierId = _data["sycIdentifierId"];
             this.ssin = _data["ssin"];
+            this.skipGenerateSsin = _data["skipGenerateSsin"];
             if (Array.isArray(_data["nonLookupValues"])) {
                 this.nonLookupValues = [] as any;
                 for (let item of _data["nonLookupValues"])
@@ -83284,6 +84819,7 @@ export class AppItemValidationInputDTO implements IAppItemValidationInputDTO {
         data["originalCode"] = this.originalCode;
         data["sycIdentifierId"] = this.sycIdentifierId;
         data["ssin"] = this.ssin;
+        data["skipGenerateSsin"] = this.skipGenerateSsin;
         if (Array.isArray(this.nonLookupValues)) {
             data["nonLookupValues"] = [];
             for (let item of this.nonLookupValues)
@@ -83343,6 +84879,7 @@ export interface IAppItemValidationInputDTO {
     originalCode: string | undefined;
     sycIdentifierId: number | undefined;
     ssin: string | undefined;
+    skipGenerateSsin: boolean;
     nonLookupValues: LookupLabelDto[] | undefined;
     manufacturerCode: string | undefined;
     tenantId: number | undefined;
@@ -94127,6 +95664,8 @@ export interface IShareTransactionByMessageResultDto {
 export class TenantContactRole implements ITenantContactRole {
     contactRole!: string | undefined;
     contactName!: string | undefined;
+    contactEmail!: string | undefined;
+    contactPhoneNumber!: string | undefined;
 
     [key: string]: any;
 
@@ -94147,6 +95686,8 @@ export class TenantContactRole implements ITenantContactRole {
             }
             this.contactRole = _data["contactRole"];
             this.contactName = _data["contactName"];
+            this.contactEmail = _data["contactEmail"];
+            this.contactPhoneNumber = _data["contactPhoneNumber"];
         }
     }
 
@@ -94165,6 +95706,8 @@ export class TenantContactRole implements ITenantContactRole {
         }
         data["contactRole"] = this.contactRole;
         data["contactName"] = this.contactName;
+        data["contactEmail"] = this.contactEmail;
+        data["contactPhoneNumber"] = this.contactPhoneNumber;
         return data;
     }
 }
@@ -94172,6 +95715,8 @@ export class TenantContactRole implements ITenantContactRole {
 export interface ITenantContactRole {
     contactRole: string | undefined;
     contactName: string | undefined;
+    contactEmail: string | undefined;
+    contactPhoneNumber: string | undefined;
 
     [key: string]: any;
 }
@@ -94860,18 +96405,15 @@ export interface IGetAppTransactionForEditOutput {
     [key: string]: any;
 }
 
-export class UserOrganizationUnit implements IUserOrganizationUnit {
-    tenantId!: number | undefined;
-    userId!: number;
-    organizationUnitId!: number;
-    isDeleted!: boolean;
-    creationTime!: moment.Moment;
-    creatorUserId!: number | undefined;
-    id!: number;
+export class FixSSINMissingVariationsResultDto implements IFixSSINMissingVariationsResultDto {
+    targetTenantCount!: number;
+    affectedParentCount!: number;
+    missingVariationCount!: number;
+    enqueuedJobCount!: number;
 
     [key: string]: any;
 
-    constructor(data?: IUserOrganizationUnit) {
+    constructor(data?: IFixSSINMissingVariationsResultDto) {
         if (data) {
             for (var property in data) {
                 if (data.hasOwnProperty(property))
@@ -94886,19 +96428,16 @@ export class UserOrganizationUnit implements IUserOrganizationUnit {
                 if (_data.hasOwnProperty(property))
                     this[property] = _data[property];
             }
-            this.tenantId = _data["tenantId"];
-            this.userId = _data["userId"];
-            this.organizationUnitId = _data["organizationUnitId"];
-            this.isDeleted = _data["isDeleted"];
-            this.creationTime = _data["creationTime"] ? moment(_data["creationTime"].toString()) : <any>undefined;
-            this.creatorUserId = _data["creatorUserId"];
-            this.id = _data["id"];
+            this.targetTenantCount = _data["targetTenantCount"];
+            this.affectedParentCount = _data["affectedParentCount"];
+            this.missingVariationCount = _data["missingVariationCount"];
+            this.enqueuedJobCount = _data["enqueuedJobCount"];
         }
     }
 
-    static fromJS(data: any): UserOrganizationUnit {
+    static fromJS(data: any): FixSSINMissingVariationsResultDto {
         data = typeof data === 'object' ? data : {};
-        let result = new UserOrganizationUnit();
+        let result = new FixSSINMissingVariationsResultDto();
         result.init(data);
         return result;
     }
@@ -94909,381 +96448,19 @@ export class UserOrganizationUnit implements IUserOrganizationUnit {
             if (this.hasOwnProperty(property))
                 data[property] = this[property];
         }
-        data["tenantId"] = this.tenantId;
-        data["userId"] = this.userId;
-        data["organizationUnitId"] = this.organizationUnitId;
-        data["isDeleted"] = this.isDeleted;
-        data["creationTime"] = this.creationTime ? this.creationTime.toISOString() : <any>undefined;
-        data["creatorUserId"] = this.creatorUserId;
-        data["id"] = this.id;
+        data["targetTenantCount"] = this.targetTenantCount;
+        data["affectedParentCount"] = this.affectedParentCount;
+        data["missingVariationCount"] = this.missingVariationCount;
+        data["enqueuedJobCount"] = this.enqueuedJobCount;
         return data;
     }
 }
 
-export interface IUserOrganizationUnit {
-    tenantId: number | undefined;
-    userId: number;
-    organizationUnitId: number;
-    isDeleted: boolean;
-    creationTime: moment.Moment;
-    creatorUserId: number | undefined;
-    id: number;
-
-    [key: string]: any;
-}
-
-export class UserToken implements IUserToken {
-    tenantId!: number | undefined;
-    userId!: number;
-    loginProvider!: string | undefined;
-    name!: string | undefined;
-    value!: string | undefined;
-    expireDate!: moment.Moment | undefined;
-    id!: number;
-
-    [key: string]: any;
-
-    constructor(data?: IUserToken) {
-        if (data) {
-            for (var property in data) {
-                if (data.hasOwnProperty(property))
-                    (<any>this)[property] = (<any>data)[property];
-            }
-        }
-    }
-
-    init(_data?: any) {
-        if (_data) {
-            for (var property in _data) {
-                if (_data.hasOwnProperty(property))
-                    this[property] = _data[property];
-            }
-            this.tenantId = _data["tenantId"];
-            this.userId = _data["userId"];
-            this.loginProvider = _data["loginProvider"];
-            this.name = _data["name"];
-            this.value = _data["value"];
-            this.expireDate = _data["expireDate"] ? moment(_data["expireDate"].toString()) : <any>undefined;
-            this.id = _data["id"];
-        }
-    }
-
-    static fromJS(data: any): UserToken {
-        data = typeof data === 'object' ? data : {};
-        let result = new UserToken();
-        result.init(data);
-        return result;
-    }
-
-    toJSON(data?: any) {
-        data = typeof data === 'object' ? data : {};
-        for (var property in this) {
-            if (this.hasOwnProperty(property))
-                data[property] = this[property];
-        }
-        data["tenantId"] = this.tenantId;
-        data["userId"] = this.userId;
-        data["loginProvider"] = this.loginProvider;
-        data["name"] = this.name;
-        data["value"] = this.value;
-        data["expireDate"] = this.expireDate ? this.expireDate.toISOString() : <any>undefined;
-        data["id"] = this.id;
-        return data;
-    }
-}
-
-export interface IUserToken {
-    tenantId: number | undefined;
-    userId: number;
-    loginProvider: string | undefined;
-    name: string | undefined;
-    value: string | undefined;
-    expireDate: moment.Moment | undefined;
-    id: number;
-
-    [key: string]: any;
-}
-
-export class User implements IUser {
-    relatedTenantId!: number;
-    profilePictureId!: string | undefined;
-    shouldChangePasswordOnNextLogin!: boolean;
-    signInTokenExpireTimeUtc!: moment.Moment | undefined;
-    signInToken!: string | undefined;
-    googleAuthenticatorKey!: string | undefined;
-    organizationUnits!: UserOrganizationUnit[] | undefined;
-    normalizedUserName!: string;
-    normalizedEmailAddress!: string;
-    concurrencyStamp!: string | undefined;
-    tokens!: UserToken[] | undefined;
-    deleterUser!: User;
-    creatorUser!: User;
-    lastModifierUser!: User;
-    authenticationSource!: string | undefined;
-    userName!: string;
-    tenantId!: number | undefined;
-    emailAddress!: string;
-    name!: string;
-    surname!: string;
-    readonly fullName!: string | undefined;
-    password!: string;
-    emailConfirmationCode!: string | undefined;
-    passwordResetCode!: string | undefined;
-    lockoutEndDateUtc!: moment.Moment | undefined;
-    accessFailedCount!: number;
-    isLockoutEnabled!: boolean;
-    phoneNumber!: string | undefined;
-    isPhoneNumberConfirmed!: boolean;
-    securityStamp!: string | undefined;
-    isTwoFactorEnabled!: boolean;
-    logins!: UserLogin[] | undefined;
-    roles!: UserRole[] | undefined;
-    claims!: UserClaim[] | undefined;
-    permissions!: UserPermissionSetting[] | undefined;
-    settings!: Setting[] | undefined;
-    isEmailConfirmed!: boolean;
-    isActive!: boolean;
-    isDeleted!: boolean;
-    deleterUserId!: number | undefined;
-    deletionTime!: moment.Moment | undefined;
-    lastModificationTime!: moment.Moment | undefined;
-    lastModifierUserId!: number | undefined;
-    creationTime!: moment.Moment;
-    creatorUserId!: number | undefined;
-    id!: number;
-
-    [key: string]: any;
-
-    constructor(data?: IUser) {
-        if (data) {
-            for (var property in data) {
-                if (data.hasOwnProperty(property))
-                    (<any>this)[property] = (<any>data)[property];
-            }
-        }
-    }
-
-    init(_data?: any) {
-        if (_data) {
-            for (var property in _data) {
-                if (_data.hasOwnProperty(property))
-                    this[property] = _data[property];
-            }
-            this.relatedTenantId = _data["relatedTenantId"];
-            this.profilePictureId = _data["profilePictureId"];
-            this.shouldChangePasswordOnNextLogin = _data["shouldChangePasswordOnNextLogin"];
-            this.signInTokenExpireTimeUtc = _data["signInTokenExpireTimeUtc"] ? moment(_data["signInTokenExpireTimeUtc"].toString()) : <any>undefined;
-            this.signInToken = _data["signInToken"];
-            this.googleAuthenticatorKey = _data["googleAuthenticatorKey"];
-            if (Array.isArray(_data["organizationUnits"])) {
-                this.organizationUnits = [] as any;
-                for (let item of _data["organizationUnits"])
-                    this.organizationUnits!.push(UserOrganizationUnit.fromJS(item));
-            }
-            this.normalizedUserName = _data["normalizedUserName"];
-            this.normalizedEmailAddress = _data["normalizedEmailAddress"];
-            this.concurrencyStamp = _data["concurrencyStamp"];
-            if (Array.isArray(_data["tokens"])) {
-                this.tokens = [] as any;
-                for (let item of _data["tokens"])
-                    this.tokens!.push(UserToken.fromJS(item));
-            }
-            this.deleterUser = _data["deleterUser"] ? User.fromJS(_data["deleterUser"]) : <any>undefined;
-            this.creatorUser = _data["creatorUser"] ? User.fromJS(_data["creatorUser"]) : <any>undefined;
-            this.lastModifierUser = _data["lastModifierUser"] ? User.fromJS(_data["lastModifierUser"]) : <any>undefined;
-            this.authenticationSource = _data["authenticationSource"];
-            this.userName = _data["userName"];
-            this.tenantId = _data["tenantId"];
-            this.emailAddress = _data["emailAddress"];
-            this.name = _data["name"];
-            this.surname = _data["surname"];
-            (<any>this).fullName = _data["fullName"];
-            this.password = _data["password"];
-            this.emailConfirmationCode = _data["emailConfirmationCode"];
-            this.passwordResetCode = _data["passwordResetCode"];
-            this.lockoutEndDateUtc = _data["lockoutEndDateUtc"] ? moment(_data["lockoutEndDateUtc"].toString()) : <any>undefined;
-            this.accessFailedCount = _data["accessFailedCount"];
-            this.isLockoutEnabled = _data["isLockoutEnabled"];
-            this.phoneNumber = _data["phoneNumber"];
-            this.isPhoneNumberConfirmed = _data["isPhoneNumberConfirmed"];
-            this.securityStamp = _data["securityStamp"];
-            this.isTwoFactorEnabled = _data["isTwoFactorEnabled"];
-            if (Array.isArray(_data["logins"])) {
-                this.logins = [] as any;
-                for (let item of _data["logins"])
-                    this.logins!.push(UserLogin.fromJS(item));
-            }
-            if (Array.isArray(_data["roles"])) {
-                this.roles = [] as any;
-                for (let item of _data["roles"])
-                    this.roles!.push(UserRole.fromJS(item));
-            }
-            if (Array.isArray(_data["claims"])) {
-                this.claims = [] as any;
-                for (let item of _data["claims"])
-                    this.claims!.push(UserClaim.fromJS(item));
-            }
-            if (Array.isArray(_data["permissions"])) {
-                this.permissions = [] as any;
-                for (let item of _data["permissions"])
-                    this.permissions!.push(UserPermissionSetting.fromJS(item));
-            }
-            if (Array.isArray(_data["settings"])) {
-                this.settings = [] as any;
-                for (let item of _data["settings"])
-                    this.settings!.push(Setting.fromJS(item));
-            }
-            this.isEmailConfirmed = _data["isEmailConfirmed"];
-            this.isActive = _data["isActive"];
-            this.isDeleted = _data["isDeleted"];
-            this.deleterUserId = _data["deleterUserId"];
-            this.deletionTime = _data["deletionTime"] ? moment(_data["deletionTime"].toString()) : <any>undefined;
-            this.lastModificationTime = _data["lastModificationTime"] ? moment(_data["lastModificationTime"].toString()) : <any>undefined;
-            this.lastModifierUserId = _data["lastModifierUserId"];
-            this.creationTime = _data["creationTime"] ? moment(_data["creationTime"].toString()) : <any>undefined;
-            this.creatorUserId = _data["creatorUserId"];
-            this.id = _data["id"];
-        }
-    }
-
-    static fromJS(data: any): User {
-        data = typeof data === 'object' ? data : {};
-        let result = new User();
-        result.init(data);
-        return result;
-    }
-
-    toJSON(data?: any) {
-        data = typeof data === 'object' ? data : {};
-        for (var property in this) {
-            if (this.hasOwnProperty(property))
-                data[property] = this[property];
-        }
-        data["relatedTenantId"] = this.relatedTenantId;
-        data["profilePictureId"] = this.profilePictureId;
-        data["shouldChangePasswordOnNextLogin"] = this.shouldChangePasswordOnNextLogin;
-        data["signInTokenExpireTimeUtc"] = this.signInTokenExpireTimeUtc ? this.signInTokenExpireTimeUtc.toISOString() : <any>undefined;
-        data["signInToken"] = this.signInToken;
-        data["googleAuthenticatorKey"] = this.googleAuthenticatorKey;
-        if (Array.isArray(this.organizationUnits)) {
-            data["organizationUnits"] = [];
-            for (let item of this.organizationUnits)
-                data["organizationUnits"].push(item.toJSON());
-        }
-        data["normalizedUserName"] = this.normalizedUserName;
-        data["normalizedEmailAddress"] = this.normalizedEmailAddress;
-        data["concurrencyStamp"] = this.concurrencyStamp;
-        if (Array.isArray(this.tokens)) {
-            data["tokens"] = [];
-            for (let item of this.tokens)
-                data["tokens"].push(item.toJSON());
-        }
-        data["deleterUser"] = this.deleterUser ? this.deleterUser.toJSON() : <any>undefined;
-        data["creatorUser"] = this.creatorUser ? this.creatorUser.toJSON() : <any>undefined;
-        data["lastModifierUser"] = this.lastModifierUser ? this.lastModifierUser.toJSON() : <any>undefined;
-        data["authenticationSource"] = this.authenticationSource;
-        data["userName"] = this.userName;
-        data["tenantId"] = this.tenantId;
-        data["emailAddress"] = this.emailAddress;
-        data["name"] = this.name;
-        data["surname"] = this.surname;
-        data["fullName"] = this.fullName;
-        data["password"] = this.password;
-        data["emailConfirmationCode"] = this.emailConfirmationCode;
-        data["passwordResetCode"] = this.passwordResetCode;
-        data["lockoutEndDateUtc"] = this.lockoutEndDateUtc ? this.lockoutEndDateUtc.toISOString() : <any>undefined;
-        data["accessFailedCount"] = this.accessFailedCount;
-        data["isLockoutEnabled"] = this.isLockoutEnabled;
-        data["phoneNumber"] = this.phoneNumber;
-        data["isPhoneNumberConfirmed"] = this.isPhoneNumberConfirmed;
-        data["securityStamp"] = this.securityStamp;
-        data["isTwoFactorEnabled"] = this.isTwoFactorEnabled;
-        if (Array.isArray(this.logins)) {
-            data["logins"] = [];
-            for (let item of this.logins)
-                data["logins"].push(item.toJSON());
-        }
-        if (Array.isArray(this.roles)) {
-            data["roles"] = [];
-            for (let item of this.roles)
-                data["roles"].push(item.toJSON());
-        }
-        if (Array.isArray(this.claims)) {
-            data["claims"] = [];
-            for (let item of this.claims)
-                data["claims"].push(item.toJSON());
-        }
-        if (Array.isArray(this.permissions)) {
-            data["permissions"] = [];
-            for (let item of this.permissions)
-                data["permissions"].push(item.toJSON());
-        }
-        if (Array.isArray(this.settings)) {
-            data["settings"] = [];
-            for (let item of this.settings)
-                data["settings"].push(item.toJSON());
-        }
-        data["isEmailConfirmed"] = this.isEmailConfirmed;
-        data["isActive"] = this.isActive;
-        data["isDeleted"] = this.isDeleted;
-        data["deleterUserId"] = this.deleterUserId;
-        data["deletionTime"] = this.deletionTime ? this.deletionTime.toISOString() : <any>undefined;
-        data["lastModificationTime"] = this.lastModificationTime ? this.lastModificationTime.toISOString() : <any>undefined;
-        data["lastModifierUserId"] = this.lastModifierUserId;
-        data["creationTime"] = this.creationTime ? this.creationTime.toISOString() : <any>undefined;
-        data["creatorUserId"] = this.creatorUserId;
-        data["id"] = this.id;
-        return data;
-    }
-}
-
-export interface IUser {
-    relatedTenantId: number;
-    profilePictureId: string | undefined;
-    shouldChangePasswordOnNextLogin: boolean;
-    signInTokenExpireTimeUtc: moment.Moment | undefined;
-    signInToken: string | undefined;
-    googleAuthenticatorKey: string | undefined;
-    organizationUnits: UserOrganizationUnit[] | undefined;
-    normalizedUserName: string;
-    normalizedEmailAddress: string;
-    concurrencyStamp: string | undefined;
-    tokens: UserToken[] | undefined;
-    deleterUser: User;
-    creatorUser: User;
-    lastModifierUser: User;
-    authenticationSource: string | undefined;
-    userName: string;
-    tenantId: number | undefined;
-    emailAddress: string;
-    name: string;
-    surname: string;
-    fullName: string | undefined;
-    password: string;
-    emailConfirmationCode: string | undefined;
-    passwordResetCode: string | undefined;
-    lockoutEndDateUtc: moment.Moment | undefined;
-    accessFailedCount: number;
-    isLockoutEnabled: boolean;
-    phoneNumber: string | undefined;
-    isPhoneNumberConfirmed: boolean;
-    securityStamp: string | undefined;
-    isTwoFactorEnabled: boolean;
-    logins: UserLogin[] | undefined;
-    roles: UserRole[] | undefined;
-    claims: UserClaim[] | undefined;
-    permissions: UserPermissionSetting[] | undefined;
-    settings: Setting[] | undefined;
-    isEmailConfirmed: boolean;
-    isActive: boolean;
-    isDeleted: boolean;
-    deleterUserId: number | undefined;
-    deletionTime: moment.Moment | undefined;
-    lastModificationTime: moment.Moment | undefined;
-    lastModifierUserId: number | undefined;
-    creationTime: moment.Moment;
-    creatorUserId: number | undefined;
-    id: number;
+export interface IFixSSINMissingVariationsResultDto {
+    targetTenantCount: number;
+    affectedParentCount: number;
+    missingVariationCount: number;
+    enqueuedJobCount: number;
 
     [key: string]: any;
 }
@@ -102977,6 +104154,8 @@ export class GetMarketplaceAccountForViewDto implements IGetMarketplaceAccountFo
     disConnectLabel!: string | undefined;
     availableConnections!: ConnectionType[] | undefined;
     connectionsInfo!: ConnectionInfo[] | undefined;
+    isProfileData!: boolean;
+    connectedAccountId!: number | undefined;
 
     [key: string]: any;
 
@@ -103012,6 +104191,8 @@ export class GetMarketplaceAccountForViewDto implements IGetMarketplaceAccountFo
                 for (let item of _data["connectionsInfo"])
                     this.connectionsInfo!.push(ConnectionInfo.fromJS(item));
             }
+            this.isProfileData = _data["isProfileData"];
+            this.connectedAccountId = _data["connectedAccountId"];
         }
     }
 
@@ -103045,6 +104226,8 @@ export class GetMarketplaceAccountForViewDto implements IGetMarketplaceAccountFo
             for (let item of this.connectionsInfo)
                 data["connectionsInfo"].push(item.toJSON());
         }
+        data["isProfileData"] = this.isProfileData;
+        data["connectedAccountId"] = this.connectedAccountId;
         return data;
     }
 }
@@ -103059,6 +104242,8 @@ export interface IGetMarketplaceAccountForViewDto {
     disConnectLabel: string | undefined;
     availableConnections: ConnectionType[] | undefined;
     connectionsInfo: ConnectionInfo[] | undefined;
+    isProfileData: boolean;
+    connectedAccountId: number | undefined;
 
     [key: string]: any;
 }
@@ -103702,6 +104887,62 @@ export interface ICreateMessageInput {
     entityAttachments: AppEntityAttachmentDto[] | undefined;
     messageCategory: string | undefined;
     mentionedUsers: MentionedUserInfo[] | undefined;
+
+    [key: string]: any;
+}
+
+export class MarketplaceItemReviewSummaryDto implements IMarketplaceItemReviewSummaryDto {
+    entityId!: number;
+    numberOfReviews!: number;
+    averageRating!: number;
+
+    [key: string]: any;
+
+    constructor(data?: IMarketplaceItemReviewSummaryDto) {
+        if (data) {
+            for (var property in data) {
+                if (data.hasOwnProperty(property))
+                    (<any>this)[property] = (<any>data)[property];
+            }
+        }
+    }
+
+    init(_data?: any) {
+        if (_data) {
+            for (var property in _data) {
+                if (_data.hasOwnProperty(property))
+                    this[property] = _data[property];
+            }
+            this.entityId = _data["entityId"];
+            this.numberOfReviews = _data["numberOfReviews"];
+            this.averageRating = _data["averageRating"];
+        }
+    }
+
+    static fromJS(data: any): MarketplaceItemReviewSummaryDto {
+        data = typeof data === 'object' ? data : {};
+        let result = new MarketplaceItemReviewSummaryDto();
+        result.init(data);
+        return result;
+    }
+
+    toJSON(data?: any) {
+        data = typeof data === 'object' ? data : {};
+        for (var property in this) {
+            if (this.hasOwnProperty(property))
+                data[property] = this[property];
+        }
+        data["entityId"] = this.entityId;
+        data["numberOfReviews"] = this.numberOfReviews;
+        data["averageRating"] = this.averageRating;
+        return data;
+    }
+}
+
+export interface IMarketplaceItemReviewSummaryDto {
+    entityId: number;
+    numberOfReviews: number;
+    averageRating: number;
 
     [key: string]: any;
 }
@@ -106852,12 +108093,6 @@ export interface IUserLoginInfoDto {
     id: number;
 
     [key: string]: any;
-}
-
-export enum SubscriptionPaymentType {
-    Manual = 0,
-    RecurringAutomatic = 1,
-    RecurringManual = 2,
 }
 
 export class EditionInfoDto implements IEditionInfoDto {
@@ -111003,6 +112238,7 @@ export class TreeNodeOfGetSycEntityObjectTypeForViewDto implements ITreeNodeOfGe
     expanded!: boolean;
     label!: string | undefined;
     totalChildrenCount!: number | undefined;
+    resultCount!: number | undefined;
 
     [key: string]: any;
 
@@ -111031,6 +112267,7 @@ export class TreeNodeOfGetSycEntityObjectTypeForViewDto implements ITreeNodeOfGe
             this.expanded = _data["expanded"];
             this.label = _data["label"];
             this.totalChildrenCount = _data["totalChildrenCount"];
+            this.resultCount = _data["resultCount"];
         }
     }
 
@@ -111057,6 +112294,7 @@ export class TreeNodeOfGetSycEntityObjectTypeForViewDto implements ITreeNodeOfGe
         data["expanded"] = this.expanded;
         data["label"] = this.label;
         data["totalChildrenCount"] = this.totalChildrenCount;
+        data["resultCount"] = this.resultCount;
         return data;
     }
 }
@@ -111068,6 +112306,7 @@ export interface ITreeNodeOfGetSycEntityObjectTypeForViewDto {
     expanded: boolean;
     label: string | undefined;
     totalChildrenCount: number | undefined;
+    resultCount: number | undefined;
 
     [key: string]: any;
 }
@@ -113959,6 +115198,7 @@ export class TreeNodeOfGetSydObjectForViewDto implements ITreeNodeOfGetSydObject
     expanded!: boolean;
     label!: string | undefined;
     totalChildrenCount!: number | undefined;
+    resultCount!: number | undefined;
 
     [key: string]: any;
 
@@ -113987,6 +115227,7 @@ export class TreeNodeOfGetSydObjectForViewDto implements ITreeNodeOfGetSydObject
             this.expanded = _data["expanded"];
             this.label = _data["label"];
             this.totalChildrenCount = _data["totalChildrenCount"];
+            this.resultCount = _data["resultCount"];
         }
     }
 
@@ -114013,6 +115254,7 @@ export class TreeNodeOfGetSydObjectForViewDto implements ITreeNodeOfGetSydObject
         data["expanded"] = this.expanded;
         data["label"] = this.label;
         data["totalChildrenCount"] = this.totalChildrenCount;
+        data["resultCount"] = this.resultCount;
         return data;
     }
 }
@@ -114024,6 +115266,7 @@ export interface ITreeNodeOfGetSydObjectForViewDto {
     expanded: boolean;
     label: string | undefined;
     totalChildrenCount: number | undefined;
+    resultCount: number | undefined;
 
     [key: string]: any;
 }
@@ -114582,6 +115825,7 @@ export class TreeNodeOfGetSysObjectTypeForViewDto implements ITreeNodeOfGetSysOb
     expanded!: boolean;
     label!: string | undefined;
     totalChildrenCount!: number | undefined;
+    resultCount!: number | undefined;
 
     [key: string]: any;
 
@@ -114610,6 +115854,7 @@ export class TreeNodeOfGetSysObjectTypeForViewDto implements ITreeNodeOfGetSysOb
             this.expanded = _data["expanded"];
             this.label = _data["label"];
             this.totalChildrenCount = _data["totalChildrenCount"];
+            this.resultCount = _data["resultCount"];
         }
     }
 
@@ -114636,6 +115881,7 @@ export class TreeNodeOfGetSysObjectTypeForViewDto implements ITreeNodeOfGetSysOb
         data["expanded"] = this.expanded;
         data["label"] = this.label;
         data["totalChildrenCount"] = this.totalChildrenCount;
+        data["resultCount"] = this.resultCount;
         return data;
     }
 }
@@ -114647,6 +115893,7 @@ export interface ITreeNodeOfGetSysObjectTypeForViewDto {
     expanded: boolean;
     label: string | undefined;
     totalChildrenCount: number | undefined;
+    resultCount: number | undefined;
 
     [key: string]: any;
 }
@@ -115034,6 +116281,7 @@ export class CreateTenantInput implements ICreateTenantInput {
     inviterTenantId!: number | undefined;
     firstName!: string;
     lastName!: string;
+    adminName!: string;
 
     [key: string]: any;
 
@@ -115066,6 +116314,7 @@ export class CreateTenantInput implements ICreateTenantInput {
             this.inviterTenantId = _data["inviterTenantId"];
             this.firstName = _data["firstName"];
             this.lastName = _data["lastName"];
+            this.adminName = _data["adminName"];
         }
     }
 
@@ -115096,6 +116345,7 @@ export class CreateTenantInput implements ICreateTenantInput {
         data["inviterTenantId"] = this.inviterTenantId;
         data["firstName"] = this.firstName;
         data["lastName"] = this.lastName;
+        data["adminName"] = this.adminName;
         return data;
     }
 }
@@ -115115,6 +116365,7 @@ export interface ICreateTenantInput {
     inviterTenantId: number | undefined;
     firstName: string;
     lastName: string;
+    adminName: string;
 
     [key: string]: any;
 }
@@ -116132,6 +117383,7 @@ export class RegisterTenantInput implements IRegisterTenantInput {
     accountType!: string | undefined;
     accountTypeId!: string | undefined;
     relatedTenantId!: number;
+    adminName!: string;
 
     [key: string]: any;
 
@@ -116163,6 +117415,7 @@ export class RegisterTenantInput implements IRegisterTenantInput {
             this.accountType = _data["accountType"];
             this.accountTypeId = _data["accountTypeId"];
             this.relatedTenantId = _data["relatedTenantId"];
+            this.adminName = _data["adminName"];
         }
     }
 
@@ -116192,6 +117445,7 @@ export class RegisterTenantInput implements IRegisterTenantInput {
         data["accountType"] = this.accountType;
         data["accountTypeId"] = this.accountTypeId;
         data["relatedTenantId"] = this.relatedTenantId;
+        data["adminName"] = this.adminName;
         return data;
     }
 }
@@ -116210,6 +117464,7 @@ export interface IRegisterTenantInput {
     accountType: string | undefined;
     accountTypeId: string | undefined;
     relatedTenantId: number;
+    adminName: string;
 
     [key: string]: any;
 }

@@ -39,6 +39,7 @@
     [imData]="imData"
     [imImages]="imImages"
     (updatedRecords)="onUpdatedRecords($event)"
+    (loadMoreRecords)="onLoadMoreValidateExcelRecords($event)"
     [_resetRecords]="_resetRecords"
     (_validateRecord)="onValidateRecord($event)"
     (_resetRecordsCompleted)="onResetRecordsCompleted()"

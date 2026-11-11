@@ -1,1 +1,5 @@
-<img *ngIf="image" [ngClass]="classList" class="img-thumbnail p-0" [ngStyle]="{'width.px':staticWidth ,'height.px':staticHeight }" [src]="image"   onerror="this.src='../../../../../assets/placeholders/appitem-placeholder.png'"/>
+<img *ngIf="image"
+	[ngClass]="classList"
+	class="img-thumbnail p-0 responsive-image"
+	[src]="image"
+	onerror="this.src='../../../../../assets/placeholders/appitem-placeholder.png'" />

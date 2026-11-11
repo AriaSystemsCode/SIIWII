@@ -5,7 +5,7 @@
         <div class="row" *ngIf="!fromMsgs">
             <div class="d-flex flex-row w-100 mr-3">
                 <h4 class="purpleColor font-weight-bold col-12 pb-4 mb-4" style="border-bottom: 2px solid #e7e8ef;color: black !important;">
-                    {{"Details"}} </h4>
+                    {{"Details" | localize}} </h4>
                 <div (click)="onhideSideBar()" class="pointer w-100"><svg xmlns="http://www.w3.org/2000/svg" width="15" height="14"
                         viewBox="0 0 15 14" fill="none">
                         <g clip-path="url(#clip0_662_76)">
@@ -22,7 +22,7 @@
             </div>
     
             <h6 class="purpleColor  col-11 pb-4 mb-4" style="color: black !important;">
-           <img src="../../../../assets/placeholders/fluent_alert-on-16-filled.png" class="mr-2" />     {{" Data view is not available"}} </h6>
+           <img src="../../../../assets/placeholders/fluent_alert-on-16-filled.png" class="mr-2" />     {{" Data view is not available" | localize}} </h6>
           
         </div>
     

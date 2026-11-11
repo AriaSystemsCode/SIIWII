@@ -4,3 +4,40 @@
     min-height:10px;
     height: auto;
 }
+
+.entity-object-type-modal__extra-attributes {
+    min-height: 120px;
+    white-space: pre-wrap;
+}
+
+@media screen and (max-width: 991px) {
+    .entity-object-type-modal {
+        max-width: calc(100vw - 2rem);
+        margin: 1rem auto;
+    }
+
+    .entity-object-type-modal__form .modal-body {
+        padding: 1.5rem;
+    }
+}
+
+@media screen and (max-width: 767px) {
+    .entity-object-type-modal {
+        max-width: calc(100vw - 1rem);
+        margin: 0.5rem auto;
+    }
+
+    .entity-object-type-modal__form .modal-body {
+        padding: 1rem;
+    }
+
+    .entity-object-type-modal__form .modal-footer {
+        display: flex;
+        flex-direction: column-reverse;
+        gap: 0.75rem;
+    }
+
+    .entity-object-type-modal__form .modal-footer .btn {
+        width: 100%;
+    }
+}

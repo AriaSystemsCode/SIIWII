@@ -2,7 +2,7 @@
     <!-- stock available -->
 
     <div class="stock-availablity pt-2 d-flex align-items-center justify-content-between px-3">
-        <p class="pt-2 fw-bold fs-6 m-0" style="font-weight: 700">
+        <p class="pt-2 fw-bold fs-6 m-0">
             {{'OnlyAvailableInStock' | localize}}
         </p>
         <div class="switch">
@@ -17,7 +17,7 @@
     <div class="filter-selection">
         <p-accordion [multiple]="true">
             <!-- product list -->
-            <p-accordionTab [header]="'ProductList' | localize" [selected]="true">
+            <p-accordionTab [header]="'ProductList' | localize" [selected]="true" *ngIf="isSellerIdExists || isFromSellerRoom">
                 <!-- <p-accordionTab header="Product List" *ngIf="isSellerIdExists || isFromSellerRoom" [selected]="true"> -->
                 <div *ngFor="let list of productList">
                     <button (click)="selectCatalog(list)" [ngClass]="{ 'selectedCatalog': catalogId == list.id  }"
@@ -38,17 +38,21 @@
                 <div class="card flex justify-content-start">
                     <p-tree [styleClass]="selectedFile?.length >0 ? 'bgAdd' : ''"
                         [ngClass]="selectedFile?.length >0 ? 'bgAdd' : ''" class="w-full md:w-30rem" [value]="files" 
-                        (onNodeExpand)="nodeExpand($event)" [loading]="loading" selectionMode="single"
+                        (onNodeExpand)="nodeExpand($event)" [loading]="loading" selectionMode="checkbox"
                         (onNodeSelect)="nodeSelect($event)" (onNodeUnselect)="nodeUnselect($event)"
-                        [(selection)]="selectedFile"></p-tree>
+                        [(selection)]="selectedFile">
+                    <ng-template let-node pTemplate="default">
+                        <span>{{ node.label }}</span>
+                    </ng-template>
+                    </p-tree>
                 </div>
                 <div class="d-flex justify-content-end my-2 mx-4">
-                    <a (click)="handledeDratmentsTreeSelections.emit(null);selectedFile=''" class="clrBtn"> {{'ClearFilter' | localize}}</a>
+                    <a (click)="selectedFile=[]; handledeDratmentsTreeSelections.emit([])" class="clrBtn"> {{'ClearFilter' | localize}}</a>
                 </div>
             </p-accordionTab>
 
              <!-- brands -->
-             <p-accordionTab [header]="'Brands' | localize" [selected]="true">
+             <p-accordionTab [header]="'Brands' | localize" [selected]="true" *ngIf="isSellerIdExists || isFromSellerRoom">
                 <div *ngFor="let brand of brands; let i = index" class="d-flex align-items-center justify-content-lg-start px-2">
                   <p-checkbox
                     name="brands"
@@ -68,14 +72,14 @@
               </p-accordionTab>
               
                   <!-- categories -->
-                  <p-accordionTab [header]="'Categories' | localize" [selected]="true">
+                  <!-- <p-accordionTab [header]="'Categories' | localize" [selected]="true">
                     <div class="card flex justify-content-start">
                       <p-tree
                         [styleClass]="selectedCatFile?.length > 0 ? 'bgAdd' : ''"
                         class="w-full md:w-30rem"
                         [value]="categories"
                         [loading]="loading"
-                        selectionMode="single"
+                        selectionMode="checkbox"
                         [(selection)]="selectedCatFile"
                         (onNodeExpand)="nodeCatExpand($event)"
                         (onNodeSelect)="nodeCatSelect($event)"
@@ -85,13 +89,13 @@
                   
                     <div class="d-flex justify-content-end my-2 mx-4">
                       <a
-                        (click)="selectedCatFile = ''; handleCategoriesTreeSelections.emit(null)"
+                        (click)="selectedCatFile = []; handleCategoriesTreeSelections.emit([])"
                         class="clrBtn"
                         >{{'ClearFilter' | localize}}</a
                       >
                     </div>
                   </p-accordionTab>
-                  
+                   -->
             <p-accordionTab [header]="'Price' | localize" [selected]="false">
                 <div class="price">
                     <input type="number" name="priceFrom" class="form-control" [placeholder]="'From' | localize" [(ngModel)]="min"

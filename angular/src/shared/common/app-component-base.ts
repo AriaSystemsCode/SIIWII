@@ -384,6 +384,7 @@ export abstract class AppComponentBase {
     
            !this.isArabic ?  config.class = "right-modal slide-right-in" : config.class = "left-modal slide-left-in ngLeft"
     
+        this.isArabic ?  config.class = "left-modal":config.class = "right-modal";
         let mgCropperModalRef = this.bsModalService.show(
             ImageCropperComponent,
             config
@@ -610,16 +611,18 @@ export abstract class AppComponentBase {
 
     getTransactionRole(roleValue): string {
         let transactionRole = "";
-        if (roleValue?.includes("Seller"))
+        const normalizedRole = roleValue?.toString()?.toLowerCase() ?? "";
+
+        if (normalizedRole.includes("seller"))
             transactionRole = "Seller"
 
-        if (roleValue?.includes("Buyer"))
+        if (normalizedRole.includes("buyer"))
             transactionRole = "Buyer"
 
-        if (roleValue?.includes("Sales Rep"))
+        if (normalizedRole.includes("sales rep") || normalizedRole.includes("salesrep"))
             transactionRole = "Independent Sales Rep"
 
-        if (roleValue?.includes("buying office"))
+        if (normalizedRole.includes("buying office") || normalizedRole.includes("buyingoffice"))
             transactionRole = "Independent Buying Office"
 
         return transactionRole;
@@ -684,4 +687,4 @@ export abstract class AppComponentBase {
 }
 
 
-}  
+}

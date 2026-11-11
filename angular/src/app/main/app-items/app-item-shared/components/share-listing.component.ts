@@ -37,6 +37,8 @@ export class ShareListingComponent extends AppComponentBase implements OnInit {
     buttonText = this.l("ShareAndPublish");
     showCloseText = false;
     subscribers: number;
+    private initialSharingLevel: number;
+    private initialSharingRecipients = "";
     constructor(
         injector: Injector,
         public currentModalRef: BsModalRef,
@@ -53,17 +55,50 @@ export class ShareListingComponent extends AppComponentBase implements OnInit {
             this.publishItemOptions = new PublishItemOptions();
         if (!this.publishItemOptions.itemSharing)
             this.publishItemOptions.itemSharing = [];
-        if (!this.publishItemOptions.sharingLevel)
-            this.publishItemOptions.sharingLevel = 1;
-        if(this.PublishAppItemListingService.sharingLevel){
-            this.publishItemOptions.sharingLevel = this.PublishAppItemListingService.sharingLevel;
-        }
-        if(this.PublishAppItemListingService.itemSharing){
+        const currentSharingLevel = this.publishItemOptions.sharingLevel !== undefined && this.publishItemOptions.sharingLevel !== null
+            ? this.publishItemOptions.sharingLevel
+            : this.PublishAppItemListingService.sharingStatus !== undefined && this.PublishAppItemListingService.sharingStatus !== null
+                ? this.PublishAppItemListingService.sharingStatus
+                : 1;
+        this.publishItemOptions.sharingLevel = currentSharingLevel;
+        this.PublishAppItemListingService.sharingStatus = currentSharingLevel;
+
+        if (this.publishItemOptions.itemSharing !== undefined && this.publishItemOptions.itemSharing !== null) {
+            this.PublishAppItemListingService.itemSharing = this.publishItemOptions.itemSharing;
+        } else if (this.PublishAppItemListingService.itemSharing) {
             this.publishItemOptions.itemSharing = this.PublishAppItemListingService.itemSharing;
         }
+
+        this.initialSharingLevel = this.publishItemOptions.sharingLevel;
+        this.initialSharingRecipients = this.getSharingRecipientsKey(
+            this.publishItemOptions.itemSharing
+        );
+    }
+
+    private getSharingRecipientsKey(items: ItemSharingDto[]): string {
+        return (items || [])
+            .map((item) => {
+                if (item.sharedUserId) return `user:${item.sharedUserId}`;
+                if (item.sharedTenantId) return `tenant:${item.sharedTenantId}`;
+                return `email:${(item.sharedUserEMail || "").trim().toLowerCase()}`;
+            })
+            .sort()
+            .join("|");
+    }
+
+    get sharingOptionsChanged(): boolean {
+        if (!this.publishItemOptions) return false;
+        return this.publishItemOptions.sharingLevel !== this.initialSharingLevel ||
+            this.getSharingRecipientsKey(this.publishItemOptions.itemSharing) !==
+                this.initialSharingRecipients;
     }
 
     publishListing() {
+        if (this.saving) {
+            return;
+        }
+
+        this.saving = true;
         const publishItemOptions = PublishItemOptions.fromJS(
             this.publishItemOptions
         );
@@ -101,49 +136,56 @@ export class ShareListingComponent extends AppComponentBase implements OnInit {
             itemSharing: this.publishItemOptions.itemSharing,
             syncProductList: false,
         };
-        // this.savingDone = true
-        console.log(">>", this.PublishAppItemListingService.sharingLevel);
+
+        const currentSharingStatus = this.PublishAppItemListingService.sharingStatus;
+        const hasSubscribers = this.PublishAppItemListingService.subscribersNumber !== 0;
         this.showMainSpinner();
-        if (
-            this.PublishAppItemListingService.sharingLevel === 0 ||
-            this.PublishAppItemListingService.sharingLevel === 3
-        ) {
+        if (currentSharingStatus === 0 || currentSharingStatus === 3 || this.sharingOptionsChanged) {
             if (this.PublishAppItemListingService.screen === 1) {
                 this.shareProdcut(SharingBody);
             } else {
                 this.shareProductList(productListSharingBody);
             }
-        } else if (this.PublishAppItemListingService.sharingLevel == 4) {
-            this.unhideProduct();
+        } else if (currentSharingStatus === 4) {
+            if (this.PublishAppItemListingService.screen === 1) this.unhideProduct();
+            else this.unhideProductList();
+        } else if (hasSubscribers) {
+            if (this.PublishAppItemListingService.screen === 1) this.hideProduct();
+            else this.hideProductList();
+        } else if (this.PublishAppItemListingService.screen === 1) {
+            this.makePrivate();
+        } else {
+            this.makeListPrivate();
         }
 
-        if (this.PublishAppItemListingService.sharingLevel !== 0) {
-            if (this.PublishAppItemListingService.subscribersNumber === 0) {
-                if (this.PublishAppItemListingService.screen === 1) {
-                    this.makePrivate();
-                } else {
-                    this.makeListPrivate();
-                }
-            } else if (
-                this.PublishAppItemListingService.subscribersNumber !== 0
-            ) {
-                this.hideProduct();
-            }
-        }
-
-        this.currentModalRef.hide();
     }
-
     unhideProduct() {
         this.appItemsServiceProxy
             .unHideProduct(this.PublishAppItemListingService.productId)
             .pipe(
                 finalize(() => {
+                    this.saving = false;
                     this.hideMainSpinner();
                 })
             )
             .subscribe((res: any) => {
-                this.PublishAppItemListingService.sharingLevel = 1;
+                this.PublishAppItemListingService.sharingStatus = 1;
+                this.savingDone = true;
+                this.currentModalRef.hide();
+            });
+    }
+
+    unhideProductList() {
+        this.AppItemsListsServiceProxy.unHideItemList(this.PublishAppItemListingService.productId)
+            .pipe(finalize(() => {
+                this.saving = false;
+                this.hideMainSpinner();
+            }))
+            .subscribe(() => {
+                this.PublishAppItemListingService.sharingStatus =
+                    this.publishItemOptions.itemSharing.length > 0 ? 2 : 1;
+                this.savingDone = true;
+                this.currentModalRef.hide();
             });
     }
 
@@ -152,12 +194,15 @@ export class ShareListingComponent extends AppComponentBase implements OnInit {
             .shareProduct(sharingOptions)
             .pipe(
                 finalize(() => {
+                    this.saving = false;
                     this.hideMainSpinner();
-                    this.notify.success(this.l("shared Successfully"));
                 })
             )
             .subscribe((res: any) => {
-                this.PublishAppItemListingService.sharingLevel = 1;
+                this.PublishAppItemListingService.sharingStatus = sharingOptions.sharingLevel;
+                this.PublishAppItemListingService.itemSharing = sharingOptions.itemSharing;
+                this.savingDone = true;
+                this.currentModalRef.hide();
             });
     }
 
@@ -165,13 +210,15 @@ export class ShareListingComponent extends AppComponentBase implements OnInit {
         this.AppItemsListsServiceProxy.shareItemList(sharingOptions)
             .pipe(
                 finalize(() => {
+                    this.saving = false;
                     this.hideMainSpinner();
-                    this.notify.success(this.l("shared Successfully"));
                 })
             )
             .subscribe((res: any) => {
-                // this.PublishAppItemListingService.sharingLevel = 1;
-                console.log(res);
+                this.PublishAppItemListingService.sharingStatus = sharingOptions.sharingLevel;
+                this.PublishAppItemListingService.itemSharing = sharingOptions.itemSharing;
+                this.savingDone = true;
+                this.currentModalRef.hide();
             });
     }
 
@@ -181,11 +228,14 @@ export class ShareListingComponent extends AppComponentBase implements OnInit {
             .makeProductPrivate(this.PublishAppItemListingService.productId)
             .pipe(
                 finalize(() => {
+                    this.saving = false;
                     this.hideMainSpinner();
                 })
             )
             .subscribe((res) => {
-                this.PublishAppItemListingService.sharingLevel = 3;
+                this.PublishAppItemListingService.sharingStatus = 3;
+                this.savingDone = true;
+                this.currentModalRef.hide();
             });
     }
 
@@ -196,12 +246,14 @@ export class ShareListingComponent extends AppComponentBase implements OnInit {
         )
             .pipe(
                 finalize(() => {
+                    this.saving = false;
                     this.hideMainSpinner();
                 })
             )
             .subscribe((res) => {
-                // this.PublishAppItemListingService.sharingLevel = 3
-                console.log(res);
+                this.PublishAppItemListingService.sharingStatus = 3;
+                this.savingDone = true;
+                this.currentModalRef.hide();
             });
     }
 
@@ -210,11 +262,27 @@ export class ShareListingComponent extends AppComponentBase implements OnInit {
             .hideProduct(this.PublishAppItemListingService.productId)
             .pipe(
                 finalize(() => {
+                    this.saving = false;
                     this.hideMainSpinner();
                 })
             )
             .subscribe((res) => {
-                this.PublishAppItemListingService.sharingLevel = 4;
+                this.PublishAppItemListingService.sharingStatus = 4;
+                this.savingDone = true;
+                this.currentModalRef.hide();
+            });
+    }
+
+    hideProductList() {
+        this.AppItemsListsServiceProxy.hideItemList(this.PublishAppItemListingService.productId)
+            .pipe(finalize(() => {
+                this.saving = false;
+                this.hideMainSpinner();
+            }))
+            .subscribe(() => {
+                this.PublishAppItemListingService.sharingStatus = 4;
+                this.savingDone = true;
+                this.currentModalRef.hide();
             });
     }
 

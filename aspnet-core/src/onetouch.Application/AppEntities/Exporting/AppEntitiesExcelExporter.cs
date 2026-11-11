@@ -30,9 +30,9 @@ namespace onetouch.AppEntities.Exporting
                 "AppEntities.xlsx",
                 excelPackage =>
                 {
-                    
-                    var sheet = excelPackage.CreateSheet(L("AppEntities"));
 
+                    var sheet = excelPackage.CreateSheet(L("AppEntities"));
+                    
                     AddHeader(
                         sheet,
                         L("Name"),

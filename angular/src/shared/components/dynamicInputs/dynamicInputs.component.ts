@@ -92,7 +92,7 @@ canChange = true;
 attr.selectedValues = formattedValue;
 
   
-        // ✅ Handle Datetime
+        //  Handle Datetime
       if (attr.dataType === 'Datetime') {
         const dateValue = new Date(formattedValue);
 
@@ -107,14 +107,14 @@ attr.selectedValues = formattedValue;
         }
       }
 
-        // ✅ Handle String input
+        //  Handle String input
       if (attr.dataType === 'string' && !attr.isLookup) {
         if (!formattedValue || formattedValue === null || formattedValue === undefined || formattedValue.toString().trim() === '') {
           formattedValue = '';
         }
       }
 
-    // ✅ Handle Numeric / Boolean / Color
+    //  Handle Numeric / Boolean / Color
       if (['Numeric', 'boolean', 'Boolean', 'bit', 'color'].includes(attr.dataType)) {
         if (formattedValue === null || formattedValue === undefined || formattedValue === '') {
           formattedValue = '';
@@ -233,16 +233,40 @@ handleRelatedWhen(attr: any, finalValue: any, updatedDataMap: Map<number, any>) 
 }
 
 
-  reset(extraAttr: any) {
-    if (extraAttr.acceptMultipleValues) {
-      extraAttr.selectedValues = [];
-    } else {
-      extraAttr.selectedValues = '';
-    }
+  // reset(extraAttr: any) {
+  //   if (extraAttr.acceptMultipleValues) {
+  //     extraAttr.selectedValues = [];
+  //   } else {
+  //     extraAttr.selectedValues = '';
+  //   }
 
-    this.onAnyInputChange();
+  //   this.onAnyInputChange();
+  // }
+reset(extraAttr: any): void {
+  if (!extraAttr) {
+    return;
   }
 
+  const isBoolean =
+    extraAttr.dataType?.toString().toLowerCase() === 'boolean' ||
+    extraAttr.dataType?.toString().toLowerCase() === 'bit';
+
+  if (
+    isBoolean &&
+    !extraAttr.validEntries?.trim()
+  ) {
+   
+    extraAttr.selectedValues =
+      this.normalizeBooleanValue(
+        extraAttr.defaultValue
+      );
+  } else {
+
+    extraAttr.selectedValues =  extraAttr.defaultValue;
+  }
+
+  this.onAnyInputChange();
+}
 
 
   themes = [];
@@ -266,220 +290,88 @@ handleRelatedWhen(attr: any, finalValue: any, updatedDataMap: Map<number, any>) 
 
 
 
-  // fillSelectedValuesFromDto() {
-  //   if (!this.extraAttributeObject?.value?.extraAttributes || !this.dynamicInputsForViewDto?.extraDataAttributes) {
-  //     return;
-  //   }
-
-  //   const dtoData = this.dynamicInputsForViewDto.extraDataAttributes;
-
-  //   const allAttributes = [
-  //     ...(this.extraAttributeObject.value.extraAttributes || []),
-  //     ...(this.extraAttributeObject.value.filteredExtraAttributes || [])
-  //   ];
-
-  //   for (const attr of allAttributes) {
-
-  //     const matchedDto = dtoData.find(d => d.extraAttributeId === attr.attributeId);
-
-  //     if (matchedDto && matchedDto.selectedValues?.length) {
-  //       const dtoValue = matchedDto.selectedValues[matchedDto.selectedValues.length - 1].value;
-
-  //       if (attr.isLookup) {
-  //         const matchedOption = attr.paginationSetting?.list?.find(opt => {
-  //           return opt.label === dtoValue || opt.value === dtoValue;
-  //         });
-
-  //         if (matchedOption) {
-  //           attr.selectedValues = matchedOption.value;
-  //         } else {
-  //           const manualOption = {
-  //             value: dtoValue,
-  //             label: dtoValue,
-  //             code: null,
-  //             isHostRecord: false,
-  //             stockAvailability: null,
-  //             image: null,
-  //             hexaCode: null
-  //           };
-  //           attr.paginationSetting.list.push(manualOption);
-  //           attr.selectedValues = manualOption.value;
-  //         }
-  //       } else if (attr.dataType === 'Datetime' && typeof dtoValue === 'string') {
-  //         attr.selectedValues = new Date(dtoValue);
-  //       } else {
-  //         attr.selectedValues = dtoValue;
-  //       }
-  //       this.originalValuesMap.set(attr.attributeId, attr.selectedValues);
-  //     }
-  //     //     else {
-  //     //         if ((attr.dataType === 'boolean' || attr.dataType === 'bit') && (attr.selectedValues == null || attr.selectedValues === '')) {
-  //     //   attr.selectedValues = this.defaultBooleanValue;
-  //     // }
-  //     //     }
-  //   }
-
-  // }
-fillSelectedValuesFromDto(): void {
-  if (
-    !this.extraAttributeObject?.value?.extraAttributes ||
-    !this.dynamicInputsForViewDto?.extraDataAttributes
-  ) {
+ fillSelectedValuesFromDto() {
+  if (!this.extraAttributeObject?.value?.extraAttributes || !this.dynamicInputsForViewDto?.extraDataAttributes) {
     return;
   }
 
-  const dtoData =
-    this.dynamicInputsForViewDto.extraDataAttributes;
+  const dtoData = this.dynamicInputsForViewDto.extraDataAttributes;
 
   const allAttributes = [
-    ...(
-      this.extraAttributeObject.value
-        .extraAttributes ?? []
-    ),
-    ...(
-      this.extraAttributeObject.value
-        .filteredExtraAttributes ?? []
-    )
+    ...(this.extraAttributeObject.value.extraAttributes || []),
+    ...(this.extraAttributeObject.value.filteredExtraAttributes || [])
   ];
 
-  const uniqueAttributes = Array.from(
-    new Map(
-      allAttributes.map(attribute => [
-        attribute.attributeId,
-        attribute
-      ])
-    ).values()
-  );
-
-  for (const attr of uniqueAttributes) {
+  for (const attr of allAttributes) {
     const matchedDto = dtoData.find(
-      dto =>
-        dto.extraAttributeId ===
-        attr.attributeId
+      d => d.extraAttributeId === attr.attributeId
     );
 
-    if (!matchedDto?.selectedValues?.length) {
-      if (
-        attr.dataType?.toUpperCase() ===
-        'MULTISELECTDROPDOWNLIST'
-      ) {
-        attr.selectedValues = [];
+    if (matchedDto && matchedDto.selectedValues?.length) {
+      let dtoValue =  matchedDto.selectedValues[matchedDto.selectedValues.length - 1].value;
+      if ((attr.dataType?.toLowerCase() === 'boolean' || attr.dataType?.toLowerCase() === 'bit') && !attr.validEntries?.trim()) {
+        dtoValue =  this.normalizeBooleanValue(dtoValue);
       }
-
-      continue;
-    }
-
-    const values =
-      matchedDto.selectedValues
-        .map(item => item.value)
-        .filter(value =>
-          value !== null &&
-          value !== undefined &&
-          value !== ''
-        );
-
-    if (
-      attr.dataType?.toUpperCase() ===
-        'MULTISELECTDROPDOWNLIST' ||
-      attr.acceptMultipleValues
-    ) {
-      attr.selectedValues = values;
-    } else {
-      const dtoValue =
-        values[values.length - 1];
-
-      // if (
-      //   attr.isLookup
-      // ) {
-      //   const matchedOption =
-      //     attr.paginationSetting?.list?.find(
-      //       option =>
-      //         option.label === dtoValue ||
-      //         option.value === dtoValue
-      //     );
-
-      //   if (matchedOption) {
-      //     attr.selectedValues =
-      //       matchedOption.value;
-      //   }
-      // }
       if (attr.isLookup) {
+        const matchedOption =  attr.paginationSetting?.list?.find(
+            opt => opt.label === dtoValue || opt.value === dtoValue
+          );
 
-  const options =
-    attr.paginationSetting?.list ?? [];
+        if (matchedOption) {
+          attr.selectedValues = matchedOption.value;
 
-  const matchedOption =
-    options.find(
-      option => {
+        } else {
 
-        return (
-          String(option?.value) ===
-            String(dtoValue) ||
+          const manualOption = {
+            value: dtoValue,
+            label: dtoValue,
+            code: null,
+            isHostRecord: false,
+            stockAvailability: null,
+            image: null,
+            hexaCode: null
+          };
 
-          String(option?.label) ===
-            String(dtoValue)
-        );
-      }
-    );
+          if (attr.paginationSetting?.list) {
+            attr.paginationSetting.list.push(manualOption);
+          }
 
+          attr.selectedValues =  manualOption.value;
+        }
 
-  if (matchedOption) {
-
-    /*
-     * Important:
-     * Use the actual option value,
-     * preserving its original type.
-     *
-     * Example:
-     * API = "534386"
-     * option.value = 534386
-     *
-     * selectedValues becomes 534386
-     * not "534386".
-     */
-    attr.selectedValues =
-      matchedOption.value;
-
-  } else {
-
-    /*
-     * Lookup options may still be loading.
-     *
-     * Payment Terms / Ship Via return
-     * numeric IDs as strings from
-     * extraDataAttributes.
-     */
-    const numericValue =
-      Number(dtoValue);
-
-    attr.selectedValues =
-      dtoValue !== '' &&
-      !Number.isNaN(numericValue)
-        ? numericValue
-        : dtoValue;
-  }
-}
-       else if (
-        attr.dataType?.toLowerCase() ===
-          'datetime' ||
-        attr.dataType?.toLowerCase() ===
-          'date'
-      ) {
-        attr.selectedValues =
-          dtoValue
-            ? new Date(dtoValue)
-            : null;
+      } else if (attr.dataType === 'Datetime' && typeof dtoValue === 'string') {
+        attr.selectedValues =  new Date(dtoValue);
       } else {
         attr.selectedValues = dtoValue;
       }
+
+      this.originalValuesMap.set(
+        attr.attributeId,
+        attr.selectedValues
+      );
     }
 
-    this.originalValuesMap.set(
-      attr.attributeId,
-      attr.selectedValues
-    );
+
+    else {
+
+      if (
+        (attr.dataType?.toLowerCase() === 'boolean' ||  attr.dataType?.toLowerCase() === 'bit') && !attr.validEntries?.trim()
+      ) {
+
+        attr.selectedValues =   this.normalizeBooleanValue(attr.defaultValue);
+
+      } else {
+        attr.selectedValues = attr.defaultValue;
+      }
+
+      this.originalValuesMap.set(
+        attr.attributeId,
+        attr.selectedValues
+      );
+    }
   }
 }
+
 
   clearExtraAttr(attr: any) {
     if (attr.acceptMultipleValues) {
@@ -830,4 +722,25 @@ private initializeStaticOptions(): void {
         }
     });
 }
+private normalizeBooleanValue(value: any): string {
+  const normalized = value?.toString().trim().toLowerCase();
+
+  if (
+    normalized === 'yes' ||
+    normalized === 'true' 
+  ) {
+    return 'true';
+  }
+
+  if (
+    normalized === 'no' ||
+    normalized === 'false' 
+  ) {
+    return 'false';
+  }
+
+  return value;
+}
+
+
 }

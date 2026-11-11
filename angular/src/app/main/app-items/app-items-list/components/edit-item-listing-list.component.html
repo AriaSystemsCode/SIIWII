@@ -62,7 +62,7 @@
           </div>
 
           <!-- SHARE / SYNC -->
-          <div class="header-actions-right">
+          <div class="header-actions-right" *ngIf="viewMode">
             <div class="top-actions-buttons">
               <button
                 pButton
@@ -92,13 +92,13 @@
             </div>
 
             <div class="last-updated">
-              {{ 'LastEdit' | localize }} {{ lastUpdatedDate }}
+              {{ 'LastEdit' | localize }} {{ lastUpdatedDate  | momentFormat:'L h:mm a'  }}
             </div>
           </div>
         </div>
 
         <!-- EDIT MODE ACTIONS -->
-        <div class="edit-actions" [ngStyle]="isArabic ? {'gap':'10px'} : ''" *ngIf="!viewMode">
+        <div class="edit-actions" [ngClass]="{ 'rtl-edit-actions-gap': isArabic }" *ngIf="!viewMode">
           <button class="btn btn-success text-capitalize" type="button" (click)="SaveAsDraft()">
             {{ l('SaveAsDraft') }}
           </button>
@@ -207,11 +207,11 @@
               <!-- EDIT FORM -->
               <div *ngIf="!viewMode" class="col-12 list-toolbar border-dashed-bottom pb-4">
                 <div class="h3 text-center text-success">
-                  {{
-                    !loading && list?.appItemsList?.statusCode
-                      ? l(list?.appItemsList?.statusCode | titlecase)
-                      : ''
-                  }}
+              {{
+    !loading && list?.appItemsList?.statusCode
+        ? (list.appItemsList.statusCode | titlecase | localize)
+        : ''
+}}
                 </div>
 
                 <div class="list-form-row">

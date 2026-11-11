@@ -2,6 +2,7 @@ import { Component, OnInit, Injector, Input } from "@angular/core";
 import { AppComponentBase } from "@shared/common/app-component-base";
 import { PageSettingDto, SycAttachmentCategoryDto, SydObjectsServiceProxy } from "@shared/service-proxies/service-proxies";
 import { AppConsts } from "@shared/AppConsts";
+import { finalize } from 'rxjs';
 @Component({
     selector: "app-carusal-with-callToAction",
     templateUrl: "./landing-page-carusal-with-callToAction.component.html",
@@ -21,6 +22,9 @@ export class LandingPageCarusalWithCallToActionComponent extends AppComponentBas
       { breakpoint: '992px',  numVisible: 2, numScroll: 1 },
       { breakpoint: '576px',  numVisible: 1, numScroll: 1 }
     ];
+
+    loading = false;
+    hasLoadError = false;
     constructor(injector: Injector,private SydObjectsServiceProxy:SydObjectsServiceProxy) {
         super(injector);
 
@@ -50,14 +54,28 @@ export class LandingPageCarusalWithCallToActionComponent extends AppComponentBas
 
 
     getBlocksData(){
+             this.loading = true;
+  this.hasLoadError = false;
         this.SydObjectsServiceProxy
         .getAllSectionBlocks(
           this.sectionId, Intl.DateTimeFormat().resolvedOptions().timeZone       
-        )
-        .subscribe((res) => {
-            this.sycLangingPageSetting = res
+        ).pipe(
+              finalize(() => {
+                this.loading = false;
+              })
+            ).subscribe({
+      next: (res) => {
+        this.sycLangingPageSetting = res ?? [];
+      },
+      error: () => {
+        this.sycLangingPageSetting = [];
+        this.hasLoadError = true;
+      }
+    });
+        //     .subscribe((res) => {
+        //     this.sycLangingPageSetting = res
       
-        });
+        // });
     }
   
     private compareByOrder = (a: PageSettingDto, b: PageSettingDto) => {

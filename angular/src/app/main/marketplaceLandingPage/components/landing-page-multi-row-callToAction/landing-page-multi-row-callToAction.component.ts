@@ -35,6 +35,8 @@ export class LandingPageMultiRowCallToActionComponent extends AppComponentBase i
     isArabic:boolean 
     isSmallScreen = false;
 
+        loading = false;
+hasLoadError = false;
   constructor(
     injector: Injector,
     private sydObjectsService: SydObjectsServiceProxy,
@@ -64,9 +66,16 @@ export class LandingPageMultiRowCallToActionComponent extends AppComponentBase i
   };
 
   private getBlocksData(): void {
-    this.sydObjectsService.getAllSectionBlocks(this.sectionId, Intl.DateTimeFormat().resolvedOptions().timeZone).subscribe({
+     this.loading = true;
+  this.hasLoadError = false;
+    this.sydObjectsService.getAllSectionBlocks(this.sectionId, Intl.DateTimeFormat().resolvedOptions().timeZone).pipe(
+      finalize(() => {
+        this.loading = false;
+      })
+    )
+    .subscribe({
       next: (res) => { this.applyData(res ?? []); },
-      error: () => this.applyData([])
+      error: () => {this.applyData([]),   this.hasLoadError = true;}
     });
 
   }

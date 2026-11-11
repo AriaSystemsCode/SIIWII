@@ -2,6 +2,7 @@ import { Component, Injector, Input, OnInit } from "@angular/core";
 import { AppComponentBase } from "@shared/common/app-component-base";
 import { PageSettingDto, SycAttachmentCategoryDto, SydObjectsServiceProxy } from "@shared/service-proxies/service-proxies";
 import { AppConsts } from "@shared/AppConsts";
+import { finalize } from 'rxjs';
 
 @Component({
   selector: "app-slider-with-callToAction",
@@ -18,7 +19,8 @@ export class LandingPageSliderWithCallToActionComponent extends AppComponentBase
 
   sycAttachmentCategoryAutoSlider: SycAttachmentCategoryDto;
   attachmentBaseUrl = AppConsts.attachmentBaseUrl;
-
+    loading = false;
+hasLoadError = false;
   constructor(injector: Injector, private SydObjectsServiceProxy: SydObjectsServiceProxy) {
     super(injector);
   }
@@ -42,9 +44,26 @@ export class LandingPageSliderWithCallToActionComponent extends AppComponentBase
   }
 
   getBlocksData() {
-    this.SydObjectsServiceProxy.getAllSectionBlocks(this.sectionId,Intl.DateTimeFormat().resolvedOptions().timeZone).subscribe((res) => {
-      this.sliderItems = (res ?? []) as any;
+      this.loading = true;
+  this.hasLoadError = false;
+
+    this.SydObjectsServiceProxy.getAllSectionBlocks(this.sectionId,Intl.DateTimeFormat().resolvedOptions().timeZone).pipe(
+          finalize(() => {
+            this.loading = false;
+          })
+        )
+        .subscribe({
+      next: (res) => {
+        this.sliderItems = res ?? [];
+      },
+      error: () => {
+        this.sliderItems = [];
+        this.hasLoadError = true;
+      }
     });
+    //     .subscribe((res) => {
+    //   this.sliderItems = (res ?? []) as any;
+    // });
   }
 
   getSlideImage(slide: any): string {

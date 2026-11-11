@@ -130,8 +130,8 @@
             this.table2.Dpi = 254F;
             this.table2.EvenStyleName = "DetailData3_Odd";
             this.table2.ExpressionBindings.AddRange(new DevExpress.XtraReports.UI.ExpressionBinding[] {
-            new DevExpress.XtraReports.UI.ExpressionBinding("BeforePrint", "WidthF", "iif(?showNo=0,600,iif(Min([counter],?showNo)<5,1100,iif(Min([counter],?showNo)<6," +
-                    "1250,1250)))"),
+            new DevExpress.XtraReports.UI.ExpressionBinding("BeforePrint", "WidthF", "iif(?showNo=0,600,iif(Min([counter],?showNo)<5,1400,iif(Min([counter],?showNo)<6," +
+                    "1600,1600)))"),
             new DevExpress.XtraReports.UI.ExpressionBinding("BeforePrint", "LeftF", "iif(?showNo=0,0,iif(Min([counter],?showNo)<5,300,iif(Min([counter],?showNo)<6,150" +
                     ",0)))")});
             this.table2.LocationFloat = new DevExpress.Utils.PointFloat(0F, 0F);
@@ -139,7 +139,7 @@
             this.table2.Rows.AddRange(new DevExpress.XtraReports.UI.XRTableRow[] {
             this.tableRow2});
             this.table2.Scripts.OnBeforePrint = "table2_BeforePrint";
-            this.table2.SizeF = new System.Drawing.SizeF(1299F, 39.60747F);
+            this.table2.SizeF = new System.Drawing.SizeF(1600F, 39.60747F);
             this.table2.StylePriority.UseBackColor = false;
             this.table2.StylePriority.UseTextAlignment = false;
             this.table2.TextAlignment = DevExpress.XtraPrinting.TextAlignment.MiddleCenter;
@@ -201,29 +201,31 @@
             this.tableCell25.ExpressionBindings.AddRange(new DevExpress.XtraReports.UI.ExpressionBinding[] {
             new DevExpress.XtraReports.UI.ExpressionBinding("BeforePrint", "Text", "iif(len(trim([AttributeValue]))>11 and [DataSource.CurrentRowIndex] > 0, Substrin" +
                     "g([AttributeValue],0 ,10 )+\'...\',[AttributeValue])")});
-            this.tableCell25.Font = new DevExpress.Drawing.DXFont("Arial", 7F);
+            this.tableCell25.Font = new DevExpress.Drawing.DXFont("Arial", 12F);
             this.tableCell25.Name = "tableCell25";
             this.tableCell25.Padding = new DevExpress.XtraPrinting.PaddingInfo(1, 1, 0, 0, 254F);
             this.tableCell25.StyleName = "DetailData1";
             this.tableCell25.StylePriority.UseBorders = false;
             this.tableCell25.StylePriority.UseFont = false;
             this.tableCell25.StylePriority.UsePadding = false;
-            this.tableCell25.Weight = 0.0676674364896074D;
+            this.tableCell25.Weight = 0.13D;
             // 
             // tableCell26
             // 
             this.tableCell26.CanGrow = false;
             this.tableCell26.Dpi = 254F;
             this.tableCell26.ExpressionBindings.AddRange(new DevExpress.XtraReports.UI.ExpressionBinding[] {
-            new DevExpress.XtraReports.UI.ExpressionBinding("BeforePrint", "Text", "[AttributeValue3]")});
-            this.tableCell26.Font = new DevExpress.Drawing.DXFont("Arial", 7F);
+            new DevExpress.XtraReports.UI.ExpressionBinding("BeforePrint", "Text", "Iif([DataSource.CurrentRowIndex] == 0, \'St. Ship\', FormatString(\'{0:MM/dd/yyyy}\', Today()) )")});
+            this.tableCell26.Font = new DevExpress.Drawing.DXFont("Arial", 10F);
+            this.tableCell26.Multiline = false;
             this.tableCell26.Name = "tableCell26";
             this.tableCell26.Padding = new DevExpress.XtraPrinting.PaddingInfo(1, 1, 0, 0, 254F);
             this.tableCell26.StyleName = "DetailData1";
             this.tableCell26.StylePriority.UseFont = false;
+            this.tableCell26.StylePriority.UseForeColor = false;
             this.tableCell26.StylePriority.UsePadding = false;
-            this.tableCell26.TextFitMode = DevExpress.XtraReports.UI.TextFitMode.ShrinkOnly;
-            this.tableCell26.Weight = 0.060046189376443418D;
+            this.tableCell26.TextFitMode = DevExpress.XtraReports.UI.TextFitMode.None;
+            this.tableCell26.Weight = 0.13D;
             this.tableCell26.WordWrap = false;
             // 
             // xrTableCell1
@@ -360,7 +362,8 @@
             this.tableCell33.StylePriority.UsePadding = false;
             this.tableCell33.StylePriority.UseTextAlignment = false;
             this.tableCell33.TextAlignment = DevExpress.XtraPrinting.TextAlignment.MiddleJustify;
-            this.tableCell33.Weight = 0.05D;
+            // Keep the More header wide enough to show all four characters.
+            this.tableCell33.Weight = 0.07D;
             // 
             // tableCell34
             // 
@@ -369,15 +372,16 @@
             new DevExpress.XtraReports.UI.ExpressionBinding("BeforePrint", "Visible", "Min(?showNo, [counter])>7"),
             new DevExpress.XtraReports.UI.ExpressionBinding("BeforePrint", "Text", "Iif(Min(?showNo, [counter])=8,Trim([Total]) ,Iif(Min(?showNo, [counter])=9, Trim(" +
                     "[Size9]),Trim([Size9] ) ))")});
-            this.tableCell34.Font = new DevExpress.Drawing.DXFont("Arial", 7F);
+            this.tableCell34.Font = new DevExpress.Drawing.DXFont("Arial", 12F);
             this.tableCell34.Name = "tableCell34";
-            this.tableCell34.Padding = new DevExpress.XtraPrinting.PaddingInfo(1, 1, 0, 0, 254F);
+            this.tableCell34.Padding = new DevExpress.XtraPrinting.PaddingInfo(1, 6, 0, 0, 254F);
             this.tableCell34.StyleName = "DetailData1";
             this.tableCell34.StylePriority.UseFont = false;
             this.tableCell34.StylePriority.UsePadding = false;
             this.tableCell34.StylePriority.UseTextAlignment = false;
             this.tableCell34.TextAlignment = DevExpress.XtraPrinting.TextAlignment.MiddleJustify;
-            this.tableCell34.Weight = 0.05D;
+            this.tableCell34.Weight = 0.08D;
+            this.tableCell34.TextFitMode = DevExpress.XtraReports.UI.TextFitMode.None;
             // 
             // sqlDataSource1
             // 
@@ -510,7 +514,7 @@
             this.Landscape = true;
             this.Margins = new DevExpress.Drawing.DXMargins(0F, 0F, 3F, 4.72581F);
             this.PageHeight = 2159;
-            this.PageWidth = 1349;
+            this.PageWidth = 1700;
             this.PaperKind = System.Drawing.Printing.PaperKind.Custom;
             this.ParameterPanelLayoutItems.AddRange(new DevExpress.XtraReports.Parameters.ParameterPanelLayoutItem[] {
             new DevExpress.XtraReports.Parameters.ParameterLayoutItem(this.ItemId, DevExpress.XtraReports.Parameters.Orientation.Horizontal),

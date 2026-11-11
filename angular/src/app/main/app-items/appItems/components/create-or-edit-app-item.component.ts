@@ -1026,6 +1026,7 @@ export class CreateOrEditAppItemComponent
                  undefined,
                  undefined,
                  undefined,
+                 undefined,
                  this.relatedItemsSkipCount,
                  this.maxResultCount
              )
@@ -1423,7 +1424,7 @@ export class CreateOrEditAppItemComponent
         att.fileName = file?.name;
         att.attachmentCategoryId = attachmentCategory.sycAttachmentCategory.id;
         att.guid = guid;
-        att.isPublic=false;
+        att.isPublic = true;
         const tempFile = guid + file.name.match(/\.[0-9a-z]+$/i)[0];
         this.addTempAttachments([    
 
@@ -1489,6 +1490,8 @@ export class CreateOrEditAppItemComponent
         this.defaultImageIndex = index;
         this.appItem.entityAttachments.map((item, i) => {
             item.isDefault = index == i ? true : false;
+            if (item.isDefault)
+                item.isPublic = true;
             return item;
         });
     }
@@ -1644,7 +1647,7 @@ export class CreateOrEditAppItemComponent
                     return this.askToPublish();
                 this.goBack("app/main/products");
             });
-    }
+}
     extraSelectedValuesExtraData() {
         const recentlyExtraAttributes: FilteredExtraAttribute<any>[] = [
             ...this.extraAttributes.ADDITIONAL.extraAttributes,
@@ -1887,7 +1890,7 @@ export class CreateOrEditAppItemComponent
     openCreateNewAppEntityModal(extraAttr: FilteredExtraAttribute) {
         this.formTouched = true;
         let config: ModalOptions = new ModalOptions();
-           !this.isArabic ?  config.class = "right-modal slide-right-in" : config.class = "left-modal slide-left-in ngLeft"
+           !this.isArabic ?  config.class = "right-modal slide-right-in" : config.class = "left-modal  slide-left-in ngLeft"
         let modalDefaultData: Partial<AppEntityListDynamicModalComponent> = {
             entityObjectType: {
                 name: extraAttr.name,
@@ -2054,15 +2057,22 @@ export class CreateOrEditAppItemComponent
             this.notify.error("Available Qty should be >=0");
     }
     checkAndAddDefaultPriceObject() {
-        if (
-            !this.appItem.appItemPriceInfos ||
-            !this.appItem.appItemPriceInfos.length
-        ) {
-            this.appItem.appItemPriceInfos = [
-                this._pricingHelperService.getDefaultPricingInstance(),
-            ];
+        if (!this.appItem.appItemPriceInfos) {
+            this.appItem.appItemPriceInfos = [];
         }
-        this.checkDefaultCurrencyMSRPPriceIndex();
+
+        this.defaultCurrencyMSRPPriceIndex =
+            this._pricingHelperService.getDefaultPricingIndex(
+                this.appItem.appItemPriceInfos
+            );
+
+        if (this.defaultCurrencyMSRPPriceIndex < 0) {
+            this.appItem.appItemPriceInfos.push(
+                this._pricingHelperService.getDefaultPricingInstance()
+            );
+            this.defaultCurrencyMSRPPriceIndex =
+                this.appItem.appItemPriceInfos.length - 1;
+        }
     }
     showAdvancedPricingModal() {
         this.showAdvancedPricing = true;
@@ -2097,11 +2107,13 @@ export class CreateOrEditAppItemComponent
         return inputvalue;
     }
 
-    setVisibleinMarketplaceImage(index) {
+    setVisibleinMarketplaceImage(index, isChecked: boolean) {
+        if (this.defaultImageIndex === index)
+            return;
         this.formTouched = true;
         this.appItem.entityAttachments?.map((item, i) => {
             if (index == i) {
-                item.isPublic = !item.isPublic;
+                item.isPublic = isChecked;
                 return item;
             }
         });

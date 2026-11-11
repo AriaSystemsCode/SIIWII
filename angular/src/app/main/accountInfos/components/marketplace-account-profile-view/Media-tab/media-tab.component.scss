@@ -115,9 +115,10 @@ media-grid {
 }
 
 .modal-image {
-  max-width: 100%;
-  height: auto;
+    max-width: 100%;
   border-radius: 8px;
+      max-height: 400px;
+    object-fit: cover;
 }
 
 .nav-button {

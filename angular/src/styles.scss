@@ -667,3 +667,100 @@ body .p-dialog .p-dialog-content {
   }
 
 }
+
+.button-busy-spinner {
+    display: inline-block;
+    width: 1em;
+    height: 1em;
+    margin-right: 0.4em;
+    vertical-align: -0.125em;
+    box-sizing: border-box;
+    border: 0.15em solid currentColor;
+    border-right-color: transparent;
+    border-radius: 50%;
+    transform-origin: 50% 50%;
+    animation: button-busy-spin 0.75s linear infinite;
+}
+
+@keyframes button-busy-spin {
+    to {
+        transform: rotate(360deg);
+    }
+}
+
+.p-dropdown .p-dropdown-clear-icon{
+    right: auto !important;
+    left: auto !important;
+        width: 10px !important;
+}
+
+
+html[dir="rtl"] p-paginator .p-paginator-first svg,
+html[dir="rtl"] p-paginator .p-paginator-prev svg,
+html[dir="rtl"] p-paginator .p-paginator-next svg,
+html[dir="rtl"] p-paginator .p-paginator-last svg {
+    transform: scaleX(-1);
+}
+
+html[dir="rtl"] .p-carousel .p-carousel-content .p-carousel-prev svg,
+html[dir="rtl"] .p-carousel .p-carousel-content .p-carousel-next svg {
+    transform: scaleX(-1);
+}
+
+body.kt-demo-panel--left .p-multiselect .p-multiselect-trigger {
+    width: revert-rule !important;
+}
+
+html[dir="rtl"] .p-carousel .p-carousel-items-content,
+html[dir="rtl"] .p-carousel .p-carousel-items-container {
+    direction: ltr !important;
+}
+
+html[dir="rtl"] .p-carousel .p-carousel-prev svg,
+html[dir="rtl"] .p-carousel .p-carousel-next svg,
+html[dir="rtl"] .p-carousel .p-carousel-prev .pi,
+html[dir="rtl"] .p-carousel .p-carousel-next .pi {
+    transform: scaleX(-1) !important;
+}
+
+.p-dropdown-panel .p-dropdown-header .p-dropdown-filter{
+    margin: auto !important;
+}
+
+.p-multiselect-filter-container {
+    flex: unset !important;
+}
+
+.p-icon-wrapper {
+    display: initial !important;
+}
+
+.p-dropdown .p-dropdown-trigger {
+        margin: 2px 9px !important;
+}
+
+.p-multiselect .p-multiselect-trigger {
+        margin: 2px 15px !important;
+
+}
+
+/* Keep import dialogs centered in both LTR and RTL layouts. */
+body .modal.show .modal-dialog.modalCenter {
+    position: absolute !important;
+    top: 50% !important;
+    right: auto !important;
+    bottom: auto !important;
+    left: 50% !important;
+    margin: 0 !important;
+    transform: translate(-50%, -50%) !important;
+  //  max-width: calc(100vw - 1rem) !important;
+}
+
+body .modal.show .modal-dialog.modalCenter.upload-modal {
+    width: min(626px, calc(100vw - 1rem)) !important;
+}
+
+body .modal.show .modal-dialog.modalCenter.upload-modal .modal-content.upload-modal {
+    width: 100% !important;
+    max-width: 626px !important;
+}

@@ -148,5 +148,10 @@ namespace onetouch.AccountInfos.Dtos
         public virtual string RecordType { set; get; }
         public virtual long? RelationshipId { set; get; }
         //I49[End]
+        //I40[start]
+        public virtual string Phone1CountryKey { get; set; }
+        public virtual string Phone2CountryKey { get; set; }
+        public virtual string Phone3CountryKey { get; set; }
+        //I40[End]
     }
 }

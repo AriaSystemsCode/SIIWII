@@ -13,9 +13,9 @@
         </div>
         <div class="kt-subheader__toolbar">
             <div class="kt-subheader__wrapper">
-				<button (click)="exportToExcel()" class="btn btn-outline-success"><i class="fa fa-file-excel"></i> {{l("ExportToExcel")}}</button>
+				<button (click)="exportToExcel()" class="btn btn-outline-success entity-object-types__toolbar-btn entity-object-types__toolbar-btn--secondary"><i class="fa fa-file-excel"></i> {{l("ExportToExcel")}}</button>
                 <button *ngIf="isGranted('Pages.SycEntityObjectTypes.Create')" (click)="createSycEntityObjectType()"
-			class="btn btn-primary blue"><i class="fa fa-plus"></i> {{l("CreateNewEntityObjectType")}}</button>
+			class="btn btn-primary blue entity-object-types__toolbar-btn entity-object-types__toolbar-btn--primary"><i class="fa fa-plus"></i> {{l("CreateNewEntityObjectType")}}</button>
             </div>
         </div>
       </div>
@@ -29,9 +29,9 @@
                             <div class="col-xl-12">
                                 <div class="form-group m-form__group align-items-center">
                                     <div class="input-group">
-                                        <input [(ngModel)]="filterText" name="filterText" autoFocus class="form-control m-input" [placeholder]="l('SearchWithThreeDot')" type="text">
+                                        <input [(ngModel)]="filterText" name="filterText" autoFocus class="form-control m-input entity-object-types__search-input" [placeholder]="l('SearchWithThreeDot')" type="text">
                                         <span class="input-group-btn">
-                                            <button (click)="getSycEntityObjectTypes()" class="btn btn-primary" type="submit"><i class="flaticon-search-1"></i></button>
+                                            <button (click)="getSycEntityObjectTypes()" class="btn btn-primary entity-object-types__search-btn" type="submit"><i class="flaticon-search-1"></i></button>
                                         </span>
                                     </div>
                                 </div>
@@ -106,46 +106,47 @@
                                      [lazy]="true"
                                      [scrollable]="true"
                                      ScrollWidth="100%"
+                                     styleClass="entity-object-types-tree"
                                      [resizableColumns]="primengTableHelper.resizableColumns"
                                      (onNodeExpand)="onNodeExpand($event)">
                             <ng-template pTemplate="header">
                                 <tr>
-                                    <th style="width: 150px" ttSortableColumn="name">
+                                    <th class="entity-object-types-tree__col" ttSortableColumn="name">
                                         {{l('Name')}}
                                         <!-- <tt-sortIcon field="sycEntityObjectType.name"></tt-sortIcon> -->
                                     </th>
-                                    <th style="width: 150px" ttSortableColumn="code">
+                                    <th class="entity-object-types-tree__col" ttSortableColumn="code">
                                         {{l('Code')}}
                                         <!-- <tt-sortIcon field="sycEntityObjectType.code"></tt-sortIcon> -->
                                     </th>
-                                    <th style="width: 150px" ttSortableColumn="sydObjectFk.name">
+                                    <th class="entity-object-types-tree__col" ttSortableColumn="sydObjectFk.name">
                                         {{l('Object')}}
                                         <!-- <tt-sortIcon field="sydObjectName"></tt-sortIcon> -->
                                     </th>
-                                    <th style="width: 150px" >
+                                    <th class="entity-object-types-tree__col" >
                                         {{l('SycIdentifierDefinitionCode')}}
                                         <!-- <tt-sortIcon field="sydObjectName"></tt-sortIcon> -->
                                     </th>
-                                    <th style="width: 130px" [hidden]="!isGrantedAny('Pages.SycEntityObjectTypes.Edit', 'Pages.SycEntityObjectTypes.Delete')">{{l('Actions')}}</th>
+                                    <th class="entity-object-types-tree__col entity-object-types-tree__col--actions" [hidden]="!isGrantedAny('Pages.SycEntityObjectTypes.Edit', 'Pages.SycEntityObjectTypes.Delete')">{{l('Actions')}}</th>
                                     
                                 </tr>
                             </ng-template>
                             <ng-template pTemplate="body" let-rowNode let-rowData="rowData">
                                 <tr [ttRow]="rowNode">
-                                    <td style="width:150px">
+                                    <td class="entity-object-types-tree__col">
                                         <p-treeTableToggler [rowNode]="rowNode"></p-treeTableToggler>
                                         {{rowData.sycEntityObjectType.name}}
                                     </td>
-                                    <td style="width:150px">
+                                    <td class="entity-object-types-tree__col">
                                         {{rowData.sycEntityObjectType.code}}
                                     </td>
-                                    <td style="width:150px">
+                                    <td class="entity-object-types-tree__col">
                                         {{rowData.sydObjectName}}
                                     </td>
-                                    <td style="width:150px">
+                                    <td class="entity-object-types-tree__col">
                                         {{ rowData.identifierCode }}
                                     </td>
-                                    <td style="width: 130px"
+                                    <td class="entity-object-types-tree__col entity-object-types-tree__col--actions"
                                     [hidden]="!isGrantedAny('Pages.SycEntityObjectTypes.Edit', 'Pages.SycEntityObjectTypes.Delete')">
                                    <div class="btn-group dropdown" dropdown container="body">
                                         <button class="dropdown-toggle btn btn-sm btn-primary" dropdownToggle>

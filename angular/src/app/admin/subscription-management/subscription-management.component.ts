@@ -22,10 +22,56 @@ import { Table } from 'primeng/table';
 import { finalize } from 'rxjs/operators';
 
 @Component({
-    templateUrl: './subscription-management.component.html',
-    animations: [appModuleAnimation()]
-})
+  templateUrl: './subscription-management.component.html',
+  animations: [appModuleAnimation()],
+  styles: [`
+    .body-sec {
+      background-color: #fff;
+      border-radius: 6px;
+      min-height: 100vh;
+    }
 
+    @media (min-width: 1024px) {
+      .addMT {
+        margin-top: 140px;
+      }
+    }
+
+    @media (max-width: 540px) {
+      .addMTMob {
+        margin-top: 75px;
+      }
+    }
+
+    .alignStart{
+    text-align: start !important ;
+    }
+
+
+    .w-150  {
+    width : 150px ;
+    }
+
+     .wPX100  {
+    width : 100px;
+    }
+
+
+     .w-250  {
+    width : 250px ;
+    }
+
+       .w-130  {
+    width : 130px ;
+    }
+
+      .btn-primary {
+        background-color: #4A0D4A !important;
+        color: #fff !important;
+        border: 1px solid #4A0D4A !important;
+    }
+  `]
+})
 export class SubscriptionManagementComponent extends AppComponentBase implements OnInit {
 
     @ViewChild('dataTable', {static: true}) dataTable: Table;
@@ -41,7 +87,8 @@ export class SubscriptionManagementComponent extends AppComponentBase implements
     editionPaymentType: typeof EditionPaymentType = EditionPaymentType;
 
     filterText = '';
-
+    currentLang: string = 'en';
+    isArabic: boolean = false;
     constructor(
         injector: Injector,
         private _sessionService: SessionServiceProxy,
@@ -55,6 +102,8 @@ export class SubscriptionManagementComponent extends AppComponentBase implements
     }
 
     ngOnInit(): void {
+           this.currentLang = abp.utils.getCookieValue('Abp.Localization.CultureName')
+        this.currentLang == 'ar' || this.currentLang == 'ar-EG'  ? this.isArabic = true : this.isArabic = false
         this.getSettings();
     }
 

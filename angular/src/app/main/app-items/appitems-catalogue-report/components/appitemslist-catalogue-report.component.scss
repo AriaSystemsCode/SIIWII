@@ -4,6 +4,39 @@
     height: 100%;
 }
 
+.linesheet-report-root {
+    padding-top: 40px;
+
+    &.is-modal-view {
+        margin-top: 0 !important;
+    }
+
+    &.not-modal-view {
+        margin-top: -90px !important;
+    }
+}
+
+.linesheet-subheader {
+    height: 80px !important;
+    border-bottom-right-radius: 12px !important;
+}
+
+.stp-title-nowrap {
+    white-space: nowrap;
+}
+
+.step-complete-icon {
+    bottom: 0;
+}
+
+.step-complete-icon-ltr {
+    right: 20%;
+}
+
+.step-complete-icon-rtl {
+    left: 20%;
+}
+
 .wizard {
     max-height: 450px;
     max-width: 1000px;
@@ -169,6 +202,19 @@ input:focus {
 }
 
 @media only screen and (max-width: 575px) {
+    .linesheet-report-root {
+        padding-top: 16px;
+
+        &.not-modal-view {
+            margin-top: -40px !important;
+        }
+    }
+
+    .linesheet-subheader {
+        height: auto !important;
+        min-height: 56px;
+    }
+
     .svgW {
         width: 15px !important;
     }
@@ -208,6 +254,18 @@ input:focus {
     .defPos {
         right: 40% !important;
         top: 20% !important;
+    }
+
+    .stp-title-nowrap {
+        white-space: normal;
+        text-align: center;
+    }
+}
+
+@media only screen and (max-width: 1024px) {
+    .linesheet-subheader .kt-subheader__main {
+        flex-wrap: wrap;
+        row-gap: 8px;
     }
 }
 

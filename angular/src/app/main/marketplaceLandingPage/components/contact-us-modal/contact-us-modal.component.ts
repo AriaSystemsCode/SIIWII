@@ -83,7 +83,7 @@ export class ContactUsModalComponent extends AppComponentBase {
 
     this._appEntitiesServiceProxy.getHostSettingValue(1219, null)
       .subscribe((result) => {
-        this.isContactUsFound = !!result && result.trim().length > 0;
+          this.isContactUsFound = !!result?.trim();
       });
   }
 }

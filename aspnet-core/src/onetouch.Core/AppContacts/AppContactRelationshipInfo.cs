@@ -5,14 +5,18 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using Abp.Auditing;
+using Microsoft.EntityFrameworkCore;
 using onetouch.AppEntities;
 
 namespace onetouch.AppContacts
 {
     [Table("AppContactRelationshipInfo")]
     [Audited]
+    [IndexAttribute("RecipientContactSSIN")]
+    [IndexAttribute("RequesterContactSSIN")]
     public class AppContactRelationshipInfo : AppEntity
     {
+        
         public string RequesterContactSSIN { set; get; }
         public string RequesterContactName { set; get; }
         public string RecipientContactSSIN { set; get; }

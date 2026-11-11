@@ -36,5 +36,48 @@ height: 45px;
     cursor: pointer;
 }
 
+@media (max-width: 768px) {
+    .modal-dialog {
+        width: 96%;
+        margin: 0.5rem auto;
+    }
+
+    .modal-body {
+        margin-left: 0 !important;
+        margin-right: 0 !important;
+        height: 220px !important;
+    }
+
+    .btn-crop {
+        width: 100%;
+        margin-bottom: 0.5rem;
+    }
+
+    .row.p-4 > .col-10,
+    .row.p-4 > .col-1 {
+        flex: 0 0 100%;
+        max-width: 100%;
+    }
+
+    .row.p-4 > .col-1.text-right {
+        text-align: left !important;
+        margin-top: 0.5rem;
+    }
+}
+
+@media (max-width: 576px) {
+    .modal-dialog {
+        width: 98%;
+    }
+
+    .modal-body {
+        height: 190px !important;
+    }
+
+    .p-4 {
+        padding: 0.75rem !important;
+    }
+}
+
 
 //  <!-- Iteration-8 -->

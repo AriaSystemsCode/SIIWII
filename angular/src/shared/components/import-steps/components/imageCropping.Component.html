@@ -196,7 +196,7 @@
                     </div>
                 </div>
                 <div class="p-3 thin-scroll rightContainer">
-                    <h6 class="mb-3 font-weight-bold" style="color: #1B101B;">{{ "Imageinfo" | localize }}</h6>
+                    <h6 class="mb-3 font-weight-bold meta-section-title">{{ "Imageinfo" | localize }}</h6>
                     <label for="code">{{ "code" | localize }}</label>
                     <input
                         type="text"
@@ -223,22 +223,22 @@
                         class="p-3"
                         readonly
                     /><br /><br />
-                    <h6 class="font-weight-bold" style="color: #1B101B;">{{ "Metadata" | localize }}</h6>
+                    <h6 class="font-weight-bold meta-section-title">{{ "Metadata" | localize }}</h6>
                     <div class="row  pt-2 pb-3">
                         <div class="col-6">{{ "Type" | localize }}</div>
-                        <div class="col-6" style="text-align: right">
+                        <div class="col-6 metadata-value-col">
                             {{ image.type }}
                         </div>
                     </div>
                     <div class="row  pt-2 pb-3">
                         <div class="col-6">{{ "Resolution" | localize }}</div>
-                        <div class="col-6" style="text-align: right">
+                        <div class="col-6 metadata-value-col">
                             {{ image.width }}x{{ image.height }}
                         </div>
                     </div>
                     <div class="row pt-2 pb-3">
                         <div class="col-6">{{ "Size" | localize }}</div>
-                        <div class="col-6" style="text-align: right">
+                        <div class="col-6 metadata-value-col">
                             {{ image.size | number }} {{ image.sizeType }}
                         </div>
                     </div>

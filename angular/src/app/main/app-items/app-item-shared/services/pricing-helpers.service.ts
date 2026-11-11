@@ -50,6 +50,7 @@ export class PricingHelpersService extends AppComponentBase {
         value: prices ? prices[this.getDefaultPricingIndex(prices)]?.price : 0 
       }),
     ]
+     //i49-get all price level from API 
     this.levels.forEach(level => {
       const col = new MatrixGridSelectItem({ 
         label : level,
@@ -91,9 +92,15 @@ export class PricingHelpersService extends AppComponentBase {
     } as IAppItemPriceInfo) 
   }
   getPricingIndex(prices:AppItemPriceInfo[], level:string, currencyId?:number){
-    return prices.findIndex(item=>item.code == level &&  (currencyId ? currencyId == item.currencyId : true) )
+        //return prices.findIndex(item=>item.code == level &&  (currencyId ? currencyId == item.currencyId : true) )
+    return prices.findIndex(item =>
+      (level == "RRP"
+        ? item.code == "RRP" || item.code == "MSRP"
+        : item.code == level) &&
+      (currencyId ? item.currencyId == currencyId : true)
+    );
   }
   getDefaultPricingIndex(prices:AppItemPriceInfo[]){
-   return this.getPricingIndex(prices,this.defaultLevel== "RRP"  ? "MSRP":  this.defaultLevel, this.tenantDefaultCurrency.value);
+   return this.getPricingIndex(prices,this.defaultLevel , this.tenantDefaultCurrency.value);
   }
 }

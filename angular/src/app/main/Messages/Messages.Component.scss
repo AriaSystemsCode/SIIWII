@@ -748,68 +748,13 @@ body .btn.btn-action:after {
 }
 
 
-.p-tabview .p-tabview-panels {
-    padding: 0 !important;
-    border: none !important;
-}
-
 .tab-header {
     display: flex;
     flex-direction: column;
     align-items: center;
 }
 
-.p-tabview .p-tabview-nav li {
-    margin: 5px;
-    width: 120px !important;
-}
 
-.p-tabview .p-tabview-nav li .p-tabview-nav-link {
-    border: none !important;
-
-
-}
-
-.p-tabview .p-tabview-nav li.p-highlight .p-tabview-nav-link {
-    background-color: white !important;
-    color: #777 !important;
-    // border-bottom: 1px solid #eee !important;
-    border-radius: 0 !important;
-    padding: 0;
-    //  width: 140px  !important;
-    //  height: 82px !important;
-    padding: 8px;
-
-    .tab-header {
-        background-color: #4A0D4A !important;
-        border-radius: 6px !important;
-        color: white !important;
-        padding: 5px !important;
-        display: flex;
-        flex-direction: column;
-        align-items: center;
-
-        svg {
-            fill: #fff !important;
-        }
-    }
-}
-
-.p-tabview .p-tabview-nav {
-    border: 1px solid #E2E2E2 !important;
-    margin-top: 10px !important;
-    border-radius: 6px !important;
-}
-
-.p-tabview .p-tabview-nav li .p-tabview-nav-link {
-    background-color: #fff !important;
-}
-
-// }
-
-.p-tabview .p-tabview-nav li .p-tabview-nav-link:not(.p-disabled):focus {
-    box-shadow: none !important;
-}
 
 .disabled {
     color: #ccc !important;
@@ -891,7 +836,7 @@ body .btn.btn-action:after {
 
 .dateMsg {
     color: #595959;
-    position: absolute;
+    // position: absolute;
     font-weight: 500;
     top: 20px;
 }
@@ -1010,4 +955,43 @@ body .btn.btn-action:after {
   background-position: right 12px center;
   padding-right: 40px;
   padding-left: 12px;
+}
+
+.message-attachments {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 10px;
+    margin-top: 12px;
+}
+
+.message-attachment-card {
+    width: 100px;
+    min-height: 110px;
+    padding: 5px;
+    border: 1px solid #eeeeee;
+    border-radius: 8px;
+    background: #ffffff;
+    cursor: pointer;
+    text-align: center;
+}
+
+.message-attachment-img {
+    width: 84px;
+    height: 100%;
+    object-fit: cover;
+    border-radius: 6px;
+}
+
+.message-attachment-icon {
+    width: 70px;
+    height: fit-content;
+    margin-top: 12px;
+}
+
+.message-attachment-name {
+    display: block;
+    margin-top: 8px;
+    font-size: 11px;
+    color: #1B101B;
+    word-break: break-word;
 }

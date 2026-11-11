@@ -56,6 +56,12 @@ import { AppRouteGuard } from '@app/shared/common/auth/auth-route-guard';
 import { PortalTenantSettingsComponent } from './settings/Portal-tenant-settings.component';
 import { PortalHostSettingsComponent } from './settings/Portal-host-settings.component';
 
+import { AriaIframeComponent } from './AriaOnSiwii/aria-frame.component';
+import { AriaEnUsSiwiiComponent } from './Aria-EN-US-Siwii/Aria-EN-US-Siwii.component';
+// import { DynamicParameterComponent } from './dynamic-entity-parameters/dynamic-parameter/dynamic-parameter.component';
+// import { DynamicParameterDetailComponent } from './dynamic-entity-parameters/dynamic-parameter/dynamic-parameter-detail.component';
+// import { EntityDynamicParameterComponent } from './dynamic-entity-parameters/entity-dynamic-parameter/entity-dynamic-parameter.component';
+// import { EntityDynamicParameterValueComponent } from './dynamic-entity-parameters/entity-dynamic-parameter/entity-dynamic-parameter-value/entity-dynamic-parameter-value.component';
 
 
 @NgModule({
@@ -114,6 +120,8 @@ import { PortalHostSettingsComponent } from './settings/Portal-host-settings.com
                     { path: 'invoice/:paymentId', component: InvoiceComponent, data: { permission: 'Pages.Administration.Tenant.SubscriptionManagement' } },
                     { path: 'tenantSettings', component: TenantSettingsComponent, data: { permission: 'Pages.Administration.Tenant.Settings' } },
                     { path: 'portaltenantSettings', component: PortalTenantSettingsComponent, data: { permission: 'Pages.Administration.Tenant.Settings' } },
+                    { path: 'AriaSystem', component: AriaIframeComponent, data: { permission: 'Pages.Administration.Tenant.Settings' } },
+                    { path: 'AriaSystem-en-us', component: AriaEnUsSiwiiComponent, data: { permission: 'Pages.Administration.Tenant.Settings' } },
                     { path: 'hostDashboard', component: HostDashboardComponent, data: { permission: 'Pages.Administration.Host.Dashboard' } },
                     { path: 'demo-ui-components', component: DemoUiComponentsComponent, data: { permission: 'Pages.DemoUiComponents' } },
                     { path: 'install', component: InstallComponent },
@@ -125,6 +133,7 @@ import { PortalHostSettingsComponent } from './settings/Portal-host-settings.com
                     // { path: 'dynamic-parameter-detail', component: DynamicParameterDetailComponent, data: { permission: 'Pages.Administration.DynamicParameters' } },
                     // { path: 'entity-dynamic-parameter', component: EntityDynamicParameterComponent, data: { permission: 'Pages.Administration.EntityDynamicParameters' } },
                     // { path: 'entity-dynamic-parameter-value/manage-all/:entityFullName/:rowId', component: EntityDynamicParameterValueComponent, data: { permission: 'Pages.Administration.EntityDynamicParameters' } },
+                    
                     { path: '', redirectTo: 'hostDashboard', pathMatch: 'full' },
                     { path: '**', redirectTo: 'hostDashboard' }
                 ]

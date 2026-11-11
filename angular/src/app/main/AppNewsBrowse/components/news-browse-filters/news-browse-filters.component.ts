@@ -134,7 +134,7 @@ export class NewsBrowseFiltersComponent extends AppComponentBase implements OnIn
         }
         this.dateErrorMessage = '';
     
-        // ✅ apply only when range complete
+        // apply only when range complete
         if (start && end) {
           this.applyFilters.emit();
         }

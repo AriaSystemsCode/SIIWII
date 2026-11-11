@@ -108,6 +108,8 @@ export class MainImportComponent
     currentStep: ImportStepInfo;
     importStepsInfo: ImportStepInfo[];
     @Output() finishImport = new EventEmitter<boolean>();
+    validMethodName;
+    saveMethodName;
 
     @ViewChild("videoModal", { static: true })
     videoModal: videoTutorialComponent;
@@ -165,6 +167,8 @@ export class MainImportComponent
         this.importService = importService;
         this.serviceUtilites = serviceUtilites;
         this.importServiceProxy = this.injector.get(this.importService);
+        this.validMethodName = this.importType != ImportTypes.price ? 'validateExcel' : 'validatePriceCSV';
+        this.saveMethodName = this.importType != ImportTypes.price ? 'saveFromExcel' : 'savePriceFromCSV';
         this.serviceUtilitesProxy = this.injector.get(this.serviceUtilites);
         this.UploadedFolder = [];
         this.imagesName = [];
@@ -232,8 +236,8 @@ export class MainImportComponent
             if (file.name.startsWith("~$")) 
                 continue;
 
-            const isSheet = file.type.includes("sheet");
-            const isImage =   file.type.includes("image")
+            const isSheet = file.type.includes("sheet") ||  file.type.includes("text/csv");
+            const isImage = file.type.includes("image") || this.isSupportedImportImage(file.name);
             if (isSheet && (this.importType !== ImportTypes.Items || this.imData)) {   
                 hasExcelFile = true;
                 this.uploader.addToQueue(new Array<File>(file));
@@ -244,8 +248,7 @@ export class MainImportComponent
                 hasImageFile = true;
                 if (file.type.includes("image") && this.hasImages) {
                     totalImageFiles++;
-                    if (this._importService.checkImageValidExt(file.name, this.sycAttachmentCategory, "IMPORT") 
-                    ||  this._importService.checkImageValidExt(file.name, this.sycAttachmentCategory, "IMAGE")  ) {
+                    if (this.isSupportedImportImage(file.name)) {
                         this.imagesName.push(file.name.toUpperCase());
                         var imgFile = new ImageFile();
                         imgFile.file = file;
@@ -326,8 +329,7 @@ export class MainImportComponent
 
                     this.callValid=true;
 
-                    this.importServiceProxy
-                        .validateExcel(this._guid, this.imagesName)
+                    this.importServiceProxy[this.validMethodName](this._guid, this.imagesName)
                         .pipe(finalize(() => {
                             this.progress = 100;
                             clearInterval(interval);
@@ -392,8 +394,7 @@ export class MainImportComponent
                 this.CheckRatio();
             }, 0);
 
-            this.importServiceProxy
-                .validateExcel(this._guid, this.imagesName)
+            this.importServiceProxy[this.validMethodName](this._guid, this.imagesName)
                 .pipe(finalize(() => {
                     this.progress = 100;
                     clearInterval(interval);
@@ -431,6 +432,11 @@ export class MainImportComponent
             this.ProgressDetail ="Uploading the files that you want to import";
         }
 
+    }
+
+    private isSupportedImportImage(fileName: string): boolean {
+        const extension = fileName?.split('.').pop()?.toLowerCase();
+        return extension === 'jpg' || extension === 'jpeg' || extension === 'png';
     }
 
     ontotalFailedRecords($event) {
@@ -555,12 +561,29 @@ export class MainImportComponent
         if (iterationNo === 0) {
             this.uploadStartTime = Date.now();
         }
-    
-        const hasImageRecords = this.uploadindResultExcelList.some(r => r.recordType === 'Image');
-    
-        if (hasImageRecords) {
+
+        if (this.importType === ImportTypes.Items && this.uploadingResult?.resultKey) {
             this.importServiceProxy
-                .saveFromExcel(this.uploadingResult)
+                .saveFromExcelResult(this.uploadingResult.resultKey, this.uploadingResult)
+                .pipe(finalize(() => {
+                    this.spinnerService.hide();
+                }))
+                .subscribe(
+                    (result) => {
+                        this.logFileUrl = result.excelLogPath;
+                        this.logFileName = result.excelLogFileName;
+                    },
+                    () => {
+                        //this.notify.error("Import completed with some errors. Please check the log file.");
+                    }
+                );
+            return;
+        }
+    
+        const hasImageRecords = this.uploadindResultExcelList?.some(r => r.recordType === 'Image');
+    
+        if (hasImageRecords || this.importType == ImportTypes.price) {
+            this.importServiceProxy[this.saveMethodName](this.uploadingResult)
                 .pipe(finalize(() => {
                     this.spinnerService.hide();
                    // this.notify.success("Your import has been completed successfully.");
@@ -594,8 +617,7 @@ export class MainImportComponent
         const hasImData = !!this.imData;
         const shouldFinish = (isLastIteration && (hasImData || !isItemsImport)) || (isItemsImport && !hasImData);
     
-        this.importServiceProxy
-            .saveFromExcel(this.uploadingResult)
+        this.importServiceProxy[this.saveMethodName](this.uploadingResult)
             .pipe(finalize(() => {
                 if (shouldFinish) {
                     this.spinnerService.hide();
@@ -617,6 +639,33 @@ export class MainImportComponent
                     } else {
                         this.callImport(iterationNo + 1);
                     }
+                }
+            );
+    }
+
+    onLoadMoreValidateExcelRecords($event: { skipCount: number; maxResultCount: number; recordType: string }) {
+        if (!this.uploadingResult?.resultKey || !this.importServiceProxy?.getValidateExcelResultPage) {
+            this.StatusModal.loadingMoreRecords = false;
+            return;
+        }
+
+        this.importServiceProxy
+            .getValidateExcelResultPage(
+                this.uploadingResult.resultKey,
+                $event.skipCount,
+                $event.maxResultCount,
+                $event.recordType
+            )
+            .subscribe(
+                (result) => {
+                    this.StatusModal.appendRecords(
+                        result?.excelRecords || [],
+                        result?.totalDisplayRecords,
+                        $event.recordType
+                    );
+                },
+                () => {
+                    this.StatusModal.loadingMoreRecords = false;
                 }
             );
     }
@@ -710,7 +759,16 @@ export class MainImportComponent
                 break;
 
             case ImportStepsEnum.importConfirmationModalStep:
-                this.importConfirmationModal.show(this.importType, this.uploadingResult.hasDuplication, this.hasImages);
+                const hasDuplicateWarning = this.uploadingResult?.hasDuplication === true ||
+                    this.uploadingResult?.HasDuplication === true ||
+                    (this.uploadingResult?.excelRecords || []).some(record => {
+                        const messages = [
+                            ...(record?.fieldsErrors || []),
+                            record?.errorMessage || ''
+                        ].join(' ');
+                        return messages.toLowerCase().includes('already exists');
+                    });
+                this.importConfirmationModal.show(this.importType, hasDuplicateWarning, this.hasImages);
                 break;
 
             case ImportStepsEnum.successfullyImportModalStep:
@@ -965,7 +1023,7 @@ export class MainImportComponent
                     $event.filter,
                     undefined,
                     undefined,
-                    undefined, undefined, undefined, undefined, undefined, undefined, "", 0, 100
+                    undefined, undefined, undefined, undefined, undefined, undefined, undefined, "", 0, 100
 
                 )
                 .subscribe((result) => {
@@ -983,6 +1041,7 @@ export class MainImportComponent
         if (record?.isCodeItem || record?._isLinkingParent) {
             this.importServiceProxy.getAppItemForEditData(
                 selectedItem.id,
+                record.excelDto?.rowNumber,
                 record.recordType,
                 record.parentCode,
                 record.code,
@@ -1069,6 +1128,7 @@ export class MainImportComponent
         else if (record?.isCodeColorItem || record?._isLinkingItemColor) {
             this.importServiceProxy.getAppItemColorForEditData(
                 selectedItem.id,
+                record.excelDto?.rowNumber,
                 record.recordType,
                 record.parentCode,
                 record.code,
@@ -1189,20 +1249,33 @@ export class MainImportComponent
         }
          _ImportItemInputDto = this.mapRecordToImportItemInputDto(record)
          
-        this.importServiceProxy.validateImportItemData(_ImportItemInputDto)
-            .subscribe((result: ImportItemReturnDto[]) => {
-                const hasErrors = Array.isArray(result) && result.length > 0;
+        // Call this endpoint directly so the DTO is always sent in the request body.
+        // Older generated proxies treated the argument as an `index` query parameter,
+        // which serialized the record as `index=[object Object]` and caused HTTP 400.
+        this._httpClient.post<any>(
+            AppConsts.remoteServiceBaseUrl + "/api/services/app/AppItems/ValidateImportItemData",
+            _ImportItemInputDto
+        )
+            .subscribe({
+            next: (response: any) => {
+                // Depending on whether the ABP response interceptor runs, the
+                // validation array is returned directly or inside `result`.
+                const result: ImportItemReturnDto[] = Array.isArray(response)
+                    ? response
+                    : (Array.isArray(response?.result) ? response.result : []);
+                const hasErrors = result.length > 0;
 
-                //record.fieldsErrors = hasErrors ? result : [];
                 record.fieldsErrors = hasErrors
                     ? result.map(err => err.errorMessage)
                     : [];
-                record.errorMessage = hasErrors ? "" : record.errorMessage;
-                let allWarnings = result.every(
+                record.errorMessage = "";
+                const allWarnings = hasErrors && result.every(
                     x => x.errorType?.toLowerCase() === "warning" ||
                          x.errorType?.toLowerCase() === "duplication"
-                  );
-                                                   record.status =hasErrors ? (allWarnings ? "Warning" :  "Failed" ) : "Passed"
+                );
+                record.status = hasErrors
+                    ? (allWarnings ? "Warning" : "Failed")
+                    : "Passed";
                 if (record._isCreateParent || record._isCreateItemColor) {
                     record.recordType = "Image";
                     record.excelDto.recordType = "Image";
@@ -1211,9 +1284,24 @@ export class MainImportComponent
                 this.updatedRecordData = {
                     record,
                     newData: record
+                };
+            },
+            error: () => {
+                record.status = "Failed";
+                record.errorMessage = "Unable to validate this record.";
+                record.fieldsErrors = [record.errorMessage];
+
+                if (record._isCreateParent || record._isCreateItemColor) {
+                    record.recordType = "Image";
+                    record.excelDto.recordType = "Image";
                 }
 
-            });
+                this.updatedRecordData = {
+                    record,
+                    newData: record
+                };
+            }
+        });
 
     }
 

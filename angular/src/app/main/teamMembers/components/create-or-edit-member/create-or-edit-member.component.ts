@@ -105,9 +105,9 @@ export class CreateOrEditMemberComponent extends AppComponentBase {
       this.canEdit = this.permission.isGranted('Pages.Accounts.Member.Edit');
       if (!this.canEdit) return this.notify.error("You don't have permission to edit");
   
-      await this.getContactDataForView(memberId); // ✅ fills memberDto
+      await this.getContactDataForView(memberId); //  fills memberDto
      
-      // this.getAppItemTypeExtraAttributesById(); // ✅ call AFTER memberDto is filled
+      // this.getAppItemTypeExtraAttributesById(); //  call AFTER memberDto is filled
     } else { // create logic
       this.canCreate = this.permission.isGranted('Pages.Accounts.Member.Create');
       if (!this.canCreate) return this.notify.error("You don't have permission to create");
@@ -536,7 +536,7 @@ export class CreateOrEditMemberComponent extends AppComponentBase {
         });
       }
 
-      // ✅ Add this if missing
+      //  Add this if missing
       if (!attr.paginationSetting) {
         attr.paginationSetting = {
           skipCount: 0,
@@ -675,7 +675,7 @@ export class CreateOrEditMemberComponent extends AppComponentBase {
       }
     });
 
-    // ✅ Step 2: No filter — keep all values
+    //  Step 2: No filter — keep all values
     const cleanIncomingData = incomingData;
 
     // Step 3: Remove old entries for incoming attributeIds
@@ -721,7 +721,6 @@ export class CreateOrEditMemberComponent extends AppComponentBase {
           attr.value = matches[0].attributeValue;
         }
   
-        // ✅ Optional: store selectedValues for UI binding
         attr.selectedValues = attr.value;
       }
     }

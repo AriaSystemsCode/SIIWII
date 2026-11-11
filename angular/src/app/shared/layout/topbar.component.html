@@ -14,20 +14,15 @@
 
         <p-menu #menu [model]="items" [popup]="true"></p-menu>
       
-        <a
-        class="navbar-brand pt-0"
-        [routerLink]="defaultHomeUrl"
-        routerLinkActive="header-link-active"
-        (click)="userClick('Home')"
-        [ngClass]="isAuthenticated? 'ml-3':''"
-      >
+      
         <img
           [src]=" attachmentBaseUrl + '/' + tenantLogo"
           class="navbar-brand"
           [ngClass]="!tenantLogo ? 'rounded-c': !isAuthenticated ? 'mx-5':'' "
           (error)="onImgErr($event)"
+           (click)="onLogoClick()"
         />
-      </a>
+    
       
         <button
             type="button"
@@ -42,7 +37,7 @@
         <!-- test nav -->
 
         <!-- Search form -->
-        <form class="input-group pt-3 input-group-form d-lg-block d-none">
+        <form class="input-group pt-3 input-group-form d-lg-block d-none mx-5">
             <div class="position-relative search-bar w-75" [ngClass]="!isHost && !isAuthenticated && !isArabic ? 'addMl' : !isHost && !isAuthenticated && isArabic ? 'addMR': ''"
 
             >
@@ -175,7 +170,7 @@
                 </li>
 
                 <li class="nav-item pl-3 mt-lg-0 mt-4">
-                    <a class="nav-link active d-flex flex-column text-center">
+                    <a class="nav-link active d-flex flex-column text-center" [ngClass]="isImpersonatedLogin ? 'p-0' : ''">
                         <div dropdown class="kt-header__topbar-item dropdown h-100 align-items-center pl-lg-3 pr-lg-3 text-white"
                             style=" height: 40px;">
                             <div dropdownToggle class="kt-header__topbar-wrapper dropdown-toggle" data-toggle="dropdown"
@@ -249,24 +244,24 @@
                                     </li>
                                     <hr />
                                     <!--Sara start-->
-                                    <li
-                                        class="kt-nav__item"
-                                        *ngIf="appSession?.user?.memberId"
-                                    >
+                                    <li class="kt-nav__item" *ngIf="((appSession?.tenant?.edition?.displayName === 'Business Edition') || (appSession?.tenant?.edition?.displayName === 'Group Edition') && appSession?.user?.memberId != 0) || (appSession?.tenant?.edition?.displayName === 'Personal Edition') ">
                                         <!--  <a class="kt-nav__link" [routerLink]="['/app/main/account']" routerLinkActive="router-link-active"  > -->
                                         <!--  'ViewMemberProfile/:id' -->
                                         <a
-                                            class="kt-nav__link"
-                                            [routerLink]="['/app/main/account']"
-                                            [queryParams]="{
-                                                tab: 'ViewMember',
-                                                memberId:
-                                                    appSession?.user?.memberId,
-                                                userId: appSession?.user?.id
-                                            }"
-                                            queryParamsHandling="merge"
-                                            routerLinkActive="router-link-active"
-                                        >
+                                        
+                                        class="kt-nav__link"
+                                        [routerLink]="['/app/main/account']"
+                                        [queryParams]="{
+                                          tab: ((appSession?.tenant?.edition?.displayName === 'Business Edition') || (appSession?.tenant?.edition?.displayName === 'Group Edition') && appSession?.user?.memberId != 0)
+                                            ? 'ViewMember'
+                                            : 'ProfileView',
+                                          memberId: appSession?.user?.memberId,
+                                          userId: appSession?.user?.id
+                                        }"
+                                        queryParamsHandling="merge"
+                                        routerLinkActive="router-link-active"
+                                      >
+                                      
                                             <span class="kt-nav__link-icon">
                                                 <i class="far fa-user"></i>
                                             </span>
@@ -410,10 +405,12 @@
             <!-- Left links -->
             <ul class="navbar-nav bottom-navbar ms-auto my-2 mb-lg-0">
                 <li class="nav-item pt-2">
-                    <a class="navbar-brand pt-0 "  [routerLink]="['/app/main/Home']"
-                        routerLinkActive="header-link-active" (click)="userClick('Home')">
-                        <img src="../../../assets/landingPage/Home_Footer_Btn.svg" class="navbar-brand _navbar-brand" />
-                    </a>
+                   
+                        <img src="../../../assets/landingPage/Home_Footer_Btn.svg" class="navbar-brand _navbar-brand"         [src]=" attachmentBaseUrl + '/' + tenantLogo"
+        
+          (error)="onImgErr($event)"
+           (click)="onLogoClick()" />
+                 
                 </li>
                 <li class="nav-item pt-1" >
                     <a

@@ -2,6 +2,7 @@ import {
     Component,
     EventEmitter,
     Injector,
+    Input,
     OnInit,
     Output,
     ViewChild,
@@ -31,6 +32,8 @@ export class ViewEventComponent extends AppComponentBase implements OnInit {
     /* @ViewChild("googleMapModal", { static: true })
     googleMapModal: GoogleMapComponent; */
     @Output() createPostEvent = new EventEmitter<AppEventDto>();
+
+     @Input('hideViewEv') hideViewEv: boolean 
     event: GetAppEventForViewDto = new GetAppEventForViewDto();
     eventAddress: string = "";
     eventId: number;

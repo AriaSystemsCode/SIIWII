@@ -20,6 +20,8 @@ export class CreateOrEditClassificationDynamicModalComponent extends AppComponen
     loading : boolean;
     parentClassification : CreateOrEditSycEntityObjectClassificationDto
     entityObjectType:string ="CLASSIFICATION"
+    currentLang: string
+    isArabic: boolean
     constructor(
         injector: Injector,
         public currentModalRef: BsModalRef,
@@ -31,7 +33,8 @@ export class CreateOrEditClassificationDynamicModalComponent extends AppComponen
     }
 
     ngOnInit(): void {
-
+        this.currentLang = abp.utils.getCookieValue('Abp.Localization.CultureName')
+        this.currentLang == 'ar' || this.currentLang == 'ar-EG'  ? this.isArabic = true : this.isArabic = false
         if(!this.classification) {
             this.classification = new CreateOrEditSycEntityObjectClassificationDto()
         }
@@ -41,7 +44,7 @@ export class CreateOrEditClassificationDynamicModalComponent extends AppComponen
     }
 
     close(){
-        this.currentModalRef.setClass('right-modal slide-right-out')
+      this.isArabic ?  this.currentModalRef.setClass('left-modal slide-left-out'):   this.currentModalRef.setClass('right-modal slide-right-out')
         this.changesApplied = false
         this.currentModalRef.hide()
     }

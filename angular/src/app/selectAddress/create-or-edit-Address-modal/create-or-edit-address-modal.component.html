@@ -78,14 +78,11 @@
                   [placeholder]="'PleaseSelect' | localize"
               >
               </p-dropdown>
-              <!-- <select [(ngModel)]="address.countryId" name="address.countryId"  class="form-control form-control-sm aria-input-text" required>
-                <option value="">{{l(PleaseSelect)}}</option>
-                <option *ngFor="let item of allCountries" value="{{item.value}}">{{item.label}}</option>
-              </select> -->
+      
             </div>
 
           </div>
-          <div class="modal-footer">
+          <div class="modal-footer p-10">
               <button [disabled]="saving" type="button" class="btn btn-default  btn-gray mr-2" (click)="cancel()">{{l("Cancel")}}</button>
               <button type="submit" class="btn bgPurple mr-2" [disabled]="!addressForm.form.valid" [buttonBusy]="saving" [busyText]="l('SavingWithThreeDot')"> <span>{{l("Save")}}</span></button>
           </div>

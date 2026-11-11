@@ -272,43 +272,126 @@ private contactsSearchSub?: import('rxjs').Subscription;
             this.__selectedPhoneTypeValue = 0;
         }
     }
-    setSelectedData() {
-        if (this.appTransactionContactsIndex >= 0) {
-            const contact = this.appTransactionsForViewDto.appTransactionContacts[this.appTransactionContactsIndex];
-            // Company
-            if (!contact.selectedCompany) contact.selectedCompany = new GetAccountInformationOutputDto();
-            contact.selectedCompany.name = contact.companyName;
-            contact.selectedCompany.accountSSIN = contact.companySSIN;
-            contact.selectedCompany.code = contact.companyCode || contact.selectedCompany.code;
+    // setSelectedData() {
+    //     if (this.appTransactionContactsIndex >= 0) {
+    //         const contact = this.appTransactionsForViewDto.appTransactionContacts[this.appTransactionContactsIndex];
+    //         // Company
+    //         if (!contact.selectedCompany) contact.selectedCompany = new GetAccountInformationOutputDto();
+    //         contact.selectedCompany.name = contact.companyName;
+    //         contact.selectedCompany.accountSSIN = contact.companySSIN;
+    //         contact.selectedCompany.code = contact.companyCode || contact.selectedCompany.code;
 
-            // Branch
-            if (!contact.selectedBranch) contact.selectedBranch = new AccountBranchDto();
-            contact.selectedBranch.name = contact.branchName || "*Main*";
-            contact.selectedBranch.ssin = contact.branchSSIN;
-            contact.selectedBranch.code = contact.branchCode || contact.selectedBranch.code;
-            if (contact.selectedBranch) {
-                this.onChangeBranch(contact.selectedBranch); 
-            }
+    //         // Branch
+    //         if (!contact.selectedBranch) contact.selectedBranch = new AccountBranchDto();
+    //         contact.selectedBranch.name = contact.branchName || "*Main*";
+    //         contact.selectedBranch.ssin = contact.branchSSIN;
+    //         contact.selectedBranch.code = contact.branchCode || contact.selectedBranch.code;
+    //         if (contact.selectedBranch) {
+    //             this.onChangeBranch(contact.selectedBranch); 
+    //         }
 
-            // Contact
-            if (!contact.selectedContact) contact.selectedContact = new GetContactInformationDto();
-            contact.selectedContact.name = contact.contactName;
-            contact.selectedContact.ssin = contact.contactSSIN;
-            contact.selectedContact.code = contact.contactCode || contact.selectedContact.code;
+    //         // Contact
+    //         if (!contact.selectedContact) contact.selectedContact = new GetContactInformationDto();
+    //         contact.selectedContact.name = contact.contactName;
+    //         contact.selectedContact.ssin = contact.contactSSIN;
+    //         contact.selectedContact.code = contact.contactCode || contact.selectedContact.code;
 
-            // Phone
-            if (!contact.selectedPhoneType) contact.selectedPhoneType = new PhoneNumberAndtype();
-            contact.selectedPhoneType.phoneTypeName = contact.contactPhoneTypeName;
-            contact.selectedPhoneType.phoneTypeId = contact.contactPhoneTypeId;
+    //         // Phone
+    //         if (!contact.selectedPhoneType) contact.selectedPhoneType = new PhoneNumberAndtype();
+    //         contact.selectedPhoneType.phoneTypeName = contact.contactPhoneTypeName;
+    //         contact.selectedPhoneType.phoneTypeId = contact.contactPhoneTypeId;
 
-            contact.selectContactPhoneNumber = contact.contactPhoneNumber || contact.selectContactPhoneNumber;
-            contact.selectedContactEmail = contact.contactEmail || contact.selectedContactEmail;
-        }
-        this.isValidForm();
+    //         contact.selectContactPhoneNumber = contact.contactPhoneNumber || contact.selectContactPhoneNumber;
+    //         contact.selectedContactEmail = contact.contactEmail || contact.selectedContactEmail;
+    //     }
+    //     this.isValidForm();
 
+    // }
+
+setSelectedData() {
+  if (this.appTransactionContactsIndex >= 0) {
+    const contact =
+      this.appTransactionsForViewDto.appTransactionContacts[this.appTransactionContactsIndex];
+
+    // Company
+    if (!contact.selectedCompany) {
+      contact.selectedCompany = new GetAccountInformationOutputDto();
     }
 
+    contact.selectedCompany.name =
+      contact.selectedCompany?.name ||
+      contact.companyName ||
+      '';
 
+    contact.selectedCompany.accountSSIN =
+      contact.selectedCompany?.accountSSIN ||
+      contact.companySSIN;
+
+    contact.selectedCompany.code =
+      contact.selectedCompany?.code ||
+      contact.companyCode;
+
+    // Branch
+    if (!contact.selectedBranch) {
+      contact.selectedBranch = new AccountBranchDto();
+    }
+
+    contact.selectedBranch.name =
+      contact.selectedBranch?.name ||
+      contact.branchName ||
+      '*Main*';
+
+    contact.selectedBranch.ssin =
+      contact.selectedBranch?.ssin ||
+      contact.branchSSIN;
+
+    contact.selectedBranch.code =
+      contact.selectedBranch?.code ||
+      contact.branchCode;
+
+    // Contact
+    if (!contact.selectedContact) {
+      contact.selectedContact = new GetContactInformationDto();
+    }
+
+    contact.selectedContact.name =
+      contact.selectedContact?.name ||
+      contact.contactName ||
+      '';
+
+    contact.selectedContact.ssin =
+      contact.selectedContact?.ssin ||
+      contact.contactSSIN;
+
+    contact.selectedContact.code =
+      contact.selectedContact?.code ||
+      contact.contactCode;
+
+    // Phone
+    if (!contact.selectedPhoneType) {
+      contact.selectedPhoneType = new PhoneNumberAndtype();
+    }
+
+    contact.selectedPhoneType.phoneTypeName =
+      contact.selectedPhoneType?.phoneTypeName ||
+      contact.contactPhoneTypeName;
+
+    contact.selectedPhoneType.phoneTypeId =
+      contact.selectedPhoneType?.phoneTypeId ||
+      contact.contactPhoneTypeId;
+
+    contact.selectContactPhoneNumber =
+      contact.selectContactPhoneNumber ||
+      contact.contactPhoneNumber;
+
+    contact.selectedContactEmail =
+      contact.selectedContactEmail ||
+      contact.contactEmail;
+
+    this.isValidForm();
+    this.cdr.markForCheck();
+  }
+}
     onChangeCompany(event) {
 
         this.appTransactionsForViewDto.appTransactionContacts[this.appTransactionContactsIndex].selectedCompany.code = event?.code
@@ -670,45 +753,129 @@ getContacts(tempContact: boolean = false): void {
 
 
 
-    getAllCompaniesData() {
+    // getAllCompaniesData() {
 
-        this.companyFilterValue = "";
-        this.companyNamePlaceholder = "Select Company Name";
-        this.contactNamePlaceholder = "Select Contact Name";
-        this.tempAccount = false;
-        this.tempContact = false;
-        this.contactFilterValue = "";
+    //     this.companyFilterValue = "";
+    //     this.companyNamePlaceholder = "Select Company Name";
+    //     this.contactNamePlaceholder = "Select Contact Name";
+    //     this.tempAccount = false;
+    //     this.tempContact = false;
+    //     this.contactFilterValue = "";
 
-        if ((this.appTransactionsForViewDto?.appTransactionContacts[this.appTransactionContactsIndex]?.companySSIN == "0" || !this.appTransactionsForViewDto?.appTransactionContacts[this.appTransactionContactsIndex]?.companySSIN) && this.appTransactionsForViewDto?.appTransactionContacts[this.appTransactionContactsIndex].companyName) {
-            this.tempAccount = true;
-            this.companyNamePlaceholder = this.appTransactionsForViewDto?.appTransactionContacts[this.appTransactionContactsIndex].companyName + "*";
+    //     if ((this.appTransactionsForViewDto?.appTransactionContacts[this.appTransactionContactsIndex]?.companySSIN == "0" || !this.appTransactionsForViewDto?.appTransactionContacts[this.appTransactionContactsIndex]?.companySSIN) && this.appTransactionsForViewDto?.appTransactionContacts[this.appTransactionContactsIndex].companyName) {
+    //         this.tempAccount = true;
+    //         this.companyNamePlaceholder = this.appTransactionsForViewDto?.appTransactionContacts[this.appTransactionContactsIndex].companyName + "*";
 
-            this.companyFilterValue = this.appTransactionsForViewDto?.appTransactionContacts[this.appTransactionContactsIndex].companyName;
-            this.contactNamePlaceholder = this.appTransactionsForViewDto?.appTransactionContacts[this.appTransactionContactsIndex].contactName + "*";
+    //         this.companyFilterValue = this.appTransactionsForViewDto?.appTransactionContacts[this.appTransactionContactsIndex].companyName;
+    //         this.contactNamePlaceholder = this.appTransactionsForViewDto?.appTransactionContacts[this.appTransactionContactsIndex].contactName + "*";
 
 
-            if (this.companyFilterValue)
-                this.handleCompanySearch(this.companyFilterValue);
-        }
-        else {
+    //         if (this.companyFilterValue)
+    //             this.handleCompanySearch(this.companyFilterValue);
+    //     }
+    //     else {
 
-            this.tempAccount = false;
-            if (this.appTransactionsForViewDto)
-                this.appTransactionsForViewDto.appTransactionContacts[this.appTransactionContactsIndex].selectedCompany = this.companeyNames?.find(x => x.accountSSIN == this.appTransactionsForViewDto?.appTransactionContacts[this.appTransactionContactsIndex]?.companySSIN)
+    //         this.tempAccount = false;
+    //         if (this.appTransactionsForViewDto)
+    //             this.appTransactionsForViewDto.appTransactionContacts[this.appTransactionContactsIndex].selectedCompany = this.companeyNames?.find(x => x.accountSSIN == this.appTransactionsForViewDto?.appTransactionContacts[this.appTransactionContactsIndex]?.companySSIN)
 
-            if (this.appTransactionsForViewDto?.appTransactionContacts[this.appTransactionContactsIndex]?.selectedCompany && this.appTransactionsForViewDto?.appTransactionContacts[this.appTransactionContactsIndex]?.selectedCompany?.accountSSIN) {
+    //         if (this.appTransactionsForViewDto?.appTransactionContacts[this.appTransactionContactsIndex]?.selectedCompany && this.appTransactionsForViewDto?.appTransactionContacts[this.appTransactionContactsIndex]?.selectedCompany?.accountSSIN) {
 
-                if (this.loadAddressComponent) {
-                    this.loadAddressComponent.emit({ compssin: this.appTransactionsForViewDto?.appTransactionContacts[this.appTransactionContactsIndex]?.selectedCompany?.accountSSIN, compId: this.appTransactionsForViewDto?.appTransactionContacts[this.appTransactionContactsIndex]?.selectedCompany?.id,branchSsin :this.appTransactionsForViewDto?.appTransactionContacts[this.appTransactionContactsIndex]?.selectedBranch?.ssin });
-                }
-            }
+    //             if (this.loadAddressComponent) {
+    //                 this.loadAddressComponent.emit({ compssin: this.appTransactionsForViewDto?.appTransactionContacts[this.appTransactionContactsIndex]?.selectedCompany?.accountSSIN, compId: this.appTransactionsForViewDto?.appTransactionContacts[this.appTransactionContactsIndex]?.selectedCompany?.id,branchSsin :this.appTransactionsForViewDto?.appTransactionContacts[this.appTransactionContactsIndex]?.selectedBranch?.ssin });
+    //             }
+    //         }
 
-        }
+    //     }
 
-        this.hideMainSpinner();
+    //     this.hideMainSpinner();
 
-        this.isValidForm();
+    //     this.isValidForm();
+    // }
+    getAllCompaniesData(): void {
+  this.companyFilterValue = '';
+  this.companyNamePlaceholder = 'SelectCompanyName';
+  this.defaultcompanyNamePlaceholder = 'SelectCompanyName';
+  this.contactNamePlaceholder = 'SelectContactName';
+  this.defaultcontactNamePlaceholder = 'SelectContactName';
+
+  this.tempAccount = false;
+  this.tempContact = false;
+  this.contactFilterValue = '';
+
+  const contact =
+    this.appTransactionsForViewDto?.appTransactionContacts?.[this.appTransactionContactsIndex];
+
+  if (!contact) {
+    this.hideMainSpinner();
+    return;
+  }
+
+  // IMPORTANT: keep DTO instance, not plain object
+  if (!contact.selectedCompany || typeof contact.selectedCompany !== 'object') {
+    contact.selectedCompany = new GetAccountInformationOutputDto();
+  }
+
+  contact.selectedCompany.name =
+    contact.selectedCompany.name || contact.companyName || '';
+
+  contact.selectedCompany.accountSSIN =
+    contact.selectedCompany.accountSSIN || contact.companySSIN;
+
+  contact.selectedCompany.code =
+    contact.selectedCompany.code || contact.companyCode;
+
+  const isTempCompany =
+    (contact.companySSIN === '0' || !contact.companySSIN) &&
+    !!contact.companyName;
+
+  if (isTempCompany) {
+    this.tempAccount = true;
+    this.companyNamePlaceholder = contact.companyName + '*';
+    this.defaultcompanyNamePlaceholder = contact.companyName + '*';
+    this.companyFilterValue = contact.companyName;
+
+    if (contact.contactName) {
+      this.contactNamePlaceholder = contact.contactName + '*';
+      this.defaultcontactNamePlaceholder = contact.contactName + '*';
     }
+
+    this.handleCompanySearch({ query: this.companyFilterValue });
+    this.isValidForm();
+    this.cdr.markForCheck();
+    this.hideMainSpinner();
+    return;
+  }
+
+  const foundCompany = this.companeyNames?.find(
+    x =>
+      x?.accountSSIN === contact.companySSIN ||
+      x?.id === contact.selectedCompany?.id ||
+      x?.name === contact.companyName
+  );
+
+  if (foundCompany) {
+    // IMPORTANT: do not use spread here
+    Object.assign(contact.selectedCompany, foundCompany);
+  }
+
+  contact.selectedCompany.name =
+    contact.selectedCompany.name || contact.companyName || '';
+
+  contact.selectedCompany.accountSSIN =
+    contact.selectedCompany.accountSSIN || contact.companySSIN;
+
+  contact.selectedCompany.code =
+    contact.selectedCompany.code || contact.companyCode;
+
+  if (contact.selectedCompany?.accountSSIN) {
+    this.getContacts();
+  }
+
+  this.isValidForm();
+  this.cdr.markForCheck();
+  this.hideMainSpinner();
+}
     checkFormValidity(): boolean {
         if (!this.appTransactionsForViewDto?.appTransactionContacts?.[this.appTransactionContactsIndex]) {
             return false;

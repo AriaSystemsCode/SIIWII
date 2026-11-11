@@ -26,11 +26,11 @@
                         <h3 class="modal-title text-left">
                             <span> {{ l("CreateNewList") }}</span>
                         </h3>
-                        <p>{{ l("PleaseFillTheBelowInformation") }}</p>
-                        <button [ngStyle]="isArabic ? {'left':'0'} : {'right':'0'}"
-                            style="position: absolute; width: 70px;; top: 8px"
+                        <p class="mx-2">{{ l("PleaseFillTheBelowInformation") }}</p>
+                        <button
+                            [ngClass]="isArabic ? 'modal-close-btn-rtl' : 'modal-close-btn-ltr'"
                             type="button"
-                            class="close"
+                            class="close modal-close-btn-wide"
                             (click)="close()"
                             aria-label="Close"
                         >

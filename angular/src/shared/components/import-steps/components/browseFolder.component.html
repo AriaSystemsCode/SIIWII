@@ -30,14 +30,21 @@
                 <label for="_input">
                     <img src="../../../../assets/accounts/importAccounts/Vector.png" /><br /><br />
 
-                    <input #fileInputRef type="file" id="_input" (change)="fileChangeEvent($event)" name="fileList" webkitdirectory
-                        multiple  [disabled]="importType==ImportTypes.Items && !isAnyOptionSelected" class="upload-input"/>
+                    <ng-container *ngIf="importType!==ImportTypes.price">
+                        <input #fileInputRef type="file" id="_input" (change)="fileChangeEvent($event)" name="fileList" webkitdirectory
+                            multiple  [disabled]="importType==ImportTypes.Items && !isAnyOptionSelected" class="upload-input"/>
+                    </ng-container>
+
+                    <ng-container *ngIf="importType==ImportTypes.price">
+                        <input #fileInputRef type="file" id="_input" (change)="fileChangeEvent($event)" name="fileList"
+                            accept=".csv,text/csv" class="upload-input"/>
+                    </ng-container>
 
                         
                     <h5>{{"Dropyourfolderhereorclickheretoupload" | localize}} </h5>
                     <h5> {{"FilesformatsSupportedareXLSX,JPGandPNG" | localize}}</h5>
                     <span *ngIf="hasImages">{{"Pleasemakesuretheimagessize5MB" | localize}}</span>
-                    <p style="color: #F6851D !important;">*Image Aspect-Ratio is {{aspectRatioNumbers}} </p>
+                    <p class="aspect-ratio-warning">*Image Aspect-Ratio is {{aspectRatioNumbers}} </p>
                 </label>
             </div>
             
@@ -68,10 +75,10 @@
     </div>
 
 
-    <div class="modal-lg m-auto  Download  pt-4 pb-4">
+    <div class="modal-lg m-auto Download pt-4 pb-4" *ngIf="importType!==ImportTypes.price" [class.download-disabled]="templateLoading">
         <div class="row align-items-baseline mb-4" *ngIf="importType==ImportTypes.Items">
             <div class="col-2 ml-4">
-                <h6><span style="color: #F6851D;">*</span>{{ 'ProductType' | localize}}</h6>
+                <h6><span class="required-asterisk">*</span>{{ 'ProductType' | localize}}</h6>
             </div>
             <div class="col-7 pl-0">
                 <div class="wide-drop-down">
@@ -95,13 +102,14 @@
             <div class="col-6">
                 <h4>{{"Downloadthetemplatefile" | localize}} </h4>
                 <!-- <span> {{"Templatelastupdate" | localize}} {{templateDate}} {{"version"| localize}}  {{templateVersion}}</span> -->
-                <span> {{"TemplateVersion"| localize}} {{templateVersion}}</span>
+                <span *ngIf="templateLoading">Preparing template...</span>
+                <span *ngIf="!templateLoading"> {{"TemplateVersion"| localize}} {{templateVersion}}</span>
             </div>
             <div class="col-5 pr-4 text-right">
-                <button class="browse-btn" [disabled]="importType==ImportTypes.Items && !itemType" [ngClass]="{
-                    disabled: importType==ImportTypes.Items && !itemType
+                <button class="browse-btn" [disabled]="templateLoading || !templateUrl || (importType==ImportTypes.Items && !itemType)" [ngClass]="{
+                    disabled: templateLoading || !templateUrl || (importType==ImportTypes.Items && !itemType)
                 }"  (click)="downloadTemplate()">
-                    <span>{{"Download"| localize}}</span>
+                    <span>{{ templateLoading ? 'Preparing...' : ("Download"| localize) }}</span>
                   </button>
 
 
@@ -117,7 +125,7 @@
 <div class="upload-modal" *ngIf="showUploadModal">
     <div class="modal-header">
       <img class="modal-icon pr-2" src="../../../../assets/accounts/importAccounts/fluent_alert-on.png"/>
-      <span class="modal-title pt-2">Are you sure you want to upload this Folder</span>
+      <span class="modal-title pt-2">Are you sure you want to upload this {{ importType === ImportTypes.price ? 'file' : 'folder' }}?</span>
       <span class="modal-close" (click)="cancelUpload()">✕</span>
     </div>
   

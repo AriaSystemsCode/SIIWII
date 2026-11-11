@@ -13,7 +13,7 @@
                 <div class="kt-subheader__main">
                     <h3 class="kt-subheader__title pl-5">
                         <div class="header">
-                            {{ appItemViewInput?.header }}
+                            {{ appItemViewInput?.header  | localize}}
                         </div>
                     </h3>
                 </div>
@@ -44,6 +44,7 @@
         >
             <div
                 class="kt-portlet kt-portlet--mobile seconedContainer extraDatacontainer p-4"
+                [ngClass]="{'arabic-margin': isArabic}"
             >
                 <div class="row details">
                     <div class="col-6">
@@ -169,8 +170,7 @@
                                         "
                                         controls
                                         alt="defaultImage"
-                                        style="margin-top: -200px !important;"
-                                        class="w-100 imageContainer"
+                                        class="w-100 imageContainer video-top-shift"
                                         [ngStyle]="{'height.px':  (centerContatiner.clientWidth / acceptedAspectRatio )}"
                                     ></video>
 
@@ -232,12 +232,11 @@
                                 <div class="main">
                               
                                   <!-- MAIN IMAGE -->
-                                  <img *ngIf="kindOf(activeAttachments[currentIndex]) === 'image'"
-                                       class="main-media"
-                                       [src]="getUrl(activeAttachments[currentIndex])"
-                                       (error)="onMainError($event)"
-                                       (click)="openImagePreview(getUrl(activeAttachments[currentIndex]))"
-                                       style="cursor: zoom-in;" />
+                                    <img *ngIf="kindOf(activeAttachments[currentIndex]) === 'image'"
+                                        class="main-media zoom-in-cursor"
+                                        [src]="getUrl(activeAttachments[currentIndex])"
+                                        (error)="onMainError($event)"
+                                        (click)="openImagePreview(getUrl(activeAttachments[currentIndex]))" />
                               
                                   <!-- MAIN VIDEO -->
                                   <video *ngIf="kindOf(activeAttachments[currentIndex]) === 'video'"
@@ -250,34 +249,32 @@
                                   <ng-container *ngIf="kindOf(activeAttachments[currentIndex]) === 'pdf'">
                                     <div *ngIf="pdfThumbLoadingMap[currentIndex]" class="main-loading">
                                       <i class="fa fa-spinner fa-spin fa-2x"></i>
-                                      <span class="mx-2">Loading preview...</span>
+                                      <span class="mx-2">{{ 'LoadingPreview' | localize }}</span>
                                     </div>
                               
-                                    <img *ngIf="!pdfThumbLoadingMap[currentIndex] && pdfThumbMap[currentIndex]"
-                                         class="main-media"
+                                     <img *ngIf="!pdfThumbLoadingMap[currentIndex] && pdfThumbMap[currentIndex]"
+                                         class="main-media pointer-cursor"
                                          [src]="pdfThumbMap[currentIndex]"
-                                         style="cursor:pointer;"
                                          (click)="openNewTab(activeAttachments[currentIndex])" />
                               
                                     <div *ngIf="!pdfThumbLoadingMap[currentIndex] && !pdfThumbMap[currentIndex]"
                                          class="main-fallback">
                                       <div>Unable to generate PDF preview.</div>
-                                      <a (click)="openNewTab(activeAttachments[currentIndex])">Open PDF</a>
+                                      <a (click)="openNewTab(activeAttachments[currentIndex])">{{ 'OpenPdf' | localize }}</a>
                                     </div>
                                   </ng-container>
                               
                                   <!-- IMAGE PREVIEW DIALOG -->
-                                  <p-dialog [(visible)]="showImagePreview"
+                                                                    <p-dialog [(visible)]="showImagePreview"
                                             [modal]="true"
                                             [closable]="true"
                                             [dismissableMask]="true"
                                             [draggable]="false"
                                             [resizable]="false"
-                                            [style]="{width: '70vw', maxWidth: '900px'}"
-                                            [contentStyle]="{padding: '0'}">
+                                                                                        styleClass="image-preview-dialog">
                                     <div class="d-flex align-items-center justify-content-center p-3">
                                       <img [src]="previewImageUrl"
-                                           style="max-width: 100%; max-height: 70vh; object-fit: contain;"
+                                                                                     class="preview-image"
                                            (error)="onMainError($event)" />
                                     </div>
                                   </p-dialog>
@@ -287,8 +284,7 @@
                               
                      
                             <div
-                                class="pt-4  mb-5 text-center position-relative"
-                                style="left: 50%; transform: translateX(-50%);"
+                                class="pt-4  mb-5 text-center position-relative variation-center-row"
                                 *ngIf="
                                     appItemForViewDto?.variations[0]
                                         ?.selectedValues?.length > 0
@@ -303,21 +299,20 @@
                                         else nocarousel
                                     "
                                 >
-                                    <div class="col-12 pl-0">
+                                    <div class="col-12 px-0">
                                         <h6 class="header">
                                             {{
                                                 appItemForViewDto?.variations[0]
                                                     .extraAttrName
-                                            }} : {{ selectedValuesName }}
+                                             | localize}} : {{ selectedValuesName }}
                                         </h6>
                                     </div>
-                                    <div class="col-12 pl-0">
+                                    <div class="col-12 px-0">
                                         <div
                                             class="attachImage thin-scroll d-flex justify-content-center"
                                         >
                                             <p-carousel
-                                                [style]="{ width : '430px' }"
-                                                itemstyle="width :77px"
+                                                styleClass="variation-carousel"
                                                 [value]="
                                                     appItemForViewDto
                                                         ?.variations[0]
@@ -415,7 +410,7 @@
 
                                 <ng-template #nocarousel>
                                     <div class="row">
-                                        <div class="col-12 pl-0">
+                                        <div class="col-12 px-0">
                                             <h6 class="header">
                                                 {{
                                                     appItemForViewDto
@@ -424,7 +419,7 @@
                                                 }} : {{ selectedValuesName }}
                                             </h6>
                                         </div>
-                                        <div class="col-12 pl-0">
+                                        <div class="col-12 px-0">
                                             <div
                                                 class="attachImage thin-scroll d-flex justify-content-center"
                                             >
@@ -520,18 +515,19 @@
                         <div
                             class="share-sync my-3 d-flex align-items-center gap-3 justify-content-end w-100"
                         >
-                            <button
+                            <button  *ngIf="tenantOwner == null || tenantOwner === appSession?.tenant?.id"
                                 pButton
                                 pRipple
-                                label="Share"
+                                label="{{'Share' |localize}}"
                                 class="share mr-2"
                                 icon="pi pi-share-alt"
+                               
                                 (click)="openShareProductListingModal()"
                             ></button>
-                            <button
+                            <button  *ngIf="tenantOwner == null || tenantOwner === appSession?.tenant?.id"
                                 pButton
                                 pRipple
-                                label="Sync"
+                                label="{{'Sync' |localize}}"
                                 class="sync"
                                 icon="pi pi-sync"
                                 (click)="syncProduct()"
@@ -540,8 +536,8 @@
                             ></button>
                         </div>
                         <div class="last-updated  my-3 d-flex align-items-center gap-3 justify-content-end w-100">
-                            <p *ngIf="languageSettingName!='en-GB'">  Last Edit  {{lastUpdatedDate |  date: 'MMM d, y, h:mm a':"+timezoneOffset"}} </p>
-                            <p *ngIf="languageSettingName=='en-GB'">  Last Edit  {{lastUpdatedDate |  date: 'd MMM, y, h:mm a':"+timezoneOffset"}} </p>
+                            <p *ngIf="languageSettingName!='en-GB'">  {{'LastEdit' |localize}}  {{lastUpdatedDate |  date: 'MMM d, y, h:mm a':"+timezoneOffset"}} </p>
+                            <p *ngIf="languageSettingName=='en-GB'">  {{'LastEdit' |localize}}  {{lastUpdatedDate |  date: 'd MMM, y, h:mm a':"+timezoneOffset"}} </p>
                         </div>
                         <div class="header">
                             [{{ appItemForViewDto?.code }}]
@@ -556,7 +552,7 @@
                                     appItemForViewDto?.maxPrice
                                 "
                             >
-                                {{  languageSettingName!='en-GB' ? "MSRP"   :  "RRP"  | localize }} :
+                                {{  languageSettingName!='en-GB' ? ("MSRP"  | localize )  :  ("RRP"  | localize) }} :
                                 {{ tenantDefaultCurrency.symbol
                                 }}{{ appItemForViewDto?.minPrice }} -
                                 {{ tenantDefaultCurrency.symbol
@@ -576,11 +572,9 @@
                             </div>
                             <div class="d-flex">
                                 <button
-                                    class="btn btn-primary"
+                                    class="btn btn-primary advanced-pricing-btn"
                                     type="button"
                                     (click)="showAdvancedPricingModal()"
-                                    style="background-color : #4A0D4A !important;
-    border : none !important;"
                                 >
                                     {{ "AdvancedPricing" | localize }}
                                 </button>
@@ -609,9 +603,9 @@
                             </div>
                         </div>
                         <div class="share-level"  >
-                            <span *ngIf="_publishAppItemListingService.sharingStatus === 1 || _publishAppItemListingService.sharingStatus === 2 " > Shared  <div class="shared-dot"></div> </span>
-                            <span *ngIf="_publishAppItemListingService.sharingStatus === 3 " > Private  <div class="private-dot"></div> </span>
-                            <span *ngIf="_publishAppItemListingService.sharingStatus === 4 " > Hidden <div class="hidden-dot"></div> </span>
+                            <span *ngIf="_publishAppItemListingService.sharingStatus === 1 || _publishAppItemListingService.sharingStatus === 2 " > {{'Shared'|localize}}  <div class="shared-dot"></div> </span>
+                            <span *ngIf="_publishAppItemListingService.sharingStatus === 3 " > {{'Private'|localize}}  <div class="private-dot"></div> </span>
+                            <span *ngIf="_publishAppItemListingService.sharingStatus === 4 " > {{'Hidden'|localize}} <div class="hidden-dot"></div> </span>
                         </div>
                         <div
                             *ngIf="productDescription"
@@ -914,6 +908,8 @@
                 </div>
             </div>
         </div>
+
+        
         <div
             [class]="
                 containerClass + ' kt-grid__item kt-grid__item--fluid mt-5'
@@ -940,9 +936,14 @@
                     </div>
 
                     <div *ngIf="appItemForViewDto?.manufacturerCode" class="row">
-                        <h5>Manufacture Code  :</h5>
+                       <h5>{{ "ManufactureCode" | localize }} :</h5>
                         &nbsp;
                         {{ appItemForViewDto?.manufacturerCode }}
+                    </div>
+                     <div *ngIf="appItemForViewDto?.ssin" class="row">
+                       <h5>{{ "SSIN" | localize }} :</h5>
+                        &nbsp;
+                        {{ appItemForViewDto?.ssin }}
                     </div>
                 </div>
             </div>
@@ -1011,6 +1012,8 @@
                 </ng-template>
             </div>
         </div>
+
+
         <div
             [class]="
                 containerClass + ' kt-grid__item kt-grid__item--fluid mt-5'
@@ -1465,135 +1468,6 @@
                     </ng-template>
                 </div>
             </div>
-
-            <div
-            [class]="
-                containerClass + ' kt-grid__item kt-grid__item--fluid mt-5'
-            "
-        >
-            <div class="p-4 recomendedandAdditionalContainer">
-                <div class="row">
-                    <div>
-                        <h6 class="header">
-                            {{ "Additional" | localize }}:
-                        </h6>
-                    </div>
-                    <div class="col text-right">
-                        <a
-                            *ngIf="showLessAdditional"
-                            (click)="showAdditional()"
-                            class="seeMore upArrow"
-                        >
-                            {{ "Showless" | localize }}</a
-                        >
-                        <a
-                            *ngIf="showMoreAdditional"
-                            (click)="showAdditional()"
-                            class="seeMore downArrow"
-                        >
-                            {{ "showmore" | localize }}</a
-                        >
-                    </div>
-                </div>
-                <div
-                    class="recomendedandAdditionalData details pt-4"
-                    [ngClass]="{ 'thin-scroll': scrollAdditional }"
-                    [ngStyle]="{
-                        'overflow-y': scrollAdditional
-                            ? 'scroll'
-                            : 'hidden',
-                        height: scrollAdditional
-                            ? maxContainerHeight + 'px'
-                            : 'auto'
-                    }"
-                    *ngIf="
-                        appItemForViewDto?.additional.length > 0;
-                        else noAdditional
-                    "
-                >
-                    <div
-                        class="row details pl-3"
-                        *ngFor="
-                            let _additional of appItemForViewDto?.additional
-                        "
-                    >
-                        <h5>{{ _additional.extraAttrName }}:&nbsp;</h5>
-                        <div
-                            *ngFor="
-                                let selectedValue of _additional.selectedValues;
-                                index as i
-                            "
-                            class="row"
-                        >
-                            <span [ngClass]="i == 0 ? 'pl-3' : 'pl-4'">
-                                <div
-                                    *ngIf="
-                                        _additional.extraAttrDataType.toUpperCase() ==
-                                            'STRING' ||
-                                        _additional.extraAttrDataType.toUpperCase() ==
-                                            'NUMERIC'
-                                    "
-                                >
-                                    {{ selectedValue.value }}
-                                </div>
-                                <div
-                                    *ngIf="
-                                        _additional.extraAttrDataType.toUpperCase() ==
-                                            'BOOLEAN' ||
-                                        _additional.extraAttrDataType.toUpperCase() ==
-                                            'BIT'
-                                    "
-                                >
-                                    <div
-                                        *ngIf="
-                                            selectedValue.value.toUpperCase() ==
-                                            'TRUE'
-                                        "
-                                    >
-                                        <i class="fa fa-1x fa-check"></i>
-                                    </div>
-                                    <div
-                                        *ngIf="
-                                            selectedValue.value.toUpperCase() ==
-                                            'FALSE'
-                                        "
-                                    >
-                                        <i class="fa fa-1x fa-times"></i>
-                                    </div>
-                                </div>
-                                <div
-                                    *ngIf="
-                                        _additional.extraAttrDataType.toUpperCase() ==
-                                        'DATETIME'
-                                    "
-                                >
-                                    {{ selectedValue.value | date }}
-                                </div>
-                            </span>
-                            <span
-                                *ngIf="
-                                    i !=
-                                    _additional.selectedValues.length - 1
-                                "
-                                class="details"
-                            >
-                                ,&nbsp;</span
-                            >
-                        </div>
-                        <br />
-                    </div>
-                </div>
-                <ng-template #noAdditional>
-                    <div class="col-md-12 pb-3 pt-2 text-center">
-                        <p>
-                            {{
-                                "NoAdditionalAtrributesSelected" | localize
-                            }}
-                        </p>
-                    </div>
-                </ng-template>
-            </div>
-        </div>
         </div>
     </div>
 </div>

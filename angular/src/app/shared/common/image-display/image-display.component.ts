@@ -1,4 +1,4 @@
-import { Component, Input, OnInit, SimpleChanges } from '@angular/core';
+import { Component, HostBinding, Input, OnInit, SimpleChanges } from '@angular/core';
 import { SycAttachmentCategoryDto } from '@shared/service-proxies/service-proxies';
 
 @Component({
@@ -7,6 +7,16 @@ import { SycAttachmentCategoryDto } from '@shared/service-proxies/service-proxie
     styleUrls: ['./image-display.component.scss']
 })
 export class ImageDisplayComponent {
+    @HostBinding('style.width')
+    get hostWidth(): string | null {
+        return this.staticWidth ? `${this.staticWidth}px` : null;
+    }
+
+    @HostBinding('style.height')
+    get hostHeight(): string | null {
+        return this.staticHeight ? `${this.staticHeight}px` : null;
+    }
+
     @Input() image : string
     @Input() sycAttachmentCategory : SycAttachmentCategoryDto
     @Input() staticWidth:number

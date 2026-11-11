@@ -1,6 +1,7 @@
 import {
   Component, EventEmitter, Injector, OnInit, Output, ViewChild
   , ViewChildren, QueryList, ViewContainerRef, ComponentFactoryResolver,
+  ComponentRef,
 } from '@angular/core';
 import { AppComponentBase } from '@shared/common/app-component-base';
 import { AppEntitiesServiceProxy, AppMarketplaceItemsServiceProxy, AppTransactionServiceProxy, CurrencyInfoDto, GetAccountInformationOutputDto, GetAllEntityObjectTypeOutput, GetAppMarketItemForViewDto, GetAppMarketplaceItemDetailForViewDto, GetAppTransactionsForViewDto, GetOrderDetailsForViewDto, LookupLabelDto, PagedResultDtoOfGetAccountInformationOutputDto, SycEntityObjectTypesServiceProxy, TenantTransactionInfo, TransactionPosition, TransactionType, ValidateTransaction } from '@shared/service-proxies/service-proxies';
@@ -11,7 +12,7 @@ import { TreeNode } from 'primeng/api';
 import { Router } from '@angular/router';
 import { TransactionCartMode } from "../../../enums/TransactionCartMode";
 import { UserClickService } from '@shared/utils/user-click.service';
-import { finalize } from 'rxjs';
+import { finalize, firstValueFrom } from 'rxjs';
 import { CommentParentComponent } from '@app/main/interactions/components/comment-parent/comment-parent.component';
 import { ProductCatalogueReportParams } from '@app/main/app-items/appitems-catalogue-report/models/product-Catalogue-Report-Params';
 import { ReportViewerComponent } from '@app/main/dev-express-demo/reportviewer/report-viewer.component';
@@ -142,6 +143,7 @@ export class TransactionInformationComponent
   isAuthenticated = this.appSession?.user
   orderAmount:number =0;
   totalCharges:number =0;
+  mobileTab: 'details' | 'summary' | 'chats' | 'actions' = 'details';
   constructor(
     injector: Injector,
     private _AppTransactionServiceProxy: AppTransactionServiceProxy,
@@ -1286,35 +1288,132 @@ loadCommentsList() {
 
     }
   }
+// private addCacheBuster(url: string): string {
+//   const separator = url.includes('?') ? '&' : '?';
+//   return `${url}${separator}v=${Date.now()}`;
+// }
+private preparePrintUrl(url: string): string {
+  // convert \ to /
+  const cleanUrl = url.replace(/\\/g, '/');
 
-  printTransaction() {
+  // force latest file (avoid cached old PDF)
+  const separator = cleanUrl.includes('?') ? '&' : '?';
 
-    this._AppTransactionServiceProxy.isOrderConfirmationNeedsReprint(this.orderId)
-      .subscribe((res) => {
-        if (res == true) {
-
-          this.showMainSpinner()
-          this.onGeneratOrderReport(true, undefined, true, false, true)
+  return `${cleanUrl}${separator}v=${Date.now()}`;
+}
 
 
-        } else {
-          this._AppTransactionServiceProxy.getTransactionOrderConfirmationUrl(this.orderId)
-            .pipe(
-              finalize(() => {
 
-              })
-            )
-            .subscribe((res) => {
-              var page = window.open(res);
-              page.print();
-            }
+private delay(ms: number) { return new Promise<void>(r => setTimeout(r, ms)); }
 
-            );
+private startReportForPrint(): Promise<ComponentRef<ReportViewerComponent>> {
+  return new Promise((resolve, reject) => {
+    this.printInfoParam = new ProductCatalogueReportParams();
+    this.printInfoParam.reportTemplateName = this.transactionReportTemplateName;
+    this.printInfoParam.TransactionId = this.orderId.toString();
+    this.printInfoParam.saveToPDF = true;
+    this.printInfoParam.tenantId = this.appSession?.tenantId;
+    this.printInfoParam.userId = this.appSession?.userId;
 
-        }
+    this._AppTransactionServiceProxy
+      .getTenantRoleInTransaction(this.orderId, this.appTransactionsForViewDto.tenantId)
+      .subscribe({
+        next: (res) => {
+          this.printInfoParam.orderConfirmationRole = res.contactRole ? this.getTransactionRole(res.contactRole) : 'Buyer';
+          this.printInfoParam.contactName = res.contactName ?? '';
+          this.printInfoParam.contactEmail = res.contactEmail ?? '';
+          this.printInfoParam.contactPhoneNumber = res.contactPhoneNumber ?? '';
+          this.reportUrl = this.printInfoParam.getReportUrl();
+
+          const ref = this.createReportViewer();
+          resolve(ref);
+        },
+        error: reject
       });
+  });
+}
 
+private waitForDocumentReady(viewer: ReportViewerComponent, timeoutMs = 60000): Promise<void> {
+  return new Promise((resolve, reject) => {
+    const timer = setTimeout(() => {
+      sub.unsubscribe();
+      reject(new Error('Report generation timeout'));
+    }, timeoutMs);
+
+    const sub = viewer.documentReady.subscribe(() => {
+      clearTimeout(timer);
+      sub.unsubscribe();
+      resolve();
+    });
+  });
+}
+
+async printTransaction(): Promise<void> {
+  const printWindow = window.open('', '_blank');
+  if (!printWindow) { console.error('Popup blocked.'); return; }
+
+  printWindow.document.write('<p>Preparing print preview...</p>');
+  printWindow.document.close();
+  this.showMainSpinner();
+
+  let viewerRef: ComponentRef<ReportViewerComponent>;
+  try {
+    viewerRef = await this.startReportForPrint();            // BE call succeeded, viewer created
+    await this.waitForDocumentReady(viewerRef.instance);     // report rendered and saved
+    await this.delay(2000);                                  // let the link refresh
+
+    const url = (await firstValueFrom(
+      this._AppTransactionServiceProxy.getTransactionOrderConfirmationUrl(this.orderId)
+    ))?.trim();
+
+    if (!url) throw new Error('Empty url');
+    printWindow.location.href = this.preparePrintUrl(url);
+  } catch (e) {
+    console.error(e);
+    printWindow.document.body.innerHTML = '<p>Print file is not ready. Please try again.</p>';
+  } finally {
+    viewerRef?.destroy();   // stops this viewer's DXXRDV calls
+    this.hideMainSpinner();
   }
+}
+
+// async printTransaction(): Promise<void> {
+//   const printWindow = window.open('', '_blank');
+
+//   if (!printWindow) {
+//     console.error('Popup blocked.');
+//     return;
+//   }
+
+//   printWindow.document.write('<p>Preparing print preview...</p>');
+//   printWindow.document.close();
+
+//   this.showMainSpinner();
+
+//   // start generate report
+//   this.onGeneratOrderReport(true, undefined, true, false, false);
+
+//   // wait for backend generation
+//   setTimeout(() => {
+
+//     this._AppTransactionServiceProxy
+//       .getTransactionOrderConfirmationUrl(this.orderId)
+//       .pipe(finalize(() => this.hideMainSpinner()))
+//       .subscribe((url: string) => {
+
+//         if (!url || !url.trim()) {
+//           printWindow.document.body.innerHTML =
+//             '<p>Print file is not ready. Please try again.</p>';
+//           return;
+//         }
+
+//         // open fresh updated PDF
+//         printWindow.location.href = this.preparePrintUrl(url);
+
+//       });
+
+//   }, 11000); // wait 10 sec for generation
+// }
 
   onShareTransaction() {
     this.onshare = true;
@@ -1327,6 +1426,12 @@ loadCommentsList() {
       this.reportUrl = "";
       if (printInfoParam) {
         this.printInfoParam = printInfoParam;
+        this.reportUrl = this.printInfoParam.getReportUrl();
+        this.createReportViewer();
+
+        if (refreshData) {
+          this.getShoppingCartData();
+        }
       } else {
         this.printInfoParam = new ProductCatalogueReportParams();
         this.printInfoParam.reportTemplateName = this.transactionReportTemplateName;
@@ -1338,8 +1443,10 @@ loadCommentsList() {
 
         // Asynchronous handling for setting orderConfirmationRole
         this._AppTransactionServiceProxy.getTenantRoleInTransaction(this.orderId, this.appTransactionsForViewDto.tenantId).subscribe((res) => {
-          this.printInfoParam.orderConfirmationRole = res.contactRole ? res.contactRole : 'buyer';
-          this.printInfoParam.contactName = res.contactName ? res.contactName : 'Savty';
+          this.printInfoParam.orderConfirmationRole = res.contactRole ? this.getTransactionRole(res.contactRole) : 'Buyer';
+          this.printInfoParam.contactName = res.contactName ?? '';
+          this.printInfoParam.contactEmail = res.contactEmail ?? '';
+          this.printInfoParam.contactPhoneNumber = res.contactPhoneNumber ?? '';
 
 
 
@@ -1390,8 +1497,10 @@ loadCommentsList() {
           const printInfoParam = new ProductCatalogueReportParams();
 
           // Set fetched data
-          printInfoParam.orderConfirmationRole = res.contactRole;
+          printInfoParam.orderConfirmationRole = this.getTransactionRole(res.contactRole);
           printInfoParam.contactName = res.contactName;
+          printInfoParam.contactEmail = res.contactEmail;
+          printInfoParam.contactPhoneNumber = res.contactPhoneNumber;
           printInfoParam.reportTemplateName = this.transactionReportTemplateName;
           printInfoParam.saveToPDF = true;
           printInfoParam.userId = this.appSession?.userId;
@@ -1407,32 +1516,44 @@ loadCommentsList() {
   }
 
 
-  createReportViewer() {
-    // Resolve the factory for ReportViewerComponent
-    const factory = this.componentFactoryResolver.resolveComponentFactory(ReportViewerComponent);
+  // createReportViewer() {
+  //   // Resolve the factory for ReportViewerComponent
+  //   const factory = this.componentFactoryResolver.resolveComponentFactory(ReportViewerComponent);
 
-    // Create a new container for the report viewer
-    const containerRef = this.reportViewerContainer.createComponent(factory);
+  //   // Create a new container for the report viewer
+  //   const containerRef = this.reportViewerContainer.createComponent(factory);
 
-    // Ensure the containerRef is valid
-    if (!containerRef) {
-      console.error("Failed to create reportViewerContainer.");
-      return;
-    }
+  //   // Ensure the containerRef is valid
+  //   if (!containerRef) {
+  //     console.error("Failed to create reportViewerContainer.");
+  //     return;
+  //   }
 
-    // Set input properties for the container
-    const instance = containerRef.instance as ReportViewerComponent;
-    instance.reportUrl = this.reportUrl;
-    instance.invokeAction = this.invokeAction;
+  //   // Set input properties for the container
+  //   const instance = containerRef.instance as ReportViewerComponent;
+  //   instance.reportUrl = this.reportUrl;
+  //   instance.invokeAction = this.invokeAction;
 
-    // Add a class to hide the component initially
-    const containerNativeElement = containerRef.location.nativeElement as HTMLElement;
-    if (containerNativeElement) {
-      containerNativeElement.classList.add('d-none');
-    } else {
-      console.error("Native element of reportViewerContainer is not available.");
-    }
-  }
+  //   // Add a class to hide the component initially
+  //   const containerNativeElement = containerRef.location.nativeElement as HTMLElement;
+  //   if (containerNativeElement) {
+  //     containerNativeElement.classList.add('d-none');
+  //   } else {
+  //     console.error("Native element of reportViewerContainer is not available.");
+  //   }
+  // }
+
+  createReportViewer(): ComponentRef<ReportViewerComponent> {
+  const factory = this.componentFactoryResolver.resolveComponentFactory(ReportViewerComponent);
+  const containerRef = this.reportViewerContainer.createComponent(factory);
+
+  const instance = containerRef.instance;
+  instance.reportUrl = this.reportUrl;
+  instance.invokeAction = this.invokeAction;
+
+  containerRef.location.nativeElement.classList.add('d-none');
+  return containerRef;
+}
   getProductDetailsForView(id: any) {
     this.appTransactionsForViewDto.transactionType == 0 ? this.orderType = 'SO' : this.orderType = 'PO'
     this.showMainSpinner();
@@ -1822,6 +1943,7 @@ loadCommentsList() {
     this.appTransactionsForViewDto.completeDate = moment.utc(moment(completeDate).format('YYYY-MM-DD'));
   }
 
+  
 
 
   automaticShare() {

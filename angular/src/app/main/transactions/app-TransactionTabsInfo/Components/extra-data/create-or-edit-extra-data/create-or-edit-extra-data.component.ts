@@ -54,7 +54,7 @@ export class CreateOrEditExtraDataComponent extends AppComponentBase implements 
 
   ngOnInit(): void {
     if (this.appTransactionsForViewDto) {
-      this.oldappTransactionsForViewDto = JSON.parse(JSON.stringify(this.appTransactionsForViewDto)); // ✅ add this
+      this.oldappTransactionsForViewDto = JSON.parse(JSON.stringify(this.appTransactionsForViewDto)); 
 
     }
     this.mapDataToForm();

@@ -717,8 +717,8 @@ margin-right: 6px;"></i>
                             </div>
                             <br />
 
-                            <div class="message-data position-relative">
-                                <span class="dateMsg" [ngStyle]="isArabic ? {'left':'0'} : {'right':'0'}">
+                            <div class="message-data position-relative d-flex justify-content-end">
+                                <span class="dateMsg">
                                     {{ messagedetail?.messages?.sendDate | date:'hh:mm a, MM/dd/yyyy' }}
                                 </span>
                             </div>
@@ -729,6 +729,54 @@ margin-right: 6px;"></i>
                                 [ngClass]="longmsgId == messagedetail?.messages?.id || messagesDetails?.length == 1 ? '' : 'long-msg'">
                             </span>
                             <br />
+                     <div
+    class="message-attachments"
+    *ngIf="messagedetail?.messages?.entityAttachments?.length">
+
+    <div
+        class="message-attachment-card"
+        *ngFor="let item of messagedetail.messages.entityAttachments"
+       (click)="downloadAttachment(item)">
+
+        <!-- Image -->
+        <img
+            *ngIf="isImageFile(item.fileName)"
+            class="message-attachment-img"
+            [src]="attachmentBaseUrl + '/' + item.url" />
+
+        <!-- PDF -->
+        <img
+            *ngIf="isPdfFile(item.fileName)"
+            class="message-attachment-icon"
+            src="assets/message/adobe.svg" />
+
+        <!-- Excel -->
+        <img
+            *ngIf="isExcelFile(item.fileName)"
+            class="message-attachment-icon"
+            src="assets/message/excel.svg" />
+
+        <!-- Word -->
+        <img
+            *ngIf="isWordFile(item.fileName)"
+            class="message-attachment-icon"
+            src="assets/message/word.svg" />
+
+        <!-- PowerPoint -->
+        <img
+            *ngIf="isPowerPointFile(item.fileName)"
+            class="message-attachment-icon"
+            src="assets/message/powerpoint.png" />
+
+        <!-- Other -->
+        <img
+            *ngIf="isOtherFile(item.fileName)"
+            class="message-attachment-icon"
+            src="assets/message/document.png" />
+
+    
+    </div>
+</div>
                             <span
                                 [innerHTML]="truncateContent(messagedetail?.messages?.bodyFormat, messagedetail?.messages?.id)"
                                 class="msg-bodyformat word-preW">
@@ -744,7 +792,13 @@ margin-right: 6px;"></i>
                             <br />
 
                         </div>
-                        <div class="btns-replay" *ngIf="messageCategoryFilter!=='MENTION'">
+                        <div class="btns-replay" *ngIf="
+        messageCategoryFilter === 'MESSAGE' ||
+        (
+            messageCategoryFilter === 'THREAD' &&
+            selectedThreadIsMessage
+        )
+    ">
                             <button (click)="onReplyMessage($event)" class="ReplyBtn btn ">
                                 <i class="fa fa-reply"></i>
                                 <span> {{ "Reply" | localize }}</span>
@@ -762,7 +816,13 @@ margin-right: 6px;"></i>
                                     }}</span>
                             </button>
                         </div>
-                        <app-add-comment [hidden]="messageCategoryFilter!=='MENTION'" [cartStyle]="true"
+                        <app-add-comment  *ngIf="
+        (
+            messageCategoryFilter === 'THREAD' ||
+            messageCategoryFilter === 'MENTION'
+        ) &&
+        selectedThreadIsComment
+    " [cartStyle]="true"
                             (saveDone)="newCommentAddedHandler($event)"
                             [relatedEntityId]="messagesDetails[0]?.messages?.entityId" #AddCommentComponent>
                         </app-add-comment>
@@ -823,6 +883,53 @@ margin-right: 6px;"></i>
                     ">
                         </span>
                         <br />
+                      <div
+    class="message-attachments"
+    *ngIf="messagedetail?.messages?.entityAttachments?.length">
+
+    <div
+        class="message-attachment-card"
+        *ngFor="let item of messagedetail.messages.entityAttachments"
+         (click)="downloadAttachment(item)">
+
+        <!-- Image -->
+        <img
+            *ngIf="isImageFile(item.fileName)"
+            class="message-attachment-img"
+            [src]="attachmentBaseUrl + '/' + item.url" />
+
+        <!-- PDF -->
+        <img
+            *ngIf="isPdfFile(item.fileName)"
+            class="message-attachment-icon"
+            src="assets/message/adobe.svg" />
+
+        <!-- Excel -->
+        <img
+            *ngIf="isExcelFile(item.fileName)"
+            class="message-attachment-icon"
+            src="assets/message/excel.svg" />
+
+        <!-- Word -->
+        <img
+            *ngIf="isWordFile(item.fileName)"
+            class="message-attachment-icon"
+            src="assets/message/word.svg" />
+
+        <!-- PowerPoint -->
+        <img
+            *ngIf="isPowerPointFile(item.fileName)"
+            class="message-attachment-icon"
+            src="assets/message/powerpoint.png" />
+
+        <!-- Other -->
+        <img
+            *ngIf="isOtherFile(item.fileName)"
+            class="message-attachment-icon"
+            src="assets/message/document.png" />
+
+    </div>
+</div>
                         <span
                             [innerHTML]="truncateContent(messagedetail.messages.bodyFormat, messagedetail.messages.id)"
                             class="msg-bodyformat word-preW">
@@ -916,7 +1023,13 @@ margin-right: 6px;"></i>
 
 
 
-                    <div class="btns-replay" *ngIf="messageCategoryFilter!=='MENTION'">
+                    <div class="btns-replay" *ngIf="
+        messageCategoryFilter === 'MESSAGE' ||
+        (
+            messageCategoryFilter === 'THREAD' &&
+            selectedThreadIsMessage
+        )
+    ">
                         <button (click)="onReplyMessage($event)" class="ReplyBtn btn ">
                             <i class="fa fa-reply"></i>
                             <span> {{ "Reply" | localize }}</span>
@@ -934,7 +1047,13 @@ margin-right: 6px;"></i>
                                 }}</span>
                         </button>
                     </div>
-                    <app-add-comment [hidden]="messageCategoryFilter!=='MENTION'" [cartStyle]="true"
+                    <app-add-comment  *ngIf="
+        (
+            messageCategoryFilter === 'THREAD' ||
+            messageCategoryFilter === 'MENTION'
+        ) &&
+        selectedThreadIsComment
+    " [cartStyle]="true"
                         (saveDone)="newCommentAddedHandler($event)"
                         [relatedEntityId]="messagesDetails[0]?.messages?.entityId" #AddCommentComponent>
                     </app-add-comment>
@@ -1120,7 +1239,54 @@ margin-right: 6px;"></i>
                     ">
                         </span>
                         <br />
+<div
+    class="message-attachments"
+    *ngIf="messagedetail?.messages?.entityAttachments?.length">
 
+    <div
+        class="message-attachment-card"
+        *ngFor="let item of messagedetail.messages.entityAttachments"
+         (click)="downloadAttachment(item)">
+
+        <!-- Image -->
+        <img
+            *ngIf="isImageFile(item.fileName)"
+            class="message-attachment-img"
+            [src]="attachmentBaseUrl + '/' + item.url" />
+
+        <!-- PDF -->
+        <img
+            *ngIf="isPdfFile(item.fileName)"
+            class="message-attachment-icon"
+            src="assets/message/adobe.svg" />
+
+        <!-- Excel -->
+        <img
+            *ngIf="isExcelFile(item.fileName)"
+            class="message-attachment-icon"
+            src="assets/message/excel.svg" />
+
+        <!-- Word -->
+        <img
+            *ngIf="isWordFile(item.fileName)"
+            class="message-attachment-icon"
+            src="assets/message/word.svg" />
+
+        <!-- PowerPoint -->
+        <img
+            *ngIf="isPowerPointFile(item.fileName)"
+            class="message-attachment-icon"
+            src="assets/message/powerpoint.png" />
+
+        <!-- Other -->
+        <img
+            *ngIf="isOtherFile(item.fileName)"
+            class="message-attachment-icon"
+            src="assets/message/document.png" />
+
+       
+    </div>
+</div>
                         <span
                             [innerHTML]="truncateContent(messagedetail.messages.bodyFormat, messagedetail.messages.id)"
                             class="msg-bodyformat word-preW">
@@ -1201,7 +1367,13 @@ margin-right: 6px;"></i>
 
 
 
-                    <div class="btns-replay" *ngIf="messageCategoryFilter!=='MENTION'">
+                    <div class="btns-replay" *ngIf="
+        messageCategoryFilter === 'MESSAGE' ||
+        (
+            messageCategoryFilter === 'THREAD' &&
+            selectedThreadIsMessage
+        )
+    ">
                         <button (click)="onReplyMessage($event)" class="ReplyBtn btn ">
                             <i class="fa fa-reply"></i>
                             <span> {{ "Reply" | localize }}</span>
@@ -1219,7 +1391,13 @@ margin-right: 6px;"></i>
                                 }}</span>
                         </button>
                     </div>
-                    <app-add-comment [hidden]="messageCategoryFilter!=='MENTION'" [cartStyle]="true"
+                    <app-add-comment  *ngIf="
+        (
+            messageCategoryFilter === 'THREAD' ||
+            messageCategoryFilter === 'MENTION'
+        ) &&
+        selectedThreadIsComment
+    " [cartStyle]="true"
                         (saveDone)="newCommentAddedHandler($event)"
                         [relatedEntityId]="messagesDetails[0]?.messages?.entityId" #AddCommentComponent>
                     </app-add-comment>
@@ -1238,7 +1416,10 @@ margin-right: 6px;"></i>
 
 </div>
 
-<SendMessageModal [modalView]="true" #SendMessageModal (modalSave)="selectMessagetype(1, l('Inbox'))">
+<SendMessageModal
+    [modalView]="true"
+    #SendMessageModal
+    (modalSave)="refreshSelectedMessage()">
 </SendMessageModal>
 <confirm-modal [content1]="l('Are you sure?')" [content2]="l('Are you sure to remove this message?')"
     [buttonYes]="l('Yes,Remove')" [buttonNo]="l('CancelAction')" [display]="displayDeleteMessage"

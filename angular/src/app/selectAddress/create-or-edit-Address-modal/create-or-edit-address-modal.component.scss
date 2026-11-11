@@ -119,9 +119,9 @@
     padding: 15px 15px 80px;
 }
 
-.modal-body {
-    margin-top: 74px;
-}
+// .modal-body {
+//     margin-top: 74px;
+// }
 
 /*Right*/
 .modal.right.fade .modal-dialog {
@@ -153,7 +153,7 @@
 .aria-select {
     height: 40px !important;
     background-color: #F3F6F9 !important;
-    border: none;
+    // border: none;
     border-radius: 5px;
 }
 
@@ -349,4 +349,8 @@
   .side-modal {
     width: 75%;
   }
+}
+
+.p-10 {
+    padding: 10px;
 }

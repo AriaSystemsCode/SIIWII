@@ -2,7 +2,7 @@
     <img class="catalogue-template-card-image mb-2" [src]="attachmentBaseUrl + '/' + template?.sycReport?.imgUrl" alt="" >
     <div class="align-items-baseline d-flex justify-content-start p-2">
         <input type="radio" class="mr-1" [value]="template.sycReport.name" [(ngModel)]="printInfoParam.reportTemplateName" name="template" id="template_{{index}}">
-        <div class="font-weight-bolder text-black" style="word-wrap: break-word;">
+        <div class="font-weight-bolder text-black template-text-wrap">
             <p class="m-0 title">{{ formattedDescription[0] }}</p>
 <ul class="p-0 desc">
   <li *ngFor="let item of formattedDescription.slice(1)" class="text-left">{{ item }}</li>

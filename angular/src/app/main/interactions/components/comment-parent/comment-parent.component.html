@@ -33,7 +33,7 @@
         #AddCommentComponent>
     </app-add-comment>
 
-    <SendMessageModal [entityId]="entityId" [parentId]="parentId" [toName]="toName"
+    <SendMessageModal [entityId]="entityId" [parentId]="parentId"   [toUser]="toUser"
         *ngIf="(!showRegularComment&&addNewThread||!addNewThread&&commentType=='MESSAGE'&&showDirectMessageComp) "
         #SendMessageModal [modalView]="false" (modalSave)="saveNewDirectMsg()" (refresh)="refreshAfterSave($event)">
     </SendMessageModal>

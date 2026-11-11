@@ -77,6 +77,7 @@ export class AppItemsViewComponent
 
     @Input() productId: number = 0;
     @Input() appItemViewInput: AppItemViewInput;
+    @Input() tenantOwner
     appItemForViewDto: AppItemForViewDto;
     actionsMenuFlags: AppItemsBrowseComponentActionsMenuFlags =
         new AppItemsBrowseComponentActionsMenuFlags();
@@ -803,6 +804,7 @@ previewImageUrl = '';
                     undefined,
                     undefined,
                     undefined,
+                    undefined,
                     this.skipClassificationCount,
                     this.maxClassificationCount
                 )
@@ -1057,7 +1059,7 @@ previewImageUrl = '';
             this._appItemsServiceProxy
                 .getAppItemPrice(
                     this.productId,
-                    this.level,
+                    this.level =='RRP' ? 'MSRP' : this.level,
                     currentCurrency.code,
                     attributeId,
                     this.selectedValuesName
@@ -1130,7 +1132,23 @@ previewImageUrl = '';
         console.log(">> listing");
         const listingId: number = this.productId;
         const alreadyPublished: boolean = true;
+        const currentSharingStatus = this._publishAppItemListingService.productId === this.productId &&
+            this._publishAppItemListingService.sharingStatus !== undefined &&
+            this._publishAppItemListingService.sharingStatus !== null
+                ? this._publishAppItemListingService.sharingStatus
+                : this.appItemForViewDto.sharingLevel;
+
+        this._publishAppItemListingService.subscribersNumber =
+            this.appItemForViewDto.numberOfSubscribers;
+        this._publishAppItemListingService.sharingStatus = currentSharingStatus;
+        this._publishAppItemListingService.itemSharing =
+            this.appItemForViewDto.itemSharing;
+        this._publishAppItemListingService.productId = this.productId;
+        this._publishAppItemListingService.screen = 1;
+
         const successCallBack = () => {
+            this.appItemForViewDto.sharingLevel = this._publishAppItemListingService.sharingStatus;
+            this.appItemForViewDto.itemSharing = this._publishAppItemListingService.itemSharing;
             this.notify.success(this.l("PublishedSuccessfully"));
             // this.eventTriggered.emit({
             //     event: AppItemBrowseEvents.PublishListing,
@@ -1144,14 +1162,6 @@ previewImageUrl = '';
             successCallBack,
             optinalData
         );
-        this._publishAppItemListingService.subscribersNumber =
-            this.appItemForViewDto.numberOfSubscribers;
-            this._publishAppItemListingService.sharingLevel =
-            this.appItemForViewDto.sharingLevel;
-            this._publishAppItemListingService.itemSharing =
-            this.appItemForViewDto.itemSharing;
-        this._publishAppItemListingService.productId = this.productId;
-        this._publishAppItemListingService.screen = 1
     }
     btnLoader: boolean = false;
     syncProduct() {

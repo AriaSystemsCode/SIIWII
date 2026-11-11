@@ -300,6 +300,7 @@ namespace onetouch
 
             configuration.CreateMap<AppItemForViewDto, AppItem>();
             configuration.CreateMap<AppItem, AppItemForViewDto>()
+                .ForMember(d => d.SSIN, s => s.MapFrom(ss => ss.SSIN))
                 //.ForMember(d => d.EntityCategories, s => s.MapFrom(ss => ss.EntityFk.EntityCategories.Where(x => x.EntityObjectCategoryFk.TenantId != null)))
                 //.ForMember(d => d.EntityDepartments, s => s.MapFrom(ss => ss.EntityFk.EntityCategories.Where(x => x.EntityObjectCategoryFk.TenantId == null)))
                 //.ForMember(d => d.EntityClassifications, s => s.MapFrom(ss => ss.EntityFk.EntityClassifications))
@@ -429,6 +430,7 @@ namespace onetouch
                 .ForMember(d => d.EntityCategories, s => s.MapFrom(ss => ss.EntityFk.EntityCategories))
                 .ForMember(d => d.EntityClassifications, s => s.MapFrom(ss => ss.EntityFk.EntityClassifications))
                 .ForMember(d => d.EntityExtraData, s => s.MapFrom(ss => ss.EntityFk.EntityExtraData))
+                .ForMember(d => d.Notes, s => s.MapFrom(ss => ss.EntityFk.Notes))
                 ;
 
             //AppMarketplaceContact
@@ -459,7 +461,8 @@ namespace onetouch
             configuration.CreateMap<AppMarketplaceContact, AppContact>()
             .ForMember(d => d.AppContactAddresses, s => s.MapFrom(ss => ss.ContactAddresses));
             configuration.CreateMap<AppContact, AppMarketplaceContact>()
-                .ForMember(d => d.ContactAddresses, s => s.MapFrom(ss => ss.AppContactAddresses));
+                .ForMember(d => d.ContactAddresses, s => s.MapFrom(ss => ss.AppContactAddresses))
+                .ForMember(d=>d.Id, s=>s.Ignore());
 
             configuration.CreateMap<AppContactAddressDto, AppMarketplaceContactAddress>().ReverseMap();
 
@@ -1189,7 +1192,9 @@ namespace onetouch
             configuration.CreateMap<AppMarketplaceContact, CreateOrEditAccountInfoDto>()
               .ForMember(a => a.Name, b => b.MapFrom(ent => ent.Name))
               .ForMember(a => a.EntityExtraData, b => b.MapFrom(ent => ent.EntityExtraData))
-              .ForMember(a => a.EntityAttachments, b => b.MapFrom(ent => ent.EntityAttachments));
+              .ForMember(a => a.EntityAttachments, b => b.MapFrom(ent => ent.EntityAttachments))
+              .ForMember(a => a.Notes, b => b.MapFrom(ent => ent.Notes))
+              ;
             //I40[End]
             //I49{Start}
             configuration.CreateMap<AppContactRelationshipInfo, AppContactRelationshipInfoDto>();

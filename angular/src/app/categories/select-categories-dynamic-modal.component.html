@@ -8,7 +8,7 @@
             </p>
         </h4>
         <button
-            style="position: absolute; right: 0; top: 8px"
+            style="position: absolute;  top: 8px" [ngClass]="isArabic ? 'closeIcon-ar':'closeIcon-en'"
             type="button"
             class="close"
             (click)="close()"

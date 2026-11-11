@@ -166,7 +166,11 @@ export class AppItemListListComponent extends AppComponentBase implements OnInit
     printList($event,item: GetAppItemsListForViewDto): void {
         if(item.appItemsList.itemsCount === 0 ) return this.notify.error(this.l("NoListingsInThisProductList.CannotPrint."))
 
-        this._router.navigate(['app/main/linesheet/print',item.appItemsList.id])
+        this._router.navigate(['app/main/linesheet/print', item.appItemsList.id], {
+            queryParams: {
+                isMarketplaceList: this.mainFilterCtrl.value.value !== ItemsListFilterTypesEnum.MyItemsList
+            }
+        })
     }
 
     exportToExcel(): void {

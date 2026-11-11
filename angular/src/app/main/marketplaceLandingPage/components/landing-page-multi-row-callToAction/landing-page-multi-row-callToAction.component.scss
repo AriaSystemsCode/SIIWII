@@ -1,35 +1,73 @@
-.products-grid-mixed {
-  display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
-  gap: 0.75rem;
+
+.products-grid-mixed,
+.products-grid-single {
+    display: grid;
+    grid-template-columns: repeat(4, minmax(0, 1fr));
+    gap: 12px;
+    width: 100%;
+    align-items: start;
 }
 
+.products-grid-mixed,
 .products-grid-single {
-  display: grid;
-      grid-template-columns: repeat(auto-fit, minmax(310px, 1fr));
-  gap: 0.75rem;
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+    gap: 12px;
+    width: 100%;
 }
 
 .product-col {
-  height: 100%;
-  max-width: 410px;
+    flex: 0 0 calc((100% - 36px) / 4);
+    max-width: calc((100% - 36px) / 4);
+    min-width: 0;
 }
 
+/* Tablet: 2 blocks per row */
+@media (max-width: 992px) {
+    .product-col {
+        flex-basis: calc((100% - 12px) / 2);
+        max-width: calc((100% - 12px) / 2);
+    }
+}
+
+/* Mobile: 1 block per row */
+@media (max-width: 575px) {
+    .product-col {
+        flex-basis: 100%;
+        max-width: 100%;
+    }
+}
 
 .block-card {
-  // background: #ffffff;
-  border-radius: 12px;
-  border: 1px solid #ebedf2;
-  box-sizing: border-box;
-
-  padding: 0;         
+    width: 100%;
+    border-radius: 12px;
+    border: 1px solid #ebedf2;
+    box-sizing: border-box;
+    padding: 0;
+    position: relative;
 }
+
 .block-card-mixed {
-  height: 200px;
-  overflow: hidden;
-
+    height: 200px;
+    overflow: hidden;
 }
 
+/* Tablet */
+@media (max-width: 992px) {
+    .products-grid-mixed,
+    .products-grid-single {
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+    }
+}
+
+/* Mobile */
+@media (max-width: 575px) {
+    .products-grid-mixed,
+    .products-grid-single {
+        grid-template-columns: minmax(0, 1fr);
+    }
+}
 
 
 
@@ -163,4 +201,34 @@
 
 .block-type-badge i{
   font-size: 12px;
+}
+
+
+
+
+
+.section-content {
+  // min-height: 260px;
+}
+
+.section-loading {
+  min-height: 260px;
+  width: 100%;
+}
+
+.purple-spinner {
+  color: #4a0d4a;
+  width: 2.5rem;
+  height: 2.5rem;
+}
+
+.section-empty,
+.section-error {
+  min-height: 180px;
+  color: #777;
+  margin-top: 100px;
+}
+
+.section-error {
+  color: #d9534f;
 }

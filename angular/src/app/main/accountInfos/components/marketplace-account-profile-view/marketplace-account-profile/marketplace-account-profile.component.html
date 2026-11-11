@@ -290,33 +290,33 @@
 
   <div class="card marketplaceAccountProfile">
     <p-tabView styleClass="tabview-custom" [(activeIndex)]="activeTabIndex" *ngIf="accountDataForView"   (activeIndexChange)="onActiveIndexChange($event)">
-      <p-tabPanel header="Overview">
+      <p-tabPanel [header]="'Overview' | localize">
         <app-overview-tab [accountDataForView]="accountDataForView" [marketPlaceData]="marketPlaceData" 
           (activeTabIndexBtn)="navigateToTab($event)"></app-overview-tab>
       </p-tabPanel>
-      <p-tabPanel *ngIf="accountDataForView?.accountType == 'BUSINESS'" header="Products" >
+      <p-tabPanel *ngIf="accountDataForView?.accountType == 'BUSINESS'" [header]="'Products' | localize" >
         <app-marketplace-products [fromMarketAcoount]="true" 
           [accountDataForView]="accountDataForView" [marketplaceAccCurrency]="accountDataForView.currencyName"></app-marketplace-products>
       </p-tabPanel>
 
-      <p-tabPanel header="Connections" *ngIf="accountDataForView">
+      <p-tabPanel [header]="'Connections' | localize" *ngIf="accountDataForView">
         <app-connections-tab [loginTenaneSsin]="loginTenaneSsin" [accountDataForView]="accountDataForView" [marketPlaceData]="marketPlaceData" [isActive]="(activeTabIndex == 2 && accountDataForView?.accountType == 'BUSINESS') || (activeTabIndex == 1 && accountDataForView?.accountType != 'BUSINESS')"
           ></app-connections-tab>
       </p-tabPanel>
 
 
 
-      <p-tabPanel header="Posts" *ngIf="accountDataForView">
+      <p-tabPanel [header]="'Posts' | localize" *ngIf="accountDataForView">
         <app-posts-tab [accountDataForView]="accountDataForView"></app-posts-tab>
       </p-tabPanel>
 
 
-      <p-tabPanel header="Events">
+      <p-tabPanel [header]="'Events' | localize">
         <app-events-tab [accountDataForView]="accountDataForView"></app-events-tab>
       </p-tabPanel>
 
 
-      <p-tabPanel header="Media">
+      <p-tabPanel [header]="'Media' | localize">
 
         <app-media-tab [accountDataForView]="accountDataForView"     [isActive]="(activeTabIndex == 5 && accountDataForView?.accountType == 'BUSINESS') || (activeTabIndex == 4 && accountDataForView?.accountType != 'BUSINESS')"></app-media-tab>
       </p-tabPanel>

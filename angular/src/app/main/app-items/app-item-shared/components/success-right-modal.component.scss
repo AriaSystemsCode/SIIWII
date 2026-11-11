@@ -1,3 +1,14 @@
 .modal-content-wrapper .modal-body {
     max-height: 63vh;
 }
+
+@media (max-width: 768px) {
+    .modal-content-wrapper .modal-body {
+        max-height: 70vh;
+        margin-right: 0 !important;
+    }
+
+    .btn.w-50 {
+        width: 100% !important;
+    }
+}

@@ -18,6 +18,7 @@ export class CatalogueReportDataSelectionStepComponent extends AppComponentBase 
   @Input() getAllAppItemsInput: GetAllAppItemsInput
   @Input() printInfoParam: ProductCatalogueReportParams;
   @Input() itemListId: number;
+  @Input() isMarketplaceList = false;
   disableAppItemsList: boolean;
   @Output() continue: EventEmitter<boolean> = new EventEmitter<boolean>();
   myProducts : any[];
@@ -64,9 +65,14 @@ export class CatalogueReportDataSelectionStepComponent extends AppComponentBase 
     }
   }
   getAppItemListAndSelectAllItsItems(){
+    const sourceListId = this.isMarketplaceList ? this.itemListId : this.printInfoParam.itemsListId;
     this._appItemsListsServiceProxy
-      .getAppItemsListForView(this.printInfoParam.itemsListId)
+      .getAppItemsListForView(sourceListId, this.isMarketplaceList)
         .subscribe((res) => {
+          this.printInfoParam.itemsListId = res.appItemsList.id
+          this.printInfoParam.tenantId = res.tenantId
+          
+
           this.myProducts = res.appItemsList.appItemsListItems.items;
           this.numberofselectedproducts = res.appItemsList.appItemsListItems.totalCount;
           this.setmyProductsName(false);
@@ -74,6 +80,8 @@ export class CatalogueReportDataSelectionStepComponent extends AppComponentBase 
           if(!this.appItemsLists?.length){
             this.appItemsLists = [new AppItemsListDto(res.appItemsList as any)]
             this.selectedAppItemList = this.appItemsLists[0]
+
+
             if(!this.printInfoParam.reportTitle)
             this.printInfoParam.reportTitle=this.appItemsLists[0]?.name
           }
