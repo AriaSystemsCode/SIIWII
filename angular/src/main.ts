@@ -6,19 +6,14 @@ import { environment } from './environments/environment';
 import { hmrBootstrap } from './hmr';
 import './polyfills.ts';
 import { RootModule } from './root.module';
-import { registerLicense } from '@syncfusion/ej2-base';
-
-// Syncfusion license registration
-registerLicense('Ngo9BigBOggjHTQxAR8/V1JAaF5cX2pCd1p/TH5YfUNzdUVEY1ZUTXxaS1ZhSXxVdkxhXH5dcHxRQ2FeVUJ9XEY=');
 
 export function getBaseUrl() {
     return document.getElementsByTagName('base')[0].href;
-}
+  }
 
-const providers = [
+  const providers = [
     { provide: 'BASE_URL', useFactory: getBaseUrl, deps: [] }
-];
-
+  ];
 if (environment.production) {
     enableProdMode();
 }
@@ -27,13 +22,17 @@ const bootstrap = () => {
     return platformBrowserDynamic(providers).bootstrapModule(RootModule);
 };
 
-/* Hot Module Replacement */
+/* "Hot Module Replacement" is enabled as described on
+ * https://medium.com/@beeman/tutorial-enable-hrm-in-angular-cli-apps-1b0d13b80130#.sa87zkloh
+ */
+
 if (environment.hmr) {
     if (module['hot']) {
-        hmrBootstrap(module, bootstrap);
+        hmrBootstrap(module, bootstrap); //HMR enabled bootstrap
     } else {
         console.error('HMR is not enabled for webpack-dev-server!');
+        // console.log('Are you using the --hmr flag for ng serve?');
     }
 } else {
-    bootstrap();
+    bootstrap(); //Regular bootstrap
 }

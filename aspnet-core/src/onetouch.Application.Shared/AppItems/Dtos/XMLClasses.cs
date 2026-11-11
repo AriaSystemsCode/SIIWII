@@ -57,7 +57,6 @@ namespace onetouch.AppItems.Dtos
         public string Service { get; set; }
         public string Api { get; set; }
         public string Parameter { get; set; }
-        public string ValueParameter { get; set; }
     }
 
     [Serializable]

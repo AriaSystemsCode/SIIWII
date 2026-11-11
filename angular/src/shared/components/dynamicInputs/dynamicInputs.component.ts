@@ -11,7 +11,7 @@ import { IAjaxResponse, TokenService } from '@node_modules/abp-ng2-module';
 import { DynamicApiDispatcherService } from '@shared/dynamicApiDispatcherService ';
 import Swal from 'sweetalert2';
 import { finalize, map  } from 'rxjs/operators';
-import { forkJoin, Observable, of } from 'rxjs';
+import { forkJoin ,of} from 'rxjs';
 
 
 
@@ -23,20 +23,19 @@ import { forkJoin, Observable, of } from 'rxjs';
   animations: [appModuleAnimation()]
 })
 export class dynamicInputs extends AppComponentBase implements OnInit, OnChanges {
-  @Input("extraAttributeObject") extraAttributeObject: any;
-  @Input("entityType") entityType: any;
-  @Input("entityObjectTypeId") entityObjectTypeId: any;
+  @Input("extraAttributeObject") extraAttributeObject;
+  @Input("entityType") entityType;
+  @Input("entityObjectTypeId") entityObjectTypeId;
   @Output() extraDataChanged = new EventEmitter<any[]>();
   @Output() extraDataCleared = new EventEmitter<number>(); // send attributeId
   selectedExtraData: any[] = [];
   @Input() appTransactionsForViewDto: any;
   @Input() fromSetting: boolean = false;
-  @Input() singleColumn: boolean = false;
   @Input() dynamicInputsForViewDto: any;
   originalValuesMap = new Map<number, any>();
 
 
-  sycAttachmentCategoryImage!: SycAttachmentCategoryDto;
+  sycAttachmentCategoryImage: SycAttachmentCategoryDto;
   @Input() defaultBooleanValue: boolean | string = 'true'; // parent can override
   warningMsg: string = "";
   isInitializing = true;
@@ -62,6 +61,7 @@ export class dynamicInputs extends AppComponentBase implements OnInit, OnChanges
  onAnyInputChange() {
   //if (this.isInitializing) return;
   //this.formTouched = true;
+
   const updatedDataMap = new Map<number, any>();
 
   // Preserve existing values
@@ -79,14 +79,12 @@ export class dynamicInputs extends AppComponentBase implements OnInit, OnChanges
         continue;
       }
 
-    const isChips = !!attr.dataType?.toLowerCase().includes('chips');
-    let formattedValue = isChips
-      ? this.normalizeChipValues(attr.selectedValues)
-      : attr.selectedValues == null ||
-        attr.selectedValues === '' ||
-        (Array.isArray(attr.selectedValues) && attr.selectedValues.length === 0)
-          ? attr.defaultValue
-          : attr.selectedValues;
+    let formattedValue =
+  attr.selectedValues == null ||
+  attr.selectedValues === '' ||
+  (Array.isArray(attr.selectedValues) && attr.selectedValues.length === 0)
+    ? attr.defaultValue
+    : attr.selectedValues;
 
 attr.selectedValues = formattedValue;
 
@@ -114,7 +112,7 @@ attr.selectedValues = formattedValue;
       }
 
     //  Handle Numeric / Boolean / Color
-      if (['Numeric', 'boolean', 'Boolean', 'bit', 'color'].indexOf(attr.dataType) !== -1) {
+      if (['Numeric', 'boolean', 'Boolean', 'bit', 'color'].includes(attr.dataType)) {
         if (formattedValue === null || formattedValue === undefined || formattedValue === '') {
           formattedValue = '';
         }
@@ -125,7 +123,7 @@ attr.selectedValues = formattedValue;
 
       let finalValue;
 
-      if ((attr.acceptMultipleValues || isChips) && Array.isArray(formattedValue)) {
+      if (attr.acceptMultipleValues && Array.isArray(formattedValue)) {
         finalValue = formattedValue.length ? formattedValue : [];
       } else if (!attr.acceptMultipleValues && (formattedValue === undefined || formattedValue === null || formattedValue === '')) {
         finalValue = '';
@@ -139,7 +137,7 @@ attr.selectedValues = formattedValue;
         attributeId: attr.attributeId,
         value: finalValue,
         isLookup: attr.isLookup === true,
-        acceptMultipleValues: attr.acceptMultipleValues === true || isChips
+        acceptMultipleValues: attr.acceptMultipleValues === true
       };
 
       updatedDataMap.set(attr.attributeId, updatedValue);
@@ -152,30 +150,8 @@ attr.selectedValues = formattedValue;
   }
 }
 
-onChipsChange(values: any, extraAttr: any): void {
-  extraAttr.selectedValues = this.normalizeChipValues(values);
-  this.onAnyInputChange();
-}
-
-addChipFromInput(host: HTMLElement, extraAttr: any): void {
-  const input = host.querySelector('input') as HTMLInputElement;
-  const value = input?.value?.trim();
-  if (!value) return;
-  const current = this.normalizeChipValues(extraAttr.selectedValues);
-  if (current.indexOf(value) === -1) {
-    this.onChipsChange([...current, value], extraAttr);
-  }
-  input.value = '';
-}
-
-private normalizeChipValues(values: any): string[] {
-  const entries = Array.isArray(values) ? values : values == null || values === '' ? [] : [values];
-  return entries
-    .map(value => String(value).trim())
-    .filter(value => value.length > 0);
-}
-
 onDropdownChange(extraAttr: any) {
+
   this.onAnyInputChange(); // update normal data
 
   const updatedDataMap = new Map<number, any>();
@@ -190,11 +166,10 @@ handleRelatedWhen(attr: any, finalValue: any, updatedDataMap: Map<number, any>) 
 
   if (!attr.relatedWhen?.relation?.length) return;
 
-  const calls: Observable<any>[] = attr.relatedWhen.relation
-    .map((relation: any): Observable<any> | null => {
+  const calls = attr.relatedWhen.relation.map(relation => {
 
     const targetAttr = this.extraAttributeObject.value.extraAttributes
-      .find((x: any) => x.name === relation.targetName || x.code === relation.targetName);
+      .find(x => x.name === relation.targetName || x.code === relation.targetName);
 
     if (!targetAttr) return null;
 
@@ -210,15 +185,14 @@ handleRelatedWhen(attr: any, finalValue: any, updatedDataMap: Map<number, any>) 
       .pipe(
         map((result: any) => {
           const newValue = result.extraDataAttributes
-            .find((x: any) => x.extraAttrName === relation.targetName)
+            .find(x => x.extraAttrName === relation.targetName)
             ?.selectedValues?.[0]?.value || 0;
 
           return { targetAttr, relation, newValue };
         })
       );
 
-  })
-    .filter((call: Observable<any> | null): call is Observable<any> => call !== null);
+  }).filter(x => x !== null);
 
   if (calls.length) {
     forkJoin(calls).subscribe((results: any[]) => {
@@ -283,7 +257,7 @@ reset(extraAttr: any): void {
 }
 
 
-  themes: any[] = [];
+  themes = [];
   selectedTheme: any;
 
   // set thems  ?
@@ -308,6 +282,7 @@ reset(extraAttr: any): void {
   if (!this.extraAttributeObject?.value?.extraAttributes || !this.dynamicInputsForViewDto?.extraDataAttributes) {
     return;
   }
+
   const dtoData = this.dynamicInputsForViewDto.extraDataAttributes;
 
   const allAttributes = [
@@ -317,7 +292,7 @@ reset(extraAttr: any): void {
 
   for (const attr of allAttributes) {
     const matchedDto = dtoData.find(
-      (d: any) => d.extraAttributeId === attr.attributeId
+      d => d.extraAttributeId === attr.attributeId
     );
 
     if (matchedDto && matchedDto.selectedValues?.length) {
@@ -327,7 +302,7 @@ reset(extraAttr: any): void {
       }
       if (attr.isLookup) {
         const matchedOption =  attr.paginationSetting?.list?.find(
-            (opt: any) => opt.label === dtoValue || opt.value === dtoValue
+            opt => opt.label === dtoValue || opt.value === dtoValue
           );
 
         if (matchedOption) {
@@ -395,7 +370,7 @@ reset(extraAttr: any): void {
 
     //  Also clear original source value 
     const matchedAttr = this.extraAttributeObject?.value?.extraAttributes?.find(
-      (a: any) => a.attributeId === attr.attributeId
+      a => a.attributeId === attr.attributeId
     );
     if (matchedAttr) {
       matchedAttr.selectedValues = attr.selectedValues;
@@ -449,7 +424,7 @@ reset(extraAttr: any): void {
         extraAttr.selectedValues.push(value);
       }
     } else {
-      extraAttr.selectedValues = extraAttr.selectedValues.filter((val: any) => val !== value);
+      extraAttr.selectedValues = extraAttr.selectedValues.filter(val => val !== value);
     }
     this.onAnyInputChange(); // emit changes
   }
@@ -462,7 +437,7 @@ reset(extraAttr: any): void {
         return;
       } */
       const allowedTypes = ['image/jpeg', 'image/png', 'image/gif'];
-      if (allowedTypes.indexOf(file.type) === -1) {
+      if (!allowedTypes.includes(file.type)) {
         //alert('Only JPG, PNG, or GIF files are allowed.');
         Swal.fire(
           " ",
@@ -484,8 +459,8 @@ reset(extraAttr: any): void {
     }
   }
 
-  attachmentsUploader!: FileUploader;
-  onUploadFile(file: File) {
+  attachmentsUploader: FileUploader;
+  onUploadFile(file) {
     this.attachmentsUploader = this.createUploader(
       '/Attachment/UploadFiles',
       result => {
@@ -524,7 +499,7 @@ reset(extraAttr: any): void {
           success(ajaxResponse.result);
         }
       } else {
-        this.message.error(ajaxResponse.error?.message || this.l('UploadFailed'));
+        this.message.error(ajaxResponse.error.message);
       }
     };
 
@@ -537,20 +512,14 @@ reset(extraAttr: any): void {
   getSafeString = (str: string) => str.replace(/\s+/g, '_');
   extraAttrOptions = new Map<string, { items: any[], totalCount: number, isLoading: boolean }>();
 
-  private validEntriesCache = new Map<string, any[]>();
-
   getDropdownOptions(extraAttr: any) {
     if (extraAttr?.validEntries && !extraAttr?.dataSource) {
-      // Stable array reference; a new one per change detection resets the dropdown
-      const cached = this.validEntriesCache.get(extraAttr.validEntries);
-      if (cached) return cached;
-      const options: any[] = extraAttr.validEntries.split('|').map((v: string) => ({
-        label: v.trim(),
-        value: v.trim()
-      }));
-      this.validEntriesCache.set(extraAttr.validEntries, options);
-      return options;
-    }
+    return extraAttr.validEntries.split('|').map(v => ({
+      label: v.trim(),
+      value: v.trim()
+    }));
+
+  }
   
   return this.extraAttrOptions.get(extraAttr.id)?.items || [];
   }
@@ -589,7 +558,7 @@ reset(extraAttr: any): void {
 
  callDynamicAPI(extraAttr: any, skipCount: number = 0, maxResultCount: number = 10) {
   if (extraAttr?.validEntries && extraAttr.validEntries.includes('|')) {
-    const items = extraAttr.validEntries.split('|').map((val: string) => ({
+    const items = extraAttr.validEntries.split('|').map(val => ({
       label: val.trim(),
       value: val.trim()
     }));
@@ -610,8 +579,8 @@ reset(extraAttr: any): void {
     this.dynamicApi.dispatch(serviceName, apiMethod, {
       skipCount: skipCount,
       maxResultCount: maxResultCount
-    }).subscribe((result: any) => {
-      const dropdownItems = result.items.map((item: any) => ({
+    }).subscribe(result => {
+      const dropdownItems = result.items.map(item => ({
         label: this.getByPath(item, resultField.trim()),
         value: item.account.id
       }));
@@ -635,7 +604,7 @@ reset(extraAttr: any): void {
 
   getExtraAttr(attributeId: number, nameIncludes: string) {
     return this.extraAttributeObject.value.extraAttributes
-      .find((x: any) => x?.attributeId === attributeId || x?.name?.includes(nameIncludes));
+      .find(x => x?.attributeId === attributeId || x?.name?.includes(nameIncludes));
   }
 
 
@@ -666,7 +635,7 @@ reset(extraAttr: any): void {
   if (!extraAttr.visibleWhen) return true;
 
   const parentAttr = this.extraAttributeObject.value.extraAttributes
-    .find((x: any) => x.attributeId == extraAttr.visibleWhen.extraAttributeId);
+    .find(x => x.attributeId == extraAttr.visibleWhen.extraAttributeId);
 
   if (!parentAttr) return false;
 

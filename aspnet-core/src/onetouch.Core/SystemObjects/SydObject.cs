@@ -41,11 +41,6 @@ namespace onetouch.SystemObjects
 		[StringLength(SydObjectConsts.MaxCodeLength, MinimumLength = SydObjectConsts.MinCodeLength)]
 		public virtual string ParentCode { get; set; }
 
-        public virtual long? BaseEntityId { get; set; }
-
-        [ForeignKey("BaseEntityId")]
-        public SydObject BaseEntityFk { get; set; }
-
 		public ICollection<SydObject> SydObjects { get; set; }
         public virtual long? SSINIdentifierId { get; set; }
         public virtual string SSINIdentifierCode { get; set; }

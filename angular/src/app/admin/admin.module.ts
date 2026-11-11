@@ -194,13 +194,7 @@ import { AccordionModule } from "primeng/accordion";
 import { PortalTenantSettingsComponent } from './settings/Portal-tenant-settings.component';
 import { PortalHostSettingsComponent } from './settings/Portal-host-settings.component';
 import { DynamicApiDispatcherService } from '@shared/dynamicApiDispatcherService ';
-import {
-    PivotViewModule
-} from '@syncfusion/ej2-angular-pivotview';
 
-import {
-    GridsterModule
-} from 'angular-gridster2';
 
 import { TreeSelectModule } from 'primeng/treeselect';
 import { AriaIframeComponent } from './AriaOnSiwii/aria-frame.component';
@@ -247,12 +241,7 @@ const DEFAULT_PERFECT_SCROLLBAR_CONFIG: PerfectScrollbarConfigInterface = {
         ReactiveFormsModule,
         CheckboxModule,
         SharedDynamicInputsModule,
-        AccordionModule,
-                // Gridster
-        GridsterModule,
-
-        // Syncfusion Pivot
-        PivotViewModule
+        AccordionModule
     ],
     declarations: [
 		ValidationRulesComponent,

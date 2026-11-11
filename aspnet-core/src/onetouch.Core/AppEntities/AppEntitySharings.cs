@@ -29,9 +29,6 @@ namespace onetouch.AppEntities
 
         [StringLength(AppEntityConsts.MaxCodeLength, MinimumLength = AppEntityConsts.MaxCodeLength)]
         public virtual string SharedUserEMail { get; set; }
-        //I52[Start]
-        public virtual DateTime LastViewDate { get; set; }
-        public virtual bool CanEdit { get; set; }
-        //I52[End]
+
     }
 }

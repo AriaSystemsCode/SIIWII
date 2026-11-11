@@ -1816,6 +1816,5 @@
 		<text name="Banner">بانر</text>
 		<text name="Portrait">عمودي</text>
 		<text name="Landscape">أفقي</text>
-    <text name="DashboardNameLengthValidation">يجب أن يتكون اسم لوحة المعلومات من 5 إلى 9 أحرف.</text>
   </texts>
 </localizationDictionary>

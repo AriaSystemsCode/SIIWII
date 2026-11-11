@@ -84,6 +84,7 @@ export class SelectEditionComponent extends AppComponentBase implements OnInit {
     getAccountTypes(){
         this._tenantRegistrationService.getEditionsForSelect()
     .subscribe((result) => {
+        debugger
     //     for (let i = 0; i < result.editionsWithFeatures.length; i++) {
     //         const accountTypeLabel = result.editionsWithFeatures[i].edition.displayName;
     //         const accountTypeValue = result.editionsWithFeatures[i].edition.id;
@@ -96,6 +97,7 @@ export class SelectEditionComponent extends AppComponentBase implements OnInit {
     }
 
     //   changeAccountType($event){
+    //     debugger ;
     //      let indx= this.accountTypes.findIndex(x=>x.value == $event.value );
 
     //      if(indx>=0){

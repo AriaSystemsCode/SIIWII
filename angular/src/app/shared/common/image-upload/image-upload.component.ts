@@ -305,6 +305,7 @@ export class ImageUploadComponent extends AppComponentBase implements OnChanges 
   
         // choose based on selected radio
         let selectedCat: SycAttachmentCategoryDto;
+  debugger
         switch (this.attachmentTypeCode) {
           case 'LOGO':
             selectedCat = this.sycAttachmentCategoryLogo;

@@ -41,8 +41,7 @@ namespace onetouch.SystemObjects
         //I40[End]
     
 		//I46[Start]
-		Task<List<GetAllEntityObjectTypeOutput>> GetAllWithExtraAttributes(long id,
-            ExtraAttributesSource source = ExtraAttributesSource.Xml);
+		Task<List<GetAllEntityObjectTypeOutput>> GetAllWithExtraAttributes(long id);
         //I46[End]
     }
 }

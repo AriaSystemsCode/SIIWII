@@ -1,102 +1,55 @@
-import { Injectable } from '@angular/core';
-import { HttpClient } from '@angular/common/http';
-import { map } from 'rxjs/operators';
+import { Injectable } from "@angular/core";
+import { AccountsServiceProxy, AppItemsServiceProxy, MarketplaceAccountsServiceProxy } from "./service-proxies/service-proxies";
 
-import {
-    AccountsServiceProxy,
-    AppItemsServiceProxy,
-    MarketplaceAccountsServiceProxy
-} from './service-proxies/service-proxies';
-
-import { AppConsts } from '@shared/AppConsts';
-
-@Injectable()
+@Injectable({ providedIn: 'root' })
 export class DynamicApiDispatcherService {
 
-    constructor(
-        private accountsServiceProxy: AccountsServiceProxy,
-        private appItemsServiceProxy: AppItemsServiceProxy,
-        private marketplaceAccountsServiceProxy: MarketplaceAccountsServiceProxy,
-        private http: HttpClient
-    ) {}
+ constructor(
+    private accountsServiceProxy: AccountsServiceProxy,
+    private appItemsServiceProxy: AppItemsServiceProxy,
+    private marketplaceAccountsServiceProxy: MarketplaceAccountsServiceProxy,
+) {}
 
-    dispatch(
-        serviceName: string,
-        methodName: string,
-        values: any = {}
-    ): any {
+ 
+dispatch(serviceName: string, methodName: string, values: any = {}) {
 
-        // Special handling for account branches
-        if (
-            serviceName === 'AccountsServiceProxy' &&
-            methodName === 'getAccountBranches'
-        ) {
-            return this.http.get<any>(
-                `${AppConsts.remoteServiceBaseUrl}/api/services/app/Accounts/GetAccountBranches`
-            ).pipe(
-                map(response => response?.result ?? response)
-            );
-        }
+  let selectedService = (this as any)[serviceName];
 
-        const normalizedServiceName =
-            serviceName.endsWith('ServiceProxy')
-                ? serviceName
-                : `${serviceName}ServiceProxy`;
+  if (!selectedService) {
+    selectedService = (this as any)[serviceName.charAt(0).toLowerCase() + serviceName.slice(1)];
+  }
 
-        const serviceMap: Record<string, any> = {
-            AccountsServiceProxy: this.accountsServiceProxy,
-            AppItemsServiceProxy: this.appItemsServiceProxy,
-            MarketplaceAccountsServiceProxy:
-                this.marketplaceAccountsServiceProxy
-        };
+  if (!selectedService) {
+    throw new Error(`Service '${serviceName}' not found`);
+  }
 
-        const selectedService =
-            serviceMap[normalizedServiceName];
+  const selectedMethod = selectedService[methodName];
 
-        if (!selectedService) {
-            throw new Error(
-                `Service '${normalizedServiceName}' not found`
-            );
-        }
+  if (typeof selectedMethod !== "function") {
+    throw new Error(`Method '${methodName}' not found in service '${serviceName}'`);
+  }
 
-        const selectedMethod =
-            selectedService[methodName];
+  const paramNames = this.getParameterNames(selectedMethod);
 
-        if (typeof selectedMethod !== 'function') {
-            throw new Error(
-                `Method '${methodName}' not found in '${normalizedServiceName}'`
-            );
-        }
+  const args = new Array(paramNames.length).fill(undefined);
 
-        const paramNames =
-            this.getParameterNames(selectedMethod);
-
-        const args = paramNames.map(param =>
-            Object.prototype.hasOwnProperty.call(values, param)
-                ? values[param]
-                : undefined
-        );
-
-        return selectedMethod.apply(
-            selectedService,
-            args
-        );
+  paramNames.forEach((p, i) => {
+    if (values.hasOwnProperty(p)) {
+      args[i] = values[p];
     }
+  });
 
-    private getParameterNames(func: Function): string[] {
-        const fnStr = func
-            .toString()
-            .replace(/\/\*[\s\S]*?\*\/|\/\/.*$/gm, '');
+  return selectedMethod.apply(selectedService, args);
+}
 
-        const match = fnStr.match(/\(([^)]*)\)/);
 
-        if (!match) {
-            return [];
-        }
 
-        return match[1]
-            .split(',')
-            .map(param => param.trim().split('=')[0].trim())
-            .filter(Boolean);
-    }
+  getParameterNames(func: Function): string[] {
+    const fnStr = func.toString().replace(/\/\/.*$|\/\*[\s\S]*?\*\//mg, ''); // remove comments
+    const result = fnStr.slice(fnStr.indexOf('(') + 1, fnStr.indexOf(')')).match(/([^\s,]+)/g);
+    return result === null ? [] : result;
+  }
+  private normalize(name: string) {
+    return name.charAt(0).toLowerCase() + name.slice(1);
+  }
 }

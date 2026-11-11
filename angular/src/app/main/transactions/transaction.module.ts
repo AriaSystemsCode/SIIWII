@@ -67,6 +67,7 @@ import { ViewBuyerSellerContactInfoComponent } from './app-TransactionTabsInfo/C
 import { CreateOrEditSalesRepInfoComponent } from './app-TransactionTabsInfo/Components/salesRep-info/create-or-edit-salesRep-info/create-or-edit-sales-rep-info.component';
 import { ViewSalesRepInfoComponent } from './app-TransactionTabsInfo/Components/salesRep-info/view-salesRep-info/view-sales-rep-info.component';
 
+
 @NgModule({
     declarations: [
         AppTransactionsBrowseComponent,
@@ -144,9 +145,7 @@ import { ViewSalesRepInfoComponent } from './app-TransactionTabsInfo/Components/
         TabViewModule,
         SharedDynamicInputsModule,
         InteractionsModule,
-        NotesModule,
-
-        
+        NotesModule
 
     ],
     exports: [

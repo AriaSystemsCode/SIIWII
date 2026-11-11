@@ -45,7 +45,6 @@ export class TenantsComponent extends AppComponentBase implements OnInit {
         selectedEditionId: number;
     } = <any>{};
 
-
     constructor(
         injector: Injector,
         private _tenantService: TenantServiceProxy,
@@ -57,8 +56,6 @@ export class TenantsComponent extends AppComponentBase implements OnInit {
         this.setFiltersFromRoute();
     }
 
-
-    
     setFiltersFromRoute(): void {
         if (this._activatedRoute.snapshot.queryParams['subscriptionEndDateStart'] != null) {
             this.filters.subscriptionEndDateRangeActive = true;
@@ -94,7 +91,6 @@ export class TenantsComponent extends AppComponentBase implements OnInit {
     }
 
     ngOnInit(): void {
-       
         this.filters.filterText = this._activatedRoute.snapshot.queryParams['filterText'] || '';
 
         this.setIsEntityHistoryEnabled();
