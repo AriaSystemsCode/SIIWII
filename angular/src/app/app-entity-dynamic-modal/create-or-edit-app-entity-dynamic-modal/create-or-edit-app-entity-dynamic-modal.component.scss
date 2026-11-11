@@ -2,17 +2,42 @@
 @import '../../../assets/styles/base/mixins';
 @import '../../../assets/styles/base/placeholders';
 
-.modal-body {
-    padding: 2rem 1.25rem 4rem 1.25rem !important;
-}
-
-.form-control , .custom-dropdown {
-    background-color: #F8F8F8 !important;
-}
-
 :host {
     height: 100%;
     display: block;
+}
+
+// Header and footer stay pinned; only the body scrolls
+.modal-content-wrapper {
+    display: flex;
+    flex-direction: column;
+    height: 100%;
+}
+
+.modal-header,
+.modal-footer {
+    flex: 0 0 auto;
+}
+
+.modal-body {
+    flex: 1 1 auto;
+    min-height: 0;
+    overflow-y: auto;
+    // padding: 2rem 1.25rem 2rem 1.25rem !important;
+}
+
+.modal-footer {
+    background-color: #ffffff;
+    border-top: 1px solid #eeeeee;
+}
+
+.form-control,
+.custom-dropdown {
+    background-color: #F8F8F8 !important;
+}
+
+.required {
+    color: #F6851D !important;
 }
 
 .add-new-lookup-btn {
@@ -20,6 +45,20 @@
     border: 1px solid #999;
 }
 
+.notes-input {
+    min-height: 131px;
+}
+
+.picker {
+    width: 100%;
+    border: none !important;
+    border-radius: 4px;
+    height: 100%;
+    margin-left: 5px;
+    cursor: pointer !important;
+}
+
+// ---------- Header ----------
 .entity-modal-header {
     display: block;
     background-color: #ffffff !important;
@@ -35,20 +74,7 @@
     top: 8px;
 }
 
-:host ::ng-deep .modal-dialog.left-modal {
-    position: absolute;
-    left: 0;
-    right: auto;
-}
-
-:host ::ng-deep .modal-dialog.left-modal.slide-left-in {
-    left: 0;
-}
-
-:host ::ng-deep .modal-dialog.left-modal.slide-left-out {
-    left: -400px;
-}
-
+// ---------- Side modal positioning ----------
 :host ::ng-deep .modal-dialog.left-modal,
 :host ::ng-deep .modal-dialog.right-modal {
     position: fixed;
@@ -66,6 +92,10 @@
     right: auto;
 }
 
+:host ::ng-deep .modal-dialog.left-modal.slide-left-out {
+    left: -400px;
+}
+
 :host ::ng-deep .modal-dialog.right-modal {
     right: 0;
     left: auto;
@@ -78,17 +108,9 @@
     min-height: 100vh;
 }
 
+// ---------- Arabic (RTL) ----------
 .create-lookup-modal--arabic {
     direction: rtl;
-}
-
-.create-lookup-modal--arabic .modal-close-btn {
-    right: auto;
-    left: 8px;
-}
-
-.create-lookup-modal--arabic .entity-modal-header {
-    text-align: right;
 }
 
 .create-lookup-modal--arabic .form-group,
@@ -113,105 +135,26 @@
     margin-left: 15px;
 }
 
-.notes-input {
-    min-height: 131px;
-}
-
-.fileImage{
-    position: absolute;
-    width: 100%;
-    height: 100%;
-    z-index: 2;
-    top: 0px;
-    left: 0px;
-    cursor: pointer;
-    opacity: 0;
-}
+// ---------- Attachments ----------
 .image-wrapper {
-    border: 1px solid $grey-1;
+    background-color: white;
+    border-radius: 6px;
+    width: 90%;
+    margin: auto;
+    cursor: pointer;
+    @extend %transition-all-3ms;
+
     &.upload {
         border: none;
-        filter: grayscale(1);
     }
-    width: 330px;
-  //  height: 276px;
-    background-color: white;
-    margin-right: 2rem;
-    border-radius: 6px;
-    cursor: pointer;
+
     img {
         max-height: 100%;
         max-width: 100%;
     }
-    label {
-        cursor: pointer;
-    }
-    .upload-image-icons {
-        position: relative;
-        width: 150px;
-        height: 90px;
-        @extend %transition-all-3ms;
-    }
+
     i {
         color: #999999;
-    }
-    .left-icon,
-    .right-icon,
-    .middle-icon {
-        position: absolute;
-        @extend %transition-all-3ms;
-    }
-    .left-icon,
-    .right-icon {
-        font-size: 1.9rem;
-    }
-    .middle-icon {
-        top: 0;
-        font-size: 3rem;
-    }
-    .left-icon{
-        left: 0;
-    }
-    .right-icon {
-        right: 0;
-    }
-    .upload-btn.btn {
-        background-color: #c8c8c8!important;
-        color: #000!important;
-        border-color: #c8c8c8!important;
-        font-weight: 500;
-        @extend %transition-all-3ms;
-    }
-    .view-img-overlay {
-        opacity: 0;
-        z-index: 0;
-        @extend %transition-all-3ms;
-    }
-    &{
-        cursor: pointer;
-      //  box-shadow: 0px 0px 6px #0000001A;
-        @extend %transition-all-3ms;
-        filter: none !important;
-        .upload-btn.btn {
-            background-color: $blue!important;
-            color: $white!important;
-         //   border-color: $blue!important;
-            font-weight: 500;
-            @extend %transition-all-3ms;
-        }
-        .upload-image-icons {
-            height: 50px;
-            width: 109px;
-            @extend %transition-all-3ms;
-        }
-        .view-img-overlay {
-            opacity: 1;
-            background-color: rgba(0,0,0,0.5);
-            @extend %transition-all-3ms;
-        }
-        .select-default-image {
-            display: block;
-        }
     }
 }
 
@@ -223,15 +166,7 @@
         border: none;
     }
 
-    .item-photos-header {
-        background-color: #3699FF1A;
-    }
-
     .item-photos-body {
-        background-color: #F5FAFF;
-        border: 2px dashed #EEEEEE;
-        border-radius: 12px;
-
         &.item-photos-body--filled {
             border: none;
         }
@@ -267,47 +202,23 @@
     object-fit: contain;
 }
 
-.select-default-image {
-    display: none;
-    position: absolute;
-    bottom: -30px;
+.section-color-picker {
+    width: 48px;
+    height: 40px;
+    padding: 3px;
+    border: 1px solid #ddd;
+    border-radius: 6px;
+    cursor: pointer;
+    flex-shrink: 0;
 }
 
-.picker{
-    width: 100%;
-    border: none !important;
-    border-radius: 4px;
-    height: 100%;
-    margin-left: 5px;
-   cursor: pointer !important;
-}
-.required{
-    color:#F6851D !important;
-}
-
-.upload-content {
-    display: flex;
-    align-items: center;
-    gap: 10px;
-    margin-bottom: 4px;
-  }
+// Referenced from the component TS (modal config class)
 .ngLeft {
     margin-left: 0 !important;
     margin-top: 0 !important;
 }
-.ngRight {
-    margin-right: 0 !important;
-    margin-top: 0 !important;
-}
-.closeIcon-ar {
-    left: 0;
-    width: 60px !important;
-}
 
-.closeIcon-en {
-    right: 0;
-}
-
+// ---------- Footer ----------
 .modal-footer-btn {
     border-radius: 5px;
 }
@@ -324,6 +235,7 @@
     color: white;
 }
 
+// ---------- Responsive ----------
 @media screen and (max-width: 991px) {
     :host ::ng-deep .modal-dialog.right-modal {
         width: min(100vw, 540px) !important;
@@ -387,27 +299,23 @@
         margin-left: 0;
         margin-right: 0;
     }
-
-    .create-lookup-modal--arabic .entity-modal-header {
-        padding-left: 2.5rem;
-        padding-right: 1rem;
-    }
 }
 
 @media screen and (max-width: 767px) {
-    :host ::ng-deep .modal-dialog.right-modal {
-        width: 100vw !important;
-        max-width: 100vw !important;
-        height: 100vh !important;
-        margin: 0 !important;
-        right: 0 !important;
-    }
 
+    :host ::ng-deep .modal-dialog.right-modal,
     :host ::ng-deep .modal-dialog.left-modal {
         width: 100vw !important;
         max-width: 100vw !important;
         height: 100vh !important;
         margin: 0 !important;
+    }
+
+    :host ::ng-deep .modal-dialog.right-modal {
+        right: 0 !important;
+    }
+
+    :host ::ng-deep .modal-dialog.left-modal {
         left: 0 !important;
     }
 
@@ -432,11 +340,6 @@
     .modal-close-btn {
         right: 0.5rem;
         top: 0.5rem;
-    }
-
-    .create-lookup-modal--arabic .modal-close-btn {
-        right: auto;
-        left: 0.5rem;
     }
 
     .modal-body .radio-inline {
@@ -516,24 +419,4 @@
         padding-left: 0.75rem;
         padding-right: 0.75rem;
     }
-}
-
-
-
-.section-color-picker {
-    width: 48px;
-    height: 40px;
-    padding: 3px;
-    border: 1px solid #ddd;
-    border-radius: 6px;
-    cursor: pointer;
-    flex-shrink: 0;
-}
-
-.section-color-preview {
-    width: 40px;
-    height: 40px;
-    border: 1px solid #ddd;
-    border-radius: 6px;
-    flex-shrink: 0;
 }

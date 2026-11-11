@@ -5,19 +5,10 @@ import {
   SliderEnum,
   SydObjectsServiceProxy,
 } from "@shared/service-proxies/service-proxies";
-import { SectionType, ApiRow, SectionConfig, SectionItem } from "../../models/landingPage-types";
+import { SectionType, ApiRow, SectionConfig, SectionItem, LandingRenderItem } from "../../models/landingPage-types";
 import { Router } from "@node_modules/@angular/router";
 import Swal from 'sweetalert2';
 
-
-
-interface FourBlocksGroup {
-  type: 'FOUR_BLOCKS_GROUP';
-  order: number;
-  sections: SectionItem[];
-}
-
-type LandingRenderItem = SectionItem | FourBlocksGroup;
 
 
 @Component({
@@ -43,21 +34,21 @@ export class MarketplaceLandingPageComponent
 
   isAuthenticated: boolean = false;
 
-  
-renderSections: LandingRenderItem[] = [];
 
-fourBlocksResponsiveOptions = [
-  {
-    breakpoint: '1199px',
-    numVisible: 2,
-    numScroll: 1
-  },
-  {
-    breakpoint: '767px',
-    numVisible: 1,
-    numScroll: 1
-  }
-];
+  renderSections: LandingRenderItem[] = [];
+
+  fourBlocksResponsiveOptions = [
+    {
+      breakpoint: '1199px',
+      numVisible: 2,
+      numScroll: 1
+    },
+    {
+      breakpoint: '767px',
+      numVisible: 1,
+      numScroll: 1
+    }
+  ];
 
 
   constructor(
@@ -203,12 +194,6 @@ fourBlocksResponsiveOptions = [
         );
 
         this.renderSections = this.buildRenderSections(flat);
-        console.log(
-  'FBS Groups:',
-  this.renderSections.filter(
-    item => item.type === 'FOUR_BLOCKS_GROUP'
-  )
-);
       });
 
 
@@ -297,57 +282,65 @@ fourBlocksResponsiveOptions = [
     });
   }
 
-private buildRenderSections(
-  sections: SectionItem[]
-): LandingRenderItem[] {
 
-  const result: LandingRenderItem[] = [];
+  private buildRenderSections(
+    sections: SectionItem[]
+  ): LandingRenderItem[] {
 
-  // Collect all FBS sections, sorted by order
-  const fbsSections = sections
-    .filter(section => section.type === 'FBS')
-    .sort((a, b) => a.order - b.order);
+    const result: LandingRenderItem[] = [];
 
-  let fbsGroupAdded = false;
+    const allFbsSections = sections
+      .filter(section => section.type === 'FBS')
+      .sort((a, b) => a.order - b.order);
 
-  for (const section of sections) {
+    // Guest: maximum 3 sections
+    // Authenticated: all sections
+    const fbsSections = this.isAuthenticated
+      ? allFbsSections
+      : allFbsSections.slice(0, 3);
 
-    // Menu is rendered separately
-    if (section.type === 'Menu') {
-      continue;
-    }
+    let fbsGroupAdded = false;
 
-    if (section.type === 'FBS') {
+    for (const section of sections) {
 
-      // Insert one carousel containing all FBS sections
-      if (!fbsGroupAdded) {
-        result.push({
-          type: 'FOUR_BLOCKS_GROUP',
-          order: section.order,
-          sections: fbsSections
-        });
-
-        fbsGroupAdded = true;
+      if (section.type === 'Menu') {
+        continue;
       }
 
-      continue;
+      if (section.type === 'FBS') {
+
+        if (!fbsGroupAdded && fbsSections.length) {
+          result.push({
+            type: 'FOUR_BLOCKS_GROUP',
+            order: section.order,
+            sections: fbsSections
+          });
+
+          fbsGroupAdded = true;
+        }
+
+        continue;
+      }
+
+      result.push(section);
     }
 
-    // Other sections remain unchanged
-    result.push(section);
+    return result;
   }
 
-  return result;
-}
-getFourBlocksSections(
-  item: LandingRenderItem
-): SectionItem[] {
 
-  return item.type === 'FOUR_BLOCKS_GROUP'
-    ? item.sections
-    : [];
+  getFourBlocksSections(
+    item: LandingRenderItem
+  ): SectionItem[] {
 
-}
+    return item.type === 'FOUR_BLOCKS_GROUP'
+      ? item.sections
+      : [];
+
+  }
+  get fourBlocksNumVisible(): number {
+    return 3;
+  }
 
 
   ngOnDestroy() {

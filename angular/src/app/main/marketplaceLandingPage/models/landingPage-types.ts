@@ -53,3 +53,14 @@ export interface SectionItem {
   rowIds?: number[];
   blockTypeIsSingleOrMixed?: string;
 }
+
+
+
+
+export interface FourBlocksGroup {
+  type: 'FOUR_BLOCKS_GROUP';
+  order: number;
+  sections: SectionItem[];
+}
+
+export type LandingRenderItem = SectionItem | FourBlocksGroup;

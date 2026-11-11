@@ -72,10 +72,10 @@
         <!-- FOUR BLOCKS -->
 
         <!-- FOUR BLOCKS GROUP -->
-        <div *ngSwitchCase="'FOUR_BLOCKS_GROUP'" class="four-blocks-carousel-wrapper px-5">
+        <div *ngSwitchCase="'FOUR_BLOCKS_GROUP'" class="four-blocks-carousel-wrapper">
 
-          <p-carousel [value]="getFourBlocksSections(s)" [numVisible]="3" [numScroll]="1" [circular]="false"
-            [showIndicators]="false" [showNavigators]="getFourBlocksSections(s).length > 3"
+          <p-carousel [value]="getFourBlocksSections(s)" [numVisible]="fourBlocksNumVisible" [numScroll]="1"
+            [circular]="false" [showIndicators]="false" [showNavigators]="getFourBlocksSections(s).length > 3"
             [responsiveOptions]="fourBlocksResponsiveOptions">
 
             <ng-template pTemplate="item" let-section>
@@ -94,6 +94,7 @@
           </p-carousel>
 
         </div>
+
 
 
       </ng-container>
