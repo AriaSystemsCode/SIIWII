@@ -42,3 +42,69 @@ color: #000000;
 
 
 }
+
+.four-blocks-carousel-wrapper {
+  width: 100%;
+  min-width: 0;
+  padding: 8px 40px;
+}
+
+.four-blocks-carousel-item {
+  width: 100%;
+  min-width: 0;
+  height: 100%;
+  padding: 8px;
+}
+
+:host ::ng-deep {
+  .four-blocks-carousel-wrapper {
+
+    .p-carousel-content {
+      align-items: center;
+    }
+
+    .p-carousel-items-content {
+      min-width: 0;
+    }
+
+    .p-carousel-item {
+      min-width: 0;
+    }
+
+    .p-carousel-prev,
+    .p-carousel-next {
+      width: 34px;
+      height: 34px;
+      flex: 0 0 34px;
+      border-radius: 50%;
+      background: #fff;
+      color: #56365c;
+      box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+    }
+
+    .p-carousel-prev:hover,
+    .p-carousel-next:hover {
+      background: #f3edf5;
+    }
+  }
+}
+
+@media (max-width: 1199px) {
+  .four-blocks-carousel-wrapper {
+    padding: 8px 20px;
+  }
+
+  .four-blocks-carousel-item {
+    padding: 6px;
+  }
+}
+
+@media (max-width: 767px) {
+  .four-blocks-carousel-wrapper {
+    padding: 6px 8px;
+  }
+
+  .four-blocks-carousel-item {
+    padding: 4px;
+  }
+}

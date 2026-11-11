@@ -1,15 +1,21 @@
 
 export type SectionType =
-  'ASMB' | 'ASSB' | 'CSMP'
- | 'SRCTA' |'PF' |'SM'
-   | 'MRCTA' 
+  | 'ASMB'
+  | 'ASSB'
+  | 'CSMP'
+  | 'SRCTA'
+  | 'PF'
+  | 'SM'
+  | 'MRCTA'
+  | 'Menu'
+  | 'IASCTA'
+  | 'FBS';
 
 export interface SectionConfig {
   type: SectionType;
   order: number;
   inputs?: any;
 }
-
 
 export interface ApiRow {
   id: number;
@@ -21,16 +27,40 @@ export interface ApiRow {
   order?: number | null;
   linkPageUrl?: string | null;
   externalUrl?: string | null;
-  name?:string
-  titleAlignment:string
-  blockTypeIsSingleOrMixed:string
+  name?: string;
+  titleAlignment?: string;
+  blockTypeIsSingleOrMixed?: string;
+
+  // New section settings
+  backgroundColor?: string | null;
+  textColor?: string | null;
+  firstImageLarger?: boolean | null;
 }
 
 export interface SectionItem {
   type: SectionType;
   order: number;
-  inputs: any;
-  sectionId?: number;   // ← add this
-  rowIds?: number[];    // ← optional: all row ids in the group
-
+  inputs: {
+    title?: string | null;
+    name?: string | null;
+    images?: string[];
+    titleAlignment?: string;
+    backgroundColor?: string;
+    textColor?: string;
+    firstImageLarger?: boolean;
+  };
+  sectionId?: number;
+  rowIds?: number[];
+  blockTypeIsSingleOrMixed?: string;
 }
+
+
+
+
+export interface FourBlocksGroup {
+  type: 'FOUR_BLOCKS_GROUP';
+  order: number;
+  sections: SectionItem[];
+}
+
+export type LandingRenderItem = SectionItem | FourBlocksGroup;
