@@ -35,5 +35,7 @@ namespace onetouch.SystemObjects.Dtos
         public GetAppEventForViewDto? GetAppEventForViewDto { set; get; }
         public string? BlockTypeIsSingleOrMixed { get; set; }
         //I50[End]
+        public string? BackgroundColor { set; get; }
+        public string? TextColor { set; get; }
     }
 }
