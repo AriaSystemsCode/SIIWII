@@ -86,7 +86,7 @@
 
                                             <button pButton pRipple label="Sync" *ngIf="isNotManualLevel()"
                                                 class="sync btn" icon="pi pi-sync" (click)="syncAccount()"
-                                                [loading]="btnLoader" [disabled]="isSync == false"></button>
+                                                [loading]="btnLoader"  [disabled]="isSync !== true || btnLoader"></button>
 
 
                                         </div>
@@ -468,7 +468,7 @@
                                     <p-multiSelect [options]="roles" [(ngModel)]="selectedRoles"
                                         [ngModelOptions]="{ standalone: true }" optionLabel="name" optionValue="name"
                                         placeholder="Select Roles" [maxSelectedLabels]="3" class="w-100 md:w-80"
-                                        display="chip">
+                                        display="chip"    (onChange)="onPersonalRolesChange($event)">
                                     </p-multiSelect>
                                 </div>
                             </div>
