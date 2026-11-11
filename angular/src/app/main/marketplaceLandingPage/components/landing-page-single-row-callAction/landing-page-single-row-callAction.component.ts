@@ -1,15 +1,11 @@
-import { Component, Injector, Input, OnInit, ViewChild } from '@angular/core';
-import { Router } from '@angular/router';
-import { SafeResourceUrl } from '@angular/platform-browser';
+import { Component, HostListener, Injector, Input, OnInit, ViewChild } from '@angular/core';
 import { AppComponentBase } from '@shared/common/app-component-base';
-import { AccountsServiceProxy, PageSettingDto, SydObjectsServiceProxy } from '@shared/service-proxies/service-proxies';
-import { AppConsts } from '@shared/AppConsts';
+import { PageSettingDto } from '@shared/service-proxies/service-proxies';
 import { ViewEventComponent } from '@app/main/AppEvent/Components/view-event.component';
-import { finalize } from 'rxjs';
 import { EventsBrowseComponentActionsMenuFlags } from '@app/main/AppEventsBrowse/models/EventsBrowseComponentActionsMenuFlags';
 import { EventsBrowseComponentStatusesFlags } from '@app/main/AppEventsBrowse/models/EventsBrowseComponentStatusesFlags';
-import { BsModalRef } from 'ngx-bootstrap/modal';
-
+import { finalize } from 'rxjs';
+import { LandingPageBlocksService } from '../../services/landing-page-blocks.service';
 
 @Component({
   selector: 'app-single-row-callAction',
@@ -18,429 +14,119 @@ import { BsModalRef } from 'ngx-bootstrap/modal';
 })
 export class LandingPageSinglrRowCallActionComponent extends AppComponentBase implements OnInit {
   @Input() sectionId!: number;
-  @Input() blockTypeIsSingleOrMixed: string
-  @Input() loginTenaneSsin: string
-  
-  @ViewChild("viewEventModal", { static: true }) viewEventModal: ViewEventComponent;
-  bsModalRef: BsModalRef;
-  items: PageSettingDto[] = [];
+  @Input() blockTypeIsSingleOrMixed: string;
+  @Input() loginTenaneSsin: string;
 
-  attachmentBaseUrl = AppConsts.attachmentBaseUrl;
+  @ViewChild('viewEventModal', { static: true }) viewEventModal: ViewEventComponent;
 
-  attachmentSafeMap: Record<number, SafeResourceUrl | null> = {};
-  numVisible: number = 4;
-  numVisibleSingle: number = 4;
+  blocksSorted: PageSettingDto[] = [];
 
-  actionsMenuFlags: EventsBrowseComponentActionsMenuFlags
-  statusesFlags: EventsBrowseComponentStatusesFlags
-  private objectUrlById: Record<number, string> = {};
+  attachmentBaseUrl = this.blocksService.attachmentBaseUrl;
+  languageSettingName = this.blocksService.languageSettingName;
+
+  numVisible = 4;
+  numVisibleSingle = 4;
+
+  actionsMenuFlags: EventsBrowseComponentActionsMenuFlags;
+  statusesFlags: EventsBrowseComponentStatusesFlags;
   acceptedAspectRatio;
-  currentLang: string
-  isArabic: boolean
+
+  isArabic = false;
+  isSmallScreen = false;
+  loading = false;
+  hasLoadError = false;
+
   responsiveOptions = [
-    {
-      breakpoint: '1400px',
-      numVisible: 4,
-      numScroll: 4
-    },
-    {
-      breakpoint: '1199px',
-      numVisible: 4,
-      numScroll: 4
-    },
-    {
-      breakpoint: '991px',
-      numVisible: 2,
-      numScroll: 2
-    },
-    {
-      breakpoint: '767px',
-      numVisible: 2,
-      numScroll: 2
-    },
-    {
-      breakpoint: '575px',
-      numVisible: 1,
-      numScroll: 1
-    }
+    { breakpoint: '1400px', numVisible: 4, numScroll: 4 },
+    { breakpoint: '1199px', numVisible: 4, numScroll: 4 },
+    { breakpoint: '991px', numVisible: 2, numScroll: 2 },
+    { breakpoint: '767px', numVisible: 2, numScroll: 2 },
+    { breakpoint: '575px', numVisible: 1, numScroll: 1 },
   ];
 
- responsiveOptionsSingle = [
-  {
-    breakpoint: '1400px',
-    numVisible: 4,
-    numScroll: 1
-  },
-  {
-    breakpoint: '1199px',
-    numVisible: 3,
-    numScroll: 1
-  },
-  {
-    breakpoint: '991px',
-    numVisible: 2,
-    numScroll: 1
-  },
-  {
-    breakpoint: '767px',
-    numVisible: 1,
-    numScroll: 1
-  },
-  {
-    breakpoint: '575px',
-    numVisible: 1,
-    numScroll: 1
-  }
-];
+  responsiveOptionsSingle = [
+    { breakpoint: '1400px', numVisible: 4, numScroll: 1 },
+    { breakpoint: '1199px', numVisible: 3, numScroll: 1 },
+    { breakpoint: '991px', numVisible: 2, numScroll: 1 },
+    { breakpoint: '767px', numVisible: 1, numScroll: 1 },
+    { breakpoint: '575px', numVisible: 1, numScroll: 1 },
+  ];
 
-  languageSettingName: string = AppConsts.languageSettingName;
-    isSmallScreen = false;
-
-
-    loading = false;
-hasLoadError = false;
-
-  constructor(
-    injector: Injector,
-    private syd: SydObjectsServiceProxy,
-    private router: Router,
-    private _accountsServiceProxy: AccountsServiceProxy,
-  ) { super(injector); }
-
-  ngOnInit() {
-
-    this.currentLang = abp.utils.getCookieValue('Abp.Localization.CultureName')
-    this.currentLang == 'ar' || this.currentLang == 'ar-EG' ? this.isArabic = true : this.isArabic = false
-
-    if (this.sectionId) {
-      this.getBlocksData();
-    }
-       this.checkScreenSize();
-  window.addEventListener('resize', this.checkScreenSize.bind(this));
-
-    }
-    checkScreenSize(): void {
-  this.isSmallScreen = window.innerWidth <= 1023;
-}
-  viewProduct(prod: any) {
-    const productBodyRequestForView = {
-      id: prod?.appItem?.id,
-      // currencyCode: this.currency,
-      sellerSSIN: prod?.sellerSSIN,
-      // buyerSSIN : this.buyerSSIN
-    };
-    localStorage.setItem("productData", JSON.stringify(productBodyRequestForView))
-    this.router.navigate(["/app/main/marketplace/products/view", prod?.appItem?.id]);
-
+  constructor(injector: Injector, private blocksService: LandingPageBlocksService) {
+    super(injector);
   }
 
-  ngOnDestroy() {
-    Object.values(this.objectUrlById).forEach(url => { try { URL.revokeObjectURL(url); } catch { } });
-    this.objectUrlById = {};
+  ngOnInit(): void {
+    this.isArabic = this.blocksService.isArabic;
+    this.checkScreenSize();
+    if (this.sectionId) this.getBlocksData();
   }
 
-  get blocksSorted(): PageSettingDto[] {
-    const cmp = (a: PageSettingDto, b: PageSettingDto) => {
-      const ao = Number.isFinite(a.order as any) ? (a.order as number) : Number.MAX_SAFE_INTEGER;
-      const bo = Number.isFinite(b.order as any) ? (b.order as number) : Number.MAX_SAFE_INTEGER;
-      return (ao - bo) || ((a.id ?? 0) - (b.id ?? 0));
-    };
-    return (this.items ?? []).slice().sort(cmp);
+  @HostListener('window:resize')
+  checkScreenSize(): void {
+    this.isSmallScreen = this.blocksService.isSmallScreen();
   }
 
   getBlocksData(): void {
-  if (!this.sectionId) {
-    return;
+    if (!this.sectionId) return;
+
+    this.loading = true;
+    this.hasLoadError = false;
+
+    this.blocksService
+      .getSectionBlocks(this.sectionId)
+      .pipe(finalize(() => (this.loading = false)))
+      .subscribe({
+        next: blocks => (this.blocksSorted = blocks),
+        error: () => {
+          this.blocksSorted = [];
+          this.hasLoadError = true;
+        },
+      });
   }
-
-  this.loading = true;
-  this.hasLoadError = false;
-
-  this.syd
-    .getAllSectionBlocks(
-      this.sectionId,
-      Intl.DateTimeFormat().resolvedOptions().timeZone
-    )
-    .pipe(
-      finalize(() => {
-        this.loading = false;
-      })
-    )
-    .subscribe({
-      next: (res) => {
-        this.items = res ?? [];
-      },
-      error: () => {
-        this.items = [];
-        this.hasLoadError = true;
-      }
-    });
-}
-
-  fullUrl(path?: string): string {
-    const p = (path ?? '').trim();
-    if (!p) return '';
-    if (/^https?:\/\//i.test(p)) return p;
-    if (p.startsWith('assets/')) return `/${p}`;
-    return `${this.attachmentBaseUrl?.replace(/\/$/, '')}/${p.replace(/^\//, '')}`;
-  }
-
-  isPdf(path?: string) { return !!path && /\.pdf($|\?)/i.test(path); }
-  isImg(path?: string) { return !!path && /\.(jpe?g|png|webp|gif|svg)($|\?)/i.test(path); }
-  isVideo(path?: string) { return !!path && /\.(mp4|webm|ogg)($|\?)/i.test(path); }
-
-
-
-  onImgErr(evt: Event) {
-    (evt.target as HTMLImageElement).src = '/assets/placeholders/_logo-placeholder.png';
-  }
-
-  goToBrand(brand) {
-
-    this.router.navigate(
-      ['/app/main/marketplace/products'],
-      { queryParams: { brand: brand?.getAppEntityForViewDto?.appEntity?.id } }
-    );
-  }
-  goToCategory(id) {
-
-    this.router.navigate(
-      ['/app/main/marketplace/products'],
-      { queryParams: { cat: id } }
-    );
-  }
-
-  // ---------- optional download helper ----------
-  downloadRaw(path?: string) {
-    const href = this.fullUrl(path);
-    const a = document.createElement('a');
-    a.href = href; a.target = '_blank'; // let server decide inline vs download
-    document.body.appendChild(a); a.click(); document.body.removeChild(a);
-  }
-  openNewTab(path?: string) {
-    window.open(this.fullUrl(path))
-  }
-  openTab(path?: string) {
-    window.open(path)
-  }
-
-
 
   getAspectatio(): void {
-    this.getSycAttachmentCategoriesByCodes(['LOGO', 'BANNER', 'IMAGE'])
-      .subscribe(result => {
-
-        const imgCat = result.find(x => x.code === 'IMAGE');
-
-        if (imgCat?.aspectRatio) {
-
-          const [w, h] = imgCat.aspectRatio.split(':').map(Number);
-
-          if (w && h) {
-            this.acceptedAspectRatio = h / w;
-          }
-        }
-      });
+    this.getSycAttachmentCategoriesByCodes(['LOGO', 'BANNER', 'IMAGE']).subscribe(result => {
+      const imgCat = result.find(x => x.code === 'IMAGE');
+      if (imgCat?.aspectRatio) {
+        const [w, h] = imgCat.aspectRatio.split(':').map(Number);
+        if (w && h) this.acceptedAspectRatio = h / w;
+      }
+    });
   }
 
+  // ---------- delegates to the shared service (template API unchanged) ----------
+  viewProduct(prod: any) { this.blocksService.viewProduct(prod); }
+  goToBrand(brand) { this.blocksService.goToBrand(brand); }
+  goToCategory(id) { this.blocksService.goToCategory(id); }
+  onImgErr(evt: Event) { this.blocksService.onImgErr(evt); }
+  fullUrl(path?: string) { return this.blocksService.fullUrl(path); }
+  openNewTab(path?: string) { this.blocksService.openNewTab(path); }
+  getAttachmentImage(b: PageSettingDto) { return this.blocksService.getAttachmentImage(b); }
+  hasPdfAttachment(b: PageSettingDto) { return this.blocksService.hasPdfAttachment(b); }
+  getAttachmentClickUrl(b: PageSettingDto) { return this.blocksService.getAttachmentClickUrl(b); }
+  onAttachmentClick(b: PageSettingDto) { this.blocksService.onAttachmentClick(b); }
+  getBlockTypeIcon(block) { return this.blocksService.getBlockTypeIcon(block); }
+  getBlockTypeLabel(block) { return this.l(this.blocksService.getBlockTypeLabelKey(block)); }
 
-
-  getAttachmentImage(b: PageSettingDto): string | null {
-    if (!b) return null;
-
-    // 1) block.image itself is an image path
-    if (this.isImg(b.image)) {
-      return this.fullUrl(b.image);
-    }
-
-    // 2) try entityAttachments: find first image attachment
-    const imgAtt = b.entityAttachments?.find(att =>
-      this.isImg(att?.url || att?.fileName)
-    );
-
-    if (imgAtt) {
-      return this.fullUrl(imgAtt.url || imgAtt.fileName);
-    }
-
-    return null;
+  openEventDetails(id: any): void {
+    this.viewEventModal.show(id, 0);
   }
 
-  /** Returns true if there is a PDF attachment on this block. */
-  hasPdfAttachment(b: PageSettingDto): boolean {
-    if (!b?.entityAttachments) return false;
-    return b.entityAttachments.some(att =>
-      this.isPdf(att?.url || att?.fileName)
-    );
-  }
-
-
-  getAttachmentPdfUrl(b: PageSettingDto): string | null {
-    if (!b?.entityAttachments) return null;
-
-    const pdfAtt = b.entityAttachments.find(att =>
-      this.isPdf(att?.url || att?.fileName)
-    );
-    if (!pdfAtt) return null;
-
-    return this.fullUrl(pdfAtt.url || pdfAtt.fileName);
-  }
-
-
-  getAttachmentClickUrl(b: PageSettingDto): string | null {
-    if (!b) return null;
-
-    // Case 2: image + PDF
-    const pdfUrl = this.getAttachmentPdfUrl(b);
-    if (pdfUrl) {
-      return pdfUrl;
-    }
-
-    // Case 1: image + external link
-    if (b.link) return b.link;
-    if (b.externalUrl) return b.externalUrl;
-    if (b.linkPageUrl) return b.linkPageUrl;
-
-    // Fallback to the main image/url
-    if (b.image) return this.fullUrl(b.image);
-
-    return null;
-  }
-
-
-  onAttachmentClick(b: PageSettingDto): void {
-    const url = this.getAttachmentClickUrl(b);
-    if (!url) { return; }
-
-    // if it's relative to attachments, normalize to fullUrl
-    const finalUrl = /^https?:\/\//i.test(url) ? url : this.fullUrl(url);
-    window.open(finalUrl, '_blank');
-  }
-
-  createRelation(account, option) {
-
+  createRelation(account, option): void {
     this.showMainSpinner();
-
-    this._accountsServiceProxy
-      .applyRelationOnProfile(
-        account?.account?.id,
-        undefined,
-        (option?.relation?.defaultVisibility || '').toLowerCase() === 'public',
-        option?.relation?.connectionEntityId
-      )
+    this.blocksService
+      .createRelation(account, option)
       .pipe(finalize(() => this.hideMainSpinner()))
-      .subscribe((result: any) => {
-
-        const raw = (typeof result === 'string' ? result : result?.result) || '';
-        const parsed = this.parseRelationResult(raw);
-
-        account.availableConnections = [];
-        account.avaliableConnectionName = '';
-        account.connectionName = parsed.connectionName;
-        account.disConnectLabel = parsed.disconnectLabel;
-      });
+      .subscribe();
   }
 
   disconnect(account): void {
-    const id = account?.account?.id;
-    if (!id) return;
-
+    if (!account?.account?.id) return;
     this.showMainSpinner();
-
-    this._accountsServiceProxy
-      .disconnect(id,undefined)
+    this.blocksService
+      .disconnect(account)
       .pipe(finalize(() => this.hideMainSpinner()))
-      .subscribe((res: any[]) => {
-        this.notify.success(this.l('SuccessfullyDisconnected'));
-
-
-        const options = Array.isArray(res) ? res : [];
-        account.connectionName = '';
-        account.disConnectLabel = '';
-        account.availableConnections = options;
-        account.avaliableConnectionName = options?.[0]?.connectLabel || '';
-      });
-  }
-  private parseRelationResult(raw: string): { connectionName: string; disconnectLabel: string } {
-    const text = (raw || '').trim();
-
-    const idx = text.indexOf('-');
-    const connectionName = idx > -1 ? text.slice(0, idx).trim() : text;
-    const disconnectLabel = idx > -1 ? text.slice(idx + 1).trim() : 'MPActionDisconnect';
-
-    return { connectionName, disconnectLabel };
-  }
-  openEventDetails(id: any) {
-
-    this.viewEventModal.show(id, 0);
-
-  }
-
-getBlockTypeLabel(block) {
-  let t  = (block.blockType).toUpperCase();
-
-  switch (t) {
-    case 'EVENT':
-     if(block?.getAppEventForViewDto?.appEvent?.isOnLine){
-      return this.l('OnlineEvent') 
-      }else{
-         return this.l('InPersonEvent' ) 
-        
-      }
-    case 'CONTACT':
-        if(block?.getAccountForViewDto?.account?.accountType == 'BUSINESS'){
-        return this.l('BUSINESSAccount')
-      } else  if(block?.getAccountForViewDto?.account?.accountType == 'PERSONAL'){
-           return this.l('PERSONALAccount')
-
-      }else {
-    return this.l('GROUPAccount')
-
-      }
-   
-    case 'PRODUCT':
-      return this.l('Product') ;
-    case 'ATTACHMENT':
-      return  this.l('Link') 
-    case 'BRAND':
-      return this.l('Brand') ;
-    case 'CATEGORY':
-      return this.l('Category') ;
-    default:
-      return this.l('Block') ;
-  }
-}
-
-  getBlockTypeIcon(block) {
-    const t = (block.blockType).toUpperCase();
-
-    switch (t) {
-      case 'EVENT':
-        if (block?.getAppEventForViewDto?.appEvent?.isOnLine == true) {
-          return 'fas fa-video'
-        } else {
-          return 'fas fa-map-marker-alt';
-
-        }
-      case 'CONTACT':
-        if (block?.getAccountForViewDto?.account?.accountType == 'BUSINESS') {
-          return 'fas fa-building'
-        } else if (block?.getAccountForViewDto?.account?.accountType == 'PERSONAL') {
-          return 'fas fa-user';
-
-        } else {
-          return 'fas fa-users';
-
-        }
-      case 'PRODUCT':
-        return 'fas fa-shopping-bag';
-      case 'ATTACHMENT':
-        return 'fas fa-paperclip';
-      case 'BRAND':
-        return 'fas fa-tag';
-      case 'CATEGORY':
-        return 'fas fa-th-large';
-      default:
-        return 'fas fa-square';
-    }
+      .subscribe(() => this.notify.success(this.l('SuccessfullyDisconnected')));
   }
 }

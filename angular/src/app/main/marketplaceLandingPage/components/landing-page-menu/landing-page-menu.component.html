@@ -1,0 +1,62 @@
+
+<nav
+  [ngClass]="isAuthenticated ? 'landing-menu' : 'landing-menu-full'"
+  [style.background-color]="backgroundColor"
+  [style.color]="textColor">
+
+  <div class="menu-scroll-wrapper">
+    <div class="menu-items mx-md-5 px-md-4 mx-2 mt-2">
+
+      <div
+        class="menu-item"
+        *ngFor="let section of sections; trackBy: trackBySection">
+
+        <button
+          type="button"
+          class="menu-trigger"
+          [class.active]="expandedMenu === section.sectionId"
+          [style.color]="textColor"
+          [attr.aria-expanded]="expandedMenu === section.sectionId"
+          (click)="toggleMenu(section)">
+
+          {{ section.inputs?.title || section.inputs?.name }}
+
+        </button>
+
+        <div
+          class="menu-dropdown"
+          *ngIf="expandedMenu === section.sectionId">
+
+          <div
+            *ngIf="loadingSections[section.sectionId]"
+            class="menu-loading">
+            {{ 'Loading' | localize }}...
+          </div>
+
+          <ng-container *ngIf="!loadingSections[section.sectionId]">
+
+            <button
+              type="button"
+              class="dropdown-item"
+              *ngFor="let block of getBlocks(section.sectionId)"
+              (click)="openItem(block)">
+
+              {{ block.name || block.title || block.code }}
+
+            </button>
+
+            <div
+              class="menu-empty"
+              *ngIf="getBlocks(section.sectionId).length === 0">
+              {{ 'No menu items found' | localize }}
+            </div>
+
+          </ng-container>
+
+        </div>
+
+      </div>
+
+    </div>
+  </div>
+</nav>

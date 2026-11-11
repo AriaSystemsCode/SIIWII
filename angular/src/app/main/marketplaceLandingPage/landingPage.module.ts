@@ -28,6 +28,11 @@ import { AccountSharedModule } from "../accounts/account-shared/account-shared.m
 import { EventsBrowseModule } from "../AppEventsBrowse/events-browse.module";
 import { TooltipModule } from 'primeng/tooltip';
 import { DialogModule } from 'primeng/dialog';
+import { LandingPageMenuComponent } from './components/landing-page-menu/landing-page-menu.component';
+import { LandingPageImgsSliderComponent } from './components/landing-page-imgs-slider/landing-page-imgs-slider.component';
+import { LandingPage4BlocksComponent } from "./components/landing-page-four-blocks/landing-page-four-blocks.component";
+import { LandingPageBlockCardComponent } from './components/landing-page-block-card/landing-page-block-card.component';
+
 
 
 @NgModule({
@@ -44,7 +49,11 @@ import { DialogModule } from 'primeng/dialog';
         ContactUsModalComponent,
         MarketplaceEventCardComponent,
         MarketplaceAccountCardComponent,
-        MarketplaceProductCardComponent
+        MarketplaceProductCardComponent,
+        LandingPageMenuComponent,
+        LandingPageImgsSliderComponent,
+        LandingPage4BlocksComponent,
+        LandingPageBlockCardComponent
 
     ],
     imports: [
@@ -67,6 +76,7 @@ import { DialogModule } from 'primeng/dialog';
         DialogModule
         
     ],
-    exports: [MarketplaceLandingPageComponent, LandingPageSliderWithCallToActionComponent,FooterPageLinkComponent,FooterSocialMediaComponent,LandingPageSinglrRowCallActionComponent,LandingPageSliderWithoutCallToActionComponent,LandingPageCarusalWithCallToActionComponent,LandingPageMultiRowCallToActionComponent,ContactUsModalComponent],
+    exports: [MarketplaceLandingPageComponent, LandingPageSliderWithCallToActionComponent,FooterPageLinkComponent,FooterSocialMediaComponent,LandingPageSinglrRowCallActionComponent,LandingPageSliderWithoutCallToActionComponent,LandingPageCarusalWithCallToActionComponent,LandingPageMultiRowCallToActionComponent,ContactUsModalComponent, LandingPageMenuComponent,
+        LandingPageImgsSliderComponent, LandingPage4BlocksComponent],
 })
 export class LandingPageModule {}
