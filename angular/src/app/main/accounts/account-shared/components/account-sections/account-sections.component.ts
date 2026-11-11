@@ -4,17 +4,14 @@ import {
   Input,
   OnChanges,
   OnInit,
-  QueryList,
-  SimpleChanges,
-  ViewChildren
+  SimpleChanges
 } from '@angular/core';
 import { SelectCategoriesDynamicModalComponent } from '@app/categories/select-categories-dynamic-modal.component';
 import { SelectClassificationDynamicModalComponent } from '@app/classification/select-classification-dynamic-modal.component';
 import { ExtraAttributeDataService } from '@app/main/app-items/app-item-shared/services/extra-attribute-data.service';
-import { BsModalRef, BsModalService, ModalOptions } from '@node_modules/ngx-bootstrap/modal';
+import { BsModalService, ModalOptions } from '@node_modules/ngx-bootstrap/modal';
 
 import { AppComponentBase } from '@shared/common/app-component-base';
-import { dynamicInputs } from '@shared/components/dynamicInputs/dynamicInputs.component';
 import {
   AccountsServiceProxy,
   AppEntitiesServiceProxy,
@@ -30,414 +27,282 @@ import {
   TreeNodeOfGetSycEntityObjectCategoryForViewDto,
   TreeNodeOfGetSycEntityObjectClassificationForViewDto
 } from '@shared/service-proxies/service-proxies';
-import {
-  forkJoin, Subscription, Observable,
-  of
-} from 'rxjs';
-import { finalize, tap } from 'rxjs/operators';
+import { forkJoin, Observable, of } from 'rxjs';
+import { finalize, switchMap, tap } from 'rxjs/operators';
+
 type EntityMode = 'create' | 'edit' | 'view';
 
-
+const PERSONAL_ACCOUNT_TYPE_ID = 21;
+const DEFAULT_RELATIONSHIP_TYPE_ID = 747;
 
 @Component({
   selector: 'app-account-sections',
   templateUrl: './account-sections.component.html',
-  styleUrls: ['./account-sections.component.scss'],
+  styleUrls: ['./account-sections.component.scss']
 })
-export class AccountSectionsComponent
-  extends AppComponentBase
-  implements OnInit, OnChanges {
+export class AccountSectionsComponent extends AppComponentBase implements OnInit, OnChanges {
 
+  // ---------- Inputs ----------
   @Input() accountId: number;
   @Input() entityData: any;
   @Input() mode: EntityMode = 'view';
-@Input() isContact = false;
+  @Input() isContact = false;
+  @Input() fieldPermissions: Record<string, boolean> = {};
+  @Input() sectionPermissions: Record<string, boolean> = {};
 
-  @Input()
-  fieldPermissions:
-    Record<string, boolean> = {};
-
-  @Input()
-  sectionPermissions:
-    Record<string, boolean> = {};
-
+  // ---------- Account ----------
   account: any = {};
 
+  readonly phoneFields = [1, 2, 3].map(n => ({
+    type: `phone${n}TypeId`,
+    number: `phone${n}Number`,
+    ext: `phone${n}Ex`
+  }));
 
   allLanguages: LookupLabelDto[] = [];
   allCurrencies: CurrencyInfoDto[] = [];
   allPhoneTypes: LookupLabelDto[] = [];
 
-  connectionsInfo: ConnectionInfo[] = [];
-
-  selectedRelationId: number | null = null;
-
-  relationshipEntityObjectTypeId: number | null = null;
-
-  dynamicInputsForViewDto: GetAppEntityForEditOutput | null = null;
-
-  allRelationshipAttributes: any[] = [];
-
-  groupedByUsage: Record<string, any[]> = {};
-
-  usageList: string[] = [];
-
-  isLoadingRelationship = false;
-
-
-  roleEntityObjectTypeId: number;
-
-  roleDynamicInputsForViewDto: GetAppEntityForEditOutput | null = null;
-
-  roleExtraAttributeObject: any = null;
-
-  roleAttributes: any[] = [];
-
-  isLoadingRoles = false;
-
-  //Department
-  showMoreDepartment: boolean = false;
-  showLessDepartment: boolean = false;
-  totalDepartment: number;
-  noOfDepartmentToShowInitially: number;
-  maxDepartmentCount: number;
-  skipDepartmentCount: number;
-  departmentToLoad: number;
-  initDepartment: string[] = [];
-  scrollDepartment: boolean = false;
-  maxDepartmentCnt: number;
-  //Classification
-  showMoreClassification: boolean = false;
-  showLessClassification: boolean = false;
-  totalClassification: number;
-  noOfClassificationToShowInitially: number;
-  maxClassificationCount: number;
-  skipClassificationCount: number;
-  classificationToLoad: number;
-  initClassification: string[] = [];
-  scrollClassification: boolean = false;
-  maxClassificationCnt: number;
-  maxContainerHeight: number = 150;
-
-
-
+  // ---------- Business (departments / classifications) ----------
   categoriesIds: number[] = [];
-
   classificationsIds: number[] = [];
 
+  // ---------- Roles ----------
+  roleEntityObjectTypeId: number;
+  roleDynamicInputsForViewDto: GetAppEntityForEditOutput | null = null;
+  roleExtraAttributeObject: any = null;
+  roleAttributes: any[] = [];
+  isLoadingRoles = false;
 
-
-  @ViewChildren('appdynamicInputs')
-  dynamicInputsComponents!: QueryList<dynamicInputs>;
-
-  relationshipDynamicInputsForViewDto:
-    GetAppEntityForEditOutput;
-
-
-  allShipVia: LookupLabelDto[] = [];
-  allPaymentTerms: LookupLabelDto[] = [];
-  allPriceLevel: any[] = [];
-
-  @ViewChildren('relationshipDynamicInput')
-  relationshipDynamicInputs!:
-    QueryList<dynamicInputs>;
-
-
+  // ---------- Relationship ----------
+  connectionsInfo: ConnectionInfo[] = [];
+  selectedRelationId: number | null = null;
+  relationshipEntityObjectTypeId: number | null = null;
+  relationshipDynamicInputsForViewDto: GetAppEntityForEditOutput;
+  allRelationshipAttributes: any[] = [];
+  groupedByUsage: Record<string, any[]> = {};
+  usageList: string[] = [];
+  isLoadingRelationship = false;
   relationshipTouched = false;
+
+  private allShipVia: LookupLabelDto[] = [];
+  private allPaymentTerms: LookupLabelDto[] = [];
+  private allPriceLevel: any[] = [];
 
   constructor(
     injector: Injector,
     private _accountsServiceProxy: AccountsServiceProxy,
-    private _AppEntitiesServiceProxy: AppEntitiesServiceProxy,
+    private _appEntitiesServiceProxy: AppEntitiesServiceProxy,
     private _extraAttributeDataService: ExtraAttributeDataService,
-
-    private _sycEntityObjectTypesServiceProxy:
-      SycEntityObjectTypesServiceProxy, private _bsModalService:
-      BsModalService
+    private _sycEntityObjectTypesServiceProxy: SycEntityObjectTypesServiceProxy,
+    private _bsModalService: BsModalService
   ) {
     super(injector);
   }
 
+  // ================= Lifecycle =================
+
   ngOnInit(): void {
-
-
     this.loadLookups();
-
-    if (this.entityData?.account) {
-      this.setAccountData(this.entityData);
-
-    }
   }
+
   ngOnChanges(changes: SimpleChanges): void {
-
-    if (changes.entityData?.currentValue?.account) {
-      this.setAccountData(changes.entityData.currentValue);
+    const data = changes.entityData?.currentValue;
+    if (data?.account) {
+      this.setAccountData(data);
     }
-
-    this.initDepartmentVariables(true);
-    this.initClassificationVariables(true);
   }
+
+  // ================= Getters =================
+
+  get isViewMode(): boolean {
+    return this.mode === 'view';
+  }
+
+  get isPersonalAccount(): boolean {
+    return this.roleEntityObjectTypeId === PERSONAL_ACCOUNT_TYPE_ID;
+  }
+
+  get selectedDepartments(): AppEntityCategoryDto[] {
+    return this.account?.entityCategories ?? [];
+  }
+
+  get selectedClassifications(): AppEntityClassificationDto[] {
+    return this.account?.entityClassifications ?? [];
+  }
+
+  get canEditAccountData(): boolean {
+    if (this.mode === 'view') {
+      return false;
+    }
+    // Contacts and new accounts are always editable.
+    if (this.isContact || this.mode === 'create') {
+      return true;
+    }
+    // Existing root account: only manual, not connected ones.
+    return this.account?.isManual === true && this.account?.isConnected !== true;
+  }
+
+  canEditField(fieldName: string): boolean {
+    if (!this.canEditAccountData || fieldName === 'ssin') {
+      return false;
+    }
+    if (fieldName === 'code') {
+      return this.mode === 'create';
+    }
+    return true;
+  }
+
+  canEditSection(section: 'basic' | 'business' | 'roles' | 'relationship'): boolean {
+    return section === 'relationship'
+      ? this.mode === 'edit'
+      : this.canEditAccountData;
+  }
+
   trackByValue(index: number, value: string): string {
     return value || index.toString();
   }
 
-  mainBranch
+  // ================= Load =================
+
+  private loadLookups(): void {
+    this._appEntitiesServiceProxy.getAllLanguageForTableDropdown()
+      .subscribe(result => (this.allLanguages = result));
+
+    this._appEntitiesServiceProxy.getAllCurrencyForTableDropdown()
+      .subscribe(result => (this.allCurrencies = result));
+
+    this._appEntitiesServiceProxy.getAllPhoneTypeForTableDropdown()
+      .subscribe(result => (this.allPhoneTypes = result));
+  }
+
+  getAccountDataForView(): void {
+    if (!this.accountId) {
+      return;
+    }
+
+    this.showMainSpinner();
+    this._accountsServiceProxy.getAccountForView(this.accountId, 5)
+      .pipe(finalize(() => this.hideMainSpinner()))
+      .subscribe(result => this.setAccountData(result));
+  }
+
   private setAccountData(data: any): void {
     if (!data?.account) {
       this.entityData = null;
       this.account = {};
-      this.mainBranch = {};
       this.connectionsInfo = [];
-
       return;
     }
 
     this.entityData = data;
     this.account = data.account;
-
-    this.mainBranch = this.account;
-
-    this.account.categories ??= [];
-    this.account.classfications ??= [];
-    this.account.imagesUrls ??= [];
-
-    this.account.entityAttachments ??= [];
-    this.account.entityCategories ??= [];
-    this.account.entityClassifications ??= [];
-
-    const existingExtraData =
-      data.entityExtraData ??
-      this.account.entityExtraData ??
-      [];
-
-    this.account.entityExtraData =
-      existingExtraData;
-
-    this.entityData.entityExtraData =
-      existingExtraData;
-
-    this.connectionsInfo =
-      data.connectionsInfo ?? [];
-
-    this.roleEntityObjectTypeId =
-      this.account.accountTypeId ?? null;
+    this.connectionsInfo = data.connectionsInfo ?? [];
+    this.roleEntityObjectTypeId = this.account.accountTypeId ?? null;
 
     this.initializeAccountFields();
-    this.initializeSelectedBusinessData();
 
     if (this.roleEntityObjectTypeId) {
       this.initializeRolesSection();
-    } else {
-      // this.resetRoleData();
     }
 
-    if (
-      this.mode !== 'create' &&
-      this.connectionsInfo.length
-    ) {
-      this.initializeRelationshipSection();
-    } else {
+    if (this.mode === 'create') {
       this.resetRelationshipData();
+    } else {
+      this.initializeRelationshipSection();
     }
   }
-
-
-  private initializeSelectedBusinessData():
-    void {
-
-    this.account.entityCategories =
-      Array.isArray(
-        this.account
-          .entityCategories
-      )
-        ? this.account
-          .entityCategories
-        : [];
-
-    this.account
-      .entityClassifications =
-      Array.isArray(
-        this.account
-          .entityClassifications
-      )
-        ? this.account
-          .entityClassifications
-        : [];
-
-    this.categoriesIds =
-      this.account
-        .entityCategories
-        .map(item =>
-          Number(
-            item
-              .entityObjectCategoryId
-          )
-        )
-        .filter(id => id > 0);
-
-    this.classificationsIds =
-      this.account
-        .entityClassifications
-        .map(item =>
-          Number(
-            item
-              .entityObjectClassificationId
-          )
-        )
-        .filter(id => id > 0);
-  }
-
-
-  private initializeBusinessSelections(): void {
-    this.categoriesIds = (this.account.entityCategories ?? [])
-      .map(item => Number(item.entityObjectCategoryId))
-      .filter(id => id > 0);
-
-    this.classificationsIds =
-      (this.account.entityClassifications ?? [])
-        .map(item =>
-          Number(item.entityObjectClassificationId)
-        )
-        .filter(id => id > 0);
-  }
-
-
 
   private initializeAccountFields(): void {
-    this.account.tradeName ??= '';
-    this.account.languageId ??= undefined;
+    const account = this.account;
 
-    this.account.phone1TypeId ??= undefined;
-    this.account.phone1Number ??= '';
-    this.account.phone1Ex ??= '';
+    account.categories ??= [];
+    account.classfications ??= [];
+    account.imagesUrls ??= [];
+    account.entityAttachments ??= [];
 
-    this.account.phone2TypeId ??= undefined;
-    this.account.phone2Number ??= '';
-    this.account.phone2Ex ??= '';
+    if (!Array.isArray(account.entityCategories)) {
+      account.entityCategories = [];
+    }
+    if (!Array.isArray(account.entityClassifications)) {
+      account.entityClassifications = [];
+    }
 
-    this.account.phone3TypeId ??= undefined;
-    this.account.phone3Number ??= '';
-    this.account.phone3Ex ??= '';
+    account.tradeName ??= '';
+    account.languageId ??= undefined;
 
-    const existingExtraData =
-      this.entityData?.entityExtraData ??
-      this.account?.entityExtraData ??
-      [];
+    this.phoneFields.forEach(phone => {
+      account[phone.type] ??= undefined;
+      account[phone.number] ??= '';
+      account[phone.ext] ??= '';
+    });
 
-    this.account.entityExtraData =
-      existingExtraData;
+    const extraData = this.entityData.entityExtraData ?? account.entityExtraData ?? [];
+    account.entityExtraData = extraData;
+    this.entityData.entityExtraData = extraData;
 
-    this.entityData.entityExtraData =
-      existingExtraData;
-
-    this.account.entityAttachments ??= [];
-    this.account.entityCategories ??= [];
-    this.account.entityClassifications ??= [];
-
-    this.initializeBusinessSelections();
+    this.updateSelectedIds();
   }
+
+  // ================= Shared helpers =================
+
+  private ensurePagination(attribute: any): void {
+    attribute.paginationSetting ??= {
+      skipCount: 0,
+      maxResultCount: 10,
+      totalCount: 0,
+      list: []
+    };
+  }
+
+  /** Keeps old rows for attributes that did not change and adds the new ones. */
+  private mergeExtraData(
+    existing: AppEntityExtraDataDto[],
+    incoming: AppEntityExtraDataDto[]
+  ): AppEntityExtraDataDto[] {
+    const changedIds = new Set(incoming.map(item => item.attributeId));
+    return [...existing.filter(item => !changedIds.has(item.attributeId)), ...incoming];
+  }
+
+  private removeFromExtraData(
+    data: AppEntityExtraDataDto[],
+    attributeId: number
+  ): AppEntityExtraDataDto[] {
+    return data.filter(item => Number(item.attributeId) !== Number(attributeId));
+  }
+
+  private syncExtraData(data: AppEntityExtraDataDto[]): void {
+    this.entityData.entityExtraData = data;
+    this.account.entityExtraData = data;
+  }
+
+  // ================= Roles =================
 
   private initializeRolesSection(): void {
     this.isLoadingRoles = true;
     this.roleExtraAttributeObject = null;
     this.roleAttributes = [];
 
-    const accountExtraData: AppEntityExtraDataDto[] =
-      this.entityData?.entityExtraData ??
-      this.account?.entityExtraData ??
-      [];
+    const extraData: AppEntityExtraDataDto[] =
+      this.entityData?.entityExtraData ?? this.account?.entityExtraData ?? [];
 
     this._sycEntityObjectTypesServiceProxy
       .getAllWithExtraAttributes(this.roleEntityObjectTypeId)
-      .pipe(
-        finalize(() => {
-          this.isLoadingRoles = false;
-        })
-      )
+      .pipe(finalize(() => (this.isLoadingRoles = false)))
       .subscribe({
         next: result => {
-          const roleType = result?.find(
-            item => item.id === this.roleEntityObjectTypeId
-          ) ?? result?.[0];
+          const roleType =
+            result?.find(item => item.id === this.roleEntityObjectTypeId) ?? result?.[0];
 
-          this.roleAttributes =
-            roleType?.extraAttributes?.extraAttributes ?? [];
+          this.roleAttributes = roleType?.extraAttributes?.extraAttributes ?? [];
+          this.roleAttributes.forEach(attribute => this.ensurePagination(attribute));
 
-          this.roleAttributes.forEach(attribute => {
-            if (!attribute.paginationSetting) {
-              attribute.paginationSetting = {
-                skipCount: 0,
-                maxResultCount: 10,
-                totalCount: 0,
-                list: []
-              };
-            }
-          });
-
-
-          this.roleDynamicInputsForViewDto =
-            new GetAppEntityForEditOutput();
-          (this.roleDynamicInputsForViewDto as any).extraDataAttributes =
-            this.roleAttributes.map(attribute => {
-
-              const attributeId =
-                attribute.attributeId ??
-                attribute.id;
-
-              const matchedValues =
-                accountExtraData.filter(
-                  item =>
-                    Number(item.attributeId) ===
-                    Number(attributeId)
-                );
-
-              let selectedValues: Array<{ value: any }> = [];
-
-              const isMultiSelect =
-                attribute.dataType?.toUpperCase() ===
-                'MULTISELECTDROPDOWNLIST' ||
-                attribute.acceptMultipleValues === true;
-
-              if (isMultiSelect) {
-                selectedValues = matchedValues.flatMap(item => {
-                  const rawValue =
-                    item.attributeValue ??
-                    item.attributeValueId ??
-                    '';
-
-                  if (Array.isArray(rawValue)) {
-                    return rawValue.map(value => ({
-                      value
-                    }));
-                  }
-
-                  return this.parseMultiSelectValue(
-                    rawValue,
-                    attribute.validEntries
-                  ).map(value => ({
-                    value
-                  }));
-                });
-              } else {
-                selectedValues = matchedValues.map(item => ({
-                  value:
-                    item.attributeValueId ??
-                    item.attributeValue ??
-                    ''
-                }));
-              }
-
-              return {
-                extraAttributeId: attributeId,
-                extraAttrName: attribute.name,
-                selectedValues
-              };
-            });
-          /*
-           * Keep entityExtraData because you use it later for saving.
-           */
-          this.roleDynamicInputsForViewDto.entityExtraData =
-            [...accountExtraData];
+          const dto = new GetAppEntityForEditOutput();
+          (dto as any).extraDataAttributes =
+            this.roleAttributes.map(attribute => this.toRoleAttributeValues(attribute, extraData));
+          // Kept because it is used later when saving.
+          dto.entityExtraData = [...extraData];
+          this.roleDynamicInputsForViewDto = dto;
 
           this.roleExtraAttributeObject = {
             value: {
@@ -446,9 +311,7 @@ export class AccountSectionsComponent
             }
           };
         },
-        error: error => {
-
-
+        error: () => {
           this.roleAttributes = [];
           this.roleExtraAttributeObject = null;
           this.roleDynamicInputsForViewDto = null;
@@ -456,26 +319,44 @@ export class AccountSectionsComponent
       });
   }
 
+  /** Builds the saved values of one role attribute for the dynamic inputs. */
+  private toRoleAttributeValues(attribute: any, extraData: AppEntityExtraDataDto[]) {
+    const attributeId = attribute.attributeId ?? attribute.id;
 
-  private parseMultiSelectValue(
-    rawValue: any,
-    validEntries: string
-  ): string[] {
+    const matched = extraData.filter(
+      item => Number(item.attributeId) === Number(attributeId)
+    );
 
-    if (
-      rawValue === null ||
-      rawValue === undefined ||
-      rawValue === ''
-    ) {
+    const isMultiSelect =
+      attribute.dataType?.toUpperCase() === 'MULTISELECTDROPDOWNLIST' ||
+      attribute.acceptMultipleValues === true;
+
+    const selectedValues = isMultiSelect
+      ? matched.flatMap(item => {
+          const raw: any = item.attributeValue ?? item.attributeValueId ?? '';
+          const values = Array.isArray(raw)
+            ? raw
+            : this.parseMultiSelectValue(raw, attribute.validEntries);
+          return values.map(value => ({ value }));
+        })
+      : matched.map(item => ({
+          value: item.attributeValueId ?? item.attributeValue ?? ''
+        }));
+
+    return {
+      extraAttributeId: attributeId,
+      extraAttrName: attribute.name,
+      selectedValues
+    };
+  }
+
+  /** Splits a saved "a-b-c" string into the valid entries it contains. */
+  private parseMultiSelectValue(rawValue: any, validEntries: string): string[] {
+    if (rawValue === null || rawValue === undefined || rawValue === '') {
       return [];
     }
 
-    if (Array.isArray(rawValue)) {
-      return rawValue;
-    }
-
     const value = String(rawValue).trim();
-
     const options = (validEntries ?? '')
       .split('|')
       .map(option => option.trim())
@@ -483,42 +364,81 @@ export class AccountSectionsComponent
 
     if (options.length) {
       return options.filter(option => {
-        const escapedOption =
-          option.replace(
-            /[.*+?^${}()|[\]\\]/g,
-            '\\$&'
-          );
-
-        const pattern = new RegExp(
-          `(^|-)${escapedOption}(?=-|$)`,
-          'i'
-        );
-
-        return pattern.test(value);
+        const escaped = option.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+        return new RegExp(`(^|-)${escaped}(?=-|$)`, 'i').test(value);
       });
     }
 
-    return value
-      .split('-')
-      .map(item => item.trim())
-      .filter(Boolean);
+    return value.split('-').map(item => item.trim()).filter(Boolean);
   }
 
-  private initializeRelationshipSection():
-    void {
-
-    if (!this.connectionsInfo?.length) {
-
-      this.resetRelationshipData();
-
+  onRoleExtraAttributesChanged(changedAttributes: any[]): void {
+    if (!this.canEditSection('roles')) {
       return;
     }
 
+    const dto = (this.roleDynamicInputsForViewDto ??= new GetAppEntityForEditOutput());
+    const incoming = (changedAttributes ?? []).map(attribute => this.createRoleExtraData(attribute));
+    const merged = this.mergeExtraData(dto.entityExtraData ?? [], incoming);
 
-    const firstRelationId =
-      this.connectionsInfo[0]
-        ?.relationEntityId;
+    dto.entityExtraData = merged;
+    this.syncExtraData(merged);
+    this.entityData.__extraDataTouched = true;
+  }
 
+  onRoleExtraAttributeCleared(attributeId: number): void {
+    if (!this.canEditSection('roles')) {
+      return;
+    }
+
+    const updated = this.removeFromExtraData(
+      this.roleDynamicInputsForViewDto?.entityExtraData ?? [],
+      attributeId
+    );
+
+    if (this.roleDynamicInputsForViewDto) {
+      this.roleDynamicInputsForViewDto.entityExtraData = updated;
+    }
+    this.syncExtraData(updated);
+    this.entityData.__extraDataTouched = true;
+  }
+
+  private createRoleExtraData(attribute: any): AppEntityExtraDataDto {
+    const dto = new AppEntityExtraDataDto();
+    dto.attributeId = attribute.attributeId;
+    dto.entityObjectTypeId = this.roleEntityObjectTypeId;
+    dto.entityid = this.account?.entityId ?? null;
+
+    const isMultiSelect =
+      attribute.acceptMultipleValues === true ||
+      String(attribute.dataType).toUpperCase() === 'MULTISELECTDROPDOWNLIST';
+
+    if (isMultiSelect) {
+      const values: any[] = Array.isArray(attribute.value)
+        ? attribute.value
+        : attribute.value ? [attribute.value] : [];
+
+      dto.attributeValue = values
+        .map(value => typeof value === 'object' ? value?.value ?? value?.label ?? '' : value)
+        .filter(Boolean)
+        .join('-');
+      dto.attributeValueId = null;
+    } else if (attribute.isLookup) {
+      const id = Number(attribute.value);
+      dto.attributeValueId = Number.isNaN(id) ? null : id;
+      dto.attributeValue = null;
+    } else {
+      dto.attributeValue = attribute.value ?? '';
+      dto.attributeValueId = null;
+    }
+
+    return dto;
+  }
+
+  // ================= Relationship =================
+
+  private initializeRelationshipSection(): void {
+    const firstRelationId = this.connectionsInfo?.[0]?.relationEntityId;
 
     if (!firstRelationId) {
       this.resetRelationshipData();
@@ -526,1576 +446,402 @@ export class AccountSectionsComponent
     }
 
     this.selectedRelationId = firstRelationId;
-    this.loadRelationshipStaticLookups()
-      .subscribe({
-
-        next: () => {
-          this.loadRelationshipData();
-        },
-
-      });
+    this.loadRelationshipStaticLookups().subscribe(() => this.loadRelationshipData());
   }
 
-  private applyRelationshipLookupLists(): void {
-
-    this.allRelationshipAttributes
-      .forEach((attr: any) => {
-
-        const code =
-          String(
-            attr.code ??
-            attr.attributeCode ??
-            attr.name ??
-            ''
-          )
-            .trim()
-            .toUpperCase();
-
-
-        attr.paginationSetting ??= {
-          skipCount: 0,
-          maxResultCount: 10,
-          totalCount: 0,
-          list: []
-        };
-
-        if (
-          code.includes('SHIP') &&
-          code.includes('VIA')
-        ) {
-
-          attr.paginationSetting.list =
-            [...this.allShipVia];
-
-          attr.paginationSetting.totalCount =
-            this.allShipVia.length;
-
-          return;
-        }
-
-
-        /*
-         * Payment Terms
-         */
-        if (
-          code.includes('PAYMENT') &&
-          code.includes('TERM')
-        ) {
-
-          attr.paginationSetting.list =
-            [...this.allPaymentTerms];
-
-          attr.paginationSetting.totalCount =
-            this.allPaymentTerms.length;
-
-          return;
-        }
-
-
-        /*
-         * Price Level
-         */
-        if (
-          code.includes('PRICE') &&
-          code.includes('LEVEL')
-        ) {
-
-          attr.paginationSetting.list =
-            [...this.allPriceLevel];
-
-          attr.paginationSetting.totalCount =
-            this.allPriceLevel.length;
-
-          return;
-        }
-
-      });
+  private resetRelationshipData(): void {
+    this.selectedRelationId = null;
+    this.relationshipEntityObjectTypeId = null;
+    this.allRelationshipAttributes = [];
+    this.groupedByUsage = {};
+    this.usageList = [];
+    this.isLoadingRelationship = false;
   }
 
-
-  //Department
-  initDepartmentVariables(firstInit: boolean) {
-    if (firstInit)
-      this.initDepartment = this.entityData.account.categories;
-    else this.entityData.account.categories = this.initDepartment;
-
-    this.noOfDepartmentToShowInitially = 10;
-    this.maxDepartmentCount = 10;
-    this.scrollDepartment = false;
-    this.maxDepartmentCnt = 40;
-    this.departmentToLoad = 20;
-    this.totalDepartment =
-      this.entityData?.account?.categoriesTotalCount;
-
-    if (this.noOfDepartmentToShowInitially < this.totalDepartment)
-      this.showMoreDepartment = true;
-    else this.showMoreDepartment = false;
-    this.showLessDepartment = false;
+  private loadRelationshipStaticLookups(): Observable<any> {
+    return forkJoin({
+      shipVia: this._appEntitiesServiceProxy.getAllEntitiesByTypeCode('SHIPVIA'),
+      paymentTerms: this._appEntitiesServiceProxy.getAllEntitiesByTypeCode('PAYMENT-TERMS')
+    }).pipe(
+      tap(result => {
+        this.allShipVia = result.shipVia ?? [];
+        this.allPaymentTerms = result.paymentTerms ?? [];
+        this.allPriceLevel = this.getPriceLevel();
+      })
+    );
   }
 
-  showDepartment() {
-    if (this.noOfDepartmentToShowInitially < this.totalDepartment) {
-      this.maxDepartmentCount = this.departmentToLoad;
-      this.skipDepartmentCount = this.noOfDepartmentToShowInitially;
-      this.noOfDepartmentToShowInitially += this.departmentToLoad;
-
-      this._AppEntitiesServiceProxy
-        .getAppEntityDepartmentsNamesWithPaging(
-          this.entityData?.account?.entityId,
-          undefined,
-          this.skipDepartmentCount,
-          this.maxDepartmentCount,
-        )
-        .subscribe((res) => {
-          if (
-            this.noOfDepartmentToShowInitially >=
-            this.totalDepartment
-          ) {
-            this.showMoreDepartment = false;
-            this.showLessDepartment = true;
-          }
-
-          this.entityData.account.categories =
-            this.entityData.account.categories.concat(
-              res.items
-            );
-          if (
-            this.entityData.account.categories.length >= this.maxDepartmentCnt
-          )
-            this.scrollDepartment = true;
-        });
-    } else {
-      this.initDepartmentVariables(false);
-    }
-  }
-
-  //Classification
-  initClassificationVariables(firstInit: boolean) {
-    if (firstInit)
-      this.initClassification = this.entityData.account.classfications
-    else this.entityData.account.classfications = this.initClassification;
-
-    this.noOfClassificationToShowInitially = 10;
-    this.maxClassificationCount = 10;
-    this.scrollClassification = false;
-    this.maxClassificationCnt = 40;
-    this.classificationToLoad = 20;
-    this.totalClassification = this.entityData.account.classificationsTotalCount;
-    if (this.noOfClassificationToShowInitially < this.totalClassification)
-      this.showMoreClassification = true;
-    else this.showMoreClassification = false;
-    this.showLessClassification = false;
-  }
-  showClassification() {
-    if (this.noOfClassificationToShowInitially < this.totalClassification) {
-      this.maxClassificationCount = this.classificationToLoad;
-      this.skipClassificationCount =
-        this.noOfClassificationToShowInitially;
-      this.noOfClassificationToShowInitially += this.classificationToLoad;
-
-      this._AppEntitiesServiceProxy
-        .getAppEntityClassificationsNamesWithPaging(
-          this.entityData.account.entityId,
-          undefined,
-          this.skipDepartmentCount,
-          this.maxDepartmentCount,
-        )
-        .subscribe((res) => {
-          if (
-            this.noOfClassificationToShowInitially >=
-            this.totalClassification
-          ) {
-            this.showMoreClassification = false;
-            this.showLessClassification = true;
-          }
-
-          this.entityData.account.classfications = this.entityData.account.classfications.concat(
-            res.items
-          );
-          if (
-            this.entityData.account.classfications.length >= this.maxClassificationCnt
-          )
-            this.scrollClassification = true;
-        });
-    } else {
-      this.initClassificationVariables(false);
-    }
-  }
-
-  onRelationshipOptionChange(
-    relationId: number
-  ): void {
-
+  onRelationshipOptionChange(relationId: number): void {
     if (!relationId) {
       return;
     }
-
-    this.selectedRelationId =
-      relationId;
-
+    this.selectedRelationId = relationId;
     this.loadRelationshipData();
   }
 
-
-  onRelationshipExtraDataChanged(
-    dataFromChild: any[]
-  ): void {
-
-    this.relationshipTouched = true;
-
-    if (
-      !this.relationshipDynamicInputsForViewDto
-    ) {
-      this.relationshipDynamicInputsForViewDto =
-        new GetAppEntityForEditOutput();
-    }
-
-    this.relationshipDynamicInputsForViewDto
-      .entityExtraData ??= [];
-
-    const existingData =
-      this.relationshipDynamicInputsForViewDto
-        .entityExtraData;
-
-    const incomingData:
-      AppEntityExtraDataDto[] =
-      dataFromChild.flatMap(attr => {
-
-        if (
-          attr.isLookup &&
-          attr.acceptMultipleValues
-        ) {
-
-          const values =
-            Array.isArray(attr.value)
-              ? attr.value
-              : [];
-
-          return values.map(value => {
-
-            const dto =
-              new AppEntityExtraDataDto();
-
-            dto.attributeId =
-              attr.attributeId;
-
-            dto.entityObjectTypeId =
-              this.relationshipEntityObjectTypeId;
-
-            dto.entityid =
-              this.selectedRelationId;
-
-            dto.attributeValueId =
-              Number(value);
-
-            return dto;
-          });
-        }
-
-
-        const dto =
-          new AppEntityExtraDataDto();
-
-        dto.attributeId =
-          attr.attributeId;
-
-        dto.entityObjectTypeId =
-          this.relationshipEntityObjectTypeId;
-
-        dto.entityid =
-          this.selectedRelationId;
-
-
-        if (attr.isLookup) {
-
-          const parsedValue =
-            Number(attr.value);
-
-          dto.attributeValueId =
-            !Number.isNaN(parsedValue)
-              ? parsedValue
-              : null;
-
-          dto.attributeValue =
-            null;
-
-        } else {
-
-          dto.attributeValue =
-            attr.value ?? null;
-
-          dto.attributeValueId =
-            null;
-        }
-
-        return dto;
-      });
-
-
-    const changedIds =
-      new Set(
-        incomingData.map(
-          item => item.attributeId
-        )
-      );
-
-
-    const unchanged =
-      existingData.filter(
-        item =>
-          !changedIds.has(
-            item.attributeId
-          )
-      );
-
-
-    this.relationshipDynamicInputsForViewDto
-      .entityExtraData = [
-        ...unchanged,
-        ...incomingData
-      ];
-
-  }
   private loadRelationshipData(): void {
-
     if (!this.selectedRelationId) {
       return;
     }
 
     this.isLoadingRelationship = true;
-    this._AppEntitiesServiceProxy
-      .getAppEntityForEdit(
-        this.selectedRelationId,
-        true)
-      .pipe(
-        finalize(() => {
-          this.isLoadingRelationship =
-            false;
-        })
-      )
-      .subscribe({
-        next: result => {
-          this.relationshipDynamicInputsForViewDto = result;
-          this.loadRelationshipAttributes();
-        },
-
-
+    this._appEntitiesServiceProxy
+      .getAppEntityForEdit(this.selectedRelationId, true)
+      .pipe(finalize(() => (this.isLoadingRelationship = false)))
+      .subscribe(result => {
+        this.relationshipDynamicInputsForViewDto = result;
+        this.loadRelationshipAttributes();
       });
   }
+
   private loadRelationshipAttributes(): void {
-
     this._sycEntityObjectTypesServiceProxy
-      .getAllWithExtraAttributesByCode(
-        'BTB',
-        'MARKETPLACECONTACTRELATIONSHIP'
-      )
+      .getAllWithExtraAttributesByCode('BTB', 'MARKETPLACECONTACTRELATIONSHIP')
       .pipe(
-        finalize(() => {
+        tap(types => {
+          this.relationshipEntityObjectTypeId =
+            types.find(type => type.code === 'BTB')?.id ?? DEFAULT_RELATIONSHIP_TYPE_ID;
+        }),
+        switchMap(() =>
           this._sycEntityObjectTypesServiceProxy
-            .getAllWithExtraAttributes(
-              this.relationshipEntityObjectTypeId
-            )
-            .subscribe(res => {
-              if (!res?.length) { return; }
-
-              this.allRelationshipAttributes = res[0]?.extraAttributes?.extraAttributes ?? [];
-              this.groupedByUsage = this.groupRelationshipAttributesByUsage(this.allRelationshipAttributes);
-
-              this.usageList =
-                Object.keys(
-                  this.groupedByUsage
-                );
-              this.applyRelationshipLookupLists();
-              this.prepareRelationshipLookupLists();
-            });
-        })
+            .getAllWithExtraAttributes(this.relationshipEntityObjectTypeId)
+        )
       )
-      .subscribe(res => {
-
-        this.relationshipEntityObjectTypeId =
-          res.find(
-            x =>
-              x.code === 'BTB'
-          )?.id ?? 747;
-      });
-  }
-
-  private prepareRelationshipLookupLists(): void {
-
-    this.allRelationshipAttributes
-      .forEach((attr: any) => {
-        if (!attr.isLookup) {
+      .subscribe(result => {
+        if (!result?.length) {
           return;
         }
 
-        const code =
-          String(
-            attr.code ??
-            attr.attributeCode ??
-            attr.name ??
-            ''
-          )
-            .trim()
-            .toUpperCase();
-
-        const isSpecialLookup =
-          (code.includes('SHIP') && code.includes('VIA')) || (code.includes('PAYMENT') && code.includes('TERM')) || (code.includes('PRICE') && code.includes('LEVEL'));
-
-        if (isSpecialLookup) {
-          return;
-        }
-
-        this.loadRelationshipLookupList(
-          attr
-        );
+        this.allRelationshipAttributes = result[0]?.extraAttributes?.extraAttributes ?? [];
+        this.groupedByUsage = this.groupByUsage(this.allRelationshipAttributes);
+        this.usageList = Object.keys(this.groupedByUsage);
+        this.setupRelationshipLookups();
       });
   }
 
-  private loadRelationshipLookupList(
-    extraAttr: any
-  ): void {
+  private groupByUsage(attributes: any[]): Record<string, any[]> {
+    return attributes.reduce((groups: Record<string, any[]>, attribute) => {
+      const usage = attribute.usage || this.l('RelationshipSettings');
+      this.ensurePagination(attribute);
+      (groups[usage] ??= []).push(attribute);
+      return groups;
+    }, {});
+  }
+
+  /** Ship via / payment terms / price level use the lists loaded here, other lookups are paged from the server. */
+  private setupRelationshipLookups(): void {
+    this.allRelationshipAttributes.forEach(attribute => {
+      this.ensurePagination(attribute);
+
+      const fixedList = this.getFixedLookupList(attribute);
+      if (fixedList) {
+        attribute.paginationSetting.list = [...fixedList];
+        attribute.paginationSetting.totalCount = fixedList.length;
+      } else if (attribute.isLookup) {
+        this.loadLookupPage(attribute);
+      }
+    });
+  }
+
+  private getFixedLookupList(attribute: any): any[] | null {
+    const code = String(attribute.code ?? attribute.attributeCode ?? attribute.name ?? '')
+      .trim()
+      .toUpperCase();
+
+    if (code.includes('SHIP') && code.includes('VIA')) {
+      return this.allShipVia;
+    }
+    if (code.includes('PAYMENT') && code.includes('TERM')) {
+      return this.allPaymentTerms;
+    }
+    if (code.includes('PRICE') && code.includes('LEVEL')) {
+      return this.allPriceLevel;
+    }
+    return null;
+  }
+
+  private loadLookupPage(attribute: any): void {
+    const paging = attribute.paginationSetting;
 
     this._extraAttributeDataService
       .getExtraAttributeLookupDataWithPaging(
-
-        extraAttr.entityObjectTypeCode,
-
-        extraAttr.paginationSetting
-          .skipCount,
-
-        extraAttr.paginationSetting
-          .maxResultCount
+        attribute.entityObjectTypeCode,
+        paging.skipCount,
+        paging.maxResultCount
       )
       .subscribe(result => {
-
-        extraAttr.paginationSetting
-          .totalCount =
-          result.totalCount;
-
-        if (
-          extraAttr.paginationSetting
-            .skipCount === 0
-        ) {
-
-          extraAttr.paginationSetting
-            .list = [];
+        paging.totalCount = result.totalCount;
+        if (paging.skipCount === 0) {
+          paging.list = [];
         }
-
-        extraAttr.paginationSetting
-          .list.push(
-            ...(result.items ?? [])
-          );
-
-        extraAttr.paginationSetting
-          .skipCount +=
-          extraAttr.paginationSetting
-            .maxResultCount;
+        paging.list.push(...(result.items ?? []));
+        paging.skipCount += paging.maxResultCount;
       });
   }
-  private resetRelationshipData(): void {
-    this.selectedRelationId = null;
 
-    this.relationshipEntityObjectTypeId = null;
-
-    this.dynamicInputsForViewDto = null;
-
-    this.allRelationshipAttributes = [];
-
-    this.groupedByUsage = {};
-
-    this.usageList = [];
-
-    this.isLoadingRelationship = false;
-  }
-  onRelationshipExtraDataCleared(
-    attributeId: number
-  ): void {
-
+  onRelationshipExtraDataChanged(changes: any[]): void {
     this.relationshipTouched = true;
 
-    const data =
-      this.relationshipDynamicInputsForViewDto
-        ?.entityExtraData;
+    const dto = (this.relationshipDynamicInputsForViewDto ??= new GetAppEntityForEditOutput());
+    const incoming = changes.flatMap(attribute => this.createRelationshipExtraData(attribute));
 
-    if (!data) {
-      return;
-    }
-
-    this.relationshipDynamicInputsForViewDto
-      .entityExtraData =
-      data.filter(
-        item =>
-          Number(item.attributeId) !==
-          Number(attributeId)
-      );
-  }
-  private groupRelationshipAttributesByUsage(
-    attributes: any[]
-  ): Record<string, any[]> {
-
-    return attributes.reduce(
-      (
-        result:
-          Record<string, any[]>,
-        attr
-      ) => {
-
-        const usage =
-          attr.usage ||
-          this.l(
-            'RelationshipSettings'
-          );
-
-        if (!result[usage]) {
-          result[usage] = [];
-        }
-
-        if (
-          !attr.paginationSetting
-        ) {
-
-          attr.paginationSetting = {
-            skipCount: 0,
-            maxResultCount: 10,
-            totalCount: 0,
-            list: []
-          };
-        }
-
-        result[usage].push(
-          attr
-        );
-
-        return result;
-      },
-      {}
-    );
+    dto.entityExtraData = this.mergeExtraData(dto.entityExtraData ?? [], incoming);
   }
 
-  getAccountDataForView(): void {
-    if (!this.accountId) {
-      return;
+  onRelationshipExtraDataCleared(attributeId: number): void {
+    this.relationshipTouched = true;
+
+    const dto = this.relationshipDynamicInputsForViewDto;
+    if (dto?.entityExtraData) {
+      dto.entityExtraData = this.removeFromExtraData(dto.entityExtraData, attributeId);
     }
-    this.showMainSpinner()
+  }
 
+  private createRelationshipExtraData(attribute: any): AppEntityExtraDataDto[] {
+    const create = () => {
+      const dto = new AppEntityExtraDataDto();
+      dto.attributeId = attribute.attributeId;
+      dto.entityObjectTypeId = this.relationshipEntityObjectTypeId;
+      dto.entityid = this.selectedRelationId;
+      return dto;
+    };
 
-    this._accountsServiceProxy
-      .getAccountForView(this.accountId, 5)
-      .subscribe({
-        next: result => {
-          this.setAccountData(result);
-          this.hideMainSpinner()
-        },
+    // Multi-select lookup: one row per selected value.
+    if (attribute.isLookup && attribute.acceptMultipleValues) {
+      const values: any[] = Array.isArray(attribute.value) ? attribute.value : [];
+      return values.map(value => {
+        const dto = create();
+        dto.attributeValueId = Number(value);
+        return dto;
       });
-  }
-
-  private loadLookups(): void {
-    this.getLanguages();
-    this.getCurrencies();
-    this.getPhoneTypes();
-  }
-
-  getPhoneTypes() {
-    this._AppEntitiesServiceProxy.getAllPhoneTypeForTableDropdown().subscribe(result => {
-      this.allPhoneTypes = result;
-    });
-  }
-
-  getLanguages() {
-    this._AppEntitiesServiceProxy.getAllLanguageForTableDropdown().subscribe(result => {
-      this.allLanguages = result;
-    });
-  }
-
-  getCurrencies() {
-    this._AppEntitiesServiceProxy.getAllCurrencyForTableDropdown().subscribe(result => {
-      this.allCurrencies = result;
-    });
-  }
-
-
-  get isViewMode(): boolean {
-    return this.mode === 'view';
-  }
-
-  get rolesEntityObjectTypeId(): number | null {
-    const roleExtraData = this.entityData?.entityExtraData?.find(
-      item => item.attributeCode === 'MARKETPLACE-ROLE'
-    );
-
-    return roleExtraData?.entityObjectTypeId ?? null;
-  }
-
-
-  onRoleExtraAttributesChanged(
-    changedAttributes: any[]
-  ): void {
-    if (!this.canEditSection('roles')) {
-      return;
     }
 
-    if (!this.roleDynamicInputsForViewDto) {
-      this.roleDynamicInputsForViewDto =
-        new GetAppEntityForEditOutput();
+    const dto = create();
+    if (attribute.isLookup) {
+      const id = Number(attribute.value);
+      dto.attributeValueId = Number.isNaN(id) ? null : id;
+      dto.attributeValue = null;
+    } else {
+      dto.attributeValue = attribute.value ?? null;
+      dto.attributeValueId = null;
     }
-
-    this.roleDynamicInputsForViewDto
-      .entityExtraData ??= [];
-
-    const existingData =
-      this.roleDynamicInputsForViewDto
-        .entityExtraData;
-
-    const incomingData:
-      AppEntityExtraDataDto[] =
-      (changedAttributes ?? []).map(
-        attribute => {
-          const dto =
-            new AppEntityExtraDataDto();
-
-          dto.attributeId =
-            attribute.attributeId;
-
-          dto.entityObjectTypeId =
-            this.roleEntityObjectTypeId;
-
-          dto.entityid =
-            this.account?.entityId ??
-            null;
-
-          const isMultiSelect =
-            attribute
-              .acceptMultipleValues === true ||
-            String(attribute.dataType)
-              .toUpperCase() ===
-            'MULTISELECTDROPDOWNLIST';
-
-          if (isMultiSelect) {
-            const values =
-              Array.isArray(attribute.value)
-                ? attribute.value
-                : attribute.value
-                  ? [attribute.value]
-                  : [];
-
-            dto.attributeValue = values
-              .map(value =>
-                typeof value === 'object'
-                  ? value?.value ??
-                  value?.label ??
-                  ''
-                  : value
-              )
-              .filter(Boolean)
-              .join('-');
-
-            dto.attributeValueId = null;
-          } else if (attribute.isLookup) {
-            const parsedValue =
-              Number(attribute.value);
-
-            dto.attributeValueId =
-              Number.isNaN(parsedValue)
-                ? null
-                : parsedValue;
-
-            dto.attributeValue = null;
-          } else {
-            dto.attributeValue =
-              attribute.value ?? '';
-
-            dto.attributeValueId = null;
-          }
-
-          return dto;
-        }
-      );
-
-    const changedAttributeIds =
-      new Set(
-        incomingData.map(
-          item => item.attributeId
-        )
-      );
-
-    const remainingExistingData =
-      existingData.filter(
-        item =>
-          !changedAttributeIds.has(
-            item.attributeId
-          )
-      );
-
-    const finalExtraData = [
-      ...remainingExistingData,
-      ...incomingData
-    ];
-
-    this.roleDynamicInputsForViewDto
-      .entityExtraData = finalExtraData;
-
-    this.entityData.entityExtraData =
-      finalExtraData;
-
-    this.account.entityExtraData =
-      finalExtraData;
-
-    this.entityData.__extraDataTouched = true;
+    return [dto];
   }
 
+  saveRelationshipEntity(): Observable<any> {
+    const relationship = this.relationshipDynamicInputsForViewDto;
 
+    if (!this.relationshipTouched || !relationship?.appEntity) {
+      return of(null);
+    }
 
+    const dto = Object.assign(new AppEntityDto(), relationship.appEntity);
+    dto.entityExtraData = relationship.entityExtraData ?? [];
+
+    return this._appEntitiesServiceProxy
+      .saveEntity(dto)
+      .pipe(tap(() => (this.relationshipTouched = false)));
+  }
+
+  // ================= Business: departments =================
 
   openSelectCategoriesModal(): void {
     if (this.isViewMode) {
       return;
     }
 
-    const config =
-      new ModalOptions();
-
-    config.class =
-      'right-modal slide-right-in';
-
-    const initialState:
-      Partial<SelectCategoriesDynamicModalComponent> = {
-
-      savedIds: [
-        ...this.categoriesIds
-      ],
-
+    const initialState: Partial<SelectCategoriesDynamicModalComponent> = {
+      savedIds: [...this.categoriesIds],
       showAddAction: false,
       showActions: false,
-
-      entityObjectName:
-        'Product',
-
-      entityObjectDisplayName:
-        'Departments',
-
+      entityObjectName: 'Product',
+      entityObjectDisplayName: 'Departments',
       isDepartment: true,
-
-      entityId:
-        this.account?.entityId ??
-        undefined
+      entityId: this.account?.entityId ?? undefined
     };
 
-    config.initialState =
-      initialState;
-
-    const modalRef:
-      BsModalRef =
-      this._bsModalService.show(
-        SelectCategoriesDynamicModalComponent,
-        config
-      );
-
-    const subscription:
-      Subscription =
-      this._bsModalService
-        .onHidden
-        .subscribe(() => {
-
-          this.handleSelectedCategories(
-            modalRef
-          );
-
-          subscription.unsubscribe();
-        });
-  }
-
-  private handleSelectedCategories(
-    modalRef: BsModalRef
-  ): void {
-
-    const modal:
-      SelectCategoriesDynamicModalComponent =
-      modalRef.content;
-
-    if (
-      !modal?.selectionDone ||
-      !Array.isArray(
-        modal.selectedRecords
-      )
-    ) {
-      return;
-    }
-
-    this.addSelectedCategories(
-      modal.selectedRecords
+    this.openRightModal(
+      SelectCategoriesDynamicModalComponent,
+      initialState,
+      (modal: SelectCategoriesDynamicModalComponent) => {
+        if (modal?.selectionDone && Array.isArray(modal.selectedRecords)) {
+          this.addCategories(modal.selectedRecords);
+        }
+      }
     );
   }
 
+  private addCategories(nodes: TreeNodeOfGetSycEntityObjectCategoryForViewDto[]): void {
+    const existingIds = new Set(
+      this.selectedDepartments.map(item => Number(item.entityObjectCategoryId))
+    );
 
-  private addSelectedCategories(
-    selectedNodes:
-      TreeNodeOfGetSycEntityObjectCategoryForViewDto[]
-  ): void {
+    const added = (nodes ?? [])
+      .map(node => {
+        const category = node?.data?.sycEntityObjectCategory;
+        if (!category) {
+          return null;
+        }
 
-    this.account
-      .entityCategories ??= [];
-
-    const existingIds =
-      new Set(
-        this.account
-          .entityCategories
-          .map(item =>
-            Number(
-              item
-                .entityObjectCategoryId
-            )
-          )
+        const dto = new AppEntityCategoryDto();
+        dto.entityObjectCategoryId = category.id;
+        dto.entityObjectCategoryCode = category.code;
+        dto.entityObjectCategoryName = category.name;
+        return dto;
+      })
+      .filter((item): item is AppEntityCategoryDto =>
+        !!item && !existingIds.has(Number(item.entityObjectCategoryId))
       );
 
-    const newCategories =
-      (selectedNodes ?? [])
-        .map(node => {
-          const category =
-            node?.data
-              ?.sycEntityObjectCategory;
-
-          if (!category) {
-            return null;
-          }
-
-          const dto =
-            new AppEntityCategoryDto();
-
-          dto.entityObjectCategoryId =
-            category.id;
-
-          dto.entityObjectCategoryCode =
-            category.code;
-
-          dto.entityObjectCategoryName =
-            category.name;
-
-          return dto;
-        })
-        .filter(
-          (
-            item
-          ): item is
-            AppEntityCategoryDto =>
-            !!item &&
-            !existingIds.has(
-              Number(
-                item
-                  .entityObjectCategoryId
-              )
-            )
-        );
-
-    this.account
-      .entityCategories = [
-        ...this.account
-          .entityCategories,
-        ...newCategories
-      ];
-
-    this.categoriesIds =
-      this.account
-        .entityCategories
-        .map(item =>
-          Number(
-            item
-              .entityObjectCategoryId
-          )
-        )
-        .filter(id => id > 0);
-
-    this.entityData
-      .__categoriesTouched =
-      true;
-
+    this.account.entityCategories = [...this.selectedDepartments, ...added];
+    this.updateSelectedIds();
+    this.entityData.__categoriesTouched = true;
     this.syncCategoryNames();
   }
-  removeCategory(
-    index: number
-  ): void {
 
-    if (
-      !this.canEditSection(
-        'business'
-      )
-    ) {
-      return;
-    }
-
-    const categories =
-      this.account
-        ?.entityCategories;
-
-    if (
-      !Array.isArray(
-        categories
-      ) ||
-      index < 0 ||
-      index >=
-      categories.length
-    ) {
+  removeCategory(index: number): void {
+    if (!this.canEditSection('business') || !this.isValidIndex(this.selectedDepartments, index)) {
       return;
     }
 
     this.message.confirm(
-      this.l(
-        'AreYouSureYouWantToRemoveThisDepartment?'
-      ),
+      this.l('AreYouSureYouWantToRemoveThisDepartment?'),
       this.l('AreYouSure'),
       confirmed => {
-
         if (!confirmed) {
           return;
         }
 
-        this.account
-          .entityCategories =
-          categories.filter(
-            (
-              _,
-              currentIndex
-            ) =>
-              currentIndex !==
-              index
-          );
-
-        this.categoriesIds =
-          this.account
-            .entityCategories
-            .map(item =>
-              Number(
-                item
-                  .entityObjectCategoryId
-              )
-            )
-            .filter(id => id > 0);
-
-        this.entityData
-          .__categoriesTouched =
-          true;
-
+        this.account.entityCategories =
+          this.selectedDepartments.filter((_, currentIndex) => currentIndex !== index);
+        this.updateSelectedIds();
+        this.entityData.__categoriesTouched = true;
         this.syncCategoryNames();
       }
     );
   }
 
-  private syncCategoryNames():
-    void {
-
-    this.account.categories =
-      (
-        this.account
-          .entityCategories ??
-        []
-      )
-        .map(item =>
-          item
-            .entityObjectCategoryName
-        )
-        .filter(Boolean);
-
-    this.entityData.account =
-      this.account;
+  private syncCategoryNames(): void {
+    this.account.categories = this.selectedDepartments
+      .map(item => item.entityObjectCategoryName)
+      .filter(Boolean);
+    this.entityData.account = this.account;
   }
 
-  openSelectClassificationsModal():
-    void {
+  // ================= Business: classifications =================
 
+  openSelectClassificationsModal(): void {
     if (this.isViewMode) {
       return;
     }
 
-    const config =
-      new ModalOptions();
-
-    config.class =
-      'right-modal slide-right-in';
-
-    const initialState:
-      Partial<SelectClassificationDynamicModalComponent> = {
-
-      savedIds: [
-        ...this.classificationsIds
-      ],
-
+    const initialState: Partial<SelectClassificationDynamicModalComponent> = {
+      savedIds: [...this.classificationsIds],
       showAddAction: false,
       showActions: false,
-
-      entityObjectName:
-        'Contact',
-
-      entityObjectDisplayName:
-        'Business Classifications',
-
-      entityId:
-        this.account?.entityId ??
-        undefined
+      entityObjectName: 'Contact',
+      entityObjectDisplayName: 'Business Classifications',
+      entityId: this.account?.entityId ?? undefined
     };
 
-    config.initialState =
-      initialState;
-
-    const modalRef:
-      BsModalRef =
-      this._bsModalService.show(
-        SelectClassificationDynamicModalComponent,
-        config
-      );
-
-    const subscription:
-      Subscription =
-      this._bsModalService
-        .onHidden
-        .subscribe(() => {
-
-          this.handleSelectedClassifications(
-            modalRef
-          );
-
-          subscription.unsubscribe();
-        });
-  }
-
-  private handleSelectedClassifications(
-    modalRef: BsModalRef
-  ): void {
-
-    const modal: SelectClassificationDynamicModalComponent = modalRef.content;
-
-    if (
-      !modal?.selectionDone ||
-      !Array.isArray(
-        modal.selectedRecords
-      )
-    ) {
-      return;
-    }
-
-    this.addSelectedClassifications(
-      modal.selectedRecords
+    this.openRightModal(
+      SelectClassificationDynamicModalComponent,
+      initialState,
+      (modal: SelectClassificationDynamicModalComponent) => {
+        if (modal?.selectionDone && Array.isArray(modal.selectedRecords)) {
+          this.addClassifications(modal.selectedRecords);
+        }
+      }
     );
   }
 
-  private addSelectedClassifications(
-    selectedNodes:
-      TreeNodeOfGetSycEntityObjectClassificationForViewDto[]
+  private addClassifications(
+    nodes: TreeNodeOfGetSycEntityObjectClassificationForViewDto[]
   ): void {
+    const existingIds = new Set(
+      this.selectedClassifications.map(item => Number(item.entityObjectClassificationId))
+    );
 
-    this.account
-      .entityClassifications ??=
-      [];
+    const added = (nodes ?? [])
+      .map(node => {
+        const classification = node?.data?.sycEntityObjectClassification;
+        if (!classification) {
+          return null;
+        }
 
-    const existingIds =
-      new Set(
-        this.account
-          .entityClassifications
-          .map(item =>
-            Number(
-              item
-                .entityObjectClassificationId
-            )
-          )
+        const dto = new AppEntityClassificationDto();
+        dto.entityObjectClassificationId = classification.id;
+        dto.entityObjectClassificationCode = classification.code;
+        dto.entityObjectClassificationName = classification.name;
+        return dto;
+      })
+      .filter((item): item is AppEntityClassificationDto =>
+        !!item && !existingIds.has(Number(item.entityObjectClassificationId))
       );
 
-    const newClassifications =
-      (selectedNodes ?? [])
-        .map(node => {
-          const classification =
-            node?.data
-              ?.sycEntityObjectClassification;
-
-          if (!classification) {
-            return null;
-          }
-
-          const dto =
-            new AppEntityClassificationDto();
-
-          dto.entityObjectClassificationId =
-            classification.id;
-
-          dto.entityObjectClassificationCode =
-            classification.code;
-
-          dto.entityObjectClassificationName =
-            classification.name;
-
-          return dto;
-        })
-        .filter(
-          (
-            item
-          ): item is
-            AppEntityClassificationDto =>
-            !!item &&
-            !existingIds.has(
-              Number(
-                item
-                  .entityObjectClassificationId
-              )
-            )
-        );
-
-    this.account
-      .entityClassifications = [
-        ...this.account
-          .entityClassifications,
-        ...newClassifications
-      ];
-
-    this.classificationsIds =
-      this.account
-        .entityClassifications
-        .map(item =>
-          Number(
-            item
-              .entityObjectClassificationId
-          )
-        )
-        .filter(id => id > 0);
-
-    this.entityData
-      .__classificationsTouched =
-      true;
-
+    this.account.entityClassifications = [...this.selectedClassifications, ...added];
+    this.updateSelectedIds();
+    this.entityData.__classificationsTouched = true;
     this.syncClassificationNames();
   }
 
-  removeClassification(
-    index: number
-  ): void {
-
-    if (
-      !this.canEditSection(
-        'business'
-      )
-    ) {
-      return;
-    }
-
-    const classifications =
-      this.account
-        ?.entityClassifications;
-
-    if (
-      !Array.isArray(
-        classifications
-      ) ||
-      index < 0 ||
-      index >=
-      classifications.length
-    ) {
+  removeClassification(index: number): void {
+    if (!this.canEditSection('business') || !this.isValidIndex(this.selectedClassifications, index)) {
       return;
     }
 
     this.message.confirm(
-      this.l(
-        'AreYouSureTouWantToRemoveThisClassification?'
-      ),
+      this.l('AreYouSureTouWantToRemoveThisClassification?'),
       this.l('AreYouSure'),
       confirmed => {
-
         if (!confirmed) {
           return;
         }
 
-        this.account
-          .entityClassifications =
-          classifications.filter(
-            (
-              _,
-              currentIndex
-            ) =>
-              currentIndex !==
-              index
-          );
-
-        this.classificationsIds =
-          this.account
-            .entityClassifications
-            .map(item =>
-              Number(
-                item
-                  .entityObjectClassificationId
-              )
-            )
-            .filter(id => id > 0);
-
-        this.entityData
-          .__classificationsTouched =
-          true;
-
+        this.account.entityClassifications =
+          this.selectedClassifications.filter((_, currentIndex) => currentIndex !== index);
+        this.updateSelectedIds();
+        this.entityData.__classificationsTouched = true;
         this.syncClassificationNames();
       }
     );
   }
 
-
-  private syncClassificationNames():
-    void {
-
-    this.account.classfications =
-      (
-        this.account
-          .entityClassifications ??
-        []
-      )
-        .map(item =>
-          item
-            .entityObjectClassificationName
-        )
-        .filter(Boolean);
-
-    this.entityData.account =
-      this.account;
-  }
-  private syncBusinessInformation(): void {
-    this.account.entityCategories ??= [];
-    this.account.entityClassifications ??= [];
-
-    this.entityData.account =
-      this.account;
-
-    this.entityData.account.categories =
-      this.account.entityCategories.map(
-        item =>
-          item.entityObjectCategoryName
-      );
-
-    this.entityData.account.classfications =
-      this.account.entityClassifications.map(
-        item =>
-          item.entityObjectClassificationName
-      );
+  private syncClassificationNames(): void {
+    this.account.classfications = this.selectedClassifications
+      .map(item => item.entityObjectClassificationName)
+      .filter(Boolean);
+    this.entityData.account = this.account;
   }
 
-  get selectedDepartments():
-    AppEntityCategoryDto[] {
+  // ================= Business: shared =================
 
-    return (
-      this.account
-        ?.entityCategories ??
-      []
-    );
+  private updateSelectedIds(): void {
+    const toIds = (items: any[], key: string): number[] =>
+      items.map(item => Number(item[key])).filter(id => id > 0);
+
+    this.categoriesIds = toIds(this.selectedDepartments, 'entityObjectCategoryId');
+    this.classificationsIds = toIds(this.selectedClassifications, 'entityObjectClassificationId');
   }
 
-  get selectedClassifications():
-    AppEntityClassificationDto[] {
-
-    return (
-      this.account
-        ?.entityClassifications ??
-      []
-    );
+  private isValidIndex(list: any[], index: number): boolean {
+    return index >= 0 && index < list.length;
   }
 
-  get isManualAccount(): boolean {
-    return this.account?.isManual === true;
-  }
-
-  get isConnectedAccount(): boolean {
-    return this.account?.isConnected === true;
-  }
-
- get canEditAccountData(): boolean {
-
-  if (this.mode === 'view') {
-    return false;
-  }
-
-  // Contact create/edit
-  if (this.isContact) {
-    return (
-      this.mode === 'create' ||
-      this.mode === 'edit'
-    );
-  }
-
-  // Root account create
-  if (this.mode === 'create') {
-    return true;
-  }
-
-  // Root account edit
-  if (this.mode === 'edit') {
-    return (
-      this.isManualAccount &&
-      !this.isConnectedAccount
-    );
-  }
-
-  return false;
-}
-  get canEditRelationship(): boolean {
-    return this.mode === 'edit';
-  }
-
-
-  canEditField(fieldName: string): boolean {
-    if (!this.canEditAccountData) {
-      return false;
-    }
-
-    if (fieldName === 'ssin') {
-      return false;
-    }
-
-    if (fieldName === 'code') {
-      return this.mode === 'create';
-    }
-
-    return true;
-  }
-
-  canEditSection(
-    section:
-      'basic' |
-      'business' |
-      'roles' |
-      'relationship'
-  ): boolean {
-
-    if (section === 'relationship') {
-      return this.canEditRelationship;
-    }
-
-    return this.canEditAccountData;
-  }
-
-  saveRelationship(): void {
-    if (!this.relationshipTouched) {
-      return;
-    }
-
-    if (!this.dynamicInputsForViewDto?.appEntity) {
-      return;
-    }
-
-    const dynamicInput =
-      this.relationshipDynamicInputs
-        ?.first;
-
-    const appEntityDto =
-      Object.assign(
-        new AppEntityDto(),
-        this.dynamicInputsForViewDto
-          .appEntity
-      );
-
-
-    appEntityDto.entityExtraData = this.dynamicInputsForViewDto.entityExtraData ?? [];
-
-    dynamicInput.saveAll(
-      appEntityDto
-    );
-
-
-    this.relationshipTouched =
-      false;
-  }
-
-  onExtraAttributeCleared(
-    attributeId: number
+  /** Opens a right-side modal and calls onSelected with its content when it closes. */
+  private openRightModal(
+    component: any,
+    initialState: any,
+    onSelected: (modal: any) => void
   ): void {
+    const config = new ModalOptions();
+    config.class = 'right-modal slide-right-in';
+    config.initialState = initialState;
 
-    this.relationshipTouched = true;
-
-    if (
-      !this.dynamicInputsForViewDto
-        ?.entityExtraData
-    ) {
-      return;
-    }
-
-    this.dynamicInputsForViewDto
-      .entityExtraData =
-      this.dynamicInputsForViewDto
-        .entityExtraData
-        .filter(
-          x =>
-            Number(x.attributeId) !==
-            Number(attributeId)
-        );
+    const modalRef = this._bsModalService.show(component, config);
+    const subscription = this._bsModalService.onHidden.subscribe(() => {
+      onSelected(modalRef.content);
+      subscription.unsubscribe();
+    });
   }
-  onRoleExtraAttributeCleared(
-    attributeId: number
-  ): void {
-
-    if (
-      !this.canEditSection('roles')
-    ) {
-      return;
-    }
-
-    const currentData =
-      this.roleDynamicInputsForViewDto
-        ?.entityExtraData ?? [];
-
-    const updatedData =
-      currentData.filter(
-        item =>
-          Number(item.attributeId) !==
-          Number(attributeId)
-      );
-
-    if (this.roleDynamicInputsForViewDto) {
-      this.roleDynamicInputsForViewDto.entityExtraData = updatedData;
-    }
-
-    this.entityData.entityExtraData = updatedData;
-    this.account.entityExtraData = updatedData;
-    this.entityData.__extraDataTouched = true;
-  }
-
-  private loadRelationshipStaticLookups():
-    Observable<any> {
-
-    return forkJoin({
-
-      shipVia:
-        this._AppEntitiesServiceProxy
-          .getAllEntitiesByTypeCode(
-            'SHIPVIA'
-          ),
-
-      paymentTerms:
-        this._AppEntitiesServiceProxy
-          .getAllEntitiesByTypeCode(
-            'PAYMENT-TERMS'
-          )
-
-    }).pipe(
-
-      tap(result => {
-
-        this.allShipVia =
-          result.shipVia ?? [];
-
-        this.allPaymentTerms =
-          result.paymentTerms ?? [];
-
-        this.allPriceLevel =
-          this.getPriceLevel();
-
-      })
-
-    );
-  }
-
-  onExtraAttributesChanged(dataFromChild: any[]): void {
-
-    this.relationshipTouched = true;
-
-    if (!this.dynamicInputsForViewDto) {
-      return;
-    }
-
-    this.dynamicInputsForViewDto.entityExtraData ??= [];
-
-    const existingData =
-      this.dynamicInputsForViewDto.entityExtraData;
-
-    const incomingData =
-      dataFromChild.flatMap(attr => {
-
-        if (
-          attr.isLookup &&
-          attr.acceptMultipleValues
-        ) {
-          const values =
-            Array.isArray(attr.value)
-              ? attr.value
-              : [];
-
-          return values.map(value => {
-
-            const dto =
-              new AppEntityExtraDataDto();
-
-            dto.attributeId =
-              attr.attributeId;
-
-            dto.entityObjectTypeId =
-              this.relationshipEntityObjectTypeId;
-
-            dto.entityid =
-              this.selectedRelationId;
-
-            dto.attributeValueId =
-              Number(value);
-
-            return dto;
-          });
-        }
-
-        const dto =
-          new AppEntityExtraDataDto();
-
-        dto.attributeId =
-          attr.attributeId;
-
-        dto.entityObjectTypeId =
-          this.relationshipEntityObjectTypeId;
-
-        dto.entityid =
-          this.selectedRelationId;
-
-        if (attr.isLookup) {
-
-          const value =
-            Number(attr.value);
-
-          dto.attributeValueId =
-            !isNaN(value)
-              ? value
-              : null;
-
-        } else {
-
-          dto.attributeValue =
-            attr.value;
-        }
-
-        return dto;
-      });
-
-    const changedIds =
-      new Set(
-        incomingData.map(x => x.attributeId)
-      );
-
-    const oldUnchanged =
-      existingData.filter(
-        x => !changedIds.has(x.attributeId)
-      );
-
-    this.dynamicInputsForViewDto.entityExtraData = [
-      ...oldUnchanged,
-      ...incomingData
-    ];
-  }
-
-
-  saveRelationshipEntity(): Observable<any> {
-    if (!this.relationshipTouched) {
-      return of(null);
-    }
-    const relationshipDto = this.relationshipDynamicInputsForViewDto;
-    if (!relationshipDto?.appEntity) {
-      return of(null);
-    }
-
-
-    const dto = Object.assign(new AppEntityDto(), relationshipDto.appEntity);
-    dto.entityExtraData = relationshipDto.entityExtraData ?? [];
-    return this._AppEntitiesServiceProxy
-      .saveEntity(dto)
-      .pipe(
-        tap(result => {
-          this.relationshipTouched = false;
-        })
-
-      );
-  }
-
 }

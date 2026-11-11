@@ -1,1588 +1,616 @@
-﻿import {
-    Component,
-    Injector,
-    ViewChild,
-    OnInit,
-    Input,
-    OnChanges,
-    SimpleChanges,
-} from "@angular/core";
-import {
-    AccountsServiceProxy,
-    MarketplaceAccountsServiceProxy,
-    AccountDto,
-    GetAccountForViewDto,
-    TreeNodeOfGetSycEntityObjectCategoryForViewDto,
-    TreeNodeOfGetSycEntityObjectClassificationForViewDto,
-    EmailingTemplateServiceProxy,
-    AppTransactionServiceProxy,
-    CreateMarketplaceAccountServiceProxy,
-
-
-} from "@shared/service-proxies/service-proxies";
-import { AbpSessionService } from "abp-ng2-module";
-import { AppComponentBase } from "@shared/common/app-component-base";
-import { appModuleAnimation } from "@shared/animations/routerTransition";
-import { Table } from "primeng/table";
-import { Paginator } from "primeng/paginator";
-import { LazyLoadEvent, SelectItem } from "primeng/api";
-import * as _ from "lodash";
-import { SendMailModalComponent } from "@app/shared/common/Mail/sendMail-modal.component";
-import { debounceTime, finalize } from "rxjs/operators";
-import { MainImportComponent } from "../../../../../../shared/components/import-steps/components/mainImport.component";
-import { AccountMainFilterEnum } from "../../models/accounts-main-filter.enum";
-import { AbstractControl, FormBuilder, FormGroup } from "@angular/forms";
-import { AppConsts } from "@shared/AppConsts";
-import { forkJoin, Observable, of } from "rxjs";
-import { ImportTypes } from "@shared/components/import-steps/models/ImportTypes";
-import { AccountsImport } from "@shared/components/import-steps/services/accountsImport.service";
-import { ImportStepInfo } from "@shared/components/import-steps/models/ImportStepInfo";
-import { MainImportService } from "@shared/components/import-steps/services/mainImport.service";
-import { AccountEntityComponent } from "../account-entity/account-entity.component";
+﻿import { Component, Injector, Input, OnChanges, OnInit, SimpleChanges, ViewChild } from '@angular/core';
+import { AbstractControl, FormBuilder, FormGroup } from '@angular/forms';
+import { ActivatedRoute, Router } from '@angular/router';
+import { AbpSessionService } from 'abp-ng2-module';
+import { SelectItem } from 'primeng/api';
+import { Paginator } from 'primeng/paginator';
+import { forkJoin } from 'rxjs';
+import { debounceTime, finalize } from 'rxjs/operators';
 
 import {
-    ActivatedRoute,
-    Router
-} from '@angular/router';
-import { AccountsBrowseState } from "../../models/imageobject";
+  AccountDto,
+  AccountsServiceProxy,
+  AppTransactionServiceProxy,
+  EmailingTemplateServiceProxy,
+  GetAccountForViewDto,
+  MarketplaceAccountsServiceProxy
+} from '@shared/service-proxies/service-proxies';
+import { AppComponentBase } from '@shared/common/app-component-base';
+import { appModuleAnimation } from '@shared/animations/routerTransition';
+import { AppConsts } from '@shared/AppConsts';
+import { SendMailModalComponent } from '@app/shared/common/Mail/sendMail-modal.component';
+import { ImportTypes } from '@shared/components/import-steps/models/ImportTypes';
+import { AccountsImport } from '@shared/components/import-steps/services/accountsImport.service';
+import { MainImportService } from '@shared/components/import-steps/services/mainImport.service';
+import { MainImportComponent } from '../../../../../../shared/components/import-steps/components/mainImport.component';
+import { AccountMainFilterEnum } from '../../models/accounts-main-filter.enum';
+import { AccountsBrowseState } from '../../models/imageobject';
+import { AccountEntityComponent } from '../account-entity/account-entity.component';
+
+type TreeFilterKey = 'sycEntityObjectCategory' | 'sycEntityObjectClassification';
+
+const LIST_VIEW_KEY = 'account-list-view-mode';
+const DEFAULT_PAGE_SIZE = 32;
+
+const EMPTY_FILTERS = {
+  search: null,
+  mainFilterType: null,
+  city: null,
+  postalCode: null,
+  state: null,
+  sorting: null,
+  accountTypes: null,
+  languages: [],
+  countries: [],
+  classifications: [],
+  categories: [],
+  currencies: [],
+  statuses: []
+};
+
 @Component({
-    selector: "app-accounts",
-    providers: [MarketplaceAccountsServiceProxy],
-    templateUrl: "./accounts.component.html",
-    styleUrls: ["./accounts.component.scss"],
-    animations: [appModuleAnimation()],
+  selector: 'app-accounts',
+  providers: [MarketplaceAccountsServiceProxy],
+  templateUrl: './accounts.component.html',
+  styleUrls: ['./accounts.component.scss'],
+  animations: [appModuleAnimation()]
 })
-export class AccountsComponent
-    extends AppComponentBase
-    implements OnInit, OnChanges {
+export class AccountsComponent extends AppComponentBase implements OnInit, OnChanges {
 
-    @Input() defaultMainFilter: AccountMainFilterEnum;
-    @Input() showMainFiltersOptions;
-    @Input() showAddButton;
-    @Input() pageMainFilters: SelectItem[] = [];
-    @Input() fromMarketplace;
-    @Input() accountType: string;
+  // ---------- Inputs ----------
+  @Input() defaultMainFilter: AccountMainFilterEnum;
+  @Input() showMainFiltersOptions;
+  @Input() showAddButton;
+  @Input() pageMainFilters: SelectItem[] = [];
+  @Input() fromMarketplace;
+  @Input() accountType: string;
 
-    @ViewChild("sendMailModal", { static: true }) sendMailModal: SendMailModalComponent;
-    @ViewChild("dataTable", { static: true }) dataTable: Table;
-    @ViewChild("paginator", { static: true }) paginator: Paginator;
-    @ViewChild("ImportAccountsModal", { static: true })
+  // ---------- View children ----------
+  @ViewChild('sendMailModal', { static: true }) sendMailModal: SendMailModalComponent;
+  @ViewChild('paginator', { static: true }) paginator: Paginator;
+  @ViewChild('ImportAccountsModal', { static: true }) ImportAccountsModal: MainImportComponent;
+  @ViewChild('accountEntity') accountEntity: AccountEntityComponent;
 
-    ImportAccountsModal: MainImportComponent;
-    mailHeader: string;
-    mailsubject: string;
-    mailbody: string;
-    filterForm: FormGroup;
-    isHost: boolean;
-    cardsViewMode: boolean = false;
+  // ---------- State ----------
+  filterForm: FormGroup;
+  accounts: GetAccountForViewDto[] = [];
+  sortingOptions: SelectItem[];
 
-    showConfirm: boolean = false;
-    selectedItemId: number;
-    selectedIndex: number;
+  isHost: boolean;
+  isArabic: boolean;
+  isAuthenticated = false;
+  loginTenaneSsin: string;
 
-    _entityTypeFullName = "onetouch.AppItems.AppItem";
-    entityHistoryEnabled = false;
+  cardsViewMode = false;
+  filterVisible = false;     // mobile filter panel
+  filterVisiblelg = false;   // desktop filter panel
+  active = false;
+  loading = false;
+  paginatorFirst = 0;
+  isCreatingRelation = false;
 
-    accounts: GetAccountForViewDto[] = [];
-    sortingOptions: SelectItem[];
-    filterVisible = false; // To toggle the filter visibility
-    filterVisiblelg = false; // To toggle the filter visibility
-    active: boolean = false;
-    loading: boolean = false;
-    currentLang: string
-    isArabic: boolean
-    isAuthenticated: boolean = false;
-    loginTenaneSsin:string
+  private restoringBrowseState = false;
 
-   
-    constructor(
-        injector: Injector,
-        private _accountsServiceProxy: AccountsServiceProxy,
-        private _marketplaceAccountsServiceProxy: MarketplaceAccountsServiceProxy,
-        private _importService: MainImportService,
-        private _abpSessionService: AbpSessionService,
-        private _formBuilder: FormBuilder,
-        private _emailingTemplateAppService: EmailingTemplateServiceProxy,
-        private AppTransactionServiceProxy:AppTransactionServiceProxy,
-
-         private CreateMarketplaceAccountServiceProxy: CreateMarketplaceAccountServiceProxy,
-             private router: Router,
+  constructor(
+    injector: Injector,
+    private _accountsServiceProxy: AccountsServiceProxy,
+    private _marketplaceAccountsServiceProxy: MarketplaceAccountsServiceProxy,
+    private _importService: MainImportService,
+    private _abpSessionService: AbpSessionService,
+    private _formBuilder: FormBuilder,
+    private _emailingTemplateAppService: EmailingTemplateServiceProxy,
+    private _appTransactionServiceProxy: AppTransactionServiceProxy,
+    private router: Router,
     private route: ActivatedRoute
-        // MarketplaceAccountsModule  
-    ) {
-        super(injector);
-        this.overridePrimeTableSetting();
-    }
+  ) {
+    super(injector);
+    this.overridePrimeTableSetting();
+  }
 
-    //     ngOnInit() {
-    //     this.isAuthenticated = !!this.appSession?.user;
-    //     this.isHost = !this._abpSessionService.tenantId;
-    //     this.currentLang = abp.utils.getCookieValue('Abp.Localization.CultureName')
-    //     this.currentLang == 'ar' || this.currentLang == 'ar-EG' ? this.isArabic = true : this.isArabic = false
-    //     this.defineSortingOptions();
-    //     this.getUserPreferenceForListView();
-    //     this.initFilterForm();
-    //     this.getLoginAccountDataForView()
+  // ================= Lifecycle =================
 
-    // }
-    // ngOnChanges(changes: SimpleChanges) {
-    //     if (changes?.defaultMainFilter?.firstChange) {
-    //         this.initFilterForm();
-    //         this.setMainPageFilter(this.defaultMainFilter);
-    //         this.getAccounts({
-    //             rows: this.primengTableHelper.defaultRecordsCountPerPage,
-    //         });
-    //     }
-ngOnInit(): void {
+  ngOnInit(): void {
+    const lang = abp.utils.getCookieValue('Abp.Localization.CultureName');
 
-    this.isAuthenticated =
-        !!this.appSession?.user;
-
-    this.isHost =
-        !this._abpSessionService.tenantId;
-
-    this.currentLang =
-        abp.utils.getCookieValue(
-            'Abp.Localization.CultureName'
-        );
-
-    this.isArabic =
-        this.currentLang === 'ar' ||
-        this.currentLang === 'ar-EG';
+    this.isAuthenticated = !!this.appSession?.user;
+    this.isHost = !this._abpSessionService.tenantId;
+    this.isArabic = lang === 'ar' || lang === 'ar-EG';
 
     this.defineSortingOptions();
-
     this.initFilterForm();
-
-    // Subscribe once
     this.applyFiltersOnChange();
 
-    /**
-     * Always read localStorage.
-     *
-     * Important:
-     * pagination must be restored even
-     * when URL contains filters.
-     */
-    const savedState =
-        this.restoreBrowseState();
+    // Always restore saved paging. URL filters then override the saved filters,
+    // but must not reset the page.
+    const savedState = this.restoreBrowseState();
 
-    /**
-     * URL filters override saved filter values,
-     * but must NOT reset pagination.
-     */
-    const hasUrlFilters =
-        Object.keys(
-            this.route.snapshot.queryParams
-        ).length > 0;
-
-    if (hasUrlFilters) {
-        this.loadFiltersFromUrl();
+    if (Object.keys(this.route.snapshot.queryParams).length > 0) {
+      this.loadFiltersFromUrl();
     }
 
-    const rows =
-        savedState?.rows ||
-        this.primengTableHelper
-            .defaultRecordsCountPerPage;
+    const rows = savedState?.rows || this.primengTableHelper.defaultRecordsCountPerPage;
+    const first = savedState?.first ?? 0;
 
-    const first =
-        savedState?.first ?? 0;
+    this.paginatorFirst = first;
+    if (this.paginator) {
+      this.paginator.rows = rows;
+      this.paginator.first = first;
+    }
 
-    this.paginatorFirst =
-        first;
+    this.getAccounts({ first, rows });
+    this.getLoginAccountDataForView();
+  }
+
+  ngOnChanges(changes: SimpleChanges): void {
+    if (changes?.defaultMainFilter?.firstChange) {
+      this.initFilterForm();
+      this.setMainPageFilter(this.defaultMainFilter);
+    }
+  }
+
+  // ================= Form =================
+
+  get mainFilterCtrl(): AbstractControl {
+    return this.filterForm?.get('mainFilterType');
+  }
+
+  get sortingCtrl(): AbstractControl {
+    return this.filterForm?.get('sorting');
+  }
+
+  initFilterForm(): void {
+    if (this.filterForm) {
+      return;
+    }
+    this.filterForm = this._formBuilder.group(
+      Object.keys(EMPTY_FILTERS).reduce((controls, key) => ({ ...controls, [key]: [] }), {})
+    );
+  }
+
+  setMainPageFilter(filter: AccountMainFilterEnum): void {
+    const selected = this.pageMainFilters.find(item => item.value === filter);
+    if (selected) {
+      this.mainFilterCtrl.setValue(selected);
+    }
+  }
+
+  defineSortingOptions(): void {
+    this.sortingOptions = [
+      { label: this.l('Name'), value: 'name' },
+      { label: this.l('AccountType'), value: 'accountTypeId' }
+    ];
+  }
+
+  overridePrimeTableSetting(countPerPage: number = DEFAULT_PAGE_SIZE): void {
+    this.primengTableHelper.defaultRecordsCountPerPage = countPerPage;
+    this.primengTableHelper.predefinedRecordsCountPerPage = [
+      countPerPage,
+      countPerPage * 2,
+      countPerPage * 3
+    ];
+  }
+
+  private applyFiltersOnChange(): void {
+    this.filterForm.valueChanges
+      .pipe(debounceTime(500))
+      .subscribe(filters => {
+        if (this.restoringBrowseState) {
+          return;
+        }
+
+        this.updateFiltersInUrl(filters);
+
+        // Filters changed: go back to the first page.
+        const rows = this.primengTableHelper.defaultRecordsCountPerPage;
+        this.saveBrowseState(0, rows);
+        this.getAccounts({ first: 0, rows });
+      });
+  }
+
+  resetList(): void {
+    localStorage.removeItem(this.browseStateKey);
+    this.filterForm.reset(EMPTY_FILTERS, { emitEvent: false });
+    this.setMainPageFilter(this.defaultMainFilter);
+
+    this.paginator?.changePage(0);
+    this.getAccounts({ first: 0, rows: this.primengTableHelper.defaultRecordsCountPerPage });
+  }
+
+  // ================= Toolbar =================
+
+  toggleFilter(): void {
+    this.filterVisible = !this.filterVisible;
+    this.filterVisiblelg = !this.filterVisiblelg;
+    this.saveBrowseState();
+  }
+
+  triggerListView(): void {
+    this.cardsViewMode = !this.cardsViewMode;
+    this.saveListViewPreference();
+    this.saveBrowseState();
+  }
+
+  saveListViewPreference(): void {
+    localStorage.setItem(LIST_VIEW_KEY, String(Number(this.cardsViewMode)));
+  }
+
+  getUserPreferenceForListView(): void {
+    const value = localStorage.getItem(LIST_VIEW_KEY);
+    if (value) {
+      this.cardsViewMode = Boolean(Number(value));
+    }
+  }
+
+  openCreateManualAccount(): void {
+    this.accountEntity.createManual();
+  }
+
+  // ================= Load accounts =================
+
+  getAccounts(event?: { first?: number; rows?: number }): void {
+    const maxResultCount =
+      event?.rows ||
+      this.paginator?.rows ||
+      this.primengTableHelper.defaultRecordsCountPerPage ||
+      DEFAULT_PAGE_SIZE;
+    const skipCount = Math.max(event?.first ?? 0, 0);
 
     if (this.paginator) {
-        this.paginator.rows =
-            rows;
-
-        this.paginator.first =
-            first;
+      this.paginator.rows = maxResultCount;
     }
 
-    /**
-     * One API call only.
-     */
-    this.getAccounts({
-        first,
-        rows
-    });
+    const filters = this.normalizedFilters();
+    const orUndefined = (list: any[]) => (list?.length ? list : undefined);
+    const hasAccountType = filters.accountTypes !== null && filters.accountTypes !== undefined && filters.accountTypes !== '';
 
-    this.getLoginAccountDataForView();
-}
- ngOnChanges(changes: SimpleChanges) {
+    // Both services share the same getAll signature. Only the main filter differs.
+    const service: any = this.fromMarketplace
+      ? this._marketplaceAccountsServiceProxy
+      : this._accountsServiceProxy;
 
-    if (changes?.defaultMainFilter?.firstChange) {
+    this.primengTableHelper.showLoadingIndicator();
+    this.showMainSpinner();
+    this.loading = true;
 
-        this.initFilterForm();
+    service
+      .getAll(
+        filters.search || undefined,
+        this.fromMarketplace ? undefined : filters.mainFilterType?.value || undefined,
+        undefined,
+        undefined,
+        filters.city || undefined,
+        filters.state || undefined,
+        filters.postalCode || undefined,
+        undefined,                                   // ssin
+        undefined,                                   // accountTypeId
+        undefined,                                   // accountType
+        hasAccountType ? [Number(filters.accountTypes)] : undefined,
+        orUndefined(filters.statuses),
+        orUndefined(filters.languages),
+        orUndefined(filters.countries),
+        orUndefined(filters.classifications),
+        orUndefined(filters.categories),
+        orUndefined(filters.currencies),
+        undefined,
+        filters.sorting?.value || undefined,
+        skipCount,
+        maxResultCount
+      )
+      .pipe(finalize(() => {
+        this.primengTableHelper.hideLoadingIndicator();
+        this.loading = false;
+        this.hideMainSpinner();
+        this.active = true;
+      }))
+      .subscribe((result: any) => {
+        this.accounts = result?.items ?? [];
+        this.primengTableHelper.totalRecordsCount = result?.totalCount ?? 0;
+        this.primengTableHelper.records = this.accounts;
+      });
+  }
 
-        this.setMainPageFilter(
-            this.defaultMainFilter
-        );
+  onAccountsPageChange(event: any): void {
+    const first = event?.first ?? 0;
+    const rows = event?.rows ?? this.primengTableHelper.defaultRecordsCountPerPage;
+
+    this.paginatorFirst = first;
+    this.saveBrowseState(first, rows);
+    this.getAccounts({ first, rows });
+  }
+
+  reloadPage(): void {
+    this.paginator.changePage(this.paginator.getPage());
+  }
+
+  onFinishImport(event): void {
+    if (event) {
+      this.reloadPage();
     }
-}
+  }
 
-private loadFiltersFromUrl(): void {
+  // ================= Filter values =================
 
-    const params =
-        this.route.snapshot.queryParamMap;
+  /** Form value where object filters (dropdown items, tree nodes) are replaced by their ids. */
+  private normalizedFilters(): any {
+    const value = this.filterForm?.getRawValue() ?? {};
+    return {
+      ...value,
+      languages: this.idsOf(value.languages),
+      countries: this.idsOf(value.countries),
+      currencies: this.idsOf(value.currencies),
+      statuses: this.idsOf(value.statuses),
+      categories: this.idsOf(value.categories, 'sycEntityObjectCategory'),
+      classifications: this.idsOf(value.classifications, 'sycEntityObjectClassification')
+    };
+  }
 
-    const accountType =
-        params.get('accountType');
+  /** Items can already be ids, dropdown items ({ value } / { id }) or tree nodes ({ data[treeKey].id }). */
+  private idsOf(values: any, treeKey?: TreeFilterKey): any[] {
+    if (!Array.isArray(values)) {
+      return [];
+    }
 
-    const city =
-        params.get('city');
+    return values
+      .map(item => {
+        if (typeof item === 'number' || typeof item === 'string') {
+          return item;
+        }
+        return treeKey ? item?.data?.[treeKey]?.id : item?.value ?? item?.id;
+      })
+      .filter(id => id !== null && id !== undefined);
+  }
 
-    const postalCode =
-        params.get('postalCode');
+  private joinIds(ids: any[]): string | null {
+    return ids.length ? ids.join(',') : null;
+  }
 
-    const state =
-        params.get('state');
+  private parseNumberArray(value: string | null): number[] {
+    return value
+      ? value.split(',').map(Number).filter(id => !isNaN(id))
+      : [];
+  }
 
-    const search =
-        params.get('search');
+  // ================= URL filters =================
 
-    const countries =
-        this.parseNumberArray(
-            params.get('countries')
-        );
-
-    const currencies =
-        this.parseNumberArray(
-            params.get('currencies')
-        );
-
-    const statuses =
-        this.parseNumberArray(
-            params.get('statuses')
-        );
-
-    const languages =
-        this.parseNumberArray(
-            params.get('languages')
-        );
-
-    const categories =
-        this.parseNumberArray(
-            params.get('categories')
-        );
-
-    const classifications =
-        this.parseNumberArray(
-            params.get('classifications')
-        );
+  private loadFiltersFromUrl(): void {
+    const params = this.route.snapshot.queryParamMap;
+    const accountType = params.get('accountType');
 
     this.filterForm.patchValue(
-        {
-            search:
-                search || null,
-
-            accountTypes:
-                accountType
-                    ? Number(accountType)
-                    : null,
-
-            city:
-                city || null,
-
-            postalCode:
-                postalCode || null,
-
-            state:
-                state || null,
-
-            countries,
-            currencies,
-            statuses,
-            languages,
-            categories,
-            classifications
-        },
-        {
-            // IMPORTANT
-            emitEvent: false
-        }
+      {
+        search: params.get('search') || null,
+        accountTypes: accountType ? Number(accountType) : null,
+        city: params.get('city') || null,
+        postalCode: params.get('postalCode') || null,
+        state: params.get('state') || null,
+        countries: this.parseNumberArray(params.get('countries')),
+        currencies: this.parseNumberArray(params.get('currencies')),
+        statuses: this.parseNumberArray(params.get('statuses')),
+        languages: this.parseNumberArray(params.get('languages')),
+        categories: this.parseNumberArray(params.get('categories')),
+        classifications: this.parseNumberArray(params.get('classifications'))
+      },
+      { emitEvent: false }
     );
-}
+  }
 
-private parseNumberArray(
-    value: string | null
-): number[] {
-
-    if (!value) {
-        return [];
-    }
-
-    return value
-        .split(',')
-        .map(x => Number(x))
-        .filter(x => !isNaN(x));
-}
-
-    get mainFilterCtrl(): AbstractControl {
-        return this.filterForm?.get("mainFilterType");
-    }
-    get sortingCtrl(): AbstractControl {
-        return this.filterForm?.get("sorting");
-    }
-
-
-    toggleFilter(): void {
-        this.filterVisible = !this.filterVisible;
-        this.filterVisiblelg = !this.filterVisiblelg
-
-         this.saveBrowseState();
-    }
-    setMainPageFilter(filter: AccountMainFilterEnum) {
-        const selectedfilter = this.pageMainFilters.filter(
-            (item) => filter == item.value
-        )[0];
-        if (!selectedfilter) return;
-        this.mainFilterCtrl.setValue(selectedfilter);
-    }
-    overridePrimeTableSetting(countPerPage: number = 32) {
-        this.primengTableHelper.defaultRecordsCountPerPage = countPerPage;
-        this.primengTableHelper.predefinedRecordsCountPerPage = [
-            countPerPage,
-            countPerPage * 2,
-            countPerPage * 3,
-        ];
-    }
-    // applyFiltersOnChange() {
-    //     this.filterForm.valueChanges
-    //         .pipe(debounceTime(1500))
-    //         .subscribe((status) => {
-    //             if (status) {
-    //                 this.getAccounts({
-    //                     rows: this.primengTableHelper
-    //                         .defaultRecordsCountPerPage,
-    //                 });
-    //             }
-    //         });
-    // }
-applyFiltersOnChange(): void {
-
-    this.filterForm.valueChanges
-        .pipe(
-            debounceTime(500)
-        )
-        .subscribe(filters => {
-
-            if (
-                this.restoringBrowseState
-            ) {
-                return;
-            }
-
-            this.updateFiltersInUrl(
-                filters
-            );
-
-            // Filters changed =>
-            // reset pagination to first page
-            this.saveBrowseState(
-                0,
-                this.primengTableHelper
-                    .defaultRecordsCountPerPage
-            );
-
-            this.getAccounts({
-                first: 0,
-                rows:
-                    this.primengTableHelper
-                        .defaultRecordsCountPerPage
-            });
-
-        });
-}
-
-private updateFiltersInUrl(
-    filters: any
-): void {
-
-    const queryParams: any = {
-
-        search:
-            filters.search || null,
-
-        accountType:
-            filters.accountTypes ?? null,
-
-        city:
-            filters.city || null,
-
-        postalCode:
-            filters.postalCode || null,
-
-        state:
-            filters.state || null,
-
-        countries:
-            this.serializeFilterArray(
-                filters.countries
-            ),
-
-        currencies:
-            this.serializeFilterArray(
-                filters.currencies
-            ),
-
-        statuses:
-            this.serializeFilterArray(
-                filters.statuses
-            ),
-
-        languages:
-            this.serializeFilterArray(
-                filters.languages
-            ),
-
-        categories:
-            this.serializeTreeFilter(
-                filters.categories,
-                'category'
-            ),
-
-        classifications:
-            this.serializeTreeFilter(
-                filters.classifications,
-                'classification'
-            )
+  private updateFiltersInUrl(filters: any): void {
+    const queryParams = {
+      search: filters.search || null,
+      accountType: filters.accountTypes ?? null,
+      city: filters.city || null,
+      postalCode: filters.postalCode || null,
+      state: filters.state || null,
+      countries: this.joinIds(this.idsOf(filters.countries)),
+      currencies: this.joinIds(this.idsOf(filters.currencies)),
+      statuses: this.joinIds(this.idsOf(filters.statuses)),
+      languages: this.joinIds(this.idsOf(filters.languages)),
+      categories: this.joinIds(this.idsOf(filters.categories, 'sycEntityObjectCategory')),
+      classifications: this.joinIds(this.idsOf(filters.classifications, 'sycEntityObjectClassification'))
     };
 
     this.router.navigate([], {
-        relativeTo: this.route,
-        queryParams,
-        queryParamsHandling: 'merge',
-        replaceUrl: true
+      relativeTo: this.route,
+      queryParams,
+      queryParamsHandling: 'merge',
+      replaceUrl: true
     });
-}
-
-
-private serializeFilterArray(
-    value: any[]
-): string | null {
-
-    if (
-        !Array.isArray(value) ||
-        value.length === 0
-    ) {
-        return null;
-    }
-
-    return value
-        .map(x => {
-            if (
-                typeof x === 'number' ||
-                typeof x === 'string'
-            ) {
-                return x;
-            }
-
-            return (
-                x?.value ??
-                x?.id
-            );
-        })
-        .filter(
-            x =>
-                x !== null &&
-                x !== undefined
-        )
-        .join(',');
-}
-private serializeTreeFilter(
-    value: any[],
-    type: 'category' | 'classification'
-): string | null {
-
-    if (
-        !Array.isArray(value) ||
-        value.length === 0
-    ) {
-        return null;
-    }
-
-    const ids =
-        value
-            .map(item => {
-
-                // Already restored as ID
-                if (
-                    typeof item === 'number' ||
-                    typeof item === 'string'
-                ) {
-                    return item;
-                }
-
-                if (type === 'category') {
-                    return item?.data
-                        ?.sycEntityObjectCategory
-                        ?.id;
-                }
-
-                return item?.data
-                    ?.sycEntityObjectClassification
-                    ?.id;
-            })
-            .filter(
-                id =>
-                    id !== null &&
-                    id !== undefined
-            );
-
-    return ids.length
-        ? ids.join(',')
-        : null;
-}
-    saveUserPreferenceForListView() {
-        const key = "account-list-view-mode";
-        const value = String(Number(this.cardsViewMode));
-        localStorage.setItem(key, value);
-    }
-    getUserPreferenceForListView() {
-        const key = "account-list-view-mode";
-        const value = localStorage.getItem(key);
-        if (value) this.cardsViewMode = Boolean(Number(value));
-    }
-    triggerListView() {
-        this.cardsViewMode = !this.cardsViewMode;
-        this.saveUserPreferenceForListView();
-            this.saveBrowseState();
-    }
-
-    defineSortingOptions() {
-        this.sortingOptions = [
-            { label: this.l("Name"), value: "name" },
-            { label: this.l("AccountType"), value: "accountTypeId" },
-        ];
-    }
-    // resetList() {
-    //     this.filterForm.reset();
-    //     this.setMainPageFilter(this.defaultMainFilter);
-    // }
-
-    // getAccounts(event?: LazyLoadEvent) {
-    //     if (
-    //     event &&
-    //     this.primengTableHelper
-    //         .shouldResetPaging(event)
-    // ) {
-
-    //     this.paginator.totalRecords = 10;
-
-    //     this.paginator.changePage(0);
-
-    //     return;
-    // }
-
-    accountTypeChanges() {
-        this.getAccounts();
-    }
-    // resetList() {
-    //     this.filterForm.reset();
-    //     this.setMainPageFilter(this.defaultMainFilter);
-    // }
-
-    resetList(): void {
-
-    localStorage.removeItem(
-        this.accountBrowseStateKey
-    );
-
-    this.filterForm.reset(
-        {
-            search: null,
-            mainFilterType: null,
-            city: null,
-            postalCode: null,
-            state: null,
-            sorting: null,
-            accountTypes: null,
-            languages: [],
-            countries: [],
-            classifications: [],
-            categories: [],
-            currencies: [],
-            statuses: []
-        },
-        {
-            emitEvent: false
-        }
-    );
-
-    this.setMainPageFilter(
-        this.defaultMainFilter
-    );
-
-    if (this.paginator) {
-        this.paginator.changePage(0);
-    }
-
-    this.getAccounts({
-        first: 0,
-        rows:
-            this.primengTableHelper
-                .defaultRecordsCountPerPage
-    });
-}
-
-getAccounts(
-        event?: LazyLoadEvent
-    ): void {
-
-    
-
-        const rows =
-            event?.rows ||
-            this.paginator?.rows ||
-            this.primengTableHelper
-                .defaultRecordsCountPerPage ||
-            32;
-
-        const maxResultCount =
-            rows > 0
-                ? rows
-                : 32;
-
-        const first =
-            event?.first ?? 0;
-
-        const skipCount =
-            first >= 0
-                ? first
-                : 0;
-
-        if (this.paginator) {
-
-            this.paginator.rows =
-                maxResultCount;
-
-            if (
-                event?.first !==
-                undefined
-            ) {
-
-                const page =
-                    Math.floor(
-                        skipCount /
-                        maxResultCount
-                    );
-
-                if (
-                    this.paginator
-                        .getPage() !==
-                    page
-                ) {
-                
-                }
-            }
-        }
-
-
-
-        const formValue =
-            this.filterForm
-                ?.getRawValue() ??
-            {};
-
-   
-        const filters: any = {
-            ...formValue
-        };
-
-        filters.classifications =
-            this.extractClassificationIds(
-                formValue.classifications
-            );
-
-        filters.categories =
-            this.extractCategoryIds(
-                formValue.categories
-            );
-
-        filters.countries =
-            this.extractSimpleIds(
-                formValue.countries
-            );
-
-        filters.currencies =
-            this.extractSimpleIds(
-                formValue.currencies
-            );
-
-        filters.statuses =
-            this.extractSimpleIds(
-                formValue.statuses
-            );
-
-        filters.languages =
-            this.extractSimpleIds(
-                formValue.languages
-            );
-
-        const accountTypesFilter =
-            filters.accountTypes !==
-                null &&
-            filters.accountTypes !==
-                undefined &&
-            filters.accountTypes !==
-                ''
-                ? [
-                    Number(
-                        filters.accountTypes
-                    )
-                ]
-                : undefined;
-
-  
-
-      
-
-
-        /**
-         * -----------------------------------------------------
-         * Loading
-         * -----------------------------------------------------
-         */
-
-        this.primengTableHelper
-            .showLoadingIndicator();
-
-        this.showMainSpinner();
-
-        this.loading = true;
-
-        let apiCall: any;
-
-     
-
-        if (
-            !this.fromMarketplace
-        ) {
-
-            apiCall =
-                this._accountsServiceProxy
-                    .getAll(
-
-                        filters.search ||
-                            undefined,
-
-                        filters
-                            ?.mainFilterType
-                            ?.value ||
-                            undefined,
-
-                        undefined,
-
-                        undefined,
-
-                        filters.city ||
-                            undefined,
-
-                        filters.state ||
-                            undefined,
-
-                        filters.postalCode ||
-                            undefined,
-
-                        filters.ssin ||
-                            undefined,
-
-                        filters.accountTypeId ||
-                            undefined,
-
-                        filters.accountType ||
-                            undefined,
-
-                        accountTypesFilter,
-
-                        filters.statuses
-                            ?.length
-                            ? filters.statuses
-                            : undefined,
-
-                        filters.languages
-                            ?.length
-                            ? filters.languages
-                            : undefined,
-
-                        filters.countries
-                            ?.length
-                            ? filters.countries
-                            : undefined,
-
-                        filters.classifications
-                            ?.length
-                            ? filters.classifications
-                            : undefined,
-
-                        filters.categories
-                            ?.length
-                            ? filters.categories
-                            : undefined,
-
-                        filters.currencies
-                            ?.length
-                            ? filters.currencies
-                            : undefined,
-
-                        undefined,
-
-                        filters
-                            ?.sorting
-                            ?.value ||
-                            undefined,
-
-                        skipCount,
-
-                        maxResultCount
-                    );
-        }
-
-        /**
-         * -----------------------------------------------------
-         * Marketplace Accounts
-         * -----------------------------------------------------
-         */
-
-        else {
-
-            apiCall =
-                this
-                    ._marketplaceAccountsServiceProxy
-                    .getAll(
-
-                        filters.search ||
-                            undefined,
-
-                        undefined,
-
-                        undefined,
-
-                        undefined,
-
-                        filters.city ||
-                            undefined,
-
-                        filters.state ||
-                            undefined,
-
-                        filters.postalCode ||
-                            undefined,
-
-                        filters.ssin ||
-                            undefined,
-
-                        filters.accountTypeId ||
-                            undefined,
-
-                        filters.accountType ||
-                            undefined,
-
-                        accountTypesFilter,
-
-                        filters.statuses
-                            ?.length
-                            ? filters.statuses
-                            : undefined,
-
-                        filters.languages
-                            ?.length
-                            ? filters.languages
-                            : undefined,
-
-                        filters.countries
-                            ?.length
-                            ? filters.countries
-                            : undefined,
-
-                        filters.classifications
-                            ?.length
-                            ? filters.classifications
-                            : undefined,
-
-                        filters.categories
-                            ?.length
-                            ? filters.categories
-                            : undefined,
-
-                        filters.currencies
-                            ?.length
-                            ? filters.currencies
-                            : undefined,
-
-                        undefined,
-
-                        filters
-                            ?.sorting
-                            ?.value ||
-                            undefined,
-
-                        skipCount,
-
-                        maxResultCount
-                    );
-        }
-
-        apiCall
-            .pipe(
-                finalize(
-                    () => {
-
-                        this
-                            .primengTableHelper
-                            .hideLoadingIndicator();
-
-                        this.loading =
-                            false;
-
-                        this.hideMainSpinner();
-
-                        if (
-                            !this.active
-                        ) {
-                            this.active =
-                                true;
-                        }
-                    }
-                )
-            )
-            .subscribe(
-                result => {
-
-                    this.accounts =
-                        result?.items ??
-                        [];
-
-                    this
-                        .primengTableHelper
-                        .totalRecordsCount =
-                        result?.totalCount ??
-                        0;
-
-                    this
-                        .primengTableHelper
-                        .records =
-                        this.accounts;
-                }
-            );
-    }
-
-    reloadPage(): void {
-        this.paginator.changePage(this.paginator.getPage());
-    }
-
-    askToConfirmDelete($event, account: AccountDto, index: number): void {
-
-        var isConfirmed: Observable<boolean>;
-        isConfirmed = this.askToConfirm("AreYouSureYouWantToDeleteThisAccount?", "AreYouSure");
-
-        isConfirmed.subscribe((res) => {
-
-            if (res) {
-                this.showMainSpinner();
-                this._accountsServiceProxy
-                    .delete(account.id)
-                    .pipe(
-                        finalize(() => {
-                            this.hideMainSpinner();
-                        })
-                    )
-                    .subscribe(() => {
-                        this.primengTableHelper.records.splice(index, 1);
-                        this.notify.success(this.l("SuccessfullyDeleted"));
-                    });
-            }
-        });
-    }
- private extractSimpleIds(
-        values: any
-    ): any[] {
-
-        if (
-            !Array.isArray(values)
-        ) {
-            return [];
-        }
-
-        return values
-            .map(
-                item => {
-
-                    if (
-                        typeof item ===
-                            'number' ||
-                        typeof item ===
-                            'string'
-                    ) {
-                        return item;
-                    }
-
-                    return (
-                        item?.value ??
-                        item?.id
-                    );
-                }
-            )
-            .filter(
-                value =>
-                    value !== null &&
-                    value !== undefined
-            );
-    }
-
-    private extractClassificationIds(
-        values: any
-    ): number[] {
-
-        if (
-            !Array.isArray(values)
-        ) {
-            return [];
-        }
-
-        return values
-            .map(
-                item => {
-
-                    if (
-                        typeof item ===
-                        'number'
-                    ) {
-                        return item;
-                    }
-
-                    return item?.data
-                        ?.sycEntityObjectClassification
-                        ?.id;
-                }
-            )
-            .filter(
-                id =>
-                    id !== null &&
-                    id !== undefined
-            );
-    }
-
-    private extractCategoryIds(
-        values: any
-    ): number[] {
-
-        if (
-            !Array.isArray(values)
-        ) {
-            return [];
-        }
-
-        return values
-            .map(
-                item => {
-
-                    if (
-                        typeof item ===
-                        'number'
-                    ) {
-                        return item;
-                    }
-
-                    return item?.data
-                        ?.sycEntityObjectCategory
-                        ?.id;
-                }
-            )
-            .filter(
-                id =>
-                    id !== null &&
-                    id !== undefined
-            );
-    }
-
-    showImportAccounts() {
-        let importService = AccountsServiceProxy;
-        let serviceUtilites = AccountsImport;
-        let importStepsInfo: ImportStepInfo[];
-        importStepsInfo = this._importService.getOriginalImportSteps();
-
-        this.ImportAccountsModal.show(ImportTypes.Accounts, importService, serviceUtilites, ['LOGO', "BANNER", "IMAGE"], true, importStepsInfo);
-    }
-
-    connect(account: AccountDto): void {
-        this.showMainSpinner();
-        this._accountsServiceProxy
-            .connectContactsProfiles(account.id, null, null)
-            .pipe(
-                finalize(() => {
-                    this.hideMainSpinner();
-                })
-            )
-            .subscribe(() => {
-                this.notify.success(this.l("SuccessfullyConnected"));
-                account.status = true;
-            });
-    }
-
-    disconnect(event): void {
-
-
-        this.showMainSpinner();
-        this._accountsServiceProxy
-            .disconnect(event.account.account.id, event.relation.relationEntityId)
-            .pipe(
-                finalize(() => {
-                    this.hideMainSpinner();
-                })
-            )
-            .subscribe((res) => {
-                this.notify.success(this.l("SuccessfullyDisconnected"));
-
-                event.account.connectionsInfo = (event.account.connectionsInfo || []).filter(
-                    x => x.relationEntityId !== event.relation.relationEntityId
-                );
-                event.account.availableConnections.push(res[0])
-         
-            });
-
-   
-    }
-
-    initFilterForm() {
-        if (this.filterForm) return;
-        this.filterForm = this._formBuilder.group({
-            search: [],
-            mainFilterType: [],
-            city: [],
-            postalCode: [],
-            state: [],
-            sorting: [],
-            accountTypes: [],
-            languages: [],
-            countries: [],
-            classifications: [],
-            categories: [],
-            currencies: [],
-            statuses: [],
-        });
-    }
-
-    showSendMail() {
-
-        this.mailHeader = "InvitePartner";
-        var emailParameters: string[] = [];
-
-        var tenancyName;
-        if (this.appSession?.tenancyName)
-            tenancyName = this.appSession?.tenancyName;
-        else tenancyName = "Host";
-        emailParameters.push(tenancyName);
-
-        emailParameters.push(AppConsts.appBaseUrl);
-
-        var tenantId;
-        if (this.appSession?.tenantId)
-            tenantId = this.appSession?.tenantId?.toString();
-        else tenantId = null;
-
-        emailParameters.push(tenantId);
-        this._emailingTemplateAppService
-            .getEmailTemplate(
-                "InvitePartner",
-                emailParameters,
-                abp.localization.currentLanguage.name
-            )
-            .subscribe((result) => {
-
-                this.mailsubject = result.messageSubject;
-                this.mailbody = result.messageBody;
-                this.sendMailModal.show(
-                    this.mailHeader,
-                    this.mailsubject,
-                    this.mailbody
-                );
-            });
-    }
-    onFinishImport($event) {
-        if ($event)
-            this.reloadPage();
-    }
-
-
-isCreatingRelation = false;
-
-createRelation(account) {
-  if (this.isCreatingRelation) {
-    return;
   }
 
-  if (!account?.account?.account?.id || !account?.relation?.connectionEntityId) {
-    return;
+  // ================= Saved browse state (localStorage) =================
+
+  private get browseStateKey(): string {
+    return this.fromMarketplace ? 'marketplaceAccountsBrowseState' : 'accountsBrowseState';
   }
 
-  this.isCreatingRelation = true;
-  this.showMainSpinner();
-
-  forkJoin({
-    recipientRoles: this.AppTransactionServiceProxy.getAccountMarketplaceRoles(
-      account.account.account.ssin
-    ),
-    loggedTenantRoles: this.AppTransactionServiceProxy.getAccountMarketplaceRoles(
-      this.loginTenaneSsin
-    )
-  }).subscribe({
-    next: ({ recipientRoles, loggedTenantRoles }: any) => {
-      const recipientHasRoles = this.hasMarketplaceRoles(recipientRoles);
-      const loggedTenantHasRoles = this.hasMarketplaceRoles(loggedTenantRoles);
-
-      if (!recipientHasRoles || !loggedTenantHasRoles) {
-        this.message.info(
-           this.l('Cannot connect, you need to update the marketplace role of your account / the recipient account marketplace role in order to build relationship together')  ,
-
-          ''
-        );
-
-      this.isCreatingRelation = false;
-    account.done?.();
-    this.hideMainSpinner();
-    return;
-      }
-
-      this.applyRelation(account);
-    },
-   error: () => {
-    this.isCreatingRelation = false;
-    account.done?.();
-    this.hideMainSpinner();
-}
-  });
-}
-
-private applyRelation(account): void {
-  this._accountsServiceProxy
-    .applyRelationOnProfile(
-      account.account.account.id,
-      undefined,
-      account.relation.defaultVisibility === 'Public',
-      account.relation.connectionEntityId
-    )
-    .pipe(
-      finalize(() => {
-        this.isCreatingRelation = false;
-        account.done?.();
-        this.hideMainSpinner();
-      })
-    )
-    .subscribe((result: any) => {
-      const i = this.accounts.findIndex(
-        x => x.account.id === account.account.account.id
-      );
-
-      if (i < 0) return;
-
-      const currentAccount = this.accounts[i];
-
-      currentAccount.availableConnections =
-        (currentAccount.availableConnections || []).filter(
-          x => x.connectionEntityId !== account.relation.connectionEntityId
-        );
-
-      currentAccount.connectionsInfo = currentAccount.connectionsInfo || [];
-
-      if (Array.isArray(result) && result.length > 0) {
-        currentAccount.connectionsInfo.push(result[0]);
-      }
-
-      currentAccount.avaliableConnectionName =
-        currentAccount.availableConnections?.length > 0
-          ? currentAccount.availableConnections[0].connectLabel
-          : '';
-
-      this.accounts = [...this.accounts];
-    });
-}
-private hasMarketplaceRoles(response: any): boolean {
-  const roles = response?.result ?? response;
-
-  return Array.isArray(roles) && roles.length > 0;
-}
-
-
-
-
-    getLoginAccountDataForView() {
-        let id = this.appSession.user.accountId
-        if (!id) return
-
-      this._accountsServiceProxy.getAccountForView(id, 5).pipe(
-  
-    ).subscribe((res) => {
-      this.loginTenaneSsin = res?.account?.ssin
-    })
-
+  private saveBrowseState(first?: number, rows?: number): void {
+    if (!this.filterForm || this.restoringBrowseState) {
+      return;
     }
 
-@ViewChild('accountEntity') accountEntity: AccountEntityComponent;
-
-openCreateManualAccount():
-  void {
-
-  this.accountEntity
-    .createManual();
-}
-
-
-
-
-    //////////////////// save filters
-
-   private saveBrowseState(
-    first?: number,
-    rows?: number
-): void {
-
-    if (
-        !this.filterForm ||
-        this.restoringBrowseState
-    ) {
-        return;
-    }
-
-    const formValue =
-        this.filterForm.getRawValue();
-
-    const safeRows =
-        rows ??
-        this.paginator?.rows ??
-        this.primengTableHelper
-            .defaultRecordsCountPerPage;
-
-    const safeFirst =
-        first ??
-        this.paginator?.first ??
-        0;
-
-    const page =
-        safeRows > 0
-            ? Math.floor(
-                safeFirst / safeRows
-            )
-            : 0;
+    const safeRows = rows ?? this.paginator?.rows ?? this.primengTableHelper.defaultRecordsCountPerPage;
+    const safeFirst = first ?? this.paginator?.first ?? 0;
 
     const state: AccountsBrowseState = {
-
-        filters: {
-            search:
-                formValue.search ?? null,
-
-            mainFilterType:
-                formValue.mainFilterType ?? null,
-
-            city:
-                formValue.city ?? null,
-
-            postalCode:
-                formValue.postalCode ?? null,
-
-            state:
-                formValue.state ?? null,
-
-            sorting:
-                formValue.sorting ?? null,
-
-            accountTypes:
-                formValue.accountTypes ?? null,
-
-            languages:
-                this.extractSimpleIds(
-                    formValue.languages
-                ),
-
-            countries:
-                this.extractSimpleIds(
-                    formValue.countries
-                ),
-
-            classifications:
-                this.extractClassificationIds(
-                    formValue.classifications
-                ),
-
-            categories:
-                this.extractCategoryIds(
-                    formValue.categories
-                ),
-
-            currencies:
-                this.extractSimpleIds(
-                    formValue.currencies
-                ),
-
-            statuses:
-                this.extractSimpleIds(
-                    formValue.statuses
-                )
-        },
-
-        first: safeFirst,
-        page,
-        rows: safeRows,
-
-        cardsViewMode:
-            this.cardsViewMode,
-
-        filterVisiblelg:
-            this.filterVisiblelg
+      filters: this.normalizedFilters(),
+      first: safeFirst,
+      page: safeRows > 0 ? Math.floor(safeFirst / safeRows) : 0,
+      rows: safeRows,
+      cardsViewMode: this.cardsViewMode,
+      filterVisiblelg: this.filterVisiblelg
     };
 
-    localStorage.setItem(
-        this.accountBrowseStateKey,
-        JSON.stringify(state)
-    );
-}
+    localStorage.setItem(this.browseStateKey, JSON.stringify(state));
+  }
 
-private restoreBrowseState():
-    AccountsBrowseState | null {
-
-    const saved =
-        localStorage.getItem(
-            this.accountBrowseStateKey
-        );
-
+  private restoreBrowseState(): AccountsBrowseState | null {
+    const saved = localStorage.getItem(this.browseStateKey);
     if (!saved) {
-        return null;
+      return null;
     }
 
     try {
+      const state: AccountsBrowseState = JSON.parse(saved);
+      this.restoringBrowseState = true;
 
-        const state:
-            AccountsBrowseState =
-            JSON.parse(saved);
+      this.filterForm.patchValue({ ...EMPTY_FILTERS, ...state.filters }, { emitEvent: false });
 
-        this.restoringBrowseState =
-            true;
+      this.cardsViewMode = state.cardsViewMode ?? this.cardsViewMode;
+      this.filterVisiblelg = state.filterVisiblelg ?? this.filterVisiblelg;
+      this.paginatorFirst = state.first ?? 0;
 
-        this.filterForm.patchValue(
-            {
-                search:
-                    state.filters
-                        ?.search ?? null,
-
-                mainFilterType:
-                    state.filters
-                        ?.mainFilterType ?? null,
-
-                city:
-                    state.filters
-                        ?.city ?? null,
-
-                postalCode:
-                    state.filters
-                        ?.postalCode ?? null,
-
-                state:
-                    state.filters
-                        ?.state ?? null,
-
-                sorting:
-                    state.filters
-                        ?.sorting ?? null,
-
-                accountTypes:
-                    state.filters
-                        ?.accountTypes ?? null,
-
-                languages:
-                    state.filters
-                        ?.languages ?? [],
-
-                countries:
-                    state.filters
-                        ?.countries ?? [],
-
-                classifications:
-                    state.filters
-                        ?.classifications ?? [],
-
-                categories:
-                    state.filters
-                        ?.categories ?? [],
-
-                currencies:
-                    state.filters
-                        ?.currencies ?? [],
-
-                statuses:
-                    state.filters
-                        ?.statuses ?? []
-            },
-            {
-                emitEvent: false
-            }
-        );
-
-        this.cardsViewMode =
-            state.cardsViewMode ??
-            this.cardsViewMode;
-
-        this.filterVisiblelg =
-            state.filterVisiblelg ??
-            this.filterVisiblelg;
-
-        this.paginatorFirst =
-            state.first ?? 0;
-
-        return state;
-
+      return state;
     } catch {
+      localStorage.removeItem(this.browseStateKey);
+      return null;
+    } finally {
+      this.restoringBrowseState = false;
+    }
+  }
 
-        localStorage.removeItem(
-            this.accountBrowseStateKey
+  // ================= Card actions =================
+
+  askToConfirmDelete($event, account: AccountDto, index: number): void {
+    this.askToConfirm('AreYouSureYouWantToDeleteThisAccount?', 'AreYouSure')
+      .subscribe(confirmed => {
+        if (!confirmed) {
+          return;
+        }
+
+        this.showMainSpinner();
+        this._accountsServiceProxy.delete(account.id)
+          .pipe(finalize(() => this.hideMainSpinner()))
+          .subscribe(() => {
+            this.primengTableHelper.records.splice(index, 1);
+            this.notify.success(this.l('SuccessfullyDeleted'));
+          });
+      });
+  }
+
+  disconnect(event): void {
+    this.showMainSpinner();
+
+    this._accountsServiceProxy
+      .disconnect(event.account.account.id, event.relation.relationEntityId)
+      .pipe(finalize(() => this.hideMainSpinner()))
+      .subscribe(res => {
+        this.notify.success(this.l('SuccessfullyDisconnected'));
+
+        event.account.connectionsInfo = (event.account.connectionsInfo || []).filter(
+          x => x.relationEntityId !== event.relation.relationEntityId
+        );
+        event.account.availableConnections.push(res[0]);
+      });
+  }
+
+  createRelation(account): void {
+    if (this.isCreatingRelation) {
+      return;
+    }
+    if (!account?.account?.account?.id || !account?.relation?.connectionEntityId) {
+      return;
+    }
+
+    this.isCreatingRelation = true;
+    this.showMainSpinner();
+
+    forkJoin({
+      recipientRoles: this._appTransactionServiceProxy.getAccountMarketplaceRoles(account.account.account.ssin),
+      loggedTenantRoles: this._appTransactionServiceProxy.getAccountMarketplaceRoles(this.loginTenaneSsin)
+    }).subscribe({
+      next: ({ recipientRoles, loggedTenantRoles }: any) => {
+        if (!this.hasMarketplaceRoles(recipientRoles) || !this.hasMarketplaceRoles(loggedTenantRoles)) {
+          this.message.info(
+            this.l('Cannot connect, you need to update the marketplace role of your account / the recipient account marketplace role in order to build relationship together'),
+            ''
+          );
+          this.finishRelation(account);
+          return;
+        }
+
+        this.applyRelation(account);
+      },
+      error: () => this.finishRelation(account)
+    });
+  }
+
+  private applyRelation(account): void {
+    this._accountsServiceProxy
+      .applyRelationOnProfile(
+        account.account.account.id,
+        undefined,
+        account.relation.defaultVisibility === 'Public',
+        account.relation.connectionEntityId
+      )
+      .pipe(finalize(() => this.finishRelation(account)))
+      .subscribe((result: any) => {
+        const current = this.accounts.find(x => x.account.id === account.account.account.id);
+        if (!current) {
+          return;
+        }
+
+        current.availableConnections = (current.availableConnections || []).filter(
+          x => x.connectionEntityId !== account.relation.connectionEntityId
         );
 
-        return null;
+        current.connectionsInfo = current.connectionsInfo || [];
+        if (Array.isArray(result) && result.length > 0) {
+          current.connectionsInfo.push(result[0]);
+        }
 
-    } finally {
+        current.avaliableConnectionName = current.availableConnections.length
+          ? current.availableConnections[0].connectLabel
+          : '';
 
-        this.restoringBrowseState =
-            false;
-    }
-}
+        this.accounts = [...this.accounts];
+      });
+  }
 
-onAccountsPageChange(
-    event: any
-): void {
+  private finishRelation(account): void {
+    this.isCreatingRelation = false;
+    account.done?.();
+    this.hideMainSpinner();
+  }
 
-    const first =
-        event?.first ?? 0;
+  private hasMarketplaceRoles(response: any): boolean {
+    const roles = response?.result ?? response;
+    return Array.isArray(roles) && roles.length > 0;
+  }
 
-    const rows =
-        event?.rows ??
-        this.primengTableHelper
-            .defaultRecordsCountPerPage;
+  // ================= Invite / import =================
 
-    this.paginatorFirst = first;
+  showSendMail(): void {
+    const header = 'InvitePartner';
+    const tenancyName = this.appSession?.tenancyName || 'Host';
+    const tenantId = this.appSession?.tenantId ? this.appSession.tenantId.toString() : null;
 
-    this.saveBrowseState(
-        first,
-        rows
+    this._emailingTemplateAppService
+      .getEmailTemplate(header, [tenancyName, AppConsts.appBaseUrl, tenantId], abp.localization.currentLanguage.name)
+      .subscribe(result => {
+        this.sendMailModal.show(header, result.messageSubject, result.messageBody);
+      });
+  }
+
+  showImportAccounts(): void {
+    this.ImportAccountsModal.show(
+      ImportTypes.Accounts,
+      AccountsServiceProxy,
+      AccountsImport,
+      ['LOGO', 'BANNER', 'IMAGE'],
+      true,
+      this._importService.getOriginalImportSteps()
     );
+  }
 
-    this.getAccounts({
-        first,
-        rows
-    });
+  // ================= Logged-in account =================
+
+  private getLoginAccountDataForView(): void {
+    const id = this.appSession.user?.accountId;
+    if (!id) {
+      return;
+    }
+
+    this._accountsServiceProxy.getAccountForView(id, 5)
+      .subscribe(res => (this.loginTenaneSsin = res?.account?.ssin));
+  }
 }
-
-private get accountBrowseStateKey(): string {
-    return this.fromMarketplace
-        ? 'marketplaceAccountsBrowseState'
-        : 'accountsBrowseState';
-}
-
-private restoringBrowseState = false;
-paginatorFirst = 0;
-
-
-
-}
-
-
-

@@ -1,4 +1,9 @@
-import { AfterViewInit,  ChangeDetectorRef, Component, EventEmitter, HostListener, Input,
+import {
+  ChangeDetectorRef,
+  Component,
+  EventEmitter,
+  HostListener,
+  Input,
   OnChanges,
   OnInit,
   Output,
@@ -7,22 +12,35 @@ import { AfterViewInit,  ChangeDetectorRef, Component, EventEmitter, HostListene
   ViewContainerRef
 } from '@angular/core';
 
-import {  SycAttachmentCategoryDto} from '@shared/service-proxies/service-proxies';
-import { EntityBasicInfoField, EntityMode, GenericEntityEditor, GenericEntityNode} from '../models/generic-entity.model';
+import { SycAttachmentCategoryDto } from '@shared/service-proxies/service-proxies';
+import {
+  EntityBasicInfoField,
+  EntityMode,
+  GenericEntityEditor,
+  GenericEntityNode
+} from '../models/generic-entity.model';
+
+type MobileSection = 'main' | 'right' | 'notes';
+
+interface LeftPanelSection {
+  key: string;
+  title: string;
+  type?: 'tree' | 'list';
+  canAdd?: boolean;
+  items: GenericEntityNode[];
+}
 
 @Component({
   selector: 'app-generic-entity-shell',
   templateUrl: './generic-entity-shell.component.html',
   styleUrls: ['./generic-entity-shell.component.scss']
 })
-export class GenericEntityShellComponent
-  implements
-  OnInit,
-  OnChanges,
-  AfterViewInit {
+export class GenericEntityShellComponent implements OnInit, OnChanges {
 
-  @ViewChild('entityComponentHost', { read: ViewContainerRef, static: true }) entityComponentHost!: ViewContainerRef;
+  @ViewChild('entityComponentHost', { read: ViewContainerRef, static: true })
+  entityComponentHost!: ViewContainerRef;
 
+  // ---------- Inputs ----------
   @Input() entity: any = {};
   @Input() entityData: any;
   @Input() entityType = '';
@@ -35,746 +53,478 @@ export class GenericEntityShellComponent
 
   @Input() logoPath = 'account.logoUrl';
   @Input() coverPath = 'account.coverUrl';
-  @Input()  imagesPath = 'account.imagesUrls';
-  @Input()  attachmentsPath =  'account.entityAttachments';
+  @Input() imagesPath = 'account.imagesUrls';
+  @Input() attachmentsPath = 'account.entityAttachments';
 
-  @Input()  logoAttachmentCategory: SycAttachmentCategoryDto;
+  @Input() logoAttachmentCategory: SycAttachmentCategoryDto;
   @Input() bannerAttachmentCategory: SycAttachmentCategoryDto;
   @Input() imageAttachmentCategory: SycAttachmentCategoryDto;
 
-  @Input()  saving = false;
-  @Input()  canDetele = false;
-  
-  @Input()  uploading = false;
+  @Input() saving = false;
+  @Input() canDetele = false;
+  @Input() uploading = false;
   @Input() loading = false;
   @Input() showMedia = true;
-  @Input()  fieldPermissions: Record<string, boolean> = {};
-  @Input()  sectionPermissions:  Record<string, boolean> = {};
-  @Input()  dynamicInputsEditable = false;
+  @Input() fieldPermissions: Record<string, boolean> = {};
+  @Input() sectionPermissions: Record<string, boolean> = {};
+  @Input() dynamicInputsEditable = false;
+  @Input() initialNode: GenericEntityNode | null = null;
+  @Input() leftPanelSections: LeftPanelSection[] = [];
 
-  @Input()
-  leftPanelSections: Array<{
-    key: string;
-    title: string;
-    type?: 'tree' | 'list';
-    canAdd?: boolean;
-    items: GenericEntityNode[];
-  }> = [];
-
-
-  @Input()  initialNode:  GenericEntityNode | null = null;
-  entityBreadcrumbPath: any[] = [];
-  @Output()  entityChange =  new EventEmitter<any>();
-  @Output() logoChange =   new EventEmitter<any>();
-  @Output()  backgroundChange =  new EventEmitter<any>();
-  @Output()  imageChange =   new EventEmitter<any>();
-  @Output()  attachmentRemove =   new EventEmitter<any>();
-  @Output()  edit =   new EventEmitter<void>();
-  @Output()  delete =   new EventEmitter<void>();
-  @Output()  save =  new EventEmitter<void>();
-  @Output()  cancel =   new EventEmitter<void>();
-  @Output()  close =   new EventEmitter<void>();
-  @Output() minimize =  new EventEmitter<void>();
-  @Output()  maximize =    new EventEmitter<void>();
-  @Output()  entityItemSelect =  new EventEmitter<GenericEntityNode>();
-  @Output()  entityItemAdd =  new EventEmitter<string>();
-  @Output() breadcrumbBrowse =  new EventEmitter<void>();
-
+  // ---------- Outputs ----------
+  @Output() entityChange = new EventEmitter<any>();
+  @Output() logoChange = new EventEmitter<any>();
+  @Output() backgroundChange = new EventEmitter<any>();
+  @Output() imageChange = new EventEmitter<any>();
+  @Output() attachmentRemove = new EventEmitter<any>();
+  @Output() edit = new EventEmitter<void>();
+  @Output() delete = new EventEmitter<void>();
+  @Output() save = new EventEmitter<void>();
+  @Output() cancel = new EventEmitter<void>();
+  @Output() close = new EventEmitter<void>();
+  @Output() minimize = new EventEmitter<void>();
+  @Output() maximize = new EventEmitter<void>();
+  @Output() entityItemSelect = new EventEmitter<GenericEntityNode>();
+  @Output() entityItemAdd = new EventEmitter<string>();
+  @Output() breadcrumbBrowse = new EventEmitter<void>();
   @Output() dynamicEntitySaved = new EventEmitter<{
-      node: GenericEntityNode;
-      result?: any;
-      entity?: any;
-    }>();
+    node: GenericEntityNode;
+    result?: any;
+    entity?: any;
+  }>();
 
+  // ---------- State ----------
   leftPanelCollapsed = false;
   rightPanelCollapsed = false;
   dynamicEntityActive = false;
+  isCompactScreen = false;
+  mobileSection: MobileSection = 'main';
 
-  currentNode:  GenericEntityNode | null = null;
-  currentEditor:  GenericEntityEditor | null = null;
+  currentNode: GenericEntityNode | null = null;
+  currentEditor: GenericEntityEditor | null = null;
   currentMode: EntityMode = 'view';
 
-  private viewInitialized = false;
-
+  private entityBreadcrumbPath: any[] = [];
   private selectingNode = false;
   private selectedNodeKey = '';
+  private readonly compactBreakpoint = 1024;
 
+  constructor(private cdr: ChangeDetectorRef) {}
 
-  showBasicInfo = true;
-
-
-  isCompactScreen = false;
-
-mobileSection:
-  'main' |
-  'right' |
-  'notes' = 'main';
-
-readonly compactBreakpoint = 1024;
-
-  constructor(private cdr: ChangeDetectorRef) {
-  }
-
+  // ================= Lifecycle =================
 
   ngOnInit(): void {
-    this.currentMode =this.mode;
-      this.checkResponsiveLayout();
-    this.setDefaultRightPanelState();
-  }
-
-  ngAfterViewInit(): void {
-    // this.viewInitialized = true;
-
-    // if (this.initialNode) {
-    //   Promise.resolve().then(() => {
-    //     this.selectEntityNode(this.initialNode);
-    //   });
-    // }
+    this.currentMode = this.mode;
+    this.updateScreenSize();
+    this.resetRightPanel();
   }
 
   ngOnChanges(changes: SimpleChanges): void {
-
     if (changes.mode && !this.dynamicEntityActive) {
       this.currentMode = changes.mode.currentValue;
-      this.setDefaultRightPanelState();
-    }
-
-    if (
-      changes.initialNode &&
-      !changes.initialNode.firstChange &&
-      changes.initialNode.currentValue &&
-      this.viewInitialized
-    ) {
-      Promise.resolve().then(() => {
-        this.selectEntityNode(
-          changes.initialNode.currentValue
-        );
-      });
+      this.resetRightPanel();
     }
   }
 
-selectEntityNode(
-  node: GenericEntityNode
-): void {
+  // ================= Node selection =================
 
-  const entityType =
-    String(
-      node.entityType ?? ''
-    ).toUpperCase();
+  selectNode(node: GenericEntityNode): void {
+    const type = String(node.entityType ?? '').toUpperCase();
+    const nodeKey = `${type}-${node.id}`;
 
-  const nodeKey =
-    `${entityType}-${node.id}`;
+    if (this.selectingNode || (this.dynamicEntityActive && this.selectedNodeKey === nodeKey)) {
+      return;
+    }
 
-  if (
-    this.selectingNode ||
-    (
-      this.dynamicEntityActive &&
-      this.selectedNodeKey === nodeKey
-    )
-  ) {
-    return;
+    this.entityBreadcrumbPath = this.findBreadcrumbPath(node);
+
+    if (type === 'ACCOUNT') {
+      this.showRoot();
+      this.entityItemSelect.emit(node);
+      return;
+    }
+
+    if (!node.component) {
+      return;
+    }
+
+    this.selectingNode = true;
+    try {
+      this.currentNode = node;
+      this.currentMode = node.context?.create === true ? 'create' : 'view';
+      this.dynamicEntityActive = true;
+      this.selectedNodeKey = nodeKey;
+
+      this.renderEditor();
+      this.entityItemSelect.emit(node);
+    } finally {
+      this.selectingNode = false;
+    }
   }
 
-  // update breadcrumb only after valid selection
-  this.entityBreadcrumbPath =
-    this.getBreadcrumbPath(node);
+  showRoot(): void {
+    this.entityComponentHost?.clear();
 
-  if (entityType === 'ACCOUNT') {
+    this.entityBreadcrumbPath = [];
+    this.dynamicEntityActive = false;
+    this.currentNode = null;
+    this.currentEditor = null;
+    this.currentMode = this.mode;
+    this.selectedNodeKey = '';
+    this.mobileSection = 'main';
 
-    this.showRootEntity();
-
-    this.entityItemSelect.emit(node);
-
-    return;
+    this.resetRightPanel();
+    this.cdr.detectChanges();
   }
 
-  if (!node.component) {
-    return;
-  }
-
-  this.selectingNode = true;
-
-  try {
-
-    this.currentNode = node;
-
-    this.currentMode =
-      node?.context?.create === true
-        ? 'create'
-        : 'view';
-
-    this.dynamicEntityActive = true;
-
-    this.selectedNodeKey = nodeKey;
-
-    this.renderSelectedEntity();
-
-    this.entityItemSelect.emit(node);
-
-  } finally {
-    this.selectingNode = false;
-  }
-}
-
-showRootEntity(): void {
-
-  this.entityComponentHost?.clear();
-
-  this.entityBreadcrumbPath = [];
-
-  this.dynamicEntityActive = false;
-
-  this.currentNode = null;
-
-  this.currentEditor = null;
-
-  this.currentMode = this.mode;
-
-  this.selectedNodeKey = '';
-
-  this.mobileSection = 'main';
-
-  this.setDefaultRightPanelState();
-
-  this.cdr.detectChanges();
-}
-
-  onEntityItemAdd(sectionKey: string): void {
+  onAdd(sectionKey: string): void {
     this.entityItemAdd.emit(sectionKey);
   }
 
-private renderSelectedEntity(): void {
-
-  const node = this.currentNode;
-
-  if (
-    !node?.component ||
-    !this.entityComponentHost
-  ) {
-    return;
-  }
-
-  this.entityComponentHost.clear();
-
-  const componentRef =
-    this.entityComponentHost.createComponent(
-      node.component
-    );
-
-  const editor =
-    componentRef.instance as GenericEntityEditor;
-
-  this.currentEditor = editor;
-
-  const editorAny =
-    editor as any;
-
-  editorAny.logoAttachmentCategory =
-    this.logoAttachmentCategory;
-
-  editorAny.bannerAttachmentCategory =
-    this.bannerAttachmentCategory;
-
-  editorAny.imageAttachmentCategory =
-    this.imageAttachmentCategory;
-
-  editor.node = node;
-  editor.mode = this.currentMode;
-  editor.entityData = node.data ?? null;
-
-  // ==============================
-  // IMPORTANT: listen for SAVE
-  // ==============================
-  editor.saved?.subscribe(result => {
-
-    this.currentMode = 'view';
-
-    editor.mode = 'view';
-
-    if (this.currentNode?.context) {
-      this.currentNode.context.create = false;
+  private renderEditor(): void {
+    const node = this.currentNode;
+    if (!node?.component || !this.entityComponentHost) {
+      return;
     }
 
-    if (result?.entity) {
-      this.currentNode.data = result.entity;
-    }
+    this.entityComponentHost.clear();
+    const componentRef = this.entityComponentHost.createComponent(node.component);
+    const editor = componentRef.instance as GenericEntityEditor;
+    this.currentEditor = editor;
 
-    if (result?.contact) {
-      this.currentNode.data = result.contact;
-    }
-
-    this.rightPanelCollapsed = false;
-
-    this.dynamicEntitySaved.emit({
-      node: this.currentNode,
-      result,
-      entity:
-        result?.contact ??
-        result?.entity ??
-        editor.entity
+    Object.assign(editor, {
+      logoAttachmentCategory: this.logoAttachmentCategory,
+      bannerAttachmentCategory: this.bannerAttachmentCategory,
+      imageAttachmentCategory: this.imageAttachmentCategory
     });
 
-    this.cdr.detectChanges();
-  });
+    editor.node = node;
+    editor.mode = this.currentMode;
+    editor.entityData = node.data ?? null;
 
+    editor.saved?.subscribe(result => {
+      this.currentMode = 'view';
+      editor.mode = 'view';
 
-  // ==============================
-  // IMPORTANT: listen for CANCEL
-  // ==============================
-  editor.cancelled?.subscribe(() => {
+      if (this.currentNode?.context) {
+        this.currentNode.context.create = false;
+      }
+      if (result?.entity) {
+        this.currentNode.data = result.entity;
+      }
+      if (result?.contact) {
+        this.currentNode.data = result.contact;
+      }
 
-    this.currentMode = 'view';
-    editor.mode = 'view';
+      this.rightPanelCollapsed = false;
 
-    this.rightPanelCollapsed = false;
+      this.dynamicEntitySaved.emit({
+        node: this.currentNode,
+        result,
+        entity: result?.contact ?? result?.entity ?? editor.entity
+      });
 
-    this.cdr.detectChanges();
-  });
+      this.cdr.detectChanges();
+    });
 
+    editor.cancelled?.subscribe(() => {
+      this.currentMode = 'view';
+      editor.mode = 'view';
+      this.rightPanelCollapsed = false;
+      this.cdr.detectChanges();
+    });
 
-  editor.loadEntity?.();
+    editor.loadEntity?.();
+    this.currentMode = editor.mode ?? this.currentMode;
+    componentRef.changeDetectorRef.detectChanges();
+  }
 
-  this.currentMode =
-    editor.mode ??
-    this.currentMode;
+  // ================= Basic-info actions =================
+  // When a dynamic editor is active the action goes to it,
+  // otherwise it is emitted to the parent.
 
-  componentRef
-    .changeDetectorRef
-    .detectChanges();
-}
-
-  editCurrentEntity(): void {
+  onEdit(): void {
     if (!this.dynamicEntityActive) {
       this.edit.emit();
       return;
     }
-
     if (!this.currentEditor) {
       return;
     }
-
     this.currentMode = 'edit';
     this.currentEditor.mode = 'edit';
     this.rightPanelCollapsed = true;
-
     this.currentEditor.editEntity?.();
   }
 
-
-   deleteCurrentEntity(): void {
+  onDelete(): void {
     if (!this.dynamicEntityActive) {
       this.delete.emit();
-      return;
     }
-
   }
 
-  saveCurrentEntity(): void {
+  onSave(): void {
     if (!this.dynamicEntityActive) {
       this.save.emit();
       return;
     }
-
     this.currentEditor?.saveEntity?.();
   }
 
-  cancelCurrentEntity(): void {
+  onCancel(): void {
     if (!this.dynamicEntityActive) {
       this.cancel.emit();
       return;
     }
-
     if (!this.currentEditor) {
       return;
     }
-
     this.currentEditor.cancelEntity?.();
-
     this.currentMode = 'view';
     this.currentEditor.mode = 'view';
     this.rightPanelCollapsed = false;
   }
 
-  onCurrentEntityChange(
-    changedData: any
-  ): void {
-
+  onEntityChange(changedData: any): void {
     if (!this.dynamicEntityActive) {
-      this.entityChange.emit(
-        changedData
-      );
-
+      this.entityChange.emit(changedData);
       return;
     }
-
     if (!this.currentEditor) {
       return;
     }
-
     this.currentEditor.entityData = changedData;
-
-
     if (this.currentNode) {
       this.currentNode.data = changedData;
     }
   }
 
-
-
-  get displayedEntity(): any {
-    if (this.dynamicEntityActive && this.currentEditor) {
-      return this.currentEditor.entity;
-    }
-    return this.entity;
-  }
-
-  get displayedEntityData(): any {
-    if (this.dynamicEntityActive &&  this.currentEditor) {
-      return this.currentEditor.entityData;
-    }
-    return this.entityData;
-  }
-
-  get displayedMode(): EntityMode {
-    return this.dynamicEntityActive
-      ? this.currentMode
-      : this.mode;
-  }
-
-  get displayedBasicInfoFields(): EntityBasicInfoField[] {
-
-    if (
-      this.dynamicEntityActive && this.currentEditor
-    ) {
-      return (  this.currentEditor.basicInfoFields ??  []
-      );
-    }
-
-    return this.basicInfoFields;
-  }
-  get displayedShowMedia(): boolean {
-    if (
-      this.dynamicEntityActive &&
-      this.currentEditor
-    ) {
-      return (
-        this.currentEditor.showMedia ??
-        false
-      );
-    }
-
-    return this.showMedia;
-  }
-
-  get displayedSaving(): boolean {
-    return this.dynamicEntityActive  ? !!this.currentEditor?.saving  : this.saving;
-  }
-
-  get displayedLoading(): boolean {
-    return this.dynamicEntityActive   ? !!this.currentEditor?.loading  : this.loading;
-  }
-
-  get currentTitle(): string {
-    if (
-      !this.dynamicEntityActive ||
-      !this.currentNode
-    ) {
-      return this.title;
-    }
-
-    const modeLabel = this.currentMode === 'create'  ? 'Create'   : this.currentMode === 'edit'   ? 'Edit'   : 'View';
-
-    return `${modeLabel} ${this.currentEditor?.entity?.name ??   this.currentNode.label ??    ''  }`;
-  }
-
-get currentBreadcrumbItems(): any[] {
-
-  const dynamicPath =
-    this.entityBreadcrumbPath.filter(
-      dynamicItem =>
-        !this.breadcrumbItems.some(
-          baseItem =>
-            baseItem.entityType &&
-            dynamicItem.entityType &&
-            baseItem.entityType.toUpperCase() ===
-              dynamicItem.entityType.toUpperCase() &&
-            String(baseItem.entityId) ===
-              String(dynamicItem.entityId)
-        )
-    );
-
-  const items = [
-    ...this.breadcrumbItems,
-    ...dynamicPath
-  ];
-
-  return items.map(
-    (item, index) => ({
-      ...item,
-      active:
-        index === items.length - 1
-    })
-  );
-}
-  private setDefaultRightPanelState(): void {
-    const activeMode =  this.dynamicEntityActive  ? this.currentMode : this.mode;
-    this.rightPanelCollapsed =  activeMode === 'create' || activeMode === 'edit';
-  }
-
-  toggleRightPanel(): void {
-    this.rightPanelCollapsed = !this.rightPanelCollapsed;
-  }
-
-
-
-  onRootLogoChange(event: any): void {
-
+  onLogoChange(event: any): void {
     if (this.dynamicEntityActive) {
       this.currentEditor?.onLogoChange?.(event);
-      return;
+    } else {
+      this.logoChange.emit(event);
     }
-
-    this.logoChange.emit(event);
   }
 
-  onRootBackgroundChange(event: any): void {
+  onBackgroundChange(event: any): void {
     if (this.dynamicEntityActive) {
       this.currentEditor?.onBackgroundChange?.(event);
-      return;
+    } else {
+      this.backgroundChange.emit(event);
     }
-
-    this.backgroundChange.emit(event);
   }
 
-  onRootImageChange(event: any): void {
+  onImageChange(event: any): void {
     if (!this.dynamicEntityActive) {
       this.imageChange.emit(event);
     }
   }
 
-  onRootAttachmentRemove(event: any): void {
+  onAttachmentRemove(event: any): void {
     if (!this.dynamicEntityActive) {
       this.attachmentRemove.emit(event);
     }
   }
 
-  get displayedShowAdditionalImages():boolean {
+  // ================= Displayed values =================
+  // Value comes from the dynamic editor when active, otherwise from inputs.
 
-    if ( this.dynamicEntityActive && this.currentEditor ) {
-      return ( this.currentEditor.showAdditionalImages ?? true);
-    }
-    return true;
+  private get editorActive(): boolean {
+    return this.dynamicEntityActive && !!this.currentEditor;
   }
 
+  get displayedEntity(): any {
+    return this.editorActive ? this.currentEditor.entity : this.entity;
+  }
 
-  openLeftPanel(): void {
-  this.leftPanelCollapsed = false;
-}
+  get displayedEntityId(): any {
+    return this.displayedEntity?.entityId ?? this.displayedEntity?.id;
+  }
 
-closeLeftPanel(): void {
-  this.leftPanelCollapsed = true;
-}
+  get displayedEntityData(): any {
+    return this.editorActive ? this.currentEditor.entityData : this.entityData;
+  }
 
-toggleLeftPanel(): void {
-  this.leftPanelCollapsed =
-    !this.leftPanelCollapsed;
-}
+  get displayedMode(): EntityMode {
+    return this.dynamicEntityActive ? this.currentMode : this.mode;
+  }
 
-showMobileMain(): void {
-  this.mobileSection = 'main';
-}
+  get displayedBasicInfoFields(): EntityBasicInfoField[] {
+    return this.editorActive
+      ? this.currentEditor.basicInfoFields ?? []
+      : this.basicInfoFields;
+  }
 
-showMobileRightPanel(): void {
-  this.mobileSection = 'right';
-}
+  get displayedShowMedia(): boolean {
+    return this.editorActive
+      ? this.currentEditor.showMedia ?? false
+      : this.showMedia;
+  }
 
-showMobileNotes(): void {
-  this.mobileSection = 'notes';
-}
+  get displayedShowAdditionalImages(): boolean {
+    return this.editorActive
+      ? this.currentEditor.showAdditionalImages ?? true
+      : true;
+  }
 
-@HostListener('window:resize')
-onWindowResize(): void {
-  this.checkResponsiveLayout();
-}
+  get displayedSaving(): boolean {
+    return this.dynamicEntityActive ? !!this.currentEditor?.saving : this.saving;
+  }
 
-private checkResponsiveLayout(): void {
-  const wasCompact = this.isCompactScreen;
-  this.isCompactScreen =  window.innerWidth <=   this.compactBreakpoint;
+  get displayedLoading(): boolean {
+    return this.dynamicEntityActive ? !!this.currentEditor?.loading : this.loading;
+  }
 
-  if (this.isCompactScreen && !wasCompact) {
-    this.leftPanelCollapsed = true;
+  get currentTitle(): string {
+    if (!this.dynamicEntityActive || !this.currentNode) {
+      return this.title;
+    }
+    const modeLabel =
+      this.currentMode === 'create' ? 'Create' :
+      this.currentMode === 'edit' ? 'Edit' : 'View';
+    const name = this.currentEditor?.entity?.name ?? this.currentNode.label ?? '';
+    return `${modeLabel} ${name}`;
+  }
+
+  get currentBreadcrumbItems(): any[] {
+    const dynamicItems = this.entityBreadcrumbPath.filter(dynamicItem =>
+      !this.breadcrumbItems.some(baseItem =>
+        baseItem.entityType &&
+        dynamicItem.entityType &&
+        this.isSameEntity(
+          baseItem.entityType, baseItem.entityId,
+          dynamicItem.entityType, dynamicItem.entityId
+        )
+      )
+    );
+
+    const items = [...this.breadcrumbItems, ...dynamicItems];
+    return items.map((item, index) => ({ ...item, active: index === items.length - 1 }));
+  }
+
+  /** Mobile left drawer is open (used for backdrop + open class). */
+  get isMobileLeftOpen(): boolean {
+    return this.isCompactScreen && !this.leftPanelCollapsed;
+  }
+
+  // ================= Panels / responsive =================
+
+  openLeftPanel(): void { this.leftPanelCollapsed = false; }
+  closeLeftPanel(): void { this.leftPanelCollapsed = true; }
+  toggleLeftPanel(): void { this.leftPanelCollapsed = !this.leftPanelCollapsed; }
+  toggleRightPanel(): void { this.rightPanelCollapsed = !this.rightPanelCollapsed; }
+
+  showMain(): void { this.mobileSection = 'main'; }
+  showRelated(): void { this.mobileSection = 'right'; }
+  showNotes(): void { this.mobileSection = 'notes'; }
+
+  private resetRightPanel(): void {
+    const mode = this.dynamicEntityActive ? this.currentMode : this.mode;
+    this.rightPanelCollapsed = mode === 'create' || mode === 'edit';
+  }
+
+  @HostListener('window:resize')
+  onWindowResize(): void {
+    this.updateScreenSize();
+  }
+
+  private updateScreenSize(): void {
+    const wasCompact = this.isCompactScreen;
+    this.isCompactScreen = window.innerWidth <= this.compactBreakpoint;
+
+    if (this.isCompactScreen === wasCompact) {
+      return;
+    }
+
     this.mobileSection = 'main';
-    return;
-  }
-  if (this.isCompactScreen) {
-    return;
-  }
 
-  if (!this.isCompactScreen && wasCompact
-  ) {
-    this.leftPanelCollapsed = false;
-    this.mobileSection = 'main';
-    this.setDefaultRightPanelState();
-  }
-}
-
-private getBreadcrumbPath(
-  target: GenericEntityNode,
-  nodes: GenericEntityNode[] =
-    this.leftPanelSections.reduce(
-      (all, section) => [
-        ...all,
-        ...(section.items || [])
-      ],
-      [] as GenericEntityNode[]
-    )
-): any[] {
-
-  for (const node of nodes) {
-
-    if (
-      String(node.id) === String(target.id) &&
-      String(node.entityType).toUpperCase() ===
-        String(target.entityType).toUpperCase()
-    ) {
-      return [{
-        label: node.label,
-        entityType: node.entityType,
-        entityId: node.id,
-        node: node
-      }];
-    }
-
-    const children = this.getBreadcrumbPath(
-      target,
-      node.children || []
-    );
-
-    if (children.length) {
-      return [
-        {
-          label: node.label,
-          entityType: node.entityType,
-          entityId: node.id,
-          node: node
-        },
-        ...children
-      ];
+    if (this.isCompactScreen) {
+      this.leftPanelCollapsed = true;
+    } else {
+      this.leftPanelCollapsed = false;
+      this.resetRightPanel();
     }
   }
 
-  return [];
-}
+  // ================= Breadcrumb =================
 
-onBreadcrumbItemClick(
-  item: any
-): void {
+  onBreadcrumbClick(item: any): void {
+    if (!item || item.active) {
+      return;
+    }
 
-  if (!item || item.active) {
-    return;
+    if (item.isBrowsePage) {
+      this.breadcrumbBrowse.emit();
+      return;
+    }
+
+    if (String(item.entityType || '').toUpperCase() === 'ACCOUNT') {
+      this.showRoot();
+      return;
+    }
+
+    const node = this.findNode(item.entityType, item.entityId);
+    if (!node) {
+      console.warn('Breadcrumb entity not found:', item);
+      return;
+    }
+
+    this.selectNode(node);
   }
 
-  // =========================================
-  // MY CONNECTIONS
-  // =========================================
-
-  if (item.isBrowsePage) {
-
-    this.breadcrumbBrowse.emit();
-
-    return;
-  }
-
-
-  // =========================================
-  // ACCOUNT / PROFILE
-  // =========================================
-
-  if (
-    String(item.entityType || '')
-      .toUpperCase() === 'ACCOUNT'
-  ) {
-
-    this.showRootEntity();
-
-    return;
-  }
-
-
-  // =========================================
-  // BRANCH / CONTACT / SUB BRANCH / ETC.
-  // =========================================
-
-  const node =
-    this.findEntityNode(
-      item.entityType,
-      item.entityId
-    );
-
-  if (!node) {
-
-    console.warn(
-      'Breadcrumb entity not found:',
-      item
-    );
-
-    return;
-  }
-
-
-  // EXACT SAME FUNCTION USED BY LEFT PANEL
-  this.selectEntityNode(node);
-}
-
-private findEntityNode(
-  entityType: string,
-  entityId: number | string,
-  nodes?: GenericEntityNode[]
-): GenericEntityNode | null {
-
-  const searchNodes =
-    nodes ??
-    this.leftPanelSections.reduce(
-      (all, section) => [
-        ...all,
-        ...(section.items || [])
-      ],
+  private get allRootNodes(): GenericEntityNode[] {
+    return this.leftPanelSections.reduce(
+      (all, section) => [...all, ...(section.items || [])],
       [] as GenericEntityNode[]
     );
+  }
 
-  for (const node of searchNodes) {
+  private isSameEntity(typeA: any, idA: any, typeB: any, idB: any): boolean {
+    return (
+      String(typeA || '').toUpperCase() === String(typeB || '').toUpperCase() &&
+      String(idA) === String(idB)
+    );
+  }
 
-    const sameType =
-      String(node.entityType || '')
-        .toUpperCase() ===
-      String(entityType || '')
-        .toUpperCase();
-
-    const sameId =
-      String(node.id) ===
-      String(entityId);
-
-    if (sameType && sameId) {
-      return node;
-    }
-
-    if (node.children?.length) {
-
-      const found =
-        this.findEntityNode(
-          entityType,
-          entityId,
-          node.children
-        );
-
+  private findNode(
+    entityType: string,
+    entityId: number | string,
+    nodes: GenericEntityNode[] = this.allRootNodes
+  ): GenericEntityNode | null {
+    for (const node of nodes) {
+      if (this.isSameEntity(node.entityType, node.id, entityType, entityId)) {
+        return node;
+      }
+      const found = this.findNode(entityType, entityId, node.children || []);
       if (found) {
         return found;
       }
     }
+    return null;
   }
 
-  return null;
-}
+  private findBreadcrumbPath(
+    target: GenericEntityNode,
+    nodes: GenericEntityNode[] = this.allRootNodes
+  ): any[] {
+    for (const node of nodes) {
+      const item = {
+        label: node.label,
+        entityType: node.entityType,
+        entityId: node.id,
+        node
+      };
 
-}
+      if (this.isSameEntity(node.entityType, node.id, target.entityType, target.id)) {
+        return [item];
+      }
 
+      const childPath = this.findBreadcrumbPath(target, node.children || []);
+      if (childPath.length) {
+        return [item, ...childPath];
+      }
+    }
+    return [];
+  }
+}

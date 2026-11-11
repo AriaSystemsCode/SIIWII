@@ -1,251 +1,146 @@
 <div class="entity-basic-info">
 
-  <!-- ===================================================== -->
-  <!-- TOP SECTION: FIELDS + ACTION BUTTONS -->
-  <!-- ===================================================== -->
-
+  <!-- FIELDS + ACTION BUTTONS -->
   <div class="basic-info-header">
 
-    <!-- Dynamic basic fields -->
     <div class="basic-fields">
-
       <ng-container *ngFor="let field of fields">
-
         <div *ngIf="isFieldVisible(field)" class="basic-field">
 
-          <label class="basic-field-label">
-            {{ field.label | localize }}:
-          </label>
+          <label class="basic-field-label">{{ field.label | localize }}:</label>
 
-          <input *ngIf="field.type === 'text'" type="text" class="form-control basic-field-control"
-            [ngModel]="getValue(field.valuePath)" (ngModelChange)="
-        setValue(
-          field.valuePath,
-          $event
-        )
-      " [disabled]="
-        isFieldDisabled(field)
-      " />
+          <input
+            *ngIf="field.type === 'text'"
+            type="text"
+            class="form-control basic-field-control"
+            [ngModel]="getValue(field.valuePath)"
+            (ngModelChange)="setValue(field.valuePath, $event)"
+            [disabled]="isFieldDisabled(field)" />
 
-          <p-dropdown *ngIf="
-        field.type === 'dropdown'
-      " styleClass="basic-field-dropdown" [options]="field.options || []" [optionLabel]="
-        field.optionLabel || 'label'
-      " [optionValue]="
-        field.optionValue || 'value'
-      " [ngModel]="
-        getValue(field.valuePath)
-      " (ngModelChange)="
-        setValue(
-          field.valuePath,
-          $event
-        )
-      " [disabled]="
-        isFieldDisabled(field)
-      " appendTo="body">
+          <p-dropdown
+            *ngIf="field.type === 'dropdown'"
+            styleClass="basic-field-dropdown"
+            appendTo="body"
+            [options]="field.options || []"
+            [optionLabel]="field.optionLabel || 'label'"
+            [optionValue]="field.optionValue || 'value'"
+            [ngModel]="getValue(field.valuePath)"
+            (ngModelChange)="setValue(field.valuePath, $event)"
+            [disabled]="isFieldDisabled(field)">
           </p-dropdown>
 
         </div>
-
       </ng-container>
-
-
     </div>
 
-    <!-- Top-right action buttons -->
     <div class="basic-info-actions">
 
       <!-- View mode -->
-            <button *ngIf="mode === 'view'  && canDetele" type="button" class="btn deleteBtn  entity-action-button"  (click)="deleteClicked()">
+      <ng-container *ngIf="mode === 'view'">
+        <button *ngIf="canDetele" type="button" class="btn deleteBtn entity-action-button"
+          (click)="onDelete()">
+          <i class="fa fa-trash mr-1"></i>{{ 'Delete' | localize }}
+        </button>
 
-        <i class="fa fa-trash mr-1"></i>
+        <button type="button" class="btn bgPurple entity-action-button"
+          [disabled]="busy" (click)="onEdit()">
+          <i class="fa fa-edit mr-1"></i>{{ 'Edit' | localize }}
+        </button>
+      </ng-container>
 
-        {{ 'Delete' | localize }}
-
-      </button>
-      <button *ngIf="mode === 'view'" type="button" class="btn bgPurple entity-action-button" [disabled]="
-          saving ||
-          uploading
-        " (click)="editClicked()">
-
-        <i class="fa fa-edit mr-1"></i>
-
-        {{ 'Edit' | localize }}
-
-      </button>
-
-    
-
-      <!-- Create/Edit mode -->
-      <ng-container *ngIf="
-          mode === 'create' ||
-          mode === 'edit'
-        ">
-
-        <button type="button" class="btn btnCancel entity-action-button" [disabled]="
-            saving ||
-            uploading
-          " (click)="cancelClicked()">
-
+      <!-- Create / Edit mode -->
+      <ng-container *ngIf="isEditing">
+        <button type="button" class="btn btnCancel entity-action-button"
+          [disabled]="busy" (click)="onCancel()">
           {{ 'Cancel' | localize }}
-
         </button>
 
-        <button type="button" class="btn bgPurple entity-action-button" [buttonBusy]="
-            saving ||
-            uploading
-          " [busyText]="
-            uploading
-              ? (
-                  'Uploading'
-                    | localize
-                )
-              : (
-                  'SavingWithThreeDot'
-                    | localize
-                )
-          " [disabled]="
-            saving ||
-            uploading 
-          " (click)="saveClicked()">
-
+        <button type="button" class="btn bgPurple entity-action-button"
+          [buttonBusy]="busy"
+          [busyText]="uploading ? ('Uploading' | localize) : ('SavingWithThreeDot' | localize)"
+          [disabled]="busy"
+          (click)="onSave()">
           {{ 'Save' | localize }}
-
         </button>
-
       </ng-container>
 
     </div>
-
   </div>
 
-  <!-- ===================================================== -->
-  <!-- COVER AND LOGO -->
-  <!-- ===================================================== -->
+  <!-- COVER, LOGO AND ADDITIONAL IMAGES -->
   <p-accordion *ngIf="showMedia">
-
     <p-accordionTab [selected]="true">
-
       <div class="entity-media-section">
 
         <div class="cover-upload-wrapper">
 
-          <!-- ============================= -->
-          <!-- COVER: VIEW MODE -->
-          <!-- ============================= -->
+          <!-- Cover -->
+          <img *ngIf="!isEditing && coverPreviewUrl"
+            class="entity-cover-image" style="width: 100%; border-radius: 6px;"
+            [src]="coverPreviewUrl" alt="Cover" />
 
-          <img *ngIf="
-         !canEditImages &&
-        coverPreviewUrl
-      " class="entity-cover-image" style="width: 100%;border-radius: 6px;"
-            [src]="coverPreviewUrl || 'assets/common/images/default-cover.jpg'" alt="Cover" />
-
-
-          <!-- ============================= -->
-          <!-- COVER: CREATE / EDIT MODE -->
-          <!-- ============================= -->
-
-          <app-image-upload *ngIf="
-        canEditImages &&
-        bannerAttachmentCategory
-      " [sycAttachmentCategory]="bannerAttachmentCategory" [attachmentTypeCode]="'BANNER'" [staticWidth]="1193"
-            [staticHeight]="bannerHeight" [showGuidelines]="false" [image]="coverPreviewUrl" [isDisabled]="
-    !canEditImages ||
-    saving ||
-    uploading
-  " (imageBrowseDone)="onBannerBrowseDone($event)" (removeImage)="removeBanner()">
+          <app-image-upload *ngIf="isEditing && bannerAttachmentCategory"
+            [sycAttachmentCategory]="bannerAttachmentCategory"
+            [attachmentTypeCode]="'BANNER'"
+            [staticWidth]="1193"
+            [staticHeight]="bannerHeight"
+            [showGuidelines]="false"
+            [image]="coverPreviewUrl"
+            [isDisabled]="busy"
+            (imageBrowseDone)="onBannerSelected($event)"
+            (removeImage)="removeBanner()">
           </app-image-upload>
 
-
-          <!-- ============================= -->
-          <!-- LOGO -->
-          <!-- ============================= -->
-
+          <!-- Logo -->
           <div class="logo-upload-wrapper">
+            <img *ngIf="!isEditing && logoPreviewUrl"
+              class="entity-logo-image" style="width: 100px; height: 100px; border-radius: 6px;"
+              [src]="logoPreviewUrl" alt="Logo" />
 
-            <!-- Logo: View mode -->
-
-            <img *ngIf="
-         !canEditImages &&
-          logoPreviewUrl
-        " style="width: 100px;height: 100px;border-radius: 6px;" class="entity-logo-image"
-              [src]="logoPreviewUrl || 'assets/common/images/default-cover.jpg'" alt="Logo" />
-
-
-
-            <!-- Logo: Create/Edit mode -->
-
-            <app-image-upload *ngIf="
-           canEditImages &&
-          logoAttachmentCategory &&
-          logoUploaderVisible
-        " [sycAttachmentCategory]="logoAttachmentCategory" [attachmentTypeCode]="'LOGO'" [staticWidth]="logoWidth"
-              [staticHeight]="logoHeight" [showGuidelines]="false" [image]="logoPreviewUrl" [isDisabled]="
-    !canEditImages ||
-    saving ||
-    uploading
-  " (imageBrowseDone)="onLogoBrowseDone($event)" (removeImage)="removeLogo()">
+            <app-image-upload *ngIf="isEditing && logoAttachmentCategory && logoUploaderVisible"
+              [sycAttachmentCategory]="logoAttachmentCategory"
+              [attachmentTypeCode]="'LOGO'"
+              [staticWidth]="logoWidth"
+              [staticHeight]="logoHeight"
+              [showGuidelines]="false"
+              [image]="logoPreviewUrl"
+              [isDisabled]="busy"
+              (imageBrowseDone)="onLogoSelected($event)"
+              (removeImage)="removeLogo()">
             </app-image-upload>
-
-
           </div>
 
         </div>
 
-        <!-- ================================= -->
-        <!-- ADDITIONAL IMAGES -->
-        <!-- ================================= -->
-
+        <!-- Additional images -->
         <div *ngIf="showAdditionalImages" class="additional-images-section">
-
-
-
           <div class="additional-images-row">
 
-            <div class="additional-image-slot" *ngFor="
-    let slot of getVisibleAdditionalImages();
-    let imageIndex = index
-  ">
+            <div class="additional-image-slot"
+              *ngFor="let slot of visibleImageSlots; let imageIndex = index">
 
-              <!-- Image: View mode -->
+              <img *ngIf="!isEditing && slot.previewUrl"
+                class="additional-image-preview" style="width: 180px; border-radius: 6px;"
+                [src]="slot.previewUrl" alt="Account image" />
 
-              <img *ngIf="
-          !canEditImages &&
-            slot.previewUrl
-          " style="width: 180px;border-radius: 6px;" class="additional-image-preview"
-                [src]="slot.previewUrl || 'assets/common/images/default-cover.jpg'" alt="Account image" />
-
-
-              <!-- Image: Create/Edit mode -->
-
-              <app-image-upload *ngIf="
-         canEditImages &&
-            imageAttachmentCategory
-          " [sycAttachmentCategory]="imageAttachmentCategory" [attachmentTypeCode]="'IMAGE'"
-                [staticWidth]="additionalImageWidth" [staticHeight]="additionalImageHeight" [showGuidelines]="false"
-                [image]="slot.previewUrl" [isDisabled]="
-    !canEditImages ||
-    saving ||
-    uploading
-  " (imageBrowseDone)="
-            onAdditionalImageBrowseDone(
-              $event,
-              imageIndex
-            )
-          " (removeImage)="
-            removeAdditionalImage(imageIndex)
-          ">
+              <app-image-upload *ngIf="isEditing && imageAttachmentCategory"
+                [sycAttachmentCategory]="imageAttachmentCategory"
+                [attachmentTypeCode]="'IMAGE'"
+                [staticWidth]="additionalImageWidth"
+                [staticHeight]="additionalImageHeight"
+                [showGuidelines]="false"
+                [image]="slot.previewUrl"
+                [isDisabled]="busy"
+                (imageBrowseDone)="onAdditionalImageSelected($event, imageIndex)"
+                (removeImage)="removeAdditionalImage(imageIndex)">
               </app-image-upload>
-
 
             </div>
 
           </div>
-
         </div>
 
       </div>
-
     </p-accordionTab>
   </p-accordion>
 </div>

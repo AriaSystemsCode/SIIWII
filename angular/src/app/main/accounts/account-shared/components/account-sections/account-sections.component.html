@@ -1,373 +1,191 @@
 <p-accordion *ngIf="account">
 
+  <!-- BASIC INFORMATION -->
   <p-accordionTab header="{{ 'BasicInformation' | localize }}" [selected]="true">
-
     <div class="basic-info-form">
 
-      <!-- Trade name -->
-      <div class="basic-info-row" *ngIf="
-      roleEntityObjectTypeId !== 21
-    ">
-        <label class="field-label">
-          {{ 'TradeName' | localize }}:
-        </label>
-
+      <div class="basic-info-row" *ngIf="!isPersonalAccount">
+        <label class="field-label">{{ 'TradeName' | localize }}:</label>
         <div class="field-control">
-
-
-
-          <!-- Trade name -->
-          <input type="text" class="form-control" [(ngModel)]="account.tradeName" name="tradeName"
-            [disabled]="!canEditField('tradeName')" />
+          <input type="text" class="form-control" name="tradeName"
+            [(ngModel)]="account.tradeName" [disabled]="!canEditField('tradeName')" />
         </div>
       </div>
 
-      <!-- Email -->
       <div class="basic-info-row">
-        <label class="field-label">
-          {{ 'Email' | localize }}:
-        </label>
-
+        <label class="field-label">{{ 'Email' | localize }}:</label>
         <div class="field-control">
-          <!-- Email -->
-          <input type="email" class="form-control" [(ngModel)]="account.eMailAddress" name="emailAddress"
-            [disabled]="!canEditField('eMailAddress')" />
+          <input type="email" class="form-control" name="emailAddress"
+            [(ngModel)]="account.eMailAddress" [disabled]="!canEditField('eMailAddress')" />
         </div>
       </div>
 
-      <!-- Language -->
       <div class="basic-info-row">
-        <label class="field-label">
-          {{ 'Language' | localize }}:
-        </label>
-
+        <label class="field-label">{{ 'Language' | localize }}:</label>
         <div class="field-control dropdown-control">
-          <!-- Language -->
-          <p-dropdown [options]="allLanguages" [(ngModel)]="account.languageId" name="languageId" optionLabel="label"
-            optionValue="value" placeholder="{{ 'SelectLanguage' | localize }}" [disabled]="!canEditField('languageId')"
-            appendTo="body">
+          <p-dropdown name="languageId" appendTo="body"
+            [options]="allLanguages" [(ngModel)]="account.languageId"
+            optionLabel="label" optionValue="value"
+            placeholder="{{ 'SelectLanguage' | localize }}"
+            [disabled]="!canEditField('languageId')">
           </p-dropdown>
         </div>
       </div>
 
-      <!-- Currency -->
-      <div class="basic-info-row" *ngIf="
-      roleEntityObjectTypeId !== 21
-    ">
-        <label class="field-label">
-          {{ 'Currency' | localize }}:
-        </label>
-
+      <div class="basic-info-row" *ngIf="!isPersonalAccount">
+        <label class="field-label">{{ 'Currency' | localize }}:</label>
         <div class="field-control dropdown-control">
-          <!-- Currency -->
-          <p-dropdown [options]="allCurrencies" [(ngModel)]="account.currencyId" name="currencyId" optionLabel="label"
-            optionValue="value" placeholder="{{ 'SelectCurrency' | localize }}" [disabled]="!canEditField('currencyId')"
-            appendTo="body">
+          <p-dropdown name="currencyId" appendTo="body"
+            [options]="allCurrencies" [(ngModel)]="account.currencyId"
+            optionLabel="label" optionValue="value"
+            placeholder="{{ 'SelectCurrency' | localize }}"
+            [disabled]="!canEditField('currencyId')">
           </p-dropdown>
         </div>
       </div>
 
       <div class="phone-separator"></div>
 
-      <!-- Phone 1 -->
-      <div class="phone-row">
-        <label class="field-label">
-          {{ 'Phone' | localize }}:
-        </label>
+      <!-- Phones 1 to 3 -->
+      <div class="phone-row" *ngFor="let phone of phoneFields">
+        <label class="field-label">{{ 'Phone' | localize }}:</label>
 
-        <p-dropdown styleClass="phone-type-dropdown my-sm-1" [options]="allPhoneTypes" [(ngModel)]="account.phone1TypeId"
-          name="phone1TypeId" optionLabel="label" optionValue="value" placeholder="{{ 'Type' | localize }}"
-          [disabled]="!canEditField('phone1TypeId')" appendTo="body">
+        <p-dropdown styleClass="phone-type-dropdown my-sm-1" appendTo="body"
+          [name]="phone.type"
+          [options]="allPhoneTypes" [(ngModel)]="account[phone.type]"
+          optionLabel="label" optionValue="value"
+          placeholder="{{ 'Type' | localize }}"
+          [disabled]="!canEditField(phone.type)">
         </p-dropdown>
 
-        <input type="text" class="form-control phone-number" [(ngModel)]="account.phone1Number" name="phone1Number"
-          [disabled]="!canEditField('phone1Number')" />
+        <input type="text" class="form-control phone-number"
+          [name]="phone.number"
+          [(ngModel)]="account[phone.number]"
+          [disabled]="!canEditField(phone.number)" />
 
-        <input type="text" class="form-control phone-extension" [(ngModel)]="account.phone1Ex" name="phone1Ex"
-          placeholder="{{ 'Ext' | localize }}" [disabled]="!canEditField('phone1Ex')" />
-      </div>
-
-      <!-- Phone 2 -->
-      <div class="phone-row">
-        <label class="field-label">
-          {{ 'Phone' | localize }}:
-        </label>
-
-        <p-dropdown styleClass="phone-type-dropdown my-sm-1" [options]="allPhoneTypes" [(ngModel)]="account.phone2TypeId"
-          name="phone2TypeId" optionLabel="label" optionValue="value" placeholder="{{ 'Type' | localize }}"
-          [disabled]="!canEditField('phone2TypeId')" appendTo="body">
-        </p-dropdown>
-
-        <input type="text" class="form-control phone-number" [(ngModel)]="account.phone2Number" name="phone2Number"
-          [disabled]="!canEditField('phone2Number')" />
-
-        <input type="text" class="form-control phone-extension" [(ngModel)]="account.phone2Ex" name="phone2Ex"
-          placeholder="{{ 'Ext' | localize }}" [disabled]="!canEditField('phone1Ex')" />
-      </div>
-
-      <!-- Phone 3 -->
-      <div class="phone-row">
-        <label class="field-label">
-          {{ 'Phone' | localize }}:
-        </label>
-
-        <p-dropdown styleClass="phone-type-dropdown my-sm-1" [options]="allPhoneTypes" [(ngModel)]="account.phone3TypeId"
-          name="phone3TypeId" optionLabel="label" optionValue="value" placeholder="{{ 'Type' | localize }}"
-          [disabled]="!canEditField('phone3TypeId')" appendTo="body">
-        </p-dropdown>
-
-        <input type="text" class="form-control phone-number" [(ngModel)]="account.phone3Number" name="phone3Number"
-          [disabled]="!canEditField('phone3Number')" />
-
-        <input type="text" class="form-control phone-extension" [(ngModel)]="account.phone3Ex" name="phone3Ex"
-          placeholder="{{ 'Ext' | localize }}" [disabled]="!canEditField('phone1Ex')" />
+        <input type="text" class="form-control phone-extension"
+          [name]="phone.ext"
+          [(ngModel)]="account[phone.ext]"
+          placeholder="{{ 'Ext' | localize }}"
+          [disabled]="!canEditField(phone.ext)" />
       </div>
 
     </div>
-
   </p-accordionTab>
 
-  <p-accordionTab *ngIf="
-      roleEntityObjectTypeId !== 21
-    " header="{{
-    'BusinessInformation'
-      | localize
-  }}">
-
+  <!-- BUSINESS INFORMATION -->
+  <p-accordionTab *ngIf="!isPersonalAccount" header="{{ 'BusinessInformation' | localize }}">
     <div>
 
-      <!-- ========================== -->
-      <!-- DEPARTMENTS -->
-      <!-- ========================== -->
-
+      <!-- Departments -->
       <div class="department-block">
-
         <div class="business-section-header d-flex justify-content-between">
           <div>
-            <h3 class="department-title">
-              {{ 'Departments' | localize }}:
-            </h3>
-
-            <p *ngIf="mode != 'view'" class="selectItem">{{'Select your company Business Category' | localize}}</p>
-          </div>
-
-
-          <button *ngIf="canEditSection('business')" type="button" class="btn bgPurple btn-sm selectBtn" (click)="
-            openSelectCategoriesModal()
-          ">
-
-            <i class="fa fa-plus mr-1"></i>
-
-            {{ 'Select' | localize }}
-
-          </button>
-
-        </div>
-
-        <!-- Create/Edit DTO records -->
-
-        <ng-container *ngIf="
-          !isViewMode;
-          else viewDepartments
-        ">
-
-          <div *ngIf="
-            selectedDepartments.length;
-         
-          " class="department-list">
-
-            <div class="department-item editable-item" *ngFor="
-              let department
-                of selectedDepartments;
-              let departmentIndex = index
-            ">
-
-              <div class="business-item-content">
-
-
-
-                <span>
-                  {{
-                  department
-                  .entityObjectCategoryName
-                  }}
-                </span>
-
-              </div>
-
-              <button *ngIf="canEditSection('business')" type="button" class="btn btn-link text-danger p-0" (click)="
-                removeCategory(
-                  departmentIndex
-                )
-              ">
-
-                <i class="fa fa-trash"></i>
-
-              </button>
-
-            </div>
-
-          </div>
-
-        </ng-container>
-
-        <!-- View API returns string names -->
-
-        <ng-template #viewDepartments>
-
-          <div *ngIf="
-            entityData?.account
-              ?.categories?.length;
-         
-          " class="department-list">
-
-            <div class="department-item" *ngFor="
-              let department
-                of entityData
-                  ?.account
-                  ?.categories;
-              trackBy: trackByValue
-            ">
-
-              {{ department }}
-
-            </div>
-
-          </div>
-
-        </ng-template>
-
-
-      </div>
-
-      <!-- ========================== -->
-      <!-- CLASSIFICATIONS -->
-      <!-- ========================== -->
-
-      <div class="department-block">
-
-        <div class="business-section-header d-flex justify-content-between">
-          <div>
-            <h3 class="department-title">
-              {{
-              'BusinessClassifications'
-              | localize
-              }}:
-            </h3>
-
-            <p *ngIf="mode != 'view'" class="selectItem">{{'Select your company business classifications' | localize}}
+            <h3 class="department-title">{{ 'Departments' | localize }}:</h3>
+            <p *ngIf="mode != 'view'" class="selectItem">
+              {{ 'Select your company Business Category' | localize }}
             </p>
           </div>
 
-
-          <button *ngIf="canEditSection('business')" type="button" class="btn bgPurple btn-sm selectBtn" (click)="
-            openSelectClassificationsModal()
-          ">
-
-            <i class="fa fa-plus mr-1"></i>
-
-            {{ 'Select' | localize }}
-
+          <button *ngIf="canEditSection('business')" type="button"
+            class="btn bgPurple btn-sm selectBtn" (click)="openSelectCategoriesModal()">
+            <i class="fa fa-plus mr-1"></i>{{ 'Select' | localize }}
           </button>
-
         </div>
 
-        <!-- Create/Edit DTO records -->
-
-        <ng-container *ngIf="
-          !isViewMode;
-          else viewClassifications
-        ">
-
-          <div *ngIf="
-            selectedClassifications.length;
-       
-          " class="department-list">
-
-            <div class="department-item editable-item" *ngFor="
-              let classification
-                of selectedClassifications;
-              let classificationIndex =
-                index
-            ">
+        <!-- Create / Edit: DTO records -->
+        <ng-container *ngIf="!isViewMode; else viewDepartments">
+          <div *ngIf="selectedDepartments.length" class="department-list">
+            <div class="department-item editable-item"
+              *ngFor="let department of selectedDepartments; let departmentIndex = index">
 
               <div class="business-item-content">
-
-
-
-                <span>
-                  {{
-                  classification
-                  .entityObjectClassificationName
-                  }}
-                </span>
-
+                <span>{{ department.entityObjectCategoryName }}</span>
               </div>
 
-              <button *ngIf="canEditSection('business')" type="button" class="btn btn-link text-danger p-0" (click)="
-                removeClassification(
-                  classificationIndex
-                )
-              ">
-
+              <button *ngIf="canEditSection('business')" type="button"
+                class="btn btn-link text-danger p-0" (click)="removeCategory(departmentIndex)">
                 <i class="fa fa-trash"></i>
-
               </button>
-
             </div>
-
           </div>
-
         </ng-container>
 
-        <!-- View API returns string names -->
-
-        <ng-template #viewClassifications>
-
-          <div *ngIf="
-            entityData?.account
-              ?.classfications?.length;
-         
-          " class="department-list">
-
-            <div class="department-item" *ngFor="
-              let classification
-                of entityData
-                  ?.account
-                  ?.classfications;
-              trackBy: trackByValue
-            ">
-
-              {{ classification }}
-
+        <!-- View: the API returns names -->
+        <ng-template #viewDepartments>
+          <div *ngIf="entityData?.account?.categories?.length" class="department-list">
+            <div class="department-item"
+              *ngFor="let department of entityData?.account?.categories; trackBy: trackByValue">
+              {{ department }}
             </div>
+          </div>
+        </ng-template>
+      </div>
 
+      <!-- Classifications -->
+      <div class="department-block">
+        <div class="business-section-header d-flex justify-content-between">
+          <div>
+            <h3 class="department-title">{{ 'BusinessClassifications' | localize }}:</h3>
+            <p *ngIf="mode != 'view'" class="selectItem">
+              {{ 'Select your company business classifications' | localize }}
+            </p>
           </div>
 
+          <button *ngIf="canEditSection('business')" type="button"
+            class="btn bgPurple btn-sm selectBtn" (click)="openSelectClassificationsModal()">
+            <i class="fa fa-plus mr-1"></i>{{ 'Select' | localize }}
+          </button>
+        </div>
+
+        <!-- Create / Edit: DTO records -->
+        <ng-container *ngIf="!isViewMode; else viewClassifications">
+          <div *ngIf="selectedClassifications.length" class="department-list">
+            <div class="department-item editable-item"
+              *ngFor="let classification of selectedClassifications; let classificationIndex = index">
+
+              <div class="business-item-content">
+                <span>{{ classification.entityObjectClassificationName }}</span>
+              </div>
+
+              <button *ngIf="canEditSection('business')" type="button"
+                class="btn btn-link text-danger p-0" (click)="removeClassification(classificationIndex)">
+                <i class="fa fa-trash"></i>
+              </button>
+            </div>
+          </div>
+        </ng-container>
+
+        <!-- View: the API returns names -->
+        <ng-template #viewClassifications>
+          <div *ngIf="entityData?.account?.classfications?.length" class="department-list">
+            <div class="department-item"
+              *ngFor="let classification of entityData?.account?.classfications; trackBy: trackByValue">
+              {{ classification }}
+            </div>
+          </div>
         </ng-template>
-
-
-
       </div>
 
     </div>
-
   </p-accordionTab>
-  <p-accordionTab  [header]="
-    (roleEntityObjectTypeId !== 21 ? 'Roles' : 'Overview')
-    | localize
-  ">
+
+  <!-- ROLES / OVERVIEW -->
+  <p-accordionTab [header]="(isPersonalAccount ? 'Overview' : 'Roles') | localize">
 
     <div *ngIf="isLoadingRoles" class="text-center py-3">
       <i class="fa fa-spinner fa-spin"></i>
     </div>
-    <app-dynamicInputs *ngIf="
-    !isLoadingRoles &&
-    roleExtraAttributeObject &&
-    roleDynamicInputsForViewDto
-  " [extraAttributeObject]="roleExtraAttributeObject" [entityObjectTypeId]="roleEntityObjectTypeId"
-      [entityType]="'Contacts'" [dynamicInputsForViewDto]="roleDynamicInputsForViewDto" [fromSetting]="false"
-      [canChange]="canEditSection('roles')" (extraDataChanged)="onRoleExtraAttributesChanged($event)"
+
+    <app-dynamicInputs
+      *ngIf="!isLoadingRoles && roleExtraAttributeObject && roleDynamicInputsForViewDto"
+      [extraAttributeObject]="roleExtraAttributeObject"
+      [entityObjectTypeId]="roleEntityObjectTypeId"
+      [entityType]="'Contacts'"
+      [dynamicInputsForViewDto]="roleDynamicInputsForViewDto"
+      [fromSetting]="false"
+      [canChange]="canEditSection('roles')"
+      (extraDataChanged)="onRoleExtraAttributesChanged($event)"
       (extraDataCleared)="onRoleExtraAttributeCleared($event)">
     </app-dynamicInputs>
 
@@ -377,73 +195,48 @@
 
   </p-accordionTab>
 
-
-
+  <!-- RELATIONSHIP -->
   <p-accordionTab header="{{ 'Relationship' | localize }}" *ngIf="!isContact && mode !== 'create'">
 
     <div *ngIf="connectionsInfo?.length" class="relationship-section">
 
       <div *ngIf="connectionsInfo.length > 1" class="relationship-selector mb-3">
+        <label>{{ 'Relationship' | localize }}:</label>
 
-        <label>
-          {{ 'Relationship' | localize }}:
-        </label>
-
-        <p-dropdown [options]="connectionsInfo" [(ngModel)]="selectedRelationId" optionLabel="connectedLabel"
-          optionValue="relationEntityId" [disabled]="isLoadingRelationship" appendTo="body" (onChange)="
-          onRelationshipOptionChange(
-            $event.value
-          )
-        ">
+        <p-dropdown appendTo="body"
+          [options]="connectionsInfo" [(ngModel)]="selectedRelationId"
+          optionLabel="connectedLabel" optionValue="relationEntityId"
+          [disabled]="isLoadingRelationship"
+          (onChange)="onRelationshipOptionChange($event.value)">
         </p-dropdown>
-
       </div>
-
 
       <div *ngIf="isLoadingRelationship" class="text-center py-3">
-
         <i class="fa fa-spinner fa-spin"></i>
-
       </div>
 
-
       <ng-container *ngIf="!isLoadingRelationship">
-
         <div *ngFor="let usage of usageList" class="relationship-usage-block">
 
-          <h5 class="usage-block">
-            {{ usage | localize }}
-          </h5>
+          <h5 class="usage-block">{{ usage | localize }}</h5>
 
-          <app-dynamicInputs #relationshipDynamicInput [extraAttributeObject]="{
-      value: {
-        filteredExtraAttributes:
-          groupedByUsage[usage],
-
-        extraAttributes:
-          allRelationshipAttributes
-      }
-    }" [entityObjectTypeId]="
-      relationshipEntityObjectTypeId
-    " [entityType]="
-      'MARKETPLACECONTACTRELATIONSHIP'
-    " [dynamicInputsForViewDto]="
-      relationshipDynamicInputsForViewDto
-    " [fromSetting]="true" [canChange]="
-      canEditSection('relationship')
-    " (extraDataCleared)="
-      onRelationshipExtraDataCleared(
-        $event
-      )
-    " (extraDataChanged)="
-      onRelationshipExtraDataChanged(
-        $event
-      )
-    ">
+          <app-dynamicInputs
+            [extraAttributeObject]="{
+              value: {
+                filteredExtraAttributes: groupedByUsage[usage],
+                extraAttributes: allRelationshipAttributes
+              }
+            }"
+            [entityObjectTypeId]="relationshipEntityObjectTypeId"
+            [entityType]="'MARKETPLACECONTACTRELATIONSHIP'"
+            [dynamicInputsForViewDto]="relationshipDynamicInputsForViewDto"
+            [fromSetting]="true"
+            [canChange]="canEditSection('relationship')"
+            (extraDataCleared)="onRelationshipExtraDataCleared($event)"
+            (extraDataChanged)="onRelationshipExtraDataChanged($event)">
           </app-dynamicInputs>
 
         </div>
-
       </ng-container>
 
     </div>

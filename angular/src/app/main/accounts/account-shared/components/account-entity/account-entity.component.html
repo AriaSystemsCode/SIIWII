@@ -1,118 +1,40 @@
-<app-generic-entity-modal
-  [(visible)]="visible">
+<app-generic-entity-modal [(visible)]="visible">
 
   <app-generic-entity-shell
     *ngIf="visible && accountData"
-
     [entity]="accountData?.account"
-    [entityType]="'Account'"
-
-    [canDetele]="
-      mode !== 'create' &&
-      accountData?.account?.isManual
-    "
-
-    [title]="title"
-
-   
-  [breadcrumbItems]="breadcrumbItems"
-
-  (breadcrumbBrowse)="onBreadcrumbBrowse()"
-
-
     [entityData]="accountData"
-
-    [entityTypes]="accountTypes"
-
-    [statuses]="statuses"
-
-    [basicInfoFields]="accountBasicInfoFields"
-
+    [title]="title"
+    [breadcrumbItems]="breadcrumbItems"
     [mode]="mode"
-
+    [canDetele]="mode !== 'create' && accountData?.account?.isManual"
+    [entityTypes]="accountTypes"
+    [statuses]="statuses"
+    [basicInfoFields]="accountBasicInfoFields"
     [saving]="saving"
-
     [uploading]="uploadingImages"
-
-    [logoPath]="'account.logoUrl'"
-
-    [coverPath]="'account.coverUrl'"
-
-    [imagesPath]="'account.imagesUrls'"
-
-    [attachmentsPath]="'account.entityAttachments'"
-
-    [logoAttachmentCategory]="
-      logoAttachmentCategory
-    "
-
-    [bannerAttachmentCategory]="
-      bannerAttachmentCategory
-    "
-
-    [imageAttachmentCategory]="
-      imageAttachmentCategory
-    "
-
-    [leftPanelSections]="
-      leftPanelSections
-    "
-
-    (entityChange)="
-      onAccountChanged($event)
-    "
-
-    (logoChange)="
-      onLogoChange($event)
-    "
-
-    (backgroundChange)="
-      onBackgroundChange($event)
-    "
-
-    (imageChange)="
-      onImagesChange($event)
-    "
-
-    (attachmentRemove)="
-      onAttachmentRemove($event)
-    "
-
-    (dynamicEntitySaved)="
-      onDynamicEntitySaved($event)
-    "
-
-    (edit)="
-      enableEditMode()
-    "
-
-    (delete)="
-      deleteAccount()
-    "
-
-    (save)="
-      saveAccount()
-    "
-
-    (cancel)="
-      cancel()
-    "
-
-    (close)="
-      close()
-    "
-
-    (minimize)="
-      minimizeAccount()
-    ">
+    [logoAttachmentCategory]="logoAttachmentCategory"
+    [bannerAttachmentCategory]="bannerAttachmentCategory"
+    [imageAttachmentCategory]="imageAttachmentCategory"
+    [leftPanelSections]="leftPanelSections"
+    (entityChange)="onAccountChange($event)"
+    (logoChange)="onLogoChange($event)"
+    (backgroundChange)="onBackgroundChange($event)"
+    (imageChange)="onImageChange($event)"
+    (attachmentRemove)="onAttachmentRemove($event)"
+    (dynamicEntitySaved)="onDynamicEntitySaved($event)"
+    (breadcrumbBrowse)="onBreadcrumbBrowse()"
+    (edit)="startEdit()"
+    (delete)="confirmDelete()"
+    (save)="save()"
+    (cancel)="cancel()"
+    (close)="close()"
+    (minimize)="minimizeAccount()">
 
     <app-account-sections
       entity-main-content
-
       [entityData]="accountData"
-
       [accountId]="accountId"
-
       [mode]="mode">
     </app-account-sections>
 
