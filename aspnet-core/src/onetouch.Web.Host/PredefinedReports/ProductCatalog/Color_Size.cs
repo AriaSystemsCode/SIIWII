@@ -46,10 +46,9 @@ namespace onetouch.Web.PredefinedReports.ProductCatalog
             var availableSizeCount = Convert.ToInt32(GetCurrentColumnValue("counter"));
             var sizeCount = Math.Min(requestedSizeCount, availableSizeCount);
 
-            var fontSize = sizeCount <= 4 ? 12F
-                : sizeCount <= 6 ? 11F
-                : sizeCount <= 8 ? 10F
-                : 9F;
+            var fontSize = sizeCount <= 4 ? 10F
+                : sizeCount <= 6 ? 9F
+                : 8F;
 
             // Keep St. Ship readable independently of the number of size columns.
             tableCell26.Font = new DevExpress.Drawing.DXFont("Arial", 10F);
@@ -83,11 +82,14 @@ namespace onetouch.Web.PredefinedReports.ProductCatalog
                 sizeCell.WordWrap = false;
             }
 
+            // Size1 (usually Ex) and Total are otherwise assigned narrow cells
+            // in this compact, dynamically sized table.
+            sizeCells[0].Weight = 0.07D;
+            var totalCellIndex = Math.Min(sizeCount, sizeCells.Length - 1);
+            sizeCells[totalCellIndex].Weight = 0.08D;
+
             // The More size header must not be clipped by the size-cell fit mode.
             tableCell33.TextFitMode = TextFitMode.None;
-            tableCell34.Font = new DevExpress.Drawing.DXFont("Arial", 12F);
-            tableCell34.Padding = new DevExpress.XtraPrinting.PaddingInfo(0, 6, 0, 0, 254F);
-            tableCell34.TextFitMode = TextFitMode.None;
         }
     }
 }

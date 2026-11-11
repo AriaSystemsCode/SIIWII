@@ -44,6 +44,7 @@ using Abp.EntityFrameworkCore.Uow;
 using onetouch.EntityFrameworkCore;
 using System.Linq.Expressions;
 using onetouch.AppSiiwiiTransaction.Dtos;
+[assembly: System.Runtime.CompilerServices.InternalsVisibleTo("onetouch.Tests")]
 namespace onetouch.AppMarketplaceItems
 {
     public partial class AppMarketplaceItemsAppService : onetouchAppServiceBase, IAppMarketplaceItemsAppService
@@ -127,24 +128,34 @@ namespace onetouch.AppMarketplaceItems
             return exchangeRate == 0 ? 0 : price.Price * exchangeRate;
         }
 
-        private decimal ResolveMarketplacePrice(IEnumerable<AppMarketplaceItemPrices> prices, string code, string currencyCode, decimal usdExchangeRate, string buyerSSIN = null, string sellerCurrencyCode = null, string debugLabel = null)
+        internal static AppMarketplaceItemPrices SelectMarketplacePrice(IEnumerable<AppMarketplaceItemPrices> prices, string code, string currencyCode, string buyerSSIN = null, string sellerCurrencyCode = null)
         {
             if (prices == null)
-                return 0;
+                return null;
 
             var priceList = prices
-                .Where(x => x.Code == code && (buyerSSIN == null ? string.IsNullOrEmpty(x.BuyerSSIN) : x.BuyerSSIN == buyerSSIN))
+                .Where(x => buyerSSIN == null
+                    ? x.Code == code && string.IsNullOrEmpty(x.BuyerSSIN)
+                    : x.BuyerSSIN == buyerSSIN)
                 .OrderByDescending(x => x.IsDefault)
                 .ThenByDescending(x => x.Id)
                 .ToList();
 
             var targetCurrencyCode = string.IsNullOrEmpty(currencyCode) ? "USD" : currencyCode;
             var sourceCurrencyCode = string.IsNullOrEmpty(sellerCurrencyCode) ? null : sellerCurrencyCode;
-            var price = priceList.FirstOrDefault(x => sourceCurrencyCode != null && x.CurrencyCode == sourceCurrencyCode)
+            return priceList.FirstOrDefault(x => buyerSSIN != null && x.CurrencyCode == targetCurrencyCode)
+                ?? priceList.FirstOrDefault(x => buyerSSIN == null && sourceCurrencyCode != null && x.CurrencyCode == sourceCurrencyCode)
                 ?? priceList.FirstOrDefault(x => x.IsDefault)
                 ?? priceList.FirstOrDefault(x => x.CurrencyCode == targetCurrencyCode)
                 ?? priceList.FirstOrDefault(x => x.CurrencyCode == "USD")
                 ?? priceList.FirstOrDefault();
+        }
+
+        private decimal ResolveMarketplacePrice(IEnumerable<AppMarketplaceItemPrices> prices, string code, string currencyCode, decimal usdExchangeRate, string buyerSSIN = null, string sellerCurrencyCode = null, string debugLabel = null)
+        {
+            var price = SelectMarketplacePrice(prices, code, currencyCode, buyerSSIN, sellerCurrencyCode);
+            var targetCurrencyCode = string.IsNullOrEmpty(currencyCode) ? "USD" : currencyCode;
+            var sourceCurrencyCode = string.IsNullOrEmpty(sellerCurrencyCode) ? null : sellerCurrencyCode;
 
             var resolvedPrice = ConvertMarketplacePrice(
                 price,
@@ -153,7 +164,7 @@ namespace onetouch.AppMarketplaceItems
                 string.Equals(code, "MSRP", StringComparison.OrdinalIgnoreCase) ? sourceCurrencyCode : null);
             if (!string.IsNullOrEmpty(debugLabel) && debugLabel.Contains("DONNA", StringComparison.OrdinalIgnoreCase))
             {
-                var priceRows = string.Join(" | ", priceList.Select(x => $"Id={x.Id},Code={x.Code},Price={x.Price},Currency={x.CurrencyCode},IsDefault={x.IsDefault},Buyer={x.BuyerSSIN}"));
+                var priceRows = string.Join(" | ", prices?.Select(x => $"Id={x.Id},Code={x.Code},Price={x.Price},Currency={x.CurrencyCode},IsDefault={x.IsDefault},Buyer={x.BuyerSSIN}") ?? Enumerable.Empty<string>());
                 Logger.Warn($"[DONNA-PRICE] Label={debugLabel}; PriceCode={code}; TargetCurrency={targetCurrencyCode}; SellerCurrency={sourceCurrencyCode}; UsdExchangeRate={usdExchangeRate}; SelectedPriceId={price?.Id}; SelectedPrice={price?.Price}; SelectedCurrency={price?.CurrencyCode}; SelectedIsDefault={price?.IsDefault}; ResolvedPrice={resolvedPrice}; Rows=[{priceRows}]");
             }
 
@@ -1111,7 +1122,7 @@ namespace onetouch.AppMarketplaceItems
                                     //I49[Start]
                                     if (!string.IsNullOrEmpty(input.BuyerAccountSSIN))
                                     {
-                                        var buyerPrice = prObj.ItemPricesFkList.Where(x => x.Code == "" && x.CurrencyCode == currencyCode &&
+                                        var buyerPrice = prObj.ItemPricesFkList.Where(x => x.CurrencyCode == currencyCode &&
                                         x.BuyerSSIN == input.BuyerAccountSSIN).FirstOrDefault();
                                         if (buyerPrice != null && buyerPrice.Price>0)
                                         {
@@ -1120,7 +1131,7 @@ namespace onetouch.AppMarketplaceItems
                                         }
                                         else
                                         {
-                                            var buyerPriceObjUsd = prObj.ItemPricesFkList.Where(x => x.Code == "" && x.CurrencyCode == "USD" &&
+                                            var buyerPriceObjUsd = prObj.ItemPricesFkList.Where(x => x.CurrencyCode == "USD" &&
                                                 x.BuyerSSIN == input.BuyerAccountSSIN).FirstOrDefault();
                                             if (buyerPriceObjUsd != null && buyerPriceObjUsd.Price > 0)
                                             {
@@ -1130,7 +1141,7 @@ namespace onetouch.AppMarketplaceItems
                                             }
                                             else
                                             {
-                                                var buyerObjDef = prObj.ItemPricesFkList.Where(x => x.Code == "" && x.IsDefault &&
+                                                var buyerObjDef = prObj.ItemPricesFkList.Where(x => x.IsDefault &&
                                                 x.BuyerSSIN == input.BuyerAccountSSIN).FirstOrDefault();
                                                 if (buyerObjDef != null && buyerObjDef.Price>0)
                                                 {
@@ -1507,6 +1518,12 @@ namespace onetouch.AppMarketplaceItems
                                                         //        attlook.Price = priceObnj.Price;
                                                         //}
                                                     }
+                                                    if (itemSsin != null && !string.IsNullOrEmpty(input.BuyerAccountSSIN))
+                                                    {
+                                                        var buyerPrice = ResolveMarketplacePrice(itemSsin.ItemPricesFkList, "", currencyCode, exchangeRate, input.BuyerAccountSSIN);
+                                                        if (buyerPrice > 0)
+                                                            attlook.Price = buyerPrice;
+                                                    }
                                                     if (itemSsin != null) attlook.SSIN = itemSsin.SSIN;
                                                     if (prepack != null)
                                                     {
@@ -1667,6 +1684,12 @@ namespace onetouch.AppMarketplaceItems
                                                         //    if (priceObnj != null)
                                                         //        attlook.Price = priceObnj.Price;
                                                         //}
+                                                    }
+                                                    if (itemSsin != null && !string.IsNullOrEmpty(input.BuyerAccountSSIN))
+                                                    {
+                                                        var buyerPrice = ResolveMarketplacePrice(itemSsin.ItemPricesFkList, "", currencyCode, exchangeRate, input.BuyerAccountSSIN);
+                                                        if (buyerPrice > 0)
+                                                            attlook.Price = buyerPrice;
                                                     }
                                                     //SSIN
                                                     if (prepack != null)
