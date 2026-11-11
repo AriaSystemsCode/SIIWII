@@ -19,12 +19,19 @@ import { DateType } from 'devextreme/ui/date_box';
     templateUrl: './appTenantActivitiesLog.component.html',
     encapsulation: ViewEncapsulation.None,
     animations: [appModuleAnimation()], 
-    styles: [`
-        .searchBtn {
-    background: #4A0D4A !important;
-    margin-top: 0px !important;color:#595959;
-}
-    `]
+   styles: [`
+    .searchBtn {
+        background: #4A0D4A !important;
+        margin-top: 0 !important;
+        color: #595959;
+    }
+
+    @media (min-width: 1025px) {
+        html[dir="rtl"] .mt-ar-log {
+            margin-top: 150px !important;
+        }
+    }
+`]
 })
 export class AppTenantActivitiesLogComponent extends AppComponentBase {
 

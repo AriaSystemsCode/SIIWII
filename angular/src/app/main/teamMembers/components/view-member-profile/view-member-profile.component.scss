@@ -104,3 +104,112 @@ input.editjobTitle ,input.editBranch{
     object-fit: cover;
   }
   
+
+
+
+
+    .relation-settings-section {
+        margin-top: 20px;
+        padding: 24px;
+        background: #fff;
+        border: 1px solid #e8e2e8;
+        border-radius: 6px;
+        box-shadow: 0 2px 8px rgba(74, 13, 74, 0.04);
+
+        > h5 {
+            margin: 0 0 20px !important;
+            padding-bottom: 14px;
+            border-bottom: 1px solid #eee8ee;
+            color: #000;
+            font-size: 17px;
+            font-weight: 600 !important;
+        }
+
+        // View mode fields
+        > .mb-3 {
+            display: grid;
+            grid-template-columns: minmax(120px, 30%) minmax(0, 1fr);
+            align-items: baseline;
+            gap: 16px;
+            margin-bottom: 0 !important;
+            padding: 14px 0;
+            border-bottom: 1px solid #f2edf2;
+
+            &:last-child {
+                padding-bottom: 0;
+                border-bottom: 0;
+            }
+
+            > label {
+                margin: 0;
+                color: #000;
+                font-size: 14px;
+                font-weight: 700 !important;
+            }
+
+            > div {
+                min-width: 0;
+                color: #6b626b;
+                font-size: 14px;
+                line-height: 1.6;
+                overflow-wrap: anywhere;
+            }
+        }
+
+        app-dynamicInputs {
+            display: block;
+            min-width: 0;
+
+            input.form-control,
+            textarea.form-control,
+            .p-dropdown,
+            .p-multiselect,
+            .p-calendar {
+                width: 100%;
+                max-width: 100%;
+                border-radius: 8px;
+            }
+
+            input.form-control,
+            textarea.form-control,
+            .p-dropdown,
+            .p-multiselect,
+            .p-calendar .p-inputtext {
+                border-color: #ddd5dd;
+                font-size: 14px;
+            }
+
+            input.form-control:focus,
+            textarea.form-control:focus,
+            .p-dropdown.p-focus,
+            .p-multiselect.p-focus,
+            .p-calendar .p-inputtext:focus {
+                border-color: #8b578b;
+                box-shadow: 0 0 0 3px rgba(74, 13, 74, 0.08);
+            }
+
+            label {
+                color: #554655;
+                font-size: 14px;
+                font-weight: 500;
+            }
+        }
+    }
+
+    @media (max-width: 767px) {
+        .relation-settings-section {
+            margin-top: 16px;
+            padding: 16px;
+            border-radius: 10px;
+
+            > h5 {
+                font-size: 16px;
+            }
+
+            > .mb-3 {
+                grid-template-columns: minmax(0, 1fr);
+                gap: 6px;
+                padding: 12px 0;
+            }
+        }
+    }

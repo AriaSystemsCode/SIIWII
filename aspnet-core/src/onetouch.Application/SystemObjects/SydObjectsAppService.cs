@@ -913,11 +913,12 @@ namespace onetouch.SystemObjects
             string contactUsEmailTemplate = await _appEntitiesAppService.GetHostSettingValue(1220);
             
             //string salesEmail = "customercare@ariasystems.biz";
-            string contactUsData = "First Name:" + firstName + "\r\n" +
-                        "Last Name:" + lastName + "\r\n" +
-                        "Email:" + email + "\r\n" +
-                        "Phone :" + phone + "\r\n" +
-                        "Message:" + message + "\r\n" ;
+            string contactUsData = "<font size=\"4\"><strong>Details:</strong><br>" +
+                        "<strong>Name:</strong>" + firstName +" "+lastName+ "\r\n" +
+                        //"Last Name:" + lastName + "\r\n" +
+                        "<strong>Email:</strong>" + email + "\r\n" +
+                        "<strong>Phone :</strong>" + phone + "\r\n" + "<br>"+
+                        "<strong>Message:</strong><br>" + message + "</font>\r\n";
             string body = contactUsEmailTemplate.Replace("CONTACTUSINFO", contactUsData);
             body = body.Replace("\r\n", "<br><br>");
             body = body.Replace("\n", "<br><br>");

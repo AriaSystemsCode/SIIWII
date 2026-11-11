@@ -1,0 +1,79 @@
+Mapper elements and required inputs
+===================================
+
+Mapper functions:
+  fieldSettingValuesToAppEntityExtraData: field settings -> extra-data rows
+  appEntityExtraDataToFieldSettingValues: extra-data rows -> field settings
+  dynamicSelectionsToAppEntityExtraData: dynamic component change event -> extra-data rows
+  appEntityExtraDataToSelectedValues: extra-data rows -> one control's selected value(s)
+
+Required data for a meaningful mapping:
+  FieldSettingValueDto.settingFieldId: identifies the setting field; required.
+  FieldSettingValueDto.value: setting value as a string; may be empty/undefined.
+  AppEntityExtraDataDto.attributeId: maps to settingFieldId; required.
+  AppEntityExtraDataDto.attributeValue: maps to value; may be empty/undefined.
+  DynamicFieldSettingSelection.attributeId and value: required event properties.
+  ExtraAttribute.attributeId: required to match a setting to its definition.
+  ExtraAttribute.acceptMultipleValues: needed to preserve multi-select values.
+  ExtraAttribute.isLookup: needed to interpret a numeric value as attributeValueId.
+  ExtraAttribute.dataType: needed to display numeric and date values with the correct control type.
+
+Optional/context data:
+  FieldSettingValueDto.settingFieldCode and settingFieldName: descriptive metadata.
+  AppEntityExtraDataDto.attributeCode and attributeValueId: code and lookup ID when available.
+  ExtraAttribute.code and name: used to fill descriptive metadata when supplied.
+  entityId: optional mapper argument; defaults to 0 for Field Manager dynamic controls.
+  AppEntityExtraDataDto.id: set to 0 because these mapped rows are not persisted entity extra-data records.
+
+Core field mapping:
+  settingFieldId <-> attributeId
+  value <-> attributeValue (or attributeValueId converted to a string when no text value exists)
+  settingFieldCode <-> attributeCode
+  Multiple selected values <-> multiple rows with the same settingFieldId/attributeId
+
+Field setting value mapper - test inputs and outputs
+Date: 2026-10-19
+File: src/shared/components/dynamicInputs/field-setting-value.mapper.ts
+
+1. FieldSettingValueDto -> AppEntityExtraDataDto -> FieldSettingValueDto
+
+Input setting rows:
+  (1, NUM, Decimals, "2")
+  (2, DATE, Date Format, "2026-10-19T00:00:00.000Z")
+  (3, LOOK, Source, "42")
+  (3, LOOK, Source, "43")
+  (4, BOOL, Visible, "false")
+Entity ID supplied to mapper: 99
+
+Observed output:
+  5 AppEntityExtraDataDto rows; each has entityId = 99.
+  Lookup rows have attributeValueId = 42 and 43.
+  Mapping back produced values ["2", "2026-10-19T00:00:00.000Z", "42", "43", "false"].
+  Setting field name for ID 1 was "Decimals".
+
+2. Values supplied to dynamic controls
+
+Observed output:
+  Numeric "2" -> number 2
+  Date string -> Date 2026-10-19T00:00:00.000Z
+  Lookup values "42" and "43" -> [42, 43]
+  Boolean "false" -> string "false"
+
+3. Dynamic control selections -> AppEntityExtraDataDto
+
+Input selections:
+  Lookup ID 3: [42, 43] (multi-select)
+  Boolean ID 4: false
+  Date ID 2: 2026-10-19T00:00:00.000Z
+  Numeric ID 1: 0
+  Empty ID 5: ""
+
+Observed output:
+  5 rows; empty ID 5 was omitted.
+  attributeValue values: ["42", "43", "false", "2026-10-19T00:00:00.000Z", "0"]
+  Lookup attributeValueId values: 42 and 43.
+  Mapping the zero-valued row back kept value "0".
+
+Result: Targeted TypeScript typecheck passed. All focused assertions passed.
+Test method: temporary Node harness with generated DTO classes mocked; the harness was removed after the run.
+No full Angular/Karma test was run.

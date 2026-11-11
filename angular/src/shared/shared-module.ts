@@ -20,6 +20,7 @@ import { TableModule } from 'primeng/table';
 import { TreeModule } from 'primeng/tree';
 import { SelectButtonModule } from 'primeng/selectbutton';
 import { InputNumberModule } from 'primeng/inputnumber';
+import { ChipsModule } from 'primeng/chips';
 import { dynamicInputs } from '@shared/components/dynamicInputs/dynamicInputs.component';
 import { BsDatepickerModule } from '@node_modules/ngx-bootstrap/datepicker';
 import { CalendarModule } from 'primeng/calendar';
@@ -62,6 +63,7 @@ import { relatedItemModule } from '@app/relatedItems/relatedItem.module';
     AppEntityDynamicModalModule,
     CalendarModule,
     InputNumberModule,
+    ChipsModule,
     InputSwitchModule,
     
   ],

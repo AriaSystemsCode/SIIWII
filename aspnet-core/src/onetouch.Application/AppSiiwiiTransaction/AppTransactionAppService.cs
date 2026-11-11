@@ -814,7 +814,7 @@ namespace onetouch.AppSiiwiiTransaction
                     }
                 }
                 //Iteration#37 -MMT [End]
-                if (input.lFromPlaceOrder)
+                if (input.lFromPlaceOrder || appTrans.TenantId != AbpSession.TenantId)
                 {
                     appTrans.EntityObjectStatusId = await _helper.SystemTables.GetEntityObjectStatusOpenTransaction();
 
@@ -1358,7 +1358,7 @@ namespace onetouch.AppSiiwiiTransaction
                 appTrans.CompleteDate = input.CompleteDate.Date;
                 appTrans.AvailableDate = input.AvailableDate.Date;
                 appTrans.StartDate = input.StartDate.Date;
-                if (input.lFromPlaceOrder)
+                if (input.lFromPlaceOrder || appTrans.TenantId!= AbpSession.TenantId)
                     appTrans.EntityObjectStatusId = await _helper.SystemTables.GetEntityObjectStatusOpenTransaction();
                 //MMT-Fix Status
                 else

@@ -49,133 +49,7 @@
                 <div class="row details">
                     <div class="col-6">
                         <div class="row">
-                            <!-- <div
-                                *ngIf="
-                                    appItemForViewDto?.variations.length == 0
-                                "
-                                class="p-2 leftContainer thin-scroll mr-5"
-                                [ngStyle]="{
-                                    'overflow-y' :
-                                        appItemForViewDto?.entityAttachments
-                                            ?.length > numLeftContainerImages
-                                            ? 'scroll'
-                                             : 'hidden'
-                                }"
-                            >
-                                <div class="leftImage pr-2" #leftImage>
-                                    <img
-                                        *ngFor="
-                                            let img of appItemForViewDto?.entityAttachments;
-                                            index as i
-                                        "
-                                        [src]="
-                                            attachmentBaseUrl + '/' + img.url
-                                        "
-                                        alt="defaultImage"
-                                        (error)="handleFailedImage($event)"
-                                        class="mb-3"
-                                        [ngClass]="{
-                                            leftImageBorder :
-                                                imageSelectedIndex == i
-                                        }"
-                                        (click)="
-                                            imageSelectedIndex = i;
-                                            showImageAtCenter(img)
-                                        "
-                                        [ngStyle]="{'height.px' :  (leftImage.clientWidth / acceptedAspectRatio )}"
-                                    />
-                                </div>
-                            </div>
-                            <div
-                                *ngIf="
-                                    appItemForViewDto?.variations[0]
-                                        ?.selectedValues[varitaionSelectedIndex]
-                                        ?.entityAttachments?.length > 0
-                                "
-                                class="p-2 leftContainer thin-scroll mr-5"
-                                [ngStyle]="{
-                                    'overflow-y' :
-                                        appItemForViewDto?.entityAttachments
-                                            ?.length > numLeftContainerImages
-                                            ? 'scroll'
-                                             : 'hidden'
-                                }"
-                            >
-                                <div class="leftImage pr-2" #leftImage>
-                                    <img
-                                        *ngFor="
-                                            let img of appItemForViewDto
-                                                ?.variations[0]?.selectedValues[
-                                                varitaionSelectedIndex
-                                            ]?.entityAttachments;
-                                            index as i
-                                        "
-                                        [src]="
-                                            attachmentBaseUrl + '/' + img.url
-                                        "
-                                        alt="defaultImage"
-                                        (error)="handleFailedImage($event)"
-                                        class="mb-3"
-                                        [ngClass]="{
-                                            leftImageBorder :
-                                                imageSelectedIndex == i
-                                        }"
-                                        (click)="
-                                            imageSelectedIndex = i;
-                                            showImageAtCenter(img)
-                                        "
-                                        [ngStyle]="{'height.px' :  (leftImage.clientWidth / acceptedAspectRatio )}"
-                                    />
-                                </div>
-                            </div>
 
-                            <div class="p-2 ml-2 center-dev" #centerdiv>
-                                <div class="centerContatiner"  #centerContatiner>
-                                   
-                                   
-                                    <img
-                                        *ngIf="centerImage && centerImage.isImageFile"
-                                        [src]="
-                                            attachmentBaseUrl +
-                                            '/' +
-                                            centerImage.url
-                                        "
-                                        alt="defaultImage"
-                                        (error)="handleFailedImage($event)"
-                                        class="w-100 imageContainer"
-                                        [ngStyle]="{'height.px':  (centerContatiner.clientWidth / acceptedAspectRatio )}"
-                                    />
-
-                                    
-                                    <iframe id="pdfViewer" *ngIf="centerImage  && centerImage.isPdfFile"
-                                       
-                                        class="w-100 imageContainer" [ngStyle]="{
-  'height.px': centerImage.loadingError ? 0 : (centerContatiner.clientWidth / acceptedAspectRatio)
-}" frameborder="0" (error)="centerImage.loadingError = true"></iframe>
-
-<div *ngIf="centerImage  && centerImage.isPdfFile && centerImage.loadingError">
-    <h6>
-        Unable to display the PDF file here.
-        <span *ngIf="centerImage.url">
-          <a [href]="attachmentBaseUrl + '/' + centerImage.url" target="_blank">Open</a> instead.
-        </span>
-      </h6>
-</div>
-                                <video
-                                        *ngIf="centerImage  && centerImage.isVideoFile"
-                                        [src]="
-                                            attachmentBaseUrl +
-                                            '/' +
-                                            centerImage.url
-                                        "
-                                        controls
-                                        alt="defaultImage"
-                                        class="w-100 imageContainer video-top-shift"
-                                        [ngStyle]="{'height.px':  (centerContatiner.clientWidth / acceptedAspectRatio )}"
-                                    ></video>
-
-                                </div>
-                            </div> -->
                             <div class="media-viewer" >
 
                                 <!-- THUMBS -->
@@ -200,22 +74,37 @@
                                     </video>
                               
                                     <!-- PDF thumb (thumbnail else icon) -->
-                                    <div *ngIf="kindOf(a) === 'pdf'"
-                                         class="thumb pdf-thumb"
-                                         [class.active]="i === currentIndex"
-                                         (click)="setMain(i)">
-                              
-                                      <div *ngIf="pdfThumbLoadingMap[i]" class="thumb-loading">
-                                        <i class="fa fa-spinner fa-spin"></i>
-                                      </div>
-                              
-                                      <img *ngIf="!pdfThumbLoadingMap[i] && pdfThumbMap[i]"
-                                           [src]="pdfThumbMap[i]"
-                                           class="thumb-img" />
-                              
-                                      <div *ngIf="!pdfThumbLoadingMap[i] && !pdfThumbMap[i]"
-                                           class="pdf-fallback"></div>
-                                    </div>
+                                 
+<!-- PDF THUMBNAIL -->
+<div
+    *ngIf="kindOf(a) === 'pdf'"
+    class="thumb pdf-thumb"
+    [class.active]="i === currentIndex"
+    (click)="setMain(i)">
+
+    <!-- Loading -->
+    <div *ngIf="pdfThumbLoadingMap[i]"
+         class="thumb-loading">
+        <i class="fa fa-spinner fa-spin"></i>
+    </div>
+
+    <!-- Uploaded image or generated PDF preview -->
+    <img
+        *ngIf="!pdfThumbLoadingMap[i] && pdfThumbMap[i]"
+        [src]="pdfThumbMap[i]"
+        class="thumb-img"
+        (error)="onPdfPreviewError(i)"
+    />
+
+    <!-- PDF icon fallback -->
+    <img
+        *ngIf="!pdfThumbLoadingMap[i] && !pdfThumbMap[i]"
+        src="../../../assets/Items/pdf-Icon.png"
+        class="thumb-img"
+        alt="PDF"
+    />
+</div>
+
                               
                                     <!-- OTHER -->
                                     <div *ngIf="kindOf(a) === 'other'"
@@ -245,24 +134,41 @@
                                     <source [src]="getUrl(activeAttachments[currentIndex])" />
                                   </video>
                               
-                                  <!-- MAIN PDF (thumbnail كبير + click open tab) -->
-                                  <ng-container *ngIf="kindOf(activeAttachments[currentIndex]) === 'pdf'">
-                                    <div *ngIf="pdfThumbLoadingMap[currentIndex]" class="main-loading">
-                                      <i class="fa fa-spinner fa-spin fa-2x"></i>
-                                      <span class="mx-2">{{ 'LoadingPreview' | localize }}</span>
-                                    </div>
-                              
-                                     <img *ngIf="!pdfThumbLoadingMap[currentIndex] && pdfThumbMap[currentIndex]"
-                                         class="main-media pointer-cursor"
-                                         [src]="pdfThumbMap[currentIndex]"
-                                         (click)="openNewTab(activeAttachments[currentIndex])" />
-                              
-                                    <div *ngIf="!pdfThumbLoadingMap[currentIndex] && !pdfThumbMap[currentIndex]"
-                                         class="main-fallback">
-                                      <div>Unable to generate PDF preview.</div>
-                                      <a (click)="openNewTab(activeAttachments[currentIndex])">{{ 'OpenPdf' | localize }}</a>
-                                    </div>
-                                  </ng-container>
+                            
+<!-- MAIN PDF -->
+<ng-container
+    *ngIf="kindOf(activeAttachments[currentIndex]) === 'pdf'">
+
+    <div
+        *ngIf="pdfThumbLoadingMap[currentIndex]"
+        class="main-loading">
+        <i class="fa fa-spinner fa-spin fa-2x"></i>
+        <span class="mx-2">
+            {{ 'LoadingPreview' | localize }}
+        </span>
+    </div>
+
+    <!-- Uploaded thumbnail or PDF.js preview -->
+    <img
+        *ngIf="!pdfThumbLoadingMap[currentIndex] &&
+               pdfThumbMap[currentIndex]"
+        class="main-media pointer-cursor"
+        [src]="pdfThumbMap[currentIndex]"
+        (click)="openNewTab(activeAttachments[currentIndex])"
+        (error)="onPdfPreviewError(currentIndex)"
+    />
+
+    <!-- PDF icon if preview unavailable -->
+    <img
+        *ngIf="!pdfThumbLoadingMap[currentIndex] &&
+               !pdfThumbMap[currentIndex]"
+        src="../../../assets/Items/pdf-Icon.png"
+        class="main-media pointer-cursor"
+        alt="Open PDF"
+        (click)="openNewTab(activeAttachments[currentIndex])"
+    />
+</ng-container>
+
                               
                                   <!-- IMAGE PREVIEW DIALOG -->
                                                                     <p-dialog [(visible)]="showImagePreview"

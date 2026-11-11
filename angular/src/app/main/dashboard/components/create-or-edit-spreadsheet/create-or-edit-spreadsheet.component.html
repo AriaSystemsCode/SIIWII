@@ -1,0 +1,222 @@
+    <div
+    *ngIf="spreadsheetNotFound"
+    class="spreadsheet-not-found">
+
+    <i class="pi pi-exclamation-circle"></i>
+
+    <h3>
+        {{ 'SpreadsheetNotFound' | localize }}
+    </h3>
+
+    <p>
+        {{ 'SpreadsheetNotFoundDescription' | localize }}
+    </p>
+</div>
+
+
+<div class="create-or-edit-spreadsheet-page" [style.margin-top]="isArLang ? '70px' : '-45px'"   [hidden]="spreadsheetNotFound">
+
+    <!-- ================= HEADER ================= -->
+    <div class="d-flex align-items-center justify-content-between px-3 pt-3 pb-2">
+        <div class="mx-3 d-flex align-items-center">
+            <h3 class="mb-0">{{ 'Spreadsheet' | localize }}</h3>
+
+            <h5 *ngIf="dashboardId" class="text-muted mx-2 mb-0">
+                #{{ dashboardTtle }}
+            </h5>
+        </div>
+
+        <div class="d-flex align-items-center">
+            <button *ngIf="isDirty" type="button" class="btn btn-primary mr-2" (click)="saveSpreadsheet()">
+                {{ 'Save' | localize }}
+            </button>
+
+            <button type="button" class="btn btn-light" (click)="refreshSpreadsheet()" [disabled]="isRefreshing">
+                <i class="fa fa-sync-alt" [class.fa-spin]="isRefreshing"></i>
+            </button>
+        </div>
+    </div>
+
+    <!-- ================= PROGRESS ================= -->
+    <div *ngIf="isLoading" class="px-3 py-2">
+        <div class="d-flex justify-content-between align-items-center mb-1">
+            <span>
+                <i class="fa fa-spinner fa-spin mr-2"></i>
+                {{ loadingMessage }}
+            </span>
+            <strong>{{ loadingProgress }}%</strong>
+        </div>
+
+        <p-progressBar [value]="loadingProgress" [showValue]="false"></p-progressBar>
+    </div>
+
+    <!-- ================= MAIN WORKSPACE ================= -->
+    <div class="d-flex spreadsheet-workspace">
+
+        <!-- SPREADSHEET -->
+        <div class="spreadsheet-editor flex-grow-1 position-relative" (click)="onSheetClick($event)" >
+            <ejs-spreadsheet     *ngIf="syncfusionLocaleReady" #spreadsheet width="100%" height="100%" [sheets]="sheets" [scrollSettings]="scrollSettings"
+                [showAggregate]="showAggregate" [showSheetTabs]="true" (created)="onCreated()"     [allowSave]="true"
+    [saveUrl]="spreadsheetSaveUrl"   [locale]="syncfusionLocale"  [enableRtl]="syncfusionRtl"
+
+                (ribbonClick)="onRibbonClick($event)" (ribbonSelect)="onSpreadsheetRibbonSelect()"
+                (actionComplete)="onSpreadsheetActionComplete($event)">
+            </ejs-spreadsheet>
+
+            <!-- PIVOT -->
+            <div *ngIf="showPivot" class="pivot-sheet-overlay">
+                <div class="d-flex align-items-center justify-content-between px-3 py-2 border-bottom bg-white">
+                    <div>
+                        <h5 class="mb-1 mx-2">{{ pivotSheet }}</h5>
+                        <small class="text-muted">{{ 'Source' | localize }}: {{ sourceSheet }}</small>
+                    </div>
+
+                    <div class="d-flex align-items-center">
+                        <button type="button" class="btn btn-light mr-2" (click)="closePivot()">
+                            <i class="fa fa-arrow-left mr-2"></i>
+                            {{ 'SourceSheet' | localize }}
+                        </button>
+
+                        <div class="mr-2" style="width: 170px;">
+                            <p-dropdown [options]="pivotChartTypes" [(ngModel)]="selectedPivotChartType"
+                                optionLabel="label" optionValue="value" appendTo="body"
+                                (onChange)="changePivotChartType($event.value)">
+                            </p-dropdown>
+                        </div>
+
+                        <button *ngIf="!isPivotOnDashboard" type="button" class="btn btn-success"
+                            (click)="copyPivotToDashboard()">
+                            <i class="fa fa-chart-bar mr-2"></i>
+                            {{ 'CopyPivotChartToDashboard' | localize }}
+                        </button>
+                    </div>
+                </div>
+
+                <div class="pivot-analysis-layout bg-white">
+                    <!-- Table / chart -->
+                    <div class="flex-grow-1" style="min-width: 0; height: 100%; overflow: hidden;">
+                        <ejs-pivotview      *ngIf="syncfusionLocaleReady"   [locale]="syncfusionLocale"
+    [enableRtl]="syncfusionRtl" #pivotView id="PivotView" width="100%" height="100%"
+                            [dataSourceSettings]="pivotSettings" [showFieldList]="false" [showToolbar]="true"
+                            [toolbar]="pivotToolbar" [showGroupingBar]="true" [allowCalculatedField]="true"
+                            [showTooltip]="true" [displayOption]="pivotDisplay" [chartSettings]="pivotChart"
+                            (enginePopulated)="onPivotReady()" (chartSeriesCreated)="onPivotChartChanged($event)">
+                        </ejs-pivotview>
+                    </div>
+
+                    <!-- Fixed field list -->
+                    <div class="pivot-fields-container border-left bg-white">
+                        <div class="px-3 py-2 border-bottom font-weight-bold">
+                            {{ 'FieldsAndPivotConfiguration' | localize }}
+                        </div>
+
+                        <ejs-pivotfieldlist   *ngIf="syncfusionLocaleReady" #pivotFieldList id="PivotFieldList" width="100%" renderMode="Fixed"   [locale]="syncfusionLocale"
+    [enableRtl]="syncfusionRtl"
+                            [dataSourceSettings]="pivotSettings" [allowCalculatedField]="true"
+                            (enginePopulated)="onFieldListReady()">
+                        </ejs-pivotfieldlist>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div *ngIf="showDataPanel || showChartPanel" class="spreadsheet-panel-backdrop"
+            (click)="closeResponsivePanel()">
+        </div>
+
+        <!-- ================= ADD DATA PANEL ================= -->
+        <app-spreadsheet-data-panel
+    [class.panel-open]="showDataPanel"
+    [visible]="showDataPanel"
+    [editSource]="editingSheetSource"
+    [targetSheetName]="dataPanelTargetSheetName"
+    [targetSheetHasData]="dataPanelTargetHasData"
+    (close)="closeDataPanel()"
+    (dataSourceCleared)="onDataSourceCleared($event)"
+    (batchLoaded)="onDataBatchLoaded($event)"
+    (loadingFailed)="onDataLoadingFailed($event)">
+</app-spreadsheet-data-panel>
+
+        <!-- ================= CHART PANEL ================= -->
+        <div *ngIf="showChartPanel" class="spreadsheet-side-panel">
+
+            <div class="d-flex justify-content-between align-items-start border-bottom p-3">
+                <div class="d-flex align-items-center">
+                    <div class="chart-panel-icon mr-2">
+                        <i class="fa fa-chart-bar"></i>
+                    </div>
+
+                    <div>
+                        <h5 class="mb-1">{{ 'Chart' | localize }}</h5>
+                        <small class="text-muted">{{ 'ConfigureChartData' | localize }}</small>
+                    </div>
+                </div>
+
+                <button type="button" class="btn btn-sm btn-light" (click)="closeChartPanel()">
+                    <i class="fa fa-times"></i>
+                </button>
+            </div>
+
+            <div class="p-3">
+
+                <div class="form-group">
+                    <label class="font-weight-bold">{{ 'DataRange' | localize }}</label>
+                    <input type="text" class="form-control" [(ngModel)]="chartRange" disabled
+                        placeholder="'Transactions'!A1:H40" />
+                </div>
+
+                <div class="form-group">
+                    <label class="font-weight-bold">{{ 'CategoryAxis' | localize }}</label>
+                    <small class="d-block text-muted mb-2">{{ 'CategoryAxisRangeHint' | localize }}</small>
+                    <input type="text" class="form-control" [(ngModel)]="categoryRange"
+                        placeholder="'Transactions'!A1:A40" />
+                </div>
+
+                <div class="form-group mt-4">
+                    <label class="font-weight-bold">{{ 'Aggregation' | localize }}</label>
+                    <small class="d-block text-muted mb-2">{{ 'AggregationHint' | localize }}</small>
+
+                    <p-dropdown [options]="chartAggregationOptions" [(ngModel)]="chartAggregation" optionLabel="label"
+                        optionValue="value" [style]="{ width: '100%' }" appendTo="body">
+                    </p-dropdown>
+                </div>
+
+                <div class="mt-4">
+                    <div class="d-flex justify-content-between align-items-center mb-2">
+                        <strong>{{ 'DataSeries' | localize }}</strong>
+
+                        <button type="button" class="btn btn-sm btn-light" (click)="addSeries()">
+                            <i class="fa fa-plus"></i>
+                        </button>
+                    </div>
+
+                    <div *ngIf="!seriesRanges.length" class="text-muted py-3">
+                        {{ 'NoDataSeries' | localize }}
+                    </div>
+
+                    <div *ngFor="let series of seriesRanges; let i = index" class="d-flex align-items-center mb-2">
+                        <input type="text" class="form-control mr-2" [(ngModel)]="series.range" />
+
+                        <button type="button" class="btn btn-sm btn-light" (click)="removeSeries(i)">
+                            <i class="fa fa-trash"></i>
+                        </button>
+                    </div>
+                </div>
+
+                <button type="button" class="btn btn-primary btn-block mt-4" [disabled]="isApplyingChart"
+                    (click)="applyChart()">
+                    <i *ngIf="isApplyingChart" class="fa fa-spinner fa-spin mr-2"></i>
+                    {{ (isApplyingChart ? 'Applying' : 'ApplyChartData') | localize }}
+                </button>
+
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- ================= DRILLDOWN (shared) - Ctrl + click on a chart point ================= -->
+<app-drilldown-dialog
+    [(visible)]="drilldownVisible"
+    [title]="drilldownTitle"
+    [records]="drilldownRecords">
+</app-drilldown-dialog>
