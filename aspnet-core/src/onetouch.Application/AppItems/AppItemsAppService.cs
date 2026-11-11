@@ -5544,7 +5544,7 @@ namespace onetouch.AppItems
                         {
                             Code = dto.Code,
                             EntityObjectCategoryID = item.Id,
-                            Name = dto.SSIN,
+                            Name = appContactsDict[dto.SSIN.ToUpper()].SSIN,
                             Price = price.ToString(),
                             Currency = currencyCode,
                             ParentId = currencyId,
@@ -5691,8 +5691,9 @@ namespace onetouch.AppItems
                 if (appItemDict.TryGetValue(NormalizePriceImportKey(dto.Code), out var appItem))
                     importAppItemIds.Add(appItem.Id);
 
-                if (!string.IsNullOrWhiteSpace(dto.Name))
-                    importBuyerSsins.Add(dto.Name.Trim());
+                if (!string.IsNullOrWhiteSpace(dto.Name) &&
+                    appContactsDict.TryGetValue(dto.Name.Trim().ToUpper(), out var buyerAccount))
+                    importBuyerSsins.Add(buyerAccount.SSIN);
 
                 if (!string.IsNullOrWhiteSpace(dto.Currency))
                     importCurrencyCodes.Add(dto.Currency.Trim());
@@ -5764,7 +5765,7 @@ namespace onetouch.AppItems
                         continue;
                     }
 
-                    var priceCode = excelDto.Name.Trim();
+                    var priceCode = appContact.SSIN;
                     var currencyCode = currency.Code.Trim();
 
                     existingPriceDict.TryGetValue(
@@ -5774,7 +5775,9 @@ namespace onetouch.AppItems
                     if (existingPrice != null)
                     {
                         existingPrice.Price = price;
-                        existingPrice.BuyerSSIN = excelDto.Name;
+                        existingPrice.Code = priceCode;
+                        existingPrice.BuyerSSIN = appContact.SSIN;
+                        existingPrice.CurrencyCode = currencyCode;
                         existingPrice.LastModificationTime = now;
                         existingPrice.LastModifierUserId = userId;
                         existingPrice.IsDefault = true;
@@ -5790,11 +5793,11 @@ namespace onetouch.AppItems
                             TenantId = tenantId,
                             Code = priceCode,
                             Price = price,
-                            BuyerSSIN = excelDto.Name,
-                            AppItemId = (long)excelDto.EntityObjectCategoryID,
+                            BuyerSSIN = appContact.SSIN,
+                            AppItemId = appItem.Id,
                             AppItemCode = excelDto.Code,
-                            CurrencyId = excelDto.ParentId,
-                            CurrencyCode = excelDto.Currency,
+                            CurrencyId = currency.Value,
+                            CurrencyCode = currencyCode,
                             IsDefault = true,
                             IsDeleted = false
                         };

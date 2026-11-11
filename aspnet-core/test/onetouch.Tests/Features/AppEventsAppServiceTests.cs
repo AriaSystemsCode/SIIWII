@@ -69,7 +69,7 @@ namespace onetouch.Tests.Features
             if (this.EventId == 0)
             { await CreateOrEditTest(); }
 
-            var appEvent = _iAppEventsAppService.GetAppEventForView(EventId,0);
+            var appEvent = _iAppEventsAppService.GetAppEventForView(EventId, 0, "UTC");
             appEvent.Result.AppEvent.ShouldNotBeNull();
             appEvent.Result.AppEvent.Name.ShouldBe(this.EventName);
         }

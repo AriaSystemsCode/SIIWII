@@ -28,6 +28,7 @@ using onetouch.AppEntities.Dtos;
 using Abp.Collections.Extensions;
 using NPOI.SS.Formula.Functions;
 using Abp.Domain.Entities;
+using Abp.UI;
 using onetouch.AppMarketplaceItems.Dtos;
 using onetouch.Configuration;
 using Microsoft.Extensions.Configuration;
@@ -3563,6 +3564,47 @@ namespace onetouch.AppSiiwiiTransaction
                 List<AppTransactionDetails> details = new List<AppTransactionDetails>();
                 if (input.AppItem.variations != null && input.AppItem.variations.Count() > 0)
                 {
+                    var sizeValues = input.AppItem.variations
+                        .SelectMany(x => x.selectedValues)
+                        .SelectMany(x => x.EDRestAttributes)
+                        .Where(x => x.ExtraAttrName == "SIZE")
+                        .SelectMany(x => x.Values)
+                        .Where(x => !string.IsNullOrEmpty(x.SSIN))
+                        .ToList();
+                    var sizeSsins = sizeValues.Select(x => x.SSIN).Distinct().ToList();
+                    var pricedItems = await _appMarketplaceItem.GetAll().AsNoTracking()
+                        .Include(x => x.ItemPricesFkList)
+                        .Where(x => sizeSsins.Contains(x.SSIN))
+                        .ToListAsync();
+                    var orderCurrency = header.CurrencyCode;
+                    if (string.IsNullOrEmpty(orderCurrency))
+                    {
+                        var tenantCurrency = await TenantManager.GetTenantCurrency();
+                        orderCurrency = string.IsNullOrEmpty(tenantCurrency?.Code) ? "USD" : tenantCurrency.Code;
+                    }
+                    foreach (var sizeValue in sizeValues)
+                    {
+                        var pricedItem = pricedItems.FirstOrDefault(x => x.SSIN == sizeValue.SSIN);
+                        var buyerPrices = pricedItem?.ItemPricesFkList
+                            .Where(x => x.Price > 0 && string.Equals(x.BuyerSSIN, header.BuyerCompanySSIN, StringComparison.OrdinalIgnoreCase))
+                            .OrderByDescending(x => x.IsDefault)
+                            .ThenByDescending(x => x.Id)
+                            .ToList();
+                        if (buyerPrices == null || buyerPrices.Count == 0)
+                            continue;
+
+                        var buyerPrice = buyerPrices.FirstOrDefault(x => string.Equals(x.CurrencyCode, orderCurrency, StringComparison.OrdinalIgnoreCase))
+                            ?? buyerPrices.FirstOrDefault(x => x.IsDefault)
+                            ?? buyerPrices.FirstOrDefault(x => x.CurrencyCode == "USD")
+                            ?? buyerPrices[0];
+                        var rate = string.IsNullOrEmpty(buyerPrice.CurrencyCode) ||
+                            string.Equals(buyerPrice.CurrencyCode, orderCurrency, StringComparison.OrdinalIgnoreCase)
+                            ? 1m
+                            : _helper.SystemTables.GetExchangeRate(buyerPrice.CurrencyCode, orderCurrency);
+                        if (rate == 0)
+                            throw new UserFriendlyException($"No exchange rate from {buyerPrice.CurrencyCode} to {orderCurrency}.");
+                        sizeValue.Price = buyerPrice.Price * rate;
+                    }
                     var orderQty = input.AppItem.variations.Sum(x => x.selectedValues.Sum(z => z.EDRestAttributes.Where(ch => ch.ExtraAttrName == "SIZE").Sum(a => a.Values.Where(f => f.OrderedQty != null).Select(f => f.OrderedQty).Sum())));
                     var orderPrepacks = input.AppItem.variations.Sum(x => x.selectedValues
                     .Sum(z => z.EDRestAttributes.Where(ch => ch.ExtraAttrName == "SIZE")
@@ -4302,10 +4344,11 @@ namespace onetouch.AppSiiwiiTransaction
                         varItem.EntityFk = entityVar;
                         varItem.ParentEntityFk = item.EntityFk;
                         varItem.ItemPricesFkList = new List<AppItemPrices>();
+                        var hasVariantCustomPrice = variation.ItemPricesFkList.Any(z => z.BuyerSSIN == destinationAccSSIN);
                         foreach (var itemPrice in variation.ItemPricesFkList)
                         {
                             if (itemPrice.Code == "MSRP" ||
-                               (hasCustomPrice ? itemPrice.BuyerSSIN == destinationAccSSIN:(itemPrice.Code == relationshipPriceLevel)))
+                               (hasVariantCustomPrice ? itemPrice.BuyerSSIN == destinationAccSSIN:(itemPrice.Code == relationshipPriceLevel)))
                             { 
                                 var price = new AppItemPrices();
                                 price.Id = 0;
