@@ -46,13 +46,14 @@ color: #000000;
 .four-blocks-carousel-wrapper {
   width: 100%;
   min-width: 0;
-  padding: 8px 12px;
+  padding: 8px 40px;
 }
 
 .four-blocks-carousel-item {
-  padding: 8px;
+  width: 100%;
+  min-width: 0;
   height: 100%;
-      max-width: 450px;
+  padding: 8px;
 }
 
 :host ::ng-deep {
@@ -60,6 +61,10 @@ color: #000000;
 
     .p-carousel-content {
       align-items: center;
+    }
+
+    .p-carousel-items-content {
+      min-width: 0;
     }
 
     .p-carousel-item {
@@ -74,7 +79,7 @@ color: #000000;
       border-radius: 50%;
       background: #fff;
       color: #56365c;
-      box-shadow: 0 2px 8px rgba(0, 0, 0, .1);
+      box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
     }
 
     .p-carousel-prev:hover,
@@ -84,22 +89,22 @@ color: #000000;
   }
 }
 
-@media (max-width: 991px) {
+@media (max-width: 1199px) {
   .four-blocks-carousel-wrapper {
-    padding: 8px;
+    padding: 8px 20px;
   }
 
   .four-blocks-carousel-item {
-    padding: 5px;
+    padding: 6px;
   }
 }
 
 @media (max-width: 767px) {
   .four-blocks-carousel-wrapper {
-    padding: 6px 0;
+    padding: 6px 8px;
   }
 
   .four-blocks-carousel-item {
-    padding: 6px;
+    padding: 4px;
   }
 }
