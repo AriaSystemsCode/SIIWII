@@ -60,7 +60,7 @@ export class TopBarComponent extends ThemesLayoutBaseComponent implements OnInit
     userName = "";
     name = "";
 
-       
+
     profilePicture = AppConsts.appBaseUrl + "/assets/common/images/default-profile-picture.png";
     defaultLogo = AppConsts.appBaseUrl + "/assets/common/images/app-logo-on-" + this.currentTheme?.baseSettings?.menu?.asideSkin + ".svg";
     recentlyLinkedUsers: LinkedUserDto[];
@@ -77,7 +77,7 @@ export class TopBarComponent extends ThemesLayoutBaseComponent implements OnInit
     role: string;
     formType: string;
 
-  
+
     modalheaderName: string;
     showSearch: boolean = false;
     shoppingCartSummary: ShoppingCartSummary;
@@ -90,24 +90,24 @@ export class TopBarComponent extends ThemesLayoutBaseComponent implements OnInit
     visible: boolean = false;
     displaneSel: boolean = false;
     displaneBuy: boolean = false;
-    
-   
+
+
 
     private profilePicSub: any;
-    
-   
-    
-   
-    searchInput:string
+
+
+
+
+    searchInput: string
     bgCol?: string;
     bgColLoaded = false;
-    tenantLogo:string
+    tenantLogo: string
     isAuthenticated: boolean = false;
     currentLang: string = 'en';
     isArabic: boolean = false;
-    allowFeeds:string
+    allowFeeds: string
     defaultHomeUrl = '/app/main/Home'; // fallback
-   
+
     constructor(
         injector: Injector,
         private _abpSessionService: AbpSessionService,
@@ -125,7 +125,7 @@ export class TopBarComponent extends ThemesLayoutBaseComponent implements OnInit
         private updateLogoService: UpdateLogoService,
         private datePipe: DatePipe,
         private _AppTransactionServiceProxy: AppTransactionServiceProxy,
-        private _AppEntitiesServiceProxy: AppEntitiesServiceProxy   ,
+        private _AppEntitiesServiceProxy: AppEntitiesServiceProxy,
         private _accountsServiceProxy: AccountsServiceProxy,
     ) {
         super(injector);
@@ -189,9 +189,9 @@ export class TopBarComponent extends ThemesLayoutBaseComponent implements OnInit
 
     ngOnInit() {
         this.isAuthenticated = !!this.appSession?.user;
-       this.loadDefaultPage()
+        this.loadDefaultPage()
         this.currentLang = abp.utils.getCookieValue('Abp.Localization.CultureName')
-        this.currentLang == 'ar' || this.currentLang == 'ar-EG'  ? this.isArabic = true : this.isArabic = false
+        this.currentLang == 'ar' || this.currentLang == 'ar-EG' ? this.isArabic = true : this.isArabic = false
         this.defaultSellerLogo = '../../../assets/shoppingCart/Order-Details-Seller-logo.svg';
         this.defaultBuyerLogo = '../../../assets/shoppingCart/Order-Details-Byer-logo.svg';
 
@@ -221,25 +221,25 @@ export class TopBarComponent extends ThemesLayoutBaseComponent implements OnInit
         this.isMultiTenancyEnabled = this._abpMultiTenancyService.isEnabled;
         this.isImpersonatedLogin =
             this._abpSessionService.impersonatorUserId > 0;
-            if(this.isAuthenticated != undefined) {
-                this.setCurrentLoginInformations();
-                this.getProfilePicture();
-                this.getRecentlyLinkedUsers();
-                this.appSession?.user?.memberId;
-                this.appSession?.user?.id;
-                this.registerToEvents();
-                this.getUnreadMessageCount();
-                if(!this.isHost)
-                  this.getShoppingCartInfo();
-        
-                this.messageReadService.readMessageSubject$.subscribe((res) => {
-                    if (res) {
-                        this.getUnreadMessageCount();
-                    }
-                });
-                this.getBelowBar();
-            }
-       
+        if (this.isAuthenticated != undefined) {
+            this.setCurrentLoginInformations();
+            this.getProfilePicture();
+            this.getRecentlyLinkedUsers();
+            this.appSession?.user?.memberId;
+            this.appSession?.user?.id;
+            this.registerToEvents();
+            this.getUnreadMessageCount();
+            if (!this.isHost)
+                this.getShoppingCartInfo();
+
+            this.messageReadService.readMessageSubject$.subscribe((res) => {
+                if (res) {
+                    this.getUnreadMessageCount();
+                }
+            });
+            this.getBelowBar();
+        }
+
     }
 
 
@@ -274,7 +274,7 @@ export class TopBarComponent extends ThemesLayoutBaseComponent implements OnInit
         this.name = this.appSession?.user?.name;
         this.fullName =
             this.appSession?.user?.name + ' ' + this.appSession?.user?.surname;
-       
+
     }
     closeModal(value: boolean) {
         this.display = false;
@@ -294,13 +294,13 @@ export class TopBarComponent extends ThemesLayoutBaseComponent implements OnInit
 
     getProfilePicture(): void {
         if (this.profilePicSub) return;
-      
+
         this.profilePicSub = this.updateLogoService.profilePictureUpdated$
-          .subscribe((res) => {
-            this.profilePicture = res || (AppConsts.appBaseUrl + "/assets/common/images/default-profile-picture.png");
-          });
-      }
-      
+            .subscribe((res) => {
+                this.profilePicture = res || (AppConsts.appBaseUrl + "/assets/common/images/default-profile-picture.png");
+            });
+    }
+
 
     getRecentlyLinkedUsers(): void {
         this._userLinkServiceProxy
@@ -533,71 +533,71 @@ export class TopBarComponent extends ThemesLayoutBaseComponent implements OnInit
     onSearch(ev?: Event): void {
         ev?.preventDefault(); //  stop native form submit
         const q = (this.searchInput ?? '').trim();
-      
-        this.router.navigate(
-          ['/app/main/marketplace/products'],
-          {
-            queryParams: { q: q || null },      // null removes it when empty
-            queryParamsHandling: 'merge',
-            replaceUrl: false
-          }
-        );
-      }
-      
-      getTenantData() {
-        this._AppEntitiesServiceProxy.getHostSettingValue(1208, null)
-        .subscribe((result) => {
-          this.bgCol = result;
-          this.bgColLoaded = true; 
-        });
-    
-      this._AppEntitiesServiceProxy.getHostSettingValue(1204, "file")
-        .subscribe((result) => {
-          this.tenantLogo = result;
-        });
 
-            
-      this._AppEntitiesServiceProxy.getHostSettingValue(1207, null)
-      .subscribe((result) => {
-        this.allowFeeds = result;
-      });
+        this.router.navigate(
+            ['/app/main/marketplace/products'],
+            {
+                queryParams: { q: q || null },      // null removes it when empty
+                queryParamsHandling: 'merge',
+                replaceUrl: false
+            }
+        );
+    }
+
+    getTenantData() {
+        this._AppEntitiesServiceProxy.getHostSettingValue(1208, null)
+            .subscribe((result) => {
+                this.bgCol = result;
+                this.bgColLoaded = true;
+            });
+
+        this._AppEntitiesServiceProxy.getHostSettingValue(1204, "file")
+            .subscribe((result) => {
+                this.tenantLogo = result;
+            });
+
+
+        this._AppEntitiesServiceProxy.getHostSettingValue(1207, null)
+            .subscribe((result) => {
+                this.allowFeeds = result;
+            });
     }
 
     loadDefaultPage(): void {
-      
+
         this.getTenantData()
-          if(!this.isAuthenticated){
-                this.defaultHomeUrl = '/app/main/marketplace';
-                return
+        if (!this.isAuthenticated) {
+            this.defaultHomeUrl = '/app/main/marketplace';
+            return
         }
         this._AppEntitiesServiceProxy.getHostSettingValue(1203, null)
-          .subscribe({
-            next: (res2: string) => {
-              if (res2 === 'Marketplace' && this.allowFeeds != 'Yes') {
-                this.defaultHomeUrl = '/app/main/marketplace';
-              } else {
-                this.defaultHomeUrl = '/app/main/Home';
-              }
-            },
-            error: err2 => {
-              console.error('Failed to load host setting 1203', err2);
-              this.defaultHomeUrl = '/app/main/Home'; // or dashboard if you want
-            }
-          });
-      }
-      onImgErr(evt: Event) {
+            .subscribe({
+                next: (res2: string) => {
+                    if (res2 === 'Marketplace' && this.allowFeeds != 'Yes') {
+                        this.defaultHomeUrl = '/app/main/marketplace';
+                    } else {
+                        this.defaultHomeUrl = '/app/main/Home';
+                    }
+                },
+                error: err2 => {
+                    console.error('Failed to load host setting 1203', err2);
+                    this.defaultHomeUrl = '/app/main/Home'; // or dashboard if you want
+                }
+            });
+    }
+    onImgErr(evt: Event) {
         (evt.target as HTMLImageElement).src = '/assets/placeholders/_logo-placeholder.png';
-      }
-
-      onLogoClick(): void {
-  this.router.navigateByUrl(this.defaultHomeUrl);
-}
+    }
+    // logoo
+    onLogoClick(): void {
+        this.router.navigateByUrl(this.defaultHomeUrl);
+    }
     ngOnDestroy(): void {
         if (this.profilePicSub) {
-          this.profilePicSub.unsubscribe();
+            this.profilePicSub.unsubscribe();
         }
-      }
-      
+    }
+
 }
 
 
