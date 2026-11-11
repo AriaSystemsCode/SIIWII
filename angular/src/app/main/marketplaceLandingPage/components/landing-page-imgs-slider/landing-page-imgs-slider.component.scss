@@ -12,7 +12,7 @@
 .slider-track {
   display: flex;
   align-items: stretch;
-  justify-content: flex-start;
+  justify-content: center;
   gap: 8px;
   width: 100%;
   overflow: hidden;
@@ -20,9 +20,9 @@
   // Scale images proportionally to fit available width
 
 
-  --large-width: 400px;
-  --small-width: 290px;
-  --image-height: 400px;
+  --large-width: 430px;
+  --small-width: 300px;
+  --image-height: 430px;
 
     // --large-width: 370px;
     // --small-width: 260px;

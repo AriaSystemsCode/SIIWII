@@ -28,8 +28,8 @@ export class LandingPageMenuComponent extends AppComponentBase implements OnChan
 
   @Input() sections: SectionItem[] = [];
 
-  @Input() backgroundColor = '#ffffff';
-  @Input() textColor = '#4A0D4A';
+  @Input() backgroundColor = '#000';
+  @Input() textColor = '#fff';
 
   expandedMenu: number | null = null;
 
