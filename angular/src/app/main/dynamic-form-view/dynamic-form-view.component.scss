@@ -1,0 +1,339 @@
+$primary: #4A0D4A;
+$primary-light: #f5eef8;
+$border: #e5e7ee;
+
+:host {
+    display: block;
+    padding: 16px;
+}
+
+.dfv-page {
+    border: 1px solid $border;
+    border-radius: 12px;
+    background: #fff;
+    overflow: hidden;
+}
+
+.dfv-header {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    padding: 14px 20px;
+    background: $primary;
+    color: #fff;
+    font-size: 20px;
+    font-weight: 600;
+}
+
+.dfv-content {
+    padding: 16px 20px 20px;
+}
+
+.dfv-screens {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+    margin-bottom: 16px;
+}
+
+.dfv-screen-tab,
+.dfv-screen-add {
+    padding: 8px 16px;
+    border: 1px solid $border;
+    border-radius: 7px;
+    background: #fff;
+    color: #343849;
+    font-size: 13px;
+    font-weight: 600;
+
+    &:hover {
+        border-color: $primary;
+    }
+}
+
+.dfv-screen-delete {
+    margin-left: 8px;
+    font-size: 11px;
+    opacity: 0.6;
+
+    &:hover {
+        opacity: 1;
+    }
+}
+
+.dfv-screen-tab.active {
+    background: $primary;
+    border-color: $primary;
+    color: #fff;
+}
+
+.dfv-toolbar {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 16px;
+    margin-bottom: 16px;
+}
+
+.dfv-table-select {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    width: 420px;
+    max-width: 100%;
+}
+
+.dfv-table-label {
+    margin: 0;
+    font-weight: 600;
+    white-space: nowrap;
+}
+
+.dfv-actions {
+    display: flex;
+    gap: 8px;
+}
+
+.dfv-reset {
+    background: #fff;
+    border: 1px solid $primary;
+    color: $primary;
+
+    &:hover,
+    &:focus {
+        background: $primary-light;
+        color: $primary;
+    }
+}
+
+.dfv-save {
+    background: $primary;
+    border-color: $primary;
+    color: #fff;
+
+    &:hover,
+    &:focus {
+        background: $primary;
+        border-color: $primary;
+        color: #fff;
+    }
+}
+
+.dfv-body {
+    display: flex;
+    align-items: flex-start;
+    gap: 16px;
+}
+
+.dfv-available,
+.dfv-builder-panel {
+    border: 1px solid $border;
+    border-radius: 10px;
+    background: #fff;
+    overflow: hidden;
+}
+
+.dfv-available {
+    flex: 0 0 280px;
+    min-height: 320px;
+}
+
+.dfv-builder-panel {
+    flex: 1;
+    min-width: 0;
+}
+
+.dfv-panel-title {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    margin: 0;
+    padding: 10px 14px;
+    background: $primary-light;
+    border-bottom: 1px solid $border;
+    color: $primary;
+    font-weight: 600;
+}
+
+.dfv-available-list {
+    padding: 12px;
+    max-height: 60vh;
+    overflow-y: auto;
+}
+
+.dfv-field-type {
+    color: #9296a5;
+}
+
+.kind-text,
+.kind-number,
+.kind-lookup {
+    color: #2f6fed;
+}
+
+.kind-date {
+    color: $primary;
+}
+
+.kind-boolean {
+    color: #28a745;
+}
+
+.dfv-builder {
+    flex: 1;
+    display: flex;
+    flex-wrap: wrap;
+    gap: 16px;
+    padding: 14px;
+    min-width: 0;
+}
+
+.dfv-add-column {
+    margin-left: auto;
+    padding: 3px 12px;
+    border: 1px solid $primary;
+    border-radius: 6px;
+    background: #fff;
+    color: $primary;
+    font-size: 12px;
+    font-weight: 600;
+
+    &:hover {
+        background: $primary;
+        color: #fff;
+    }
+}
+
+.dfv-column-remove {
+    margin-left: 8px;
+    font-size: 11px;
+    color: #74798a;
+    cursor: pointer;
+
+    &:hover {
+        color: #d94a4a;
+    }
+}
+
+// A column that doesn't fit on the row wraps to a new line.
+.dfv-column {
+    flex: 1 1 280px;
+    min-width: 280px;
+    padding: 12px;
+    border: 1px dashed #c7cad5;
+    border-radius: 8px;
+    background: #fff;
+}
+
+.dfv-column-body {
+    display: flex;
+    flex-direction: column;
+    min-height: 300px;
+}
+
+.dfv-column-title {
+    margin-bottom: 12px;
+    text-align: center;
+    font-weight: 700;
+}
+
+.dfv-field-item {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    margin-bottom: 6px;
+    padding: 8px 10px;
+    border: 1px solid $border;
+    border-radius: 6px;
+    background: #fff;
+    cursor: grab;
+}
+
+.dfv-field-name {
+    flex: 1;
+    min-width: 0;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
+.dfv-slot,
+.dfv-column-end {
+    // Gap opens (animated) where the dragged field will land.
+    padding-top: 0;
+    transition: padding-top 0.15s ease;
+
+    &.drop-before {
+        padding-top: 28px;
+
+        .dfv-drop-indicator {
+            opacity: 1;
+        }
+    }
+}
+
+.dfv-slot {
+    position: relative;
+    margin-bottom: 8px;
+}
+
+.dfv-column-end {
+    position: relative;
+    flex: 1;
+    min-height: 60px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.dfv-drop-indicator {
+    position: absolute;
+    top: 10px;
+    left: 0;
+    right: 0;
+    height: 4px;
+    border-radius: 2px;
+    background: $primary;
+    opacity: 0;
+    transition: opacity 0.15s ease;
+    pointer-events: none;
+}
+
+.dfv-card {
+    padding: 8px 12px;
+    border: 1px solid $border;
+    border-radius: 8px;
+    background: #fff;
+}
+
+.dfv-card-header {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+
+.dfv-card-icon {
+    cursor: grab;
+}
+
+.dfv-remove {
+    color: #74798a;
+    cursor: pointer;
+
+    &:hover {
+        color: #d94a4a;
+    }
+}
+
+@media (max-width: 991px) {
+    .dfv-body,
+    .dfv-toolbar {
+        flex-direction: column;
+        align-items: stretch;
+    }
+
+    .dfv-available {
+        flex-basis: auto;
+        width: 100%;
+    }
+}
