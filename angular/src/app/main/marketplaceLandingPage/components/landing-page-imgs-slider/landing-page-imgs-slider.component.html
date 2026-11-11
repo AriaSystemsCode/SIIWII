@@ -1,0 +1,64 @@
+
+<div class="landing-imgs-slider" *ngIf="images.length > 0">
+
+  <div class="slider-track"
+       [class.first-large]="firstImageLarger">
+
+    <div
+      class="slider-image"
+      *ngFor="let image of visibleImages;
+              let i = index;
+              trackBy: trackByImage"
+      [class.large-image]="firstImageLarger && i === 0"
+      [class.small-image]="firstImageLarger && i !== 0"
+      [class.clickable]="image.externalUrl || image.link || image.linkPageUrl"
+      (click)="openImage(image)">
+
+      <img
+        [src]="getImageUrl(image)"
+        [alt]="image.name || image.title || 'Slider image'"
+        loading="lazy" />
+
+    </div>
+
+  </div>
+
+  <div class="slider-controls" *ngIf="images.length > 1">
+
+    <button type="button"
+            class="slider-arrow"
+            (click)="previous()">
+      <i class="pi pi-chevron-left"></i>
+    </button>
+
+    <div class="slider-dots">
+      <button
+        type="button"
+        class="slider-dot"
+        *ngFor="let image of images; let i = index"
+        [class.active]="currentIndex === i"
+        (click)="goTo(i)">
+      </button>
+    </div>
+
+    <button type="button"
+            class="slider-arrow"
+            (click)="next()">
+      <i class="pi pi-chevron-right"></i>
+    </button>
+
+  </div>
+
+</div>
+
+  <div
+    *ngIf="loading"
+    class="section-loading d-flex justify-content-center align-items-center">
+
+    <div class="spinner-border purple-spinner" role="status">
+      <span class="sr-only">
+        {{ 'Loading' | localize }}
+      </span>
+    </div>
+
+  </div>

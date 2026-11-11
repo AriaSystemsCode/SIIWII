@@ -1,0 +1,27 @@
+
+<div class="landing-block-card"
+     [class.compact]="compact"
+     (click)="openBlock()"
+     role="button"
+     tabindex="0"
+     (keydown.enter)="openBlock()"
+     (keydown.space)="$event.preventDefault(); openBlock()">
+
+  <div class="block-image-wrapper">
+
+    <img
+      class="block-image"
+      [src]="blockImage"
+      [alt]="blockName"
+      loading="lazy"
+      (error)="onImageError($event)" />
+
+  </div>
+
+  <div class="block-info">
+    <span class="block-name" [title]="blockName">
+      {{ blockName }}
+    </span>
+  </div>
+
+</div>
