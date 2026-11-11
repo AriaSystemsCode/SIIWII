@@ -174,6 +174,13 @@ import { DashboardComponent } from "./dashboard/dashboard.component";
                     },
 
                     
+                    {
+                        path: "dynamic-form-view",
+                        loadChildren: () =>
+                            import("./dynamic-form-view/dynamic-form-view.module").then(
+                                (m) => m.DynamicFormViewModule
+                            ),
+                    },
                       {
                         path: 'dashboards',
                         loadChildren: () => import('./dashboard/dashboard.module').then(m => m.DashboardModule),
