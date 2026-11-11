@@ -769,20 +769,16 @@ CreateBusiness_GroupAccount(
       onImgErr(evt: Event) {
         (evt.target as HTMLImageElement).src = '/assets/placeholders/_logo-placeholder.png';
       }
-    // ngOnDestroy(): void {
-    //     if (this.profilePicSub) {
-    //       this.profilePicSub.unsubscribe();
-    //     }
-    //   }
-ngOnDestroy(): void {
 
-    this.destroy$.next(true);
-    this.destroy$.complete();
-
-    if (this.profilePicSub) {
-        this.profilePicSub.unsubscribe();
-    }
+      onLogoClick(): void {
+  this.router.navigateByUrl(this.defaultHomeUrl);
 }
+    ngOnDestroy(): void {
+        if (this.profilePicSub) {
+          this.profilePicSub.unsubscribe();
+        }
+      }
+      
 }
 
 
