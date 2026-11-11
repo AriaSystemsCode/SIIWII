@@ -14,20 +14,15 @@
 
         <p-menu #menu [model]="items" [popup]="true"></p-menu>
       
-        <a
-        class="navbar-brand pt-0"
-        [routerLink]="defaultHomeUrl"
-        routerLinkActive="header-link-active"
-   
-        [ngClass]="isAuthenticated? 'ml-3':''"
-      >
+      
         <img
           [src]=" attachmentBaseUrl + '/' + tenantLogo"
           class="navbar-brand"
           [ngClass]="!tenantLogo ? 'rounded-c': !isAuthenticated ? 'mx-5':'' "
           (error)="onImgErr($event)"
+           (click)="onLogoClick()"
         />
-      </a>
+    
       
         <button
             type="button"
@@ -410,10 +405,12 @@
             <!-- Left links -->
             <ul class="navbar-nav bottom-navbar ms-auto my-2 mb-lg-0">
                 <li class="nav-item pt-2">
-                    <a class="navbar-brand pt-0 "     [routerLink]="defaultHomeUrl"
-                        routerLinkActive="header-link-active">
-                        <img src="../../../assets/landingPage/Home_Footer_Btn.svg" class="navbar-brand _navbar-brand" />
-                    </a>
+                   
+                        <img src="../../../assets/landingPage/Home_Footer_Btn.svg" class="navbar-brand _navbar-brand"         [src]=" attachmentBaseUrl + '/' + tenantLogo"
+        
+          (error)="onImgErr($event)"
+           (click)="onLogoClick()" />
+                 
                 </li>
                 <li class="nav-item pt-1" >
                     <a
