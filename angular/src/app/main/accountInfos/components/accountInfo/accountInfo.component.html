@@ -414,7 +414,7 @@
                                     </a>
                                 </li>
 
-                                <li class="nav-item" *ngIf="relationId && relationId > 0 && roleSeller">
+                                <li class="nav-item" *ngIf="relationId && relationId > 0 && (roleSeller || roleEmployer)">
                                     <a class="nav-link profile-nav-link"
                                         (click)="changeTab(accountInfoPageTabsEnum.RelationshipSettings)"
                                         [ngClass]="currentTab == accountInfoPageTabsEnum.RelationshipSettings ? 'active' : ''">
@@ -721,16 +721,17 @@
                                                 <!-- <div class="d-flex flex-grow-1"> -->
                                                 <div class="flex-grow-1 mr-1 account-page">
 
-                                                    <p-dropdown *ngIf="accountLevel == accountLevelEnum.Manual"
-                                                        (onChange)="onAccountTypeChange($event)"
-                                                        #manualAccountTypeInput="ngModel"
-                                                        placeholder="{{ 'Account Type' | localize }} *"
+                                                    <p-dropdown
+                                                        *ngIf="accountLevel == accountLevelEnum.Manual"
                                                         [options]="accountTypes"
-                                                        [disabled]="accountDataForView?.isConnected && currentTab === accountInfoPageTabsEnum.ProfileCreateOrEdit && !isRecordOwner"
-                                                        [ngStyle]="{'cursor': accountDataForView?.isConnected && currentTab === accountInfoPageTabsEnum.ProfileCreateOrEdit ? 'not-allowed' : 'pointer'}"
+                                                        optionLabel="label"
+                                                        optionValue="value"
+                                                        [(ngModel)]="accountInfoTemp.accountTypeId"
+                                                        name="accountType"
+                                                        #manualAccountTypeInput="ngModel"
+                                                        [filter]="false"
                                                         styleClass="ticket-dropdown form-control aria-select text-left"
-                                                        [filter]="false" name="accountType"
-                                                        [(ngModel)]="accountInfoTemp.accountTypeId" required>
+                                                        required>
                                                     </p-dropdown>
 
                                                     <input *ngIf="accountLevel != accountLevelEnum.Manual" type="text"

@@ -115,6 +115,7 @@ export class AccountInfoComponent extends AppComponentBase implements OnInit {
     // relations / connections
     relationId = 0;
     roleSeller = false;
+    roleEmployer = false;
     connectionsInfo: ConnectionInfo[] = [];
     availableConnectionsInfo: ConnectionInfo[] = [];
     availableConnections: any[] = [];
@@ -192,6 +193,12 @@ export class AccountInfoComponent extends AppComponentBase implements OnInit {
             this.roleSeller = (roles || []).some(r =>
                 (r.requesterMarketplaceRole || '').toLowerCase().includes('seller') ||
                 (r.recipientMarketplaceRole || '').toLowerCase().includes('seller')
+
+            );
+
+            this.roleEmployer = (roles || []).some(r =>
+                (r.requesterMarketplaceRole || '').toLowerCase().includes('employer')
+
             );
         });
     }
@@ -504,11 +511,26 @@ export class AccountInfoComponent extends AppComponentBase implements OnInit {
     }
 
     getAccountTypes(): void {
-        this._AppEntitiesServiceProxy.getAllAccountTypesForTableDropdown()
+        this._AppEntitiesServiceProxy
+            .getAllAccountTypesForTableDropdown()
             .subscribe(result => {
-                this.accountTypes = (result ?? []).filter(
-                    x => x?.code === 'BUSINESS' || x?.code === 'PERSONAL'
+
+                const business = (result ?? []).find(
+                    x => x?.code?.toUpperCase() === 'BUSINESS'
                 );
+
+                if (!business) return;
+
+                this.accountTypes = [{
+                    label: business.label,
+                    value: Number(business.value)
+                }];
+
+                // Force Business for manual accounts
+                if (this.isManualAccount) {
+                    this.accountInfoTemp.accountTypeId = 19;
+                    this.accountInfoTemp.accountType = 'BUSINESS';
+                }
             });
     }
 
@@ -777,8 +799,18 @@ export class AccountInfoComponent extends AppComponentBase implements OnInit {
         if (!this.accountInfoTemp.entityAttachments) this.accountInfoTemp.entityAttachments = [];
         if (!this.accountInfoTemp.entityCategories) this.accountInfoTemp.entityCategories = [];
         if (!this.accountInfoTemp.entityClassifications) this.accountInfoTemp.entityClassifications = [];
-        if (!this.accountInfoTemp.accountType) this.accountInfoTemp.accountType = '';
-        if (!this.accountInfoTemp.accountTypeId) this.accountInfoTemp.accountTypeId = 0;
+        // if (!this.accountInfoTemp.accountType) this.accountInfoTemp.accountType = '';
+        // if (!this.accountInfoTemp.accountTypeId) this.accountInfoTemp.accountTypeId = 0;
+        if (this.isManualAccountCreate) {
+            this.accountInfoTemp.accountTypeId = 19;
+            this.accountInfoTemp.accountType = 'BUSINESS';
+        } else {
+            if (!this.accountInfoTemp.accountType)
+                this.accountInfoTemp.accountType = '';
+
+            if (!this.accountInfoTemp.accountTypeId)
+                this.accountInfoTemp.accountTypeId = 0;
+        }
         if (!this.accountInfoTemp.contactAddresses) this.accountInfoTemp.contactAddresses = [];
         if (!this.accountInfoTemp.contactPaymentMethods) this.accountInfoTemp.contactPaymentMethods = [];
         if (!this.accountInfoTemp.branches) this.accountInfoTemp.branches = [];
