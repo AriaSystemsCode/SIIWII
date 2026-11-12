@@ -3032,7 +3032,7 @@ Please select one of the available linesheet templates
 		<text name="Transaction Number">Transaction Number</text>
 		<text name="Price Range">Price Range</text>
 		<text name="Amount Range">Amount Range</text>
-
+		<text name="aldtver_scx-_1H80UY10F-Caption">Shipping Labels</text>
 		
   </texts>  
 </localizationDictionary>
