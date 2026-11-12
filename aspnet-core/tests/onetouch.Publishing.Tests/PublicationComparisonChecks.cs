@@ -66,6 +66,7 @@ internal static class PublicationComparisonChecks
         Check(context.Entry(timestampOnly).Properties.Where(property => property.IsModified).Select(property => property.Metadata.Name)
             .SequenceEqual(new[] { "TimeStamp" }), "A version-only update changed unrelated product fields.");
         CheckApplicationMappings(context, comparison);
+        CheckRelatedProductMapping();
         CheckImageCopies();
         Console.WriteLine("PASS: publication comparisons detect content changes, preserve ownership, honor stored precision, and reuse unchanged images.");
     }
@@ -108,6 +109,7 @@ internal static class PublicationComparisonChecks
         normalizer.Invoke(null, new object[] { desired, source, published, null!, null! });
         Check((bool)comparison.Invoke(null, new object[] { context, desired, published, true })!, "The application's actual mapping could not recognize an unchanged product.");
         source.ParentId = 700;
+        source.ParentFk = new AppItem { Id = 700, Name = "Seller parent" };
         source.Name = "Variation name";
         published.ParentId = 800;
         var parentSource = new AppItem { Name = "Parent name", EntityFk = new AppEntity { Notes = "Parent notes" } };
@@ -116,6 +118,11 @@ internal static class PublicationComparisonChecks
         published.Notes = parentSource.EntityFk.Notes;
         published.SharingLevel = parentPublished.SharingLevel;
         desired = mapper.Map<AppMarketplaceItems>(source);
+        var publishedVariation = new AppMarketplaceItems { Id = 801, ParentId = parentPublished.Id, ParentFk = parentPublished };
+        mapper.Map(source, publishedVariation);
+        Check(parentPublished.Id == 800 && publishedVariation.ParentId == 800 &&
+            ReferenceEquals(publishedVariation.ParentFk, parentPublished),
+            "Mapping a seller variation changed its existing marketplace parent.");
         normalizer.Invoke(null, new object[] { desired, source, published, parentSource, parentPublished });
         Check(!(bool)comparison.Invoke(null, new object[] { context, desired, published, false })!, "A legacy variation code mismatch was overlooked.");
         published.Code = source.SSIN;
@@ -151,6 +158,30 @@ internal static class PublicationComparisonChecks
                     AppItemSizeScalesDetails = new List<AppMarketplaceItemSizeScaleDetails> { new() { Id = id + 10, SizeScaleId = id + 9, SizeCode = "S", SizeRatio = 1 } } }
             }
         };
+    }
+
+    private static void CheckRelatedProductMapping()
+    {
+        var sourceRelationships = new List<AppEntitiesRelationship>
+        {
+            new() { RelatedEntityId = 408100, RelatedEntityCode = "00000000001" },
+            new() { RelatedEntityId = 410641, RelatedEntityCode = "00000000006" },
+            new() { RelatedEntityId = 999999, RelatedEntityCode = "UNPUBLISHED" }
+        };
+        var publishedTargets = new Dictionary<long, (long Id, string Code)>
+        {
+            [408100] = (405647, "00002490-000000007536"),
+            [410641] = (410276, "00002490-000000008178")
+        };
+        var method = typeof(AppItemsAppService).GetMethod("MapPublishedRelationships", BindingFlags.Static | BindingFlags.NonPublic)!;
+        var mapped = (IList<AppEntitiesRelationship>)method.Invoke(null,
+            new object[] { sourceRelationships, publishedTargets, "PUBLISHED-ROOT" })!;
+        Check(mapped.Select(item => item.RelatedEntityId).SequenceEqual(new long[] { 405647, 410276 }),
+            "Selected related products did not map to both published products in order.");
+        Check(mapped.All(item => item.EntityCode == "PUBLISHED-ROOT") &&
+            mapped[1].RelatedEntityCode == "00002490-000000008178", "Published relationship codes were incorrect.");
+        Check(sourceRelationships[1].RelatedEntityId == 410641 && sourceRelationships[1].RelatedEntityCode == "00000000006",
+            "Mapping changed the source product's selected relationships.");
     }
 
     private static void CheckImageCopies()

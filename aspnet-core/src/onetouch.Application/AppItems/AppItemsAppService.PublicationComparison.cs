@@ -13,10 +13,14 @@ namespace onetouch.AppItems
     {
         private bool PublicationMatches(onetouchDbContext context, AppItem source,
             AppMarketplaceItems.AppMarketplaceItems published, AppItem parentSource = null,
-            AppMarketplaceItems.AppMarketplaceItems publishedParent = null)
+            AppMarketplaceItems.AppMarketplaceItems publishedParent = null,
+            IReadOnlyDictionary<long, (long Id, string Code)> publishedRelatedItems = null)
         {
             var desired = ObjectMapper.Map<AppMarketplaceItems.AppMarketplaceItems>(source);
             PreparePublicationComparison(desired, source, published, parentSource, publishedParent);
+            if (publishedRelatedItems != null)
+                desired.EntitiesRelationships = MapPublishedRelationships(source.EntityFk.EntitiesRelationships,
+                    publishedRelatedItems, published.Code);
             return SamePublicationPayload(context, desired, published, parentSource == null);
         }
 

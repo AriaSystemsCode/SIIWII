@@ -3724,6 +3724,7 @@ namespace onetouch.AppItems
                         .Include(item => item.ItemPricesFkList)
                         .FirstOrDefaultAsync(item => item.Id == marketplaceItemId);
                     LogPhase("marketplace loaded");
+                    var publishedRelatedItems = await ResolvePublishedRelatedItems(appItem);
 
                     List<AppItemPrices> prefetchedPrices = null;
                     List<AppMarketplaceItems.AppMarketplaceItems> prefetchedChildren = null;
@@ -3754,7 +3755,8 @@ namespace onetouch.AppItems
                             if (publishedChild != null && PublicationMatches(x, child, publishedChild, appItem, marketplaceItem))
                                 currentVariationSsins.Add(child.SSIN);
                         }
-                        parentContentIsCurrent = PublicationMatches(x, appItem, marketplaceItem);
+                        parentContentIsCurrent = PublicationMatches(x, appItem, marketplaceItem,
+                            publishedRelatedItems: publishedRelatedItems);
                         if (parentContentIsCurrent && currentVariationSsins.Count == appItem.ParentFkList.Count &&
                             prefetchedChildren.Count == appItem.ParentFkList.Count)
                         {
@@ -3954,42 +3956,8 @@ namespace onetouch.AppItems
                                 clas.Id = 0;
                             }
                         }
-                        if (marketplaceItem.EntitiesRelationships != null)
-                        {
-                            foreach (var rela in marketplaceItem.EntitiesRelationships)
-                            {
-                                rela.Id = 0;
-                                //check if the related item publisehd or not
-                                //rela.RelatedEntityId
-                                var appItemForEntity = _appItemRepository.GetAll()
-                                    .Where(e => e.EntityId == rela.RelatedEntityId).FirstOrDefault();
-                                if (appItemForEntity == null)
-                                    rela.RelatedEntityId = 0;
-                                else
-                                {
-                                    var appMarketplaceItem = await _appMarketplaceItem.GetAll()
-                                    .Where(x => x.TenantOwner == appItemForEntity.TenantId &&
-                                        (x.SSIN == appItemForEntity.SSIN || x.Code == appItemForEntity.SSIN || x.ManufacturerCode == appItemForEntity.Code))
-                                    .OrderByDescending(x => x.SSIN == appItemForEntity.SSIN || x.Code == appItemForEntity.SSIN)
-                                    .ThenBy(x => x.Id).FirstOrDefaultAsync();
-                                    if (appMarketplaceItem != null)
-                                    {
-                                        rela.RelatedEntityFk = null;
-                                        rela.RelatedEntityId = appMarketplaceItem.Id;
-                                        rela.RelatedEntityCode = appMarketplaceItem.Code;
-                                    }
-                                    else
-                                    {
-                                        rela.RelatedEntityId = 0;
-                                    }
-                                }
-                            }
-                            var notSharedRelated = marketplaceItem.EntitiesRelationships.Where(e => e.RelatedEntityId == 0).ToList();
-                            foreach (var rela in notSharedRelated)
-                            { marketplaceItem.EntitiesRelationships.Remove(rela); }
-
-
-                        }
+                        marketplaceItem.EntitiesRelationships = MapPublishedRelationships(
+                            appItem.EntityFk.EntitiesRelationships, publishedRelatedItems, marketplaceItem.Code);
 
 
                         if (!input.SyncProduct && marketplaceItem != null && publishedEntityId != 0)
@@ -4053,6 +4021,7 @@ namespace onetouch.AppItems
                             await CurrentUnitOfWork.SaveChangesAsync();
                     }
                     LogPhase("parent saved");
+                    var publishedMarketplaceParentId = marketplaceItem.Id;
                     //Delete removed child items
                     if (marketplaceItem != null && publishedEntityId != 0 && children != null && children.Count > 0)  //&& marketplaceItem.ParentFkList != null
                     {
@@ -4216,7 +4185,7 @@ namespace onetouch.AppItems
 
                         publishChild.Id = publishId;
                         publishChild.ObjectId = itemObjectId;
-                        publishChild.ParentId = marketplaceItem.Id;
+                        publishChild.ParentId = publishedMarketplaceParentId;
                         publishChild.Notes = child.EntityFk.Notes;
                         publishChild.Name = child.Name;
                         publishChild.Name = marketplaceItem.Name;
@@ -4247,7 +4216,34 @@ namespace onetouch.AppItems
                             publishChild = await _appMarketplaceItem.UpdateAsync(publishChild);
                         }
                     }
-                    await CurrentUnitOfWork.SaveChangesAsync();
+                    try
+                    {
+                        await CurrentUnitOfWork.SaveChangesAsync();
+                    }
+                    catch (DbUpdateException ex) when (ex.InnerException is Microsoft.Data.SqlClient.SqlException sqlException &&
+                        sqlException.Number == 547 &&
+                        sqlException.Message.Contains("FK_AppMarketplaceItems_AppMarketplaceItems_ParentId"))
+                    {
+                        var pendingMarketplaceItems = x.ChangeTracker.Entries<AppMarketplaceItems.AppMarketplaceItems>()
+                            .Where(entry => entry.State != EntityState.Unchanged && entry.State != EntityState.Detached)
+                            .Select(entry =>
+                            {
+                                var parentId = entry.Property(item => item.ParentId);
+                                return $"Id={entry.Entity.Id}, Code={entry.Entity.Code}, State={entry.State}, " +
+                                    $"ParentId={entry.Entity.ParentId?.ToString() ?? "NULL"}, " +
+                                    $"OriginalParentId={parentId.OriginalValue?.ToString() ?? "NULL"}, " +
+                                    $"ParentIdModified={parentId.IsModified}, " +
+                                    $"ParentFkId={entry.Entity.ParentFk?.Id.ToString() ?? "NULL"}";
+                            });
+                        var failedMarketplaceIds = ex.Entries
+                            .Where(entry => entry.Entity is AppMarketplaceItems.AppMarketplaceItems)
+                            .Select(entry => ((AppMarketplaceItems.AppMarketplaceItems)entry.Entity).Id);
+                        Logger.Error($"Sync/share of source item {input.AppItemId} failed while saving variations. " +
+                            $"Marketplace parent Id={marketplaceItem.Id}. " +
+                            $"Failed entry Ids=[{string.Join(", ", failedMarketplaceIds)}]. " +
+                            $"Pending marketplace rows=[{string.Join("; ", pendingMarketplaceItems)}].", ex);
+                        throw;
+                    }
                     x.ChangeTracker.Clear();
                     LogPhase("variations saved");
                     //send notification to the users
@@ -5835,7 +5831,7 @@ namespace onetouch.AppItems
                         {
                             Code = dto.Code,
                             EntityObjectCategoryID = item.Id,
-                            Name = dto.SSIN,
+                            Name = appContactsDict[dto.SSIN.ToUpper()].SSIN,
                             Price = price.ToString(),
                             Currency = currencyCode,
                             ParentId = currencyId,
@@ -5982,8 +5978,9 @@ namespace onetouch.AppItems
                 if (appItemDict.TryGetValue(NormalizePriceImportKey(dto.Code), out var appItem))
                     importAppItemIds.Add(appItem.Id);
 
-                if (!string.IsNullOrWhiteSpace(dto.Name))
-                    importBuyerSsins.Add(dto.Name.Trim());
+                if (!string.IsNullOrWhiteSpace(dto.Name) &&
+                    appContactsDict.TryGetValue(dto.Name.Trim().ToUpper(), out var buyerAccount))
+                    importBuyerSsins.Add(buyerAccount.SSIN);
 
                 if (!string.IsNullOrWhiteSpace(dto.Currency))
                     importCurrencyCodes.Add(dto.Currency.Trim());
@@ -6055,7 +6052,7 @@ namespace onetouch.AppItems
                         continue;
                     }
 
-                    var priceCode = excelDto.Name.Trim();
+                    var priceCode = appContact.SSIN;
                     var currencyCode = currency.Code.Trim();
 
                     existingPriceDict.TryGetValue(
@@ -6065,7 +6062,9 @@ namespace onetouch.AppItems
                     if (existingPrice != null)
                     {
                         existingPrice.Price = price;
-                        existingPrice.BuyerSSIN = excelDto.Name;
+                        existingPrice.Code = priceCode;
+                        existingPrice.BuyerSSIN = appContact.SSIN;
+                        existingPrice.CurrencyCode = currencyCode;
                         existingPrice.LastModificationTime = now;
                         existingPrice.LastModifierUserId = userId;
                         existingPrice.IsDefault = true;
@@ -6081,11 +6080,11 @@ namespace onetouch.AppItems
                             TenantId = tenantId,
                             Code = priceCode,
                             Price = price,
-                            BuyerSSIN = excelDto.Name,
-                            AppItemId = (long)excelDto.EntityObjectCategoryID,
+                            BuyerSSIN = appContact.SSIN,
+                            AppItemId = appItem.Id,
                             AppItemCode = excelDto.Code,
-                            CurrencyId = excelDto.ParentId,
-                            CurrencyCode = excelDto.Currency,
+                            CurrencyId = currency.Value,
+                            CurrencyCode = currencyCode,
                             IsDefault = true,
                             IsDeleted = false
                         };
