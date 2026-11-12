@@ -82,12 +82,20 @@ canChange = true;
         continue;
       }
 
-    let formattedValue =
-  attr.selectedValues == null ||
-  attr.selectedValues === '' ||
-  (Array.isArray(attr.selectedValues) && attr.selectedValues.length === 0)
-    ? attr.defaultValue
-    : attr.selectedValues;
+//     let formattedValue =
+//   attr.selectedValues == null ||
+//   attr.selectedValues === '' ||
+//   (Array.isArray(attr.selectedValues) && attr.selectedValues.length === 0)
+//     ? attr.defaultValue
+//     : attr.selectedValues;
+
+// attr.selectedValues = formattedValue;
+
+let formattedValue = this.isMultiSelect(attr)
+  ? this.toArrayValue(attr.selectedValues)
+  : (attr.selectedValues == null || attr.selectedValues === '')
+      ? attr.defaultValue
+      : attr.selectedValues;
 
 attr.selectedValues = formattedValue;
 
@@ -306,6 +314,22 @@ reset(extraAttr: any): void {
     const matchedDto = dtoData.find(
       d => d.extraAttributeId === attr.attributeId
     );
+
+    if (this.isMultiSelect(attr)) {
+  const saved = (matchedDto?.selectedValues ?? [])
+    .map(item => item.value)
+    .filter(v => v !== null && v !== undefined && v !== '');
+
+  // Saved values win. Otherwise use the default value as an array.
+  const values = saved.length ? saved : this.toArrayValue(attr.defaultValue);
+
+  attr.selectedValues = attr.isLookup
+    ? values.map(v => attr.paginationSetting?.list?.find(o => o.label === v || o.value === v)?.value ?? v)
+    : values;
+
+  this.originalValuesMap.set(attr.attributeId, attr.selectedValues);
+  continue;
+}
 
     if (matchedDto && matchedDto.selectedValues?.length) {
       let dtoValue =  matchedDto.selectedValues[matchedDto.selectedValues.length - 1].value;
@@ -740,6 +764,25 @@ private normalizeBooleanValue(value: any): string {
   }
 
   return value;
+}
+
+
+
+
+private isMultiSelect(attr: any): boolean {
+  return attr.acceptMultipleValues === true ||
+    String(attr.dataType ?? '').toUpperCase() === 'MULTISELECTDROPDOWNLIST';
+}
+
+/** Multi-select values must always be arrays. A default like "A|B" becomes ['A', 'B']. */
+private toArrayValue(value: any): any[] {
+  if (Array.isArray(value)) {
+    return value;
+  }
+  if (value === null || value === undefined || value === '') {
+    return [];
+  }
+  return String(value).split('|').map(v => v.trim()).filter(Boolean);
 }
 
 

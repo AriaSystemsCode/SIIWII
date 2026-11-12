@@ -41,3 +41,56 @@
   </app-generic-entity-shell>
 
 </app-generic-entity-modal>
+
+
+
+
+<p-dialog
+    [(visible)]="showConnectionPopup"
+    [modal]="true"
+    [closable]="false"
+    [draggable]="false"
+    [style]="{ width: '650px', maxWidth: '95vw' }"
+    [header]="'MultipleRolesDetected' | localize">
+
+    <p class="mb-3">
+        {{ 'BeforeSavingManualAccountMsg' | localize }}
+    </p>
+
+    <div *ngFor="let connection of availableConnections"
+         class="mb-3">
+
+        <p-radioButton
+            name="selectedConnection"
+            [value]="connection"
+            [(ngModel)]="selectedConnection"
+            [inputId]="'connection_' + connection.connectionEntityId">
+        </p-radioButton>
+
+        <label class="ml-2 mb-0"
+               [for]="'connection_' + connection.connectionEntityId">
+            {{ connection.connectionName }}
+        </label>
+
+    </div>
+
+    <ng-template pTemplate="footer">
+
+        <button
+            type="button"
+            class="btn bgPurple"
+            [disabled]="!selectedConnection || saving"
+            (click)="confirmSelectedConnection()">
+            {{ 'SaveManualAccount' | localize }}
+        </button>
+
+        <button
+            type="button"
+            class="btn btn-secondary ml-3"
+            (click)="cancelConnectionPopup()">
+            {{ 'Cancel' | localize }}
+        </button>
+
+    </ng-template>
+
+</p-dialog>

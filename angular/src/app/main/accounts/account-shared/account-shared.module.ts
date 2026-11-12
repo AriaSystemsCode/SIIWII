@@ -31,7 +31,7 @@ import { AccordionModule } from "primeng/accordion";
 import { SharedDynamicInputsModule } from '@shared/shared-module';
 import { ContactGenericComponent } from './components/contact-generic/contact-generic.component';
 import { AccountEntityComponent } from './components/account-entity/account-entity.component';
-
+import { RadioButtonModule } from 'primeng/radiobutton';
 
 @NgModule({
     declarations: [
@@ -67,7 +67,8 @@ import { AccountEntityComponent } from './components/account-entity/account-enti
         DialogModule,
         EntityShellModule,
         AccordionModule,
-        SharedDynamicInputsModule
+        SharedDynamicInputsModule,
+        RadioButtonModule
     ],
     providers: [
         { provide: BsDatepickerConfig, useFactory: NgxBootstrapDatePickerConfigService.getDatepickerConfig },

@@ -9,6 +9,7 @@ import {
 import { SelectCategoriesDynamicModalComponent } from '@app/categories/select-categories-dynamic-modal.component';
 import { SelectClassificationDynamicModalComponent } from '@app/classification/select-classification-dynamic-modal.component';
 import { ExtraAttributeDataService } from '@app/main/app-items/app-item-shared/services/extra-attribute-data.service';
+import { AbpSessionService } from '@node_modules/abp-ng2-module';
 import { BsModalService, ModalOptions } from '@node_modules/ngx-bootstrap/modal';
 
 import { AppComponentBase } from '@shared/common/app-component-base';
@@ -89,13 +90,27 @@ export class AccountSectionsComponent extends AppComponentBase implements OnInit
   private allPaymentTerms: LookupLabelDto[] = [];
   private allPriceLevel: any[] = [];
 
+  relationId = 0;
+  roleSeller = false;
+  roleFollower = false;
+
+  get showRolesTab(): boolean {
+    if (this.mode === 'create') {
+      return true;
+    }
+
+    return this.relationId > 0 &&
+      (this.roleSeller || this.roleFollower);
+  }
+
   constructor(
     injector: Injector,
     private _accountsServiceProxy: AccountsServiceProxy,
     private _appEntitiesServiceProxy: AppEntitiesServiceProxy,
     private _extraAttributeDataService: ExtraAttributeDataService,
     private _sycEntityObjectTypesServiceProxy: SycEntityObjectTypesServiceProxy,
-    private _bsModalService: BsModalService
+    private _bsModalService: BsModalService,
+    private _abpSessionService: AbpSessionService,
   ) {
     super(injector);
   }
@@ -199,6 +214,16 @@ export class AccountSectionsComponent extends AppComponentBase implements OnInit
     this.account = data.account;
     this.connectionsInfo = data.connectionsInfo ?? [];
     this.roleEntityObjectTypeId = this.account.accountTypeId ?? null;
+
+    this.connectionsInfo = data.connectionsInfo ?? [];
+    this.relationId = Number(data.relationId) || 0;
+
+    this.roleSeller = false;
+    this.roleFollower = false;
+
+    if (this.relationId > 0) {
+      this.loadRelationshipRoles();
+    }
 
     this.initializeAccountFields();
 
@@ -333,15 +358,15 @@ export class AccountSectionsComponent extends AppComponentBase implements OnInit
 
     const selectedValues = isMultiSelect
       ? matched.flatMap(item => {
-          const raw: any = item.attributeValue ?? item.attributeValueId ?? '';
-          const values = Array.isArray(raw)
-            ? raw
-            : this.parseMultiSelectValue(raw, attribute.validEntries);
-          return values.map(value => ({ value }));
-        })
+        const raw: any = item.attributeValue ?? item.attributeValueId ?? '';
+        const values = Array.isArray(raw)
+          ? raw
+          : this.parseMultiSelectValue(raw, attribute.validEntries);
+        return values.map(value => ({ value }));
+      })
       : matched.map(item => ({
-          value: item.attributeValueId ?? item.attributeValue ?? ''
-        }));
+        value: item.attributeValueId ?? item.attributeValue ?? ''
+      }));
 
     return {
       extraAttributeId: attributeId,
@@ -493,32 +518,65 @@ export class AccountSectionsComponent extends AppComponentBase implements OnInit
         this.loadRelationshipAttributes();
       });
   }
+  
 
-  private loadRelationshipAttributes(): void {
+  private getSelectedRelationshipCode(): string {
+    const selectedConnection = this.connectionsInfo?.find(
+        connection =>
+            Number(connection.relationEntityId) ===
+            Number(this.selectedRelationId)
+    );
+
+    return selectedConnection?.relationshipCode || 'BTB';
+}
+
+ private loadRelationshipAttributes(): void {
+    const relationshipCode = this.getSelectedRelationshipCode();
+
     this._sycEntityObjectTypesServiceProxy
-      .getAllWithExtraAttributesByCode('BTB', 'MARKETPLACECONTACTRELATIONSHIP')
-      .pipe(
-        tap(types => {
-          this.relationshipEntityObjectTypeId =
-            types.find(type => type.code === 'BTB')?.id ?? DEFAULT_RELATIONSHIP_TYPE_ID;
-        }),
-        switchMap(() =>
-          this._sycEntityObjectTypesServiceProxy
-            .getAllWithExtraAttributes(this.relationshipEntityObjectTypeId)
+        .getAllWithExtraAttributesByCode(
+            relationshipCode,
+            'MARKETPLACECONTACTRELATIONSHIP'
         )
-      )
-      .subscribe(result => {
-        if (!result?.length) {
-          return;
-        }
+        .pipe(
+            switchMap(types => {
+                const selectedType = types?.find(
+                    type => type.code === relationshipCode
+                );
 
-        this.allRelationshipAttributes = result[0]?.extraAttributes?.extraAttributes ?? [];
-        this.groupedByUsage = this.groupByUsage(this.allRelationshipAttributes);
-        this.usageList = Object.keys(this.groupedByUsage);
-        this.setupRelationshipLookups();
-      });
-  }
+                this.relationshipEntityObjectTypeId =
+                    selectedType?.id ?? DEFAULT_RELATIONSHIP_TYPE_ID;
 
+                return this._sycEntityObjectTypesServiceProxy
+                    .getAllWithExtraAttributes(
+                        this.relationshipEntityObjectTypeId
+                    );
+            })
+        )
+        .subscribe({
+            next: result => {
+                const selectedType = result?.find(
+                    type => type.id === this.relationshipEntityObjectTypeId
+                ) ?? result?.[0];
+
+                this.allRelationshipAttributes =
+                    selectedType?.extraAttributes?.extraAttributes ?? [];
+
+                this.groupedByUsage = this.groupByUsage(
+                    this.allRelationshipAttributes
+                );
+
+                this.usageList = Object.keys(this.groupedByUsage);
+
+                this.setupRelationshipLookups();
+            },
+            error: () => {
+                this.allRelationshipAttributes = [];
+                this.groupedByUsage = {};
+                this.usageList = [];
+            }
+        });
+}
   private groupByUsage(attributes: any[]): Record<string, any[]> {
     return attributes.reduce((groups: Record<string, any[]>, attribute) => {
       const usage = attribute.usage || this.l('RelationshipSettings');
@@ -628,20 +686,40 @@ export class AccountSectionsComponent extends AppComponentBase implements OnInit
     return [dto];
   }
 
-  saveRelationshipEntity(): Observable<any> {
+saveRelationshipEntity(): Observable<any> {
     const relationship = this.relationshipDynamicInputsForViewDto;
 
-    if (!this.relationshipTouched || !relationship?.appEntity) {
-      return of(null);
+    console.log('[Relationship] Save requested', {
+        touched: this.relationshipTouched,
+        selectedRelationId: this.selectedRelationId,
+        appEntity: relationship?.appEntity,
+        extraData: relationship?.entityExtraData
+    });
+
+    if (!this.relationshipTouched) {
+        console.log('[Relationship] No changes to save');
+        return of(null);
     }
 
-    const dto = Object.assign(new AppEntityDto(), relationship.appEntity);
+  
+
+    const dto = Object.assign(
+        new AppEntityDto(),
+        relationship.appEntity
+    );
+
+    dto.id = this.selectedRelationId;
     dto.entityExtraData = relationship.entityExtraData ?? [];
 
-    return this._appEntitiesServiceProxy
-      .saveEntity(dto)
-      .pipe(tap(() => (this.relationshipTouched = false)));
-  }
+    console.log('[Relationship] Calling saveEntity', dto);
+
+    return this._appEntitiesServiceProxy.saveEntity(dto).pipe(
+        tap(() => {
+            console.log('[Relationship] Saved successfully');
+            this.relationshipTouched = false;
+        })
+    );
+}
 
   // ================= Business: departments =================
 
@@ -842,6 +920,34 @@ export class AccountSectionsComponent extends AppComponentBase implements OnInit
     const subscription = this._bsModalService.onHidden.subscribe(() => {
       onSelected(modalRef.content);
       subscription.unsubscribe();
+    });
+  }
+
+  private updateRelationshipRoles(roles: any[]): void {
+    const hasRole = (role: any, name: string): boolean =>
+      [role.requesterMarketplaceRole, role.recipientMarketplaceRole]
+        .some(value =>
+          String(value ?? '')
+            .toLowerCase()
+            .split('-')
+            .some(item => item.trim() === name)
+        );
+
+    this.roleSeller = roles.some(role => hasRole(role, 'seller'));
+    this.roleFollower = roles.some(role => hasRole(role, 'follower'));
+  }
+
+  private loadRelationshipRoles(): void {
+    this.getRelationshipRoles(
+      this._abpSessionService.tenantId,
+      this.account?.ssin
+    ).subscribe({
+      next: (roles: any[]) => {
+        this.updateRelationshipRoles(roles ?? []);
+      },
+      error: () => {
+        this.updateRelationshipRoles([]);
+      }
     });
   }
 }

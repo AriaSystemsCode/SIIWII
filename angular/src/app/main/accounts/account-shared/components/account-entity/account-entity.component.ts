@@ -3,7 +3,7 @@ import { Router } from '@angular/router';
 import { IAjaxResponse, TokenService } from 'abp-ng2-module';
 import { FileUploader } from 'ng2-file-upload';
 import { forkJoin, Observable, of } from 'rxjs';
-import { finalize, map } from 'rxjs/operators';
+import { finalize, map , switchMap } from 'rxjs/operators';
 
 import { AppConsts } from '@shared/AppConsts';
 import { AppComponentBase } from '@shared/common/app-component-base';
@@ -21,6 +21,9 @@ import { GenericEntityNode } from '@app/shared/entity-shell/models/generic-entit
 import { EntityWindowManagerService } from '@app/shared/entity-shell/services/entity-window-manager.service';
 import { BranchGenericComponent } from '@app/select-branch/branch-generic/branch-generic.component';
 import { ContactGenericComponent } from '../contact-generic/contact-generic.component';
+
+import { ViewChild } from '@angular/core';
+import { AccountSectionsComponent } from '../account-sections/account-sections.component';
 
 export type AccountEntityMode = 'create' | 'view' | 'edit';
 type AttachmentType = 'LOGO' | 'BANNER' | 'IMAGE';
@@ -44,6 +47,8 @@ export class AccountEntityComponent extends AppComponentBase {
   @Output() deleted = new EventEmitter<number>();
   @Output() closed = new EventEmitter<void>();
   @Output() minimized = new EventEmitter<number>();
+
+  @ViewChild(AccountSectionsComponent) accountSections: AccountSectionsComponent;
 
   // ---------- State ----------
   visible = false;
@@ -100,6 +105,11 @@ export class AccountEntityComponent extends AppComponentBase {
   private pendingBackgroundFile: File | null = null;
   private pendingImageFiles: Array<File | null> = this.emptyImageFiles();
   private readonly entityObjectType = 'BUSINESS';
+
+
+  availableConnections: any[] = [];
+  selectedConnection: any = null;
+  showConnectionPopup = false;
 
   constructor(
     injector: Injector,
@@ -374,54 +384,74 @@ export class AccountEntityComponent extends AppComponentBase {
     }
 
     this.prepareDto();
+
     if (!this.isValid()) {
       return;
     }
 
-    this.saving = true;
-    this.uploadingImages = this.hasPendingFiles();
-    this.showMainSpinner();
+    // Apply connection selection only when creating a manual account.
+    if (this.mode === 'create' &&
+      this.accountDto.accountLevel === AccountLevelEnum.Manual) {
+      this.saveExternalOrManualAccount();
+      return;
+    }
 
-    this.uploadPendingFiles().subscribe({
-      next: uploaded => {
-        this.mergeUploaded(uploaded);
-        this.saveDto();
-      },
-      error: () => {
-        this.saving = false;
-        this.uploadingImages = false;
-        this.hideMainSpinner();
-        this.notify.error(this.l('UploadFailed'));
-      }
-    });
+    this.saveAccountAfterConnectionSelected();
   }
 
-  private saveDto(): void {
-    this._accountsServiceProxy.createOrEditAccount(this.accountDto)
-      .pipe(finalize(() => {
-        this.saving = false;
-        this.uploadingImages = false;
-        this.hideMainSpinner();
-      }))
-      .subscribe((result: any) => {
-        this.notify.success(this.l('SavedSuccessfully'));
+ private saveDto(): void {
+    this._accountsServiceProxy
+        .createOrEditAccount(this.accountDto)
+        .pipe(
+            switchMap((result: any) => {
+                // Save relationship settings after account is saved
+                const relationshipSave$ = this.accountSections
+                    ? this.accountSections.saveRelationshipEntity()
+                    : of(null);
 
-        const savedAccount = result?.accountInfo ?? result?.account ?? result;
-        this.clearPendingFiles();
-        this.saved.emit(savedAccount);
+                return relationshipSave$.pipe(
+                    map(() => result)
+                );
+            }),
+            finalize(() => {
+                this.saving = false;
+                this.uploadingImages = false;
+                this.hideMainSpinner();
+            })
+        )
+        .subscribe({
+            next: (result: any) => {
+                this.notify.success(this.l('SavedSuccessfully'));
 
-        const id = this.mode === 'create'
-          ? savedAccount?.id ?? savedAccount?.accountId ?? this.accountDto?.id ?? this.accountDto?.accountId
-          : this.accountId;
+                const savedAccount =
+                    result?.accountInfo ??
+                    result?.account ??
+                    result;
 
-        if (!id) {
-          this.visible = false;
-          return;
-        }
-        this.accountId = Number(id);
-        this.loadForView(this.accountId);
-      });
-  }
+                this.clearPendingFiles();
+                this.saved.emit(savedAccount);
+
+                const id = this.mode === 'create'
+                    ? savedAccount?.id ??
+                      savedAccount?.accountId ??
+                      this.accountDto?.id ??
+                      this.accountDto?.accountId
+                    : this.accountId;
+
+                if (!id) {
+                    this.visible = false;
+                    return;
+                }
+
+                this.accountId = Number(id);
+                this.loadForView(this.accountId);
+            },
+            error: error => {
+                console.error('Account or relationship save failed:', error);
+                this.notify.error(this.l('AnErrorOccurred'));
+            }
+        });
+}
 
   private prepareDto(): void {
     if (!this.accountData?.account) {
@@ -706,18 +736,18 @@ export class AccountEntityComponent extends AppComponentBase {
   }
 
   private createAttachmentUploader(): FileUploader {
-  const uploader = new FileUploader({
-    url: AppConsts.remoteServiceBaseUrl + '/Attachment/UploadFiles',
-    authToken: 'Bearer ' + this._tokenService.getToken(),
-    removeAfterUpload: true
-  });
+    const uploader = new FileUploader({
+      url: AppConsts.remoteServiceBaseUrl + '/Attachment/UploadFiles',
+      authToken: 'Bearer ' + this._tokenService.getToken(),
+      removeAfterUpload: true
+    });
 
-  uploader.onAfterAddingFile = fileItem => {
-    fileItem.withCredentials = false;
-  };
+    uploader.onAfterAddingFile = fileItem => {
+      fileItem.withCredentials = false;
+    };
 
-  return uploader;
-}
+    return uploader;
+  }
 
   private createAttachmentDto(
     file: File,
@@ -772,56 +802,56 @@ export class AccountEntityComponent extends AppComponentBase {
   }
 
   private buildLeftPanel(): void {
-  const account = this.accountData?.account;
-  if (!account?.id) {
-    this.leftPanelSections = [];
-    return;
+    const account = this.accountData?.account;
+    if (!account?.id) {
+      this.leftPanelSections = [];
+      return;
+    }
+
+    // Only branches that have an id get their contacts loaded.
+    const branchRequests: Observable<BranchWithContacts>[] = (account.branches ?? [])
+      .filter((branchNode: any) => branchNode?.data?.branch?.id)
+      .map((branchNode: any) =>
+        this.loadContacts(branchNode.data.branch.id)
+          .pipe(map(contacts => ({ branchNode, contacts })))
+      );
+
+    const branches$: Observable<BranchWithContacts[]> =
+      branchRequests.length ? forkJoin(branchRequests) : of([]);
+
+    forkJoin({
+      accountContacts: this.loadContacts(account.id),
+      branches: branches$
+    }).subscribe(({ accountContacts, branches }) => {
+
+      const branchNodes = branches.map(({ branchNode, contacts }) =>
+        this.createBranchNode(account, branchNode, contacts)
+      );
+
+      const accountNode: GenericEntityNode = {
+        id: account.id,
+        label: account.name,
+        entityType: 'ACCOUNT',
+        icon: 'fa fa-building',
+        data: this.accountData,
+        component: undefined,
+        expanded: true,
+        children: [
+          this.createAddContactNode(account),
+          ...branchNodes,
+          ...this.createContactNodes(accountContacts, account.id, account.id, account.tenantId)
+        ]
+      };
+
+      this.leftPanelSections = [{
+        key: 'profile',
+        title: this.l('MyProfile'),
+        type: 'tree',
+        canAdd: true,
+        items: [accountNode]
+      }];
+    });
   }
-
-  // Only branches that have an id get their contacts loaded.
-  const branchRequests: Observable<BranchWithContacts>[] = (account.branches ?? [])
-    .filter((branchNode: any) => branchNode?.data?.branch?.id)
-    .map((branchNode: any) =>
-      this.loadContacts(branchNode.data.branch.id)
-        .pipe(map(contacts => ({ branchNode, contacts })))
-    );
-
-  const branches$: Observable<BranchWithContacts[]> =
-    branchRequests.length ? forkJoin(branchRequests) : of([]);
-
-  forkJoin({
-    accountContacts: this.loadContacts(account.id),
-    branches: branches$
-  }).subscribe(({ accountContacts, branches }) => {
-
-    const branchNodes = branches.map(({ branchNode, contacts }) =>
-      this.createBranchNode(account, branchNode, contacts)
-    );
-
-    const accountNode: GenericEntityNode = {
-      id: account.id,
-      label: account.name,
-      entityType: 'ACCOUNT',
-      icon: 'fa fa-building',
-      data: this.accountData,
-      component: undefined,
-      expanded: true,
-      children: [
-        this.createAddContactNode(account),
-        ...branchNodes,
-        ...this.createContactNodes(accountContacts, account.id, account.id, account.tenantId)
-      ]
-    };
-
-    this.leftPanelSections = [{
-      key: 'profile',
-      title: this.l('MyProfile'),
-      type: 'tree',
-      canAdd: true,
-      items: [accountNode]
-    }];
-  });
-}
   private createBranchNode(account: any, branchNode: any, contacts: any[]): GenericEntityNode {
     const branch = branchNode.data.branch;
 
@@ -937,6 +967,9 @@ export class AccountEntityComponent extends AppComponentBase {
     this.uploadingImages = false;
     this.saving = false;
     this.isLoadingAccount = false;
+    this.availableConnections = [];
+    this.selectedConnection = null;
+    this.showConnectionPopup = false;
   }
 
   private emptyImageFiles(): Array<File | null> {
@@ -959,6 +992,102 @@ export class AccountEntityComponent extends AppComponentBase {
     return 'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g, char => {
       const random = (Math.random() * 16) | 0;
       return (char === 'x' ? random : (random & 0x3) | 0x8).toString(16);
+    });
+  }
+
+  private saveExternalOrManualAccount(): void {
+    const roles = this.getSelectedMarketplaceRoles();
+
+    this.saving = true;
+
+    this._accountsServiceProxy
+      .getAvailableConnections(roles.join('-').toLowerCase())
+      .subscribe({
+        next: (connections: any[]) => {
+          this.availableConnections = connections ?? [];
+
+          if (this.availableConnections.length === 0) {
+            this.saveAccountAfterConnectionSelected();
+            return;
+          }
+
+          if (this.availableConnections.length === 1) {
+            this.selectedConnection = this.availableConnections[0];
+            this.setSelectedRelationshipId();
+            this.saveAccountAfterConnectionSelected();
+            return;
+          }
+
+          this.selectedConnection = this.availableConnections[0];
+          this.showConnectionPopup = true;
+          this.saving = false;
+        },
+        error: () => {
+          this.saving = false;
+          this.notify.error(this.l('AnErrorOccurred'));
+        }
+      });
+  }
+
+  private getSelectedMarketplaceRoles(): string[] {
+    const roleAttribute = (this.accountDto.entityExtraData ?? [])
+      .find(item => Number(item.attributeId) === 610);
+
+    const value = roleAttribute?.attributeValue;
+
+    if (!value) {
+      return [];
+    }
+
+    return String(value)
+      .split('-')
+      .map(role => role.trim())
+      .filter(Boolean);
+  }
+
+  confirmSelectedConnection(): void {
+    if (!this.selectedConnection) {
+      return;
+    }
+
+    this.setSelectedRelationshipId();
+    this.showConnectionPopup = false;
+
+    this.saveAccountAfterConnectionSelected();
+  }
+
+  cancelConnectionPopup(): void {
+    this.showConnectionPopup = false;
+    this.selectedConnection = null;
+    this.availableConnections = [];
+    this.saving = false;
+  }
+
+  private setSelectedRelationshipId(): void {
+    this.accountDto.relationshipId =
+      this.selectedConnection?.connectionEntityId;
+  }
+
+  private saveAccountAfterConnectionSelected(): void {
+    if (this.saving && this.uploadingImages) {
+      return;
+    }
+
+    this.saving = true;
+    this.uploadingImages = this.hasPendingFiles();
+    this.showMainSpinner();
+
+    this.uploadPendingFiles().subscribe({
+      next: uploaded => {
+        this.mergeUploaded(uploaded);
+        this.saveDto();
+      },
+      error: () => {
+        this.saving = false;
+        this.uploadingImages = false;
+        this.hideMainSpinner();
+        this.notify.error(this.l('UploadFailed'));
+      }
     });
   }
 }

@@ -171,7 +171,7 @@
   </p-accordionTab>
 
   <!-- ROLES / OVERVIEW -->
-  <p-accordionTab [header]="(isPersonalAccount ? 'Overview' : 'Roles') | localize">
+  <p-accordionTab   *ngIf="showRolesTab" [header]="(isPersonalAccount ? 'Overview' : 'Roles') | localize">
 
     <div *ngIf="isLoadingRoles" class="text-center py-3">
       <i class="fa fa-spinner fa-spin"></i>
