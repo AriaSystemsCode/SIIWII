@@ -4,6 +4,7 @@ using System.Diagnostics;
 using System.Globalization;
 using System.Linq;
 using System.Linq.Dynamic.Core;
+using System.Text;
 using System.Threading.Tasks;
 using Abp.Application.Services.Dto;
 using Abp.Authorization;
@@ -12,6 +13,7 @@ using Abp.Extensions;
 using Abp.Localization;
 using Abp.MultiTenancy;
 using Abp.UI;
+using DocumentFormat.OpenXml.Wordprocessing;
 using onetouch.Authorization;
 using onetouch.Localization.Dto;
 
@@ -188,7 +190,129 @@ namespace onetouch.Localization
                 languageTexts.ToList()
                 );
         }
+        //export erp text files
 
+        public async Task ExportERPFiles(string? fileName,string language)
+        {
+            GetLanguageTextsInput langInput = new GetLanguageTextsInput();
+            langInput.BaseLanguageName = "en";
+            langInput.TargetLanguageName = "ar-EG";
+            
+            langInput.SourceName = "onetouch";
+            
+            langInput.SkipCount = 0;
+            langInput.TargetValueFilter = "ALL";
+            langInput.Sorting = null;
+            
+            if (string.IsNullOrEmpty(fileName))
+            {
+                langInput.FilterText = "AriaERP";
+                langInput.MaxResultCount = 1000000;
+            }
+            else
+            {
+                langInput.FilterText = fileName;
+                langInput.MaxResultCount = 1000;
+            }
+            var result = await GetLanguageTexts(langInput);
+            if (result != null && result.TotalCount > 0)
+            {
+                string lang = langInput.TargetLanguageName == "ar-EG" ? "ar" : langInput.TargetLanguageName;
+                if (!string.IsNullOrEmpty(fileName))
+                {
+                    string xmlFile = "<?xml version = \"1.0\" encoding=\"Windows-1256\" standalone=\"yes\"?>" + "\r\n";
+                    xmlFile += "<VFPData>" + "\r\n";
+                    foreach (var trans in result.Items)
+                    {
+                        var keySplit = trans.Key.Split("-");
+                        //"AriaERP - Screens--aldtver_scx.xml - _1H80UY10F - Caption - ariabranchformset.AriaForm1";
+                        //<aldtver_scx_ar row_key="_1H80UY10K" cproperty="Caption"
+                        //orgtext="Ok" orgcol="ariabranchformset.AriaForm1.cmdOk" langtext="موافق"/>
+                        var fileNameAct = keySplit[3];
+                        var fileSplit = fileNameAct.Split(".");
+                        xmlFile += "<" + fileSplit[0].TrimEnd() + "_" + lang +
+                                  " row_key=\"" + keySplit[4] + "\" cproperty=\"" +
+                                  keySplit[5] + "\" orgtext=\"" + trans.BaseValue + "\" orgcol=\"" +
+                                  keySplit[6] + "\"  langtext=\"" + trans.TargetValue + "\"/>" + "\r\n";
+                    }
+                    xmlFile += "</VFPData>";
+                    string filePath = System.IO.Path.Combine(
+    AppDomain.CurrentDomain.BaseDirectory,
+    "App_Data",
+    "Translations",
+   fileName);
+                    System.IO.File.WriteAllText(
+                          filePath,
+                          xmlFile,
+                          new UTF8Encoding(false)
+                      );
+                }
+                else
+                {
+                    var res = result.Items.OrderBy(z=>z.Key).ToList();
+                    if (res != null)
+                    {
+                        string xmlFile = "<?xml version = \"1.0\" encoding=\"Windows-1256\" standalone=\"yes\"?>" + "\r\n";
+                        xmlFile += "<VFPData>" + "\r\n";
+                        string fileNameAct = "";
+                        string filePath = "";
+                        string[] fileSplit = new string[1];
+                        foreach (var trans in res)
+                        {
+                            var keySplit = trans.Key.Split("-");
+                            
+                            //"AriaERP - Screens--aldtver_scx.xml - _1H80UY10F - Caption - ariabranchformset.AriaForm1";
+                            //<aldtver_scx_ar row_key="_1H80UY10K" cproperty="Caption"
+                            //orgtext="Ok" orgcol="ariabranchformset.AriaForm1.cmdOk" langtext="موافق"/>
+                            if (!string.IsNullOrEmpty(fileNameAct) && fileNameAct != keySplit[3])
+                            {
+                                fileNameAct = keySplit[3];
+                                fileName = fileNameAct;
+                                xmlFile += "</VFPData>";
+                                 filePath = System.IO.Path.Combine(
+                AppDomain.CurrentDomain.BaseDirectory,
+                "App_Data",
+                "Translations",
+               fileNameAct);
+                                System.IO.File.WriteAllText(
+                                      filePath,
+                                      xmlFile,
+                                      new UTF8Encoding(false)
+                                  );
+                                
+                                
+                                fileSplit = fileNameAct.Split(".");
+                                xmlFile = "<?xml version = \"1.0\" encoding=\"Windows-1256\" standalone=\"yes\"?>" + "\r\n";
+                                xmlFile += "<VFPData>" + "\r\n";
+
+                            }
+                            fileNameAct = keySplit[3];
+                            fileName = fileNameAct;
+                            //fileName = fileNameAct;
+                            xmlFile += "<" + fileSplit[0] + "_" + lang +
+                                      " row_key=\"" + keySplit[4] + "\" cproperty=\"" +
+                                      keySplit[5] + "\" orgtext=\"" + trans.BaseValue + "\" orgcol=\"" +
+                                      keySplit[6] + "\"  langtext=\"" + trans.TargetValue + "\"/>" + "\r\n";
+                        }
+                        xmlFile += "</VFPData>";
+                        filePath = System.IO.Path.Combine(
+        AppDomain.CurrentDomain.BaseDirectory,
+        "App_Data",
+        "Translations",
+       fileName);
+                        System.IO.File.WriteAllText(
+                              filePath,
+                              xmlFile,
+                              new UTF8Encoding(false)
+                          );
+
+                    }
+
+                }
+            }
+        }
+
+        //
         public async Task UpdateLanguageText(UpdateLanguageTextInput input)
         {
             var culture = CultureHelper.GetCultureInfoByChecking(input.LanguageName);

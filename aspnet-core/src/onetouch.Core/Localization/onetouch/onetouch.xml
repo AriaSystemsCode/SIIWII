@@ -3032,7 +3032,11 @@ Please select one of the available linesheet templates
 		<text name="Transaction Number">Transaction Number</text>
 		<text name="Price Range">Price Range</text>
 		<text name="Amount Range">Amount Range</text>
-		<text name="aldtver_scx-_1H80UY10F-Caption">Shipping Labels</text>
-		
+		<text name="AriaERP-Screens--aldtver_scx.xml-_1H80UY10F-Caption-ariabranchformset.AriaForm1">Shipping Labels</text>
+		<text name="AriaERP-Screens--aldtver_scx.xml-_1H80UY10I-Caption-ariabranchformset.AriaForm1.lblPrntLabel">Print Detailed Label :</text>
+		<text name="AriaERP-Screens--aldtver_scx.xml-_1H80UY10K-Caption-ariabranchformset.AriaForm1.cmdOk">Ok</text>
+	<text name="AriaERP-Reports--rmcmem_h.xml-LANG_INVOICENO-Caption-LANG_INVOICENO">Invoice #</text>
+	<text name="AriaERP-Reports--rmcmem_h.xml-LANG_ORDERNO-Caption-LANG_ORDERNO">Order #</text>
+	<text name="AriaERP-Reports--rmcmem_h.xml-LANG_RANO-Caption-LANG_RANO">R/A #</text>
   </texts>  
 </localizationDictionary>
