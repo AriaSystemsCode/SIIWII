@@ -1,21 +1,13 @@
 <div class="entity-header">
-
   <div class="header-left">
-    <app-entity-breadcrumb
-      [items]="breadcrumbItems"   (itemClick)="breadcrumbItemClick.emit($event)">
+    <app-entity-breadcrumb [items]="breadcrumbItems" (itemClick)="breadcrumbItemClick.emit($event)">
     </app-entity-breadcrumb>
   </div>
-
   <div class="header-title">
     {{ title }}
   </div>
-
   <div class="header-actions">
-
-
     <button class="window-btn" (click)="minimize.emit()">—</button>
     <button class="window-btn" (click)="close.emit()">×</button>
-
   </div>
-
 </div>

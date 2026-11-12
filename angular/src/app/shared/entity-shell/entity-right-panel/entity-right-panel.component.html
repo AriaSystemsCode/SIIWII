@@ -1,34 +1,23 @@
-<div class="entity-right-panel"   [class.collapsed]="collapsed">
+<div class="entity-right-panel" [class.collapsed]="collapsed">
 
   <div class="panel-tabs">
 
-    <button
-      class="tab-btn"
-      [class.active]="activeTab === 'audit'"
-      (click)="activeTab = 'audit'">
-      Audit trail
+    <button class="tab-btn" [class.active]="activeTab === 'audit'" (click)="activeTab = 'audit'">
+      {{'Audit trail' | localize}}
     </button>
 
-    <button
-      class="tab-btn"
-      [class.active]="activeTab === 'messages'"
-      (click)="activeTab = 'messages'">
-      Message
+    <button class="tab-btn" [class.active]="activeTab === 'messages'" (click)="activeTab = 'messages'">
+      {{'Message' | localize}}
     </button>
 
-    <button
-      class="tab-btn"
-      [class.active]="activeTab === 'related'"
-      (click)="activeTab = 'related'">
-      Related
+    <button class="tab-btn" [class.active]="activeTab === 'related'" (click)="activeTab = 'related'">
+      {{'Related' | localize}}
     </button>
 
   </div>
 
   <div class="tab-indicator">
-    <div
-      class="active-line"
-      [ngClass]="{
+    <div class="active-line" [ngClass]="{
         'audit': activeTab === 'audit',
         'messages': activeTab === 'messages',
         'related': activeTab === 'related'
@@ -40,16 +29,9 @@
 
     <app-audit-trail *ngIf="activeTab === 'audit'"></app-audit-trail>
 
-    <!-- <app-entity-messages *ngIf="activeTab === 'messages'"></app-entity-messages> -->
-     <app-entity-messages
-  *ngIf="activeTab === 'messages'"
-
-  [entityId]="entityId"
-
-  [creatorUserId]="creatorUserId"
-
-  [parentId]="parentId">
-</app-entity-messages>
+    <app-entity-messages *ngIf="activeTab === 'messages'" [entityId]="entityId" [creatorUserId]="creatorUserId"
+      [parentId]="parentId">
+    </app-entity-messages>
 
     <app-related-entities *ngIf="activeTab === 'related'" [entityData]="entityData"></app-related-entities>
 

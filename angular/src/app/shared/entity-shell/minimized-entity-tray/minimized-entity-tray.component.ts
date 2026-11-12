@@ -7,7 +7,6 @@ import {
   MinimizedEntityItem
 } from '../services/entity-window-manager.service';
 
-
 @Component({
   selector: 'app-minimized-entity-tray',
   templateUrl: './minimized-entity-tray.component.html',
@@ -15,40 +14,23 @@ import {
 })
 export class MinimizedEntityTrayComponent {
 
-  items$ =
-    this.entityWindowManager.items$;
-
+  items$ = this.entityWindowManager.items$;
 
   constructor(
-    private entityWindowManager:
-      EntityWindowManagerService
-  ) {}
+    private entityWindowManager: EntityWindowManagerService
+  ) { }
 
 
-  maximize(
-    item: MinimizedEntityItem
-  ): void {
-
-    this.entityWindowManager
-      .maximize(item);
+  maximize(item: MinimizedEntityItem): void {
+    this.entityWindowManager.maximize(item);
   }
 
-
-  close(
-    event: MouseEvent,
-    item: MinimizedEntityItem
-  ): void {
-
+  close(event: MouseEvent, item: MinimizedEntityItem): void {
     event.stopPropagation();
-
-    this.entityWindowManager
-      .remove(item.key);
+    this.entityWindowManager.remove(item.key);
   }
-
 
   closeAll(): void {
-
-    this.entityWindowManager
-      .closeAll();
+    this.entityWindowManager.closeAll();
   }
 }

@@ -13,24 +13,11 @@ import {
 })
 export class EntityBreadcrumbComponent {
 
-  @Input()
-  items: any[] = [];
+  @Input() items: any[] = [];
 
+  @Output() itemClick = new EventEmitter<any>();
 
-  @Output()
-  itemClick =
-    new EventEmitter<any>();
-
-
-  onItemClick(
-    item: any
-  ): void {
-
-    console.log(
-      'BREADCRUMB SELECT:',
-      item
-    );
-
+  onItemClick(item: any): void {
     this.itemClick.emit(item);
   }
 }

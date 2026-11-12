@@ -1,29 +1,14 @@
 <div class="left-panel " [class.collapsed]="collapsed" [ngClass]="!collapsed ? 'p-4':''">
-
   <button class="toggle-btn" type="button" (click)="onToggle()">
-    <i
-      class="fa"
-      [ngClass]="collapsed ? 'fa-chevron-right' : 'fa-chevron-left'">
+    <i class="fa" [ngClass]="collapsed ? 'fa-chevron-right' : 'fa-chevron-left'">
     </i>
   </button>
-
   <ng-container *ngIf="!collapsed">
-
     <div class="search-box">
       <i class="fa fa-search"></i>
-      <input
-        type="text"
-        placeholder="Search"
-        [(ngModel)]="searchText" />
+      <input type="text" placeholder="Search" [(ngModel)]="searchText" />
     </div>
-
-    <p-tree
-      [value]="treeNodes"
-      [filter]="false"
-      selectionMode="single"
-      (onNodeSelect)="onNodeSelect($event)">
+    <p-tree [value]="treeNodes" [filter]="false" selectionMode="single" (onNodeSelect)="onNodeSelect($event)">
     </p-tree>
-
   </ng-container>
-
 </div>

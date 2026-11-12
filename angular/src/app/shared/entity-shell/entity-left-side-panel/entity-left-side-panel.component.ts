@@ -21,7 +21,7 @@ export class EntityLeftSidePanelComponent implements OnChanges {
     items: GenericEntityNode[];
   }> = [];
 
-  @Output() itemSelect =  new EventEmitter<GenericEntityNode>();
+  @Output() itemSelect = new EventEmitter<GenericEntityNode>();
 
   treeNodes: TreeNode[] = [];
   searchText = '';
@@ -41,11 +41,11 @@ export class EntityLeftSidePanelComponent implements OnChanges {
   ): TreeNode {
     return {
       label: item.label,
-      key:  `${item.entityType}-${item.id}`,
+      key: `${item.entityType}-${item.id}`,
       data: item,
       icon: item.icon,
-      expanded:  item.expanded ?? false,
-      children:  (item.children ?? []).map(child => this.mapToTreeNode(child))
+      expanded: item.expanded ?? false,
+      children: (item.children ?? []).map(child => this.mapToTreeNode(child))
     };
   }
 
