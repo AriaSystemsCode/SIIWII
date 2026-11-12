@@ -1,64 +1,105 @@
 
-<div class="landing-imgs-slider" *ngIf="images.length > 0">
+<!-- ================= IMAGE SLIDER ================= -->
 
-  <div class="slider-track"
-       [class.first-large]="firstImageLarger">
+<div
+  class="landing-imgs-slider"
+  *ngIf="images.length > 0">
+
+  <!-- ================= SLIDER TRACK ================= -->
+
+  <div
+    class="slider-track"
+    [class.first-large]="firstImageLarger">
 
     <div
       class="slider-image"
-      *ngFor="let image of visibleImages;
-              let i = index;
-              trackBy: trackByImage"
+      *ngFor="
+        let image of visibleImages;
+        let i = index;
+        trackBy: trackByImage
+      "
       [class.large-image]="firstImageLarger && i === 0"
       [class.small-image]="firstImageLarger && i !== 0"
-      [class.clickable]="image.externalUrl || image.link || image.linkPageUrl"
+      [class.clickable]="
+        image.attachmentUrl ||
+        image.externalUrl ||
+        image.link ||
+        image.linkPageUrl
+      "
       (click)="openImage(image)">
 
+      <!-- Image thumbnail / PDF preview / Excel preview -->
       <img
         [src]="getImageUrl(image)"
         [alt]="image.name || image.title || 'Slider image'"
-        loading="lazy" />
+        loading="lazy"
+        (error)="onImageError($event)" />
 
     </div>
 
   </div>
 
-  <div class="slider-controls" *ngIf="images.length > 1">
+  <!-- ================= SLIDER CONTROLS ================= -->
 
-    <button type="button"
-            class="slider-arrow"
-            (click)="previous()">
+  <div
+    class="slider-controls"
+    *ngIf="images.length > 1">
+
+    <!-- Previous -->
+    <button
+      type="button"
+      class="slider-arrow"
+      [attr.aria-label]="'Previous'"
+      (click)="previous()">
+
       <i class="pi pi-chevron-left"></i>
+
     </button>
 
+    <!-- Dots -->
     <div class="slider-dots">
+
       <button
         type="button"
         class="slider-dot"
         *ngFor="let image of images; let i = index"
         [class.active]="currentIndex === i"
+        [attr.aria-label]="'Go to image ' + (i + 1)"
+        [attr.aria-current]="currentIndex === i ? 'true' : null"
         (click)="goTo(i)">
       </button>
+
     </div>
 
-    <button type="button"
-            class="slider-arrow"
-            (click)="next()">
+    <!-- Next -->
+    <button
+      type="button"
+      class="slider-arrow"
+      [attr.aria-label]="'Next'"
+      (click)="next()">
+
       <i class="pi pi-chevron-right"></i>
+
     </button>
 
   </div>
 
 </div>
 
-  <div
-    *ngIf="loading"
-    class="section-loading d-flex justify-content-center align-items-center">
+<!-- ================= LOADING ================= -->
 
-    <div class="spinner-border purple-spinner" role="status">
-      <span class="sr-only">
-        {{ 'Loading' | localize }}
-      </span>
-    </div>
+<div
+  *ngIf="loading"
+  class="section-loading d-flex justify-content-center align-items-center">
+
+  <div
+    class="spinner-border purple-spinner"
+    role="status">
+
+    <span class="sr-only">
+      {{ 'Loading' | localize }}
+    </span>
 
   </div>
+
+</div>
