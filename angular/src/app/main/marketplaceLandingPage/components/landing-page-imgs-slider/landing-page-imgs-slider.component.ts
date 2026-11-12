@@ -1,4 +1,3 @@
-
 import {
   Component,
   Input,
@@ -8,11 +7,15 @@ import {
   HostListener
 } from '@angular/core';
 
-import { SydObjectsServiceProxy } from
-  '@shared/service-proxies/service-proxies';
+import {
+  SydObjectsServiceProxy
+} from '@shared/service-proxies/service-proxies';
 
-import { AppConsts } from '@shared/AppConsts';
 import { finalize } from 'rxjs';
+
+import {
+  LandingPageBlocksService
+} from '../../services/landing-page-blocks.service';
 
 @Component({
   selector: 'app-landing-page-imgs-slider',
@@ -30,15 +33,16 @@ export class LandingPageImgsSliderComponent
 
   loading = false;
   currentIndex = 0;
-
   isMobile = false;
 
-  attachmentBaseUrl = AppConsts.attachmentBaseUrl;
-  
-
   constructor(
-    private syd: SydObjectsServiceProxy
+    private syd: SydObjectsServiceProxy,
+    private blocksService: LandingPageBlocksService
   ) {}
+
+  // ========================================
+  // INITIALIZATION
+  // ========================================
 
   ngOnInit(): void {
     this.updateScreenSize();
@@ -55,6 +59,10 @@ export class LandingPageImgsSliderComponent
     }
   }
 
+  // ========================================
+  // RESPONSIVE
+  // ========================================
+
   @HostListener('window:resize')
   onResize(): void {
     this.updateScreenSize();
@@ -64,6 +72,10 @@ export class LandingPageImgsSliderComponent
   updateScreenSize(): void {
     this.isMobile = window.innerWidth <= 767;
   }
+
+  // ========================================
+  // LOAD SECTION BLOCKS
+  // ========================================
 
   loadImages(): void {
     if (!this.sectionId) return;
@@ -75,11 +87,14 @@ export class LandingPageImgsSliderComponent
       Intl.DateTimeFormat().resolvedOptions().timeZone
     )
     .pipe(
-      finalize(() => this.loading = false)
+      finalize(() => {
+        this.loading = false;
+      })
     )
     .subscribe({
       next: (res: any) => {
-        const blocks = Array.isArray(res)
+
+        const blocks: any[] = Array.isArray(res)
           ? res
           : Array.isArray(res?.result)
             ? res.result
@@ -88,7 +103,34 @@ export class LandingPageImgsSliderComponent
               : [];
 
         this.images = blocks
-          .filter((x: any) => !!x.image)
+          .map((block: any) => {
+
+            // Find image thumbnail from block.image
+            // or entityAttachments.
+            const previewImage =
+              this.blocksService.getAttachmentImage(block);
+
+            // Find PDF / Excel attachment.
+            // Also checks block.image if it is a file.
+            const attachmentUrl =
+              this.blocksService.getAttachmentFileUrl(block);
+
+            // If a PDF has no image thumbnail,
+            // display its PDF placeholder.
+            const fallbackImage = attachmentUrl
+              ? this.blocksService.getAttachmentFileIcon(block)
+              : null;
+
+            return {
+              ...block,
+
+              previewImage:
+                previewImage || fallbackImage,
+
+              attachmentUrl
+            };
+          })
+          .filter((block: any) => !!block.previewImage)
           .sort(
             (a: any, b: any) =>
               (a.order ?? 0) - (b.order ?? 0)
@@ -96,41 +138,55 @@ export class LandingPageImgsSliderComponent
 
         this.currentIndex = 0;
         this.updateVisibleImages();
+
       },
+
       error: (err) => {
-        console.error('Failed to load images:', err);
+        console.error(
+          'Failed to load slider images:',
+          err
+        );
+
         this.images = [];
         this.visibleImages = [];
       }
     });
   }
 
- 
-updateVisibleImages(): void {
-  if (!this.images.length) {
-    this.visibleImages = [];
-    return;
+
+
+  updateVisibleImages(): void {
+    if (!this.images.length) {
+      this.visibleImages = [];
+      return;
+    }
+
+    const width = window.innerWidth;
+
+    let count = 4;
+
+    // Mobile
+    if (width <= 575) {
+      count = 2;
+    }
+    // Tablet
+    else if (width <= 991) {
+      count = 3;
+    }
+
+    const visibleCount = Math.min(
+      count,
+      this.images.length
+    );
+
+    this.visibleImages = Array.from(
+      { length: visibleCount },
+      (_, i) =>
+        this.images[
+          (this.currentIndex + i) % this.images.length
+        ]
+    );
   }
-
-  const width = window.innerWidth;
-
-  let count = 4;
-
-  if (width <= 575) {
-    count = 2;
-  } else if (width <= 991) {
-    count = 3;
-  }
-
-  this.visibleImages = Array.from(
-    { length: Math.min(count, this.images.length) },
-    (_, i) =>
-      this.images[
-        (this.currentIndex + i) % this.images.length
-      ]
-  );
-}
-
 
   next(): void {
     if (this.images.length <= 1) return;
@@ -152,52 +208,74 @@ updateVisibleImages(): void {
   }
 
   goTo(index: number): void {
+    if (
+      index < 0 ||
+      index >= this.images.length
+    ) {
+      return;
+    }
+
     this.currentIndex = index;
     this.updateVisibleImages();
   }
 
-  getImageUrl(item: any): string {
-    const path = item?.image || '';
 
-    if (/^https?:\/\//i.test(path)) {
-      return path;
+
+  getImageUrl(item: any): string {
+    return item?.previewImage ||
+      'assets/placeholders/_logo-placeholder.png';
+  }
+
+  openImage(item: any): void {
+    if (!item) return;
+
+    if (item.attachmentUrl) {
+      window.open(
+        item.attachmentUrl,
+        '_blank',
+        'noopener,noreferrer'
+      );
+      return;
     }
 
-    return `${this.attachmentBaseUrl.replace(/\/$/, '')}/${path.replace(/^\/+/, '')}`;
+    // 2. Open configured link in new tab.
+    const link =
+      item.externalUrl ||
+      item.link ||
+      item.linkPageUrl;
+
+    if (!link) return;
+
+    let finalUrl: string;
+
+    if (/^https?:\/\//i.test(link)) {
+      finalUrl = link;
+    } else if (
+      link.startsWith('attachments/')
+    ) {
+      finalUrl = this.blocksService.fullUrl(link);
+    } else {
+      finalUrl = new URL(
+        link,
+        window.location.origin + '/'
+      ).href;
+    }
+
+    window.open(
+      finalUrl,
+      '_blank',
+      'noopener,noreferrer'
+    );
   }
 
- 
-openImage(item: any): void {
-  const url =
-    item?.externalUrl ||
-    item?.link ||
-    item?.linkPageUrl;
+  onImageError(event: Event): void {
+    const img = event.target as HTMLImageElement;
 
-  if (!url) return;
-
-  let finalUrl: string;
-
-  if (/^https?:\/\//i.test(url)) {
-    // External URL
-    finalUrl = url;
-  } else if (url.startsWith('/')) {
-    // Internal page URL
-    finalUrl = `${window.location.origin}${url}`;
-  } else if (url.startsWith('attachments/')) {
-    // Attachment or PDF
-    finalUrl =
-      `${this.attachmentBaseUrl.replace(/\/$/, '')}/${url}`;
-  } else {
-    // Relative internal page URL
-    finalUrl = new URL(url, window.location.origin + '/').href;
+    img.onerror = null;
+    img.src =
+      'assets/placeholders/_logo-placeholder.png';
   }
-
-  // Always open in a new tab
-  window.open(finalUrl, '_blank', 'noopener,noreferrer');
-}
-
-
   trackByImage(index: number, item: any): number {
-    return item.id ?? index;
+    return item?.id ?? index;
   }
 }

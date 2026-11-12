@@ -1,6 +1,7 @@
 import { Component, EventEmitter, Input, Output } from '@angular/core';
 import { PageSettingDto } from '@shared/service-proxies/service-proxies';
 import { LandingPageBlocksService } from '../../services/landing-page-blocks.service';
+import { AppConsts } from '@shared/AppConsts';
 
 @Component({
   selector: 'app-landing-page-block-card',
@@ -19,6 +20,8 @@ export class LandingPageBlockCardComponent {
 
   readonly placeholder = 'assets/placeholders/_logo-placeholder.png';
   readonly pdfIcon = 'assets/Items/pdf-Icon.png';
+
+  attachmentBaseUrl = AppConsts.attachmentBaseUrl;
 
   constructor(private blocksService: LandingPageBlocksService) {}
 
@@ -47,47 +50,95 @@ export class LandingPageBlockCardComponent {
   }
 
   // ---------- image ----------
-  private url(path?: string): string {
-    return path ? this.blocksService.fullUrl(path) : this.placeholder;
+
+private url(path?: string): string {
+  if (!path) return this.placeholder;
+
+  if (
+    /^(https?:)?\/\//i.test(path) ||
+    path.startsWith('assets/') ||
+    path.startsWith('data:')
+  ) {
+    return path;
   }
 
-  get blockImage(): string {
-    const b = this.item;
-    if (!b) return this.placeholder;
+  return this.blocksService.fullUrl(path);
+}
 
-    // ATTACHMENT: image preview (block.image or first image in entityAttachments),
-    // PDF icon if only a PDF exists
-    // if (this.blockType === 'ATTACHMENT') {
-    //   const img = this.blocksService.getAttachmentImage(b);
-    //   if (img) return img;
-    //   return this.blocksService.hasPdfAttachment(b) ? this.pdfIcon : this.placeholder;
-    // }
 
-    // // Other types: block.image unless it is a PDF
-    // if (b.image && !this.blocksService.isPdf(b.image)) return this.url(b.image);
-        if (this.blockType === 'ATTACHMENT') {
-      const img = this.blocksService.getAttachmentImage(b);
-      if (img) return img;
+
+get blockImage(): string {
+  const b = this.item;
+  if (!b) return this.placeholder;
+
+  const validImage = (path?: string | null): string | null => {
+    return path && !this.blocksService.isDocFile(path)
+      ? this.url(path)
+      : null;
+  };
+
+  switch (this.blockType) {
+
+    case 'PRODUCT':
+      return validImage(
+        b.getAppMarketItemForViewDto?.appItem?.imageUrl
+      ) || validImage(b.image) || this.placeholder;
+
+    case 'EVENT': {
+      const event = b.getAppEventForViewDto?.appEvent;
+
+      return validImage(event?.logoURL)
+        || validImage(event?.banarURL)
+        || validImage(b.image)
+        || this.placeholder;
+    }
+
+    case 'CONTACT': {
+      const account = b.getAccountForViewDto?.account;
+
+      return validImage(account?.logoUrl)
+        || validImage(account?.coverUrl)
+        || validImage(account?.imagesUrls?.[0])
+        || this.placeholder;
+    }
+
+    case 'BRAND':
+    case 'CATEGORY':
+      return validImage(b.image)
+        || this.getEntityAttachmentImage(b)
+        || this.placeholder;
+
+    case 'ATTACHMENT': {
+      const image = this.blocksService.getAttachmentImage(b);
+
+      if (image) return this.url(image);
+
       return this.blocksService.hasAttachmentFile(b)
         ? this.blocksService.getAttachmentFileIcon(b)
         : this.placeholder;
     }
 
-    // Other types: block.image unless it is a PDF/Excel file
-    if (b.image && !this.blocksService.isDocFile(b.image)) return this.url(b.image);
-
-    // image inside entityAttachments
-    const imgAtt = b.entityAttachments?.find(a =>
-      this.blocksService.isImg(a?.url || a?.fileName)
-    );
-    if (imgAtt) return this.url(imgAtt.url || imgAtt.fileName);
-
-    // brand: entity attachments
-    const entityAtt = b.getAppEntityForViewDto?.appEntity?.entityAttachments;
-    if (entityAtt?.length) return this.url(entityAtt[0].url || entityAtt[0].fileName);
-
-    return this.placeholder;
+    default:
+      return validImage(b.image)
+        || this.getEntityAttachmentImage(b)
+        || this.placeholder;
   }
+}
+
+private getEntityAttachmentImage(b: PageSettingDto): string | null {
+  const attachments = [
+    ...(b.entityAttachments || []),
+    ...(b.getAppEntityForViewDto?.appEntity?.entityAttachments || [])
+  ];
+
+  const image = attachments.find(a =>
+    this.blocksService.isImg(a?.url || a?.fileName)
+  );
+
+  return image
+    ? this.url(image.url || image.fileName)
+    : null;
+}
 
   get blockIcon(): string {
     return this.blocksService.getBlockTypeIcon(this.item);
