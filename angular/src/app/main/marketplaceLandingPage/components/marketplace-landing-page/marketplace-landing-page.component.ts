@@ -339,7 +339,7 @@ export class MarketplaceLandingPageComponent
 
   }
   get fourBlocksNumVisible(): number {
-    return 3;
+    return 4;
   }
 
 

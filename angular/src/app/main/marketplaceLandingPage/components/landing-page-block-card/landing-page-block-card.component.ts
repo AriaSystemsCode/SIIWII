@@ -23,7 +23,16 @@ export class LandingPageBlockCardComponent {
 
   attachmentBaseUrl = AppConsts.attachmentBaseUrl;
 
+    isSmallScreen = false;
+
   constructor(private blocksService: LandingPageBlocksService) {}
+
+    ngOnInit(){
+
+      this.checkScreenSize();
+  window.addEventListener('resize', this.checkScreenSize.bind(this));
+
+    }
 
   get blockType(): string {
     return (this.item?.blockType || '').toUpperCase();
@@ -178,9 +187,8 @@ private getEntityAttachmentImage(b: PageSettingDto): string | null {
         break;
       }
 
-      case 'CONTACT':
-        if (b.getAccountForViewDto) this.contactDetails.emit(b.getAccountForViewDto);
-        break;
+      case 'CONTACT':  this.blocksService.viewContact(b);
+  break;
 
       case 'ATTACHMENT':
         this.blocksService.onAttachmentClick(b);
@@ -195,4 +203,8 @@ private getEntityAttachmentImage(b: PageSettingDto): string | null {
         break;
     }
   }
+
+      checkScreenSize(): void {
+  this.isSmallScreen = window.innerWidth <= 1023;
+}
 }
