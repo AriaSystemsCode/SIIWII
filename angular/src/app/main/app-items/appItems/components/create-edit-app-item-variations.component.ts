@@ -3,6 +3,7 @@ import {
     EventEmitter,
     Injector,
     Input,
+    OnDestroy,
     OnChanges,
     Output,
     SimpleChanges,
@@ -49,6 +50,16 @@ import { table } from "console";
 import { CreateOrEditAppEntityDynamicModalComponent } from "@app/app-entity-dynamic-modal/create-or-edit-app-entity-dynamic-modal/create-or-edit-app-entity-dynamic-modal.component";
 import Swal from "sweetalert2";
 import { AppConsts } from "@shared/AppConsts";
+import { FileItem } from "ng2-file-upload";
+
+interface VariationAttachmentUploadJob {
+    attachment: AppEntityAttachmentDto;
+    fileItem?: FileItem;
+    fileSize: number;
+    progress: number;
+    status: "pending" | "complete" | "failed" | "cancelled";
+    tempFileName: string;
+}
 
 @Component({
     selector: "app-create-edit-app-item-variations",
@@ -58,7 +69,7 @@ import { AppConsts } from "@shared/AppConsts";
 })
 export class CreateEditAppItemVariationsComponent
     extends AppComponentBase
-    implements OnChanges
+    implements OnChanges, OnDestroy
 {
     @Input("isListing") isListing: boolean = false;
     @Input("listingMode") listingMode: ListingModeEnum;
@@ -233,6 +244,35 @@ export class CreateEditAppItemVariationsComponent
     deselectedValues=[];
     currentLang: string
     isArabic: boolean
+    private attachmentUploadJobs = new Map<string, VariationAttachmentUploadJob>();
+    private attachmentUploadJobsByFile = new Map<FileItem, VariationAttachmentUploadJob>();
+    private uploadedTempFileNames = new Set<string>();
+    private changesApplied = false;
+
+    get hasPendingAttachmentUploads(): boolean {
+        return Array.from(this.attachmentUploadJobs.values()).some(
+            (job) => job.status === "pending"
+        );
+    }
+
+    get hasFailedAttachmentUploads(): boolean {
+        return Array.from(this.attachmentUploadJobs.values()).some(
+            (job) => job.status === "failed"
+        );
+    }
+
+    get attachmentUploadProgress(): number {
+        const jobs = Array.from(this.attachmentUploadJobs.values());
+        const totalSize = jobs.reduce((total, job) => total + job.fileSize, 0);
+        if (!totalSize) return 0;
+
+        const uploadedSize = jobs.reduce((total, job) => {
+            const progress = job.status === "complete" ? 100 : job.progress;
+            return total + (job.fileSize * progress) / 100;
+        }, 0);
+
+        return Math.min(100, Math.round((uploadedSize / totalSize) * 100));
+    }
     constructor(
         injector: Injector,
         private _extraAttributeDataService: ExtraAttributeDataService,
@@ -248,6 +288,7 @@ export class CreateEditAppItemVariationsComponent
         this.currentLang = abp.utils.getCookieValue('Abp.Localization.CultureName')
         this.currentLang == 'ar' || this.currentLang == 'ar-EG'  ? this.isArabic = true : this.isArabic = false
         this.initUploaders();
+        this.configureAttachmentUploader();
         this.initPricingNeededData();
         this.getSiwiiMarketPlaceColor();
         this._appEntitiesServiceProxy
@@ -259,6 +300,146 @@ export class CreateEditAppItemVariationsComponent
           this.selectedAttrID = this.appItem?.sycIdentifierId?.toString()
           this.selectedAttrID?null:this.editVariationsOpend=true;
           this.getAspectatio();
+    }
+
+    ngOnDestroy(): void {
+        if (!this.changesApplied) this.cancelPendingAttachmentUploads();
+    }
+
+    private configureAttachmentUploader(): void {
+        // This component handles upload success/error feedback itself.
+        this.uploader.onCompleteAll = () => undefined;
+        this.uploader.onBuildItemForm = (fileItem, form) => {
+            const job = this.attachmentUploadJobsByFile.get(fileItem);
+            if (job) form.append("guid", job.attachment.guid);
+        };
+
+        this.uploader.onProgressItem = (fileItem, progress) => {
+            const job = this.attachmentUploadJobsByFile.get(fileItem);
+            if (job && job.status === "pending") job.progress = progress;
+        };
+
+        this.uploader.onSuccessItem = (fileItem, response, status) => {
+            const job = this.attachmentUploadJobsByFile.get(fileItem);
+            if (!job || job.status !== "pending") return;
+
+            let uploadResponse: any;
+            try {
+                uploadResponse = JSON.parse(response);
+            } catch {
+                this.markAttachmentUploadFailed(job);
+                return;
+            }
+
+            if (
+                status >= 200 &&
+                status < 300 &&
+                (uploadResponse?.success === true || uploadResponse?.Success === true)
+            ) {
+                job.status = "complete";
+                job.progress = 100;
+                this.uploadedTempFileNames.add(job.tempFileName);
+            } else {
+                this.markAttachmentUploadFailed(job);
+            }
+        };
+
+        this.uploader.onErrorItem = (fileItem) => {
+            const job = this.attachmentUploadJobsByFile.get(fileItem);
+            if (job && job.status === "pending") this.markAttachmentUploadFailed(job);
+        };
+
+        this.uploader.onCancelItem = (fileItem) => {
+            const job = this.attachmentUploadJobsByFile.get(fileItem);
+            if (job && job.status === "pending") job.status = "cancelled";
+        };
+    }
+
+    private markAttachmentUploadFailed(job: VariationAttachmentUploadJob): void {
+        job.status = "failed";
+        this.notify.error("Attachment upload failed. Remove it and try again.");
+    }
+
+    private createAttachmentUploadJob(
+        file: Blob,
+        attachment: AppEntityAttachmentDto
+    ): VariationAttachmentUploadJob {
+        const extension = attachment.fileName?.split(".").pop();
+        const tempFileName = extension
+            ? `${attachment.guid}.${extension}`
+            : attachment.guid;
+        const job: VariationAttachmentUploadJob = {
+            attachment,
+            fileSize: file.size,
+            progress: 0,
+            status: "pending",
+            tempFileName,
+        };
+        this.attachmentUploadJobs.set(attachment.guid, job);
+        return job;
+    }
+
+    private uploadVariationAttachment(file: Blob, attachment: AppEntityAttachmentDto): void {
+        const job = this.attachmentUploadJobs.get(attachment.guid)
+            ?? this.createAttachmentUploadJob(file, attachment);
+        if (job.status !== "pending") return;
+
+        const fileToUpload = new File([file], attachment.fileName);
+        const queueLengthBeforeAdd = this.uploader.queue.length;
+        this.uploader.addToQueue([fileToUpload]);
+        const fileItem = this.uploader.queue.length > queueLengthBeforeAdd
+            ? this.uploader.queue[this.uploader.queue.length - 1]
+            : undefined;
+        if (!fileItem) {
+            this.markAttachmentUploadFailed(job);
+            return;
+        }
+
+        job.fileItem = fileItem;
+        this.attachmentUploadJobsByFile.set(fileItem, job);
+        this.uploader.uploadItem(fileItem);
+    }
+
+    private cancelPendingAttachmentUploads(): void {
+        for (const job of this.attachmentUploadJobs.values()) {
+            if (job.status === "pending") {
+                this.uploadedTempFileNames.add(job.tempFileName);
+                if (job.fileItem) this.uploader.removeFromQueue(job.fileItem);
+                job.status = "cancelled";
+            } else if (job.status === "complete" || job.status === "failed") {
+                this.uploadedTempFileNames.add(job.tempFileName);
+            }
+        }
+        this.cleanupTemporaryAttachmentUploads();
+        this.attachmentUploadJobs.clear();
+        this.attachmentUploadJobsByFile.clear();
+    }
+
+    private cleanupTemporaryAttachmentUploads(): void {
+        if (!this.uploadedTempFileNames.size) return;
+        this.addTempAttachments(Array.from(this.uploadedTempFileNames));
+        this.uploadedTempFileNames.clear();
+        this.removeAllUnusedTempAttachments();
+    }
+
+    private clearAttachmentUploadJob(attachment: AppEntityAttachmentDto): void {
+        const job = this.attachmentUploadJobs.get(attachment?.guid);
+        if (!job) return;
+
+        if (job.status === "pending") {
+            this.uploadedTempFileNames.add(job.tempFileName);
+            if (job.fileItem) this.uploader.removeFromQueue(job.fileItem);
+            job.status = "cancelled";
+            this.cleanupTemporaryAttachmentUploads();
+        } else if (job.status === "complete") {
+            this.uploadedTempFileNames.add(job.tempFileName);
+            this.cleanupTemporaryAttachmentUploads();
+        } else if (job.status === "failed") {
+            this.uploadedTempFileNames.add(job.tempFileName);
+            this.cleanupTemporaryAttachmentUploads();
+        }
+        this.attachmentUploadJobs.delete(attachment.guid);
+        if (job.fileItem) this.attachmentUploadJobsByFile.delete(job.fileItem);
     }
 
     async getSiwiiMarketPlaceColor() {
@@ -917,7 +1098,12 @@ this.showMainSpinner();
 
             if(index<0)
                  index =this.activeAttachmentOption.entityAttachments.findIndex(  (y) => `${this.attachmentBaseUrl}/${y?.url}` === this.activeAttachmentOption.attachmentSrcs[i]);
-                
+
+            if (index >= 0) {
+                this.clearAttachmentUploadJob(
+                    this.activeAttachmentOption.entityAttachments[index]
+                );
+            }
 
             this.activeAttachmentOption.attachmentSrcs.splice(i, 1);
                 if(index>=0)
@@ -972,6 +1158,8 @@ this.showMainSpinner();
     onDrop(event: DragEvent, index: number) {
         event.preventDefault();
         event.stopPropagation();
+
+        if (this.hasPendingAttachmentUploads) return;
       
         if (event.dataTransfer?.files.length) {
           const file = event.dataTransfer.files[0];
@@ -1004,6 +1192,11 @@ this.showMainSpinner();
     }
 
     fileChange(event) {
+        if (this.hasPendingAttachmentUploads) {
+            if (event.target) event.target.value = null;
+            return;
+        }
+
         if (event.target.value) {
                 let file = event.target?.files[0];
                     const fileType = file.type.toLowerCase();
@@ -1116,20 +1309,21 @@ let index = this.activeAttachmentOption.attachmentSrcs?.length ? this.activeAtta
             this.activeAttachmentOption.attachmentSrcs.push("");
         this.updateVaritaionAttachments();
 
-        this.uploadBlobAttachment(croppedImageContent.croppedImage, att);
+        this.uploadVariationAttachment(croppedImageContent.croppedImage, att);
 
     }
 
     else if (isPDF || isVideo) {
+        const uploadJob = this.createAttachmentUploadJob(file, att);
         const reader = new FileReader();
         reader.onload = () => {
+            if (uploadJob.status !== "pending") return;
             att.url = reader.result as string;
             if (!this.activeAttachmentOption.attachmentSrcs) {
                 this.activeAttachmentOption.attachmentSrcs = [];
             }
             this.activeAttachmentOption.attachmentSrcs.push(reader.result  as string);
             let index = this.activeAttachmentOption.attachmentSrcs?.length ? this.activeAttachmentOption.attachmentSrcs?.length-1 : 0;
-            this.uploadBlobAttachment(file, att);
 
            this.activeAttachmentOption.entityAttachments[index] = att;
            att.index = index;
@@ -1142,8 +1336,12 @@ let index = this.activeAttachmentOption.attachmentSrcs?.length ? this.activeAtta
             this.activeAttachmentOption.attachmentSrcs.push("");
         this.updateVaritaionAttachments();
 
-        this.uploadBlobAttachment(file, att);
+        this.uploadVariationAttachment(file, att);
     }
+        reader.onerror = () => {
+            this.attachmentUploadJobs.delete(uploadJob.attachment.guid);
+            this.notify.error("Could not read the attachment. Please try again.");
+        };
     reader.readAsDataURL(file);
     }
 }
@@ -1349,6 +1547,13 @@ let index = this.activeAttachmentOption.attachmentSrcs?.length ? this.activeAtta
     }
 
     saveVariations() {
+        if (this.hasPendingAttachmentUploads) {
+            return this.notify.info("Wait for attachment uploads to finish before applying changes.");
+        }
+        if (this.hasFailedAttachmentUploads) {
+            return this.notify.error("Remove failed attachments and upload them again before applying changes.");
+        }
+
         if(this.selectedVaritaions && this.selectedVaritaions?.length>0){
         let sectedRecordsPositions: number[] = this.selectedVaritaions.reduce(
             (accum, variation) => {
@@ -1431,6 +1636,7 @@ let index = this.activeAttachmentOption.attachmentSrcs?.length ? this.activeAtta
                 this.appSizeRatios?.appSizeScalesDetails?.forEach((item, index) => {
                     item.d1Position = index.toString(); 
                    }); 
+                this.changesApplied = true;
                 this.applyVariations.emit(body);
     }
 
@@ -1767,6 +1973,7 @@ let index = this.activeAttachmentOption.attachmentSrcs?.length ? this.activeAtta
         return imgUrlSrc;
     }
     cancelVariations() {
+        this.cancelPendingAttachmentUploads();
         this.cancel.emit(true);
     }
     // currentEntityObjectTypeCode: string

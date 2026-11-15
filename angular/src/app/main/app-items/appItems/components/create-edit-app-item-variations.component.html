@@ -20,10 +20,17 @@
                   </div>
                   <div class="kt-subheader__toolbar">
                     <div class="kt-subheader__wrapper">
+                        <div class="attachment-upload-status" *ngIf="hasPendingAttachmentUploads" role="status" aria-live="polite">
+                            <span>Uploading attachment(s): {{ attachmentUploadProgress }}%</span>
+                            <progress max="100" [value]="attachmentUploadProgress" aria-label="Attachment upload progress"></progress>
+                        </div>
+                        <div class="attachment-upload-error" *ngIf="hasFailedAttachmentUploads" role="alert">
+                            An attachment upload failed. Remove the failed attachment and upload it again.
+                        </div>
                         <button type="button" (click)="cancelVariations()" class="btn btn-light cancel text-capitalize mr-4 action-btn-cancel" type="button">
                             {{ "Cancel" | localize }}
                         </button>
-                        <button class="btn btn-primary text-capitalize action-btn-save" type="button" [disabled]="editVariationsOpend"  (click)="saveVariations()">
+                        <button class="btn btn-primary text-capitalize action-btn-save" type="button" [disabled]="editVariationsOpend || hasPendingAttachmentUploads || hasFailedAttachmentUploads"  (click)="saveVariations()">
                             {{  !appItem?.id   ?  ("ApplyVariations" | localize ): ("ApplyChanges" | localize) }}
                         </button>
                     </div>
@@ -680,11 +687,11 @@
 </p-dropdown>
                                         </div>
                                         <div class="row pt-3 pb-3 pl-3">
-                                            <div class="image-wrapper mb-5"   [ngClass]="{'upload':!attachment}" *ngFor="let attachment of activeAttachmentOption?.attachmentSrcs; index as i" (dragover)="onDragOver($event)"
+                                            <div class="image-wrapper mb-5"   [ngClass]="{'upload':!attachment, 'upload-pending': !attachment && hasPendingAttachmentUploads}" *ngFor="let attachment of activeAttachmentOption?.attachmentSrcs; index as i" (dragover)="onDragOver($event)"
                                             (dragleave)="onDragLeave($event)"
                                             (drop)="onDrop($event, i)"
                                        >
-                                                <label *ngIf="!attachment" class="d-flex flex-column justify-content-center h-100 align-items-center upload-dropzone" for="variation_file_{{i}}" [ngClass]="activeAttachmentOption.defaultImageIndex == i? 'default-border':'' ">
+                                                <label *ngIf="!attachment" class="d-flex flex-column justify-content-center h-100 align-items-center upload-dropzone" [class.upload-disabled]="hasPendingAttachmentUploads" [attr.aria-disabled]="hasPendingAttachmentUploads" for="variation_file_{{i}}" [ngClass]="activeAttachmentOption.defaultImageIndex == i? 'default-border':'' ">
                                                     <div class="align-items-end d-flex justify-content-center mb-4 upload-image-icons mt-3">
                                                         <!-- <div class="left-icon">
                                                             <i class="fa-photo-video fas" ></i>
@@ -712,7 +719,7 @@
                                                         </p>
                                                         <p class="attachment-aspect-note">* {{'ImageAspectRatio16_9' | localize}} </p>
 
-                                                <a class="btn border-0 btn-sm mb-3 upload-btn">
+                                                <a class="btn border-0 btn-sm mb-3 upload-btn" [class.disabled]="hasPendingAttachmentUploads" [attr.aria-disabled]="hasPendingAttachmentUploads">
                                                     <!-- {{ 'AddAttachedFile' | localize}} -->
                                                     {{ 'AddAttachment' | localize}}
                                                 </a>
@@ -780,7 +787,7 @@
                                                 </a>
                                               
 
-                                                <input type="file" id="variation_file_{{i}}"  name="file"  class="d-none" #file (change)="fileChange($event)">
+                                                <input type="file" id="variation_file_{{i}}"  name="file"  class="d-none" #file [disabled]="hasPendingAttachmentUploads" (change)="fileChange($event)">
                                             </div>
                                         </div>
                                     </div>
