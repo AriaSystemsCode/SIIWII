@@ -2248,7 +2248,7 @@ namespace onetouch.AppItems
                     }
 
                     var colorCodes = input.VariationItems.SelectMany(x => x.EntityExtraData)
-                        .Where(z => z.AttributeId == 101 && !string.IsNullOrEmpty(z.AttributeCode))
+                        .Where(z => (z.AttributeId == 101 || z.AttributeId == 100) && !string.IsNullOrEmpty(z.AttributeCode))
                         .Select(z => z.AttributeCode).Distinct().ToList();
 
                     if (colorCodes.Any())
@@ -2513,16 +2513,19 @@ namespace onetouch.AppItems
                                         }
                                     }
                                 }
-                                var colorHex = colorExtra.EntityExtraData.Where(z => z.AttributeId == 39).FirstOrDefault();
-                                if (colorHex != null && !string.IsNullOrEmpty(colorHex.AttributeValue))
+                                else
                                 {
-                                    colorHexa = childEntity.EntityExtraData.Where(z => z.AttributeId == 201).FirstOrDefault();
-                                    if (colorHexa != null)
-                                    {
-                                        if (string.IsNullOrEmpty(colorHexa.AttributeValue))
-                                            colorHexa.AttributeValue = colorHex.AttributeValue;
-                                    }
-
+                                    colorImage = childEntity.EntityExtraData.Where(z => z.AttributeId == 202).FirstOrDefault();
+                                    if (colorImage != null)
+                                        colorImage.AttributeValue = null;
+                                }
+                                var colorHex = colorExtra.EntityExtraData.Where(z => z.AttributeId == 39).FirstOrDefault();
+                                colorHexa = childEntity.EntityExtraData.Where(z => z.AttributeId == 201).FirstOrDefault();
+                                if (colorHexa != null)
+                                {
+                                    colorHexa.AttributeValue = string.IsNullOrWhiteSpace(colorHex?.AttributeValue)
+                                        ? null
+                                        : colorHex.AttributeValue;
                                 }
 
                                 var colorNRFlook = colorExtra.EntityExtraData.Where(z => z.AttributeId == 38).FirstOrDefault();
@@ -2552,14 +2555,12 @@ namespace onetouch.AppItems
                                 var extraNonLookup = input.NonLookupValues.FirstOrDefault(z => z.Code == colorExtraAtt.AttributeCode);
                                 if (extraNonLookup != null)
                                 {
-                                    if (extraNonLookup.HexaCode != null)
+                                    colorHexa = childEntity.EntityExtraData.Where(z => z.AttributeId == 201).FirstOrDefault();
+                                    if (colorHexa != null)
                                     {
-                                        colorHexa = childEntity.EntityExtraData.Where(z => z.AttributeId == 201).FirstOrDefault();
-                                        if (colorHexa != null)
-                                        {
-                                            if (string.IsNullOrEmpty(colorHexa.AttributeValue))
-                                                colorHexa.AttributeValue = extraNonLookup.HexaCode;
-                                        }
+                                        colorHexa.AttributeValue = string.IsNullOrWhiteSpace(extraNonLookup.HexaCode)
+                                            ? null
+                                            : extraNonLookup.HexaCode;
                                     }
                                     if (!string.IsNullOrEmpty(extraNonLookup.Image))
                                     {
@@ -2573,6 +2574,12 @@ namespace onetouch.AppItems
                                             pendingFileMoves.Add(() => MoveFile(attachmentStr2, sourceTenantId2, destTenantId2));
                                         }
 
+                                    }
+                                    else
+                                    {
+                                        colorImage = childEntity.EntityExtraData.Where(z => z.AttributeId == 202).FirstOrDefault();
+                                        if (colorImage != null)
+                                            colorImage.AttributeValue = null;
                                     }
                                 }
                             }
