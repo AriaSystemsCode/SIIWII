@@ -14,6 +14,28 @@
     margin-top: 0 !important;
 }
 
+.attachment-upload-status {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  min-width: 220px;
+  margin-right: 1rem;
+  color: $purple;
+  font-size: 0.8rem;
+}
+
+.attachment-upload-status progress {
+  width: 110px;
+  height: 0.6rem;
+  accent-color: $purple;
+}
+
+.attachment-upload-error {
+  margin-right: 1rem;
+  color: #b42318;
+  font-size: 0.8rem;
+}
+
 // to be removed after styling refactor - end
 .avoidClick{
   pointer-events: none;
@@ -501,6 +523,23 @@ a.nav-link.active {
 .upload-dropzone {
   border: 1px dashed #dadada !important;
   border-radius: 12px !important;
+}
+
+.upload-dropzone.upload-disabled {
+  opacity: 0.6;
+  cursor: not-allowed !important;
+}
+
+.upload-pending {
+  cursor: not-allowed;
+}
+
+.upload-pending .upload-btn,
+.upload-pending.upload:hover .upload-btn {
+  background-color: #c8c8c8 !important;
+  color: #000 !important;
+  border-color: #c8c8c8 !important;
+  cursor: not-allowed;
 }
 
 .attachment-copy {
