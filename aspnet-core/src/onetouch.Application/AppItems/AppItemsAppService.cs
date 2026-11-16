@@ -618,8 +618,12 @@ namespace onetouch.AppItems
         {
             using (UnitOfWorkManager.Current.DisableFilter(AbpDataFilters.MustHaveTenant, AbpDataFilters.MayHaveTenant))
             {
+                var isRetailPrice = string.Equals(priceLevel, "MSRP", StringComparison.OrdinalIgnoreCase) ||
+                                    string.Equals(priceLevel, "RRP", StringComparison.OrdinalIgnoreCase);
                 List<AppItemAttributePriceDto> appItemAttributePriceDto = new List<AppItemAttributePriceDto>();
-                var appItems = await _appItemRepository.GetAll().Include(x => x.ItemPricesFkList.Where(s => s.Code == priceLevel && s.CurrencyCode == currencyCode))
+                var appItems = await _appItemRepository.GetAll()
+                    .Include(x => x.ItemPricesFkList.Where(s => s.CurrencyCode == currencyCode &&
+                        (isRetailPrice ? s.Code == "MSRP" || s.Code == "RRP" : s.Code == priceLevel)))
                     .Include(x => x.EntityFk).ThenInclude(x => x.EntityExtraData)
 
                     .Where(x => x.ParentId == appItemId).ToListAsync();
@@ -636,6 +640,10 @@ namespace onetouch.AppItems
                         var extraAttributes = item.EntityFk.EntityExtraData.Where(z => (item.EntityFk.EntityExtraData.Count() > 1 ? z.AttributeId != attributeId : z.AttributeId == attributeId) && z.AttributeValue != null).ToList();
                         if (extraAttributes != null && extraAttributes.Count > 0)
                         {
+                            var price = isRetailPrice
+                                ? GetRetailPrice(item.ItemPricesFkList, currencyCode)
+                                : item.ItemPricesFkList?.FirstOrDefault(x => x.CurrencyCode == currencyCode && x.Code == priceLevel)?.Price;
+
                             foreach (var extr in extraAttributes)
                             {
                                 if (extr.AttributeValue == null || extr.AttributeCode == null)
@@ -646,8 +654,7 @@ namespace onetouch.AppItems
                                     AppItemCode = item.Code,
                                     AttibuteCode = extr.AttributeCode,
                                     AttributeValue = extr.AttributeValue,
-                                    Price = item.ItemPricesFkList != null && item.ItemPricesFkList.Count > 0 &&
-                                          item.ItemPricesFkList.FirstOrDefault(x => x.CurrencyCode == currencyCode & x.Code == priceLevel) != null ? item.ItemPricesFkList.FirstOrDefault(x => x.CurrencyCode == currencyCode & x.Code == priceLevel).Price : 0
+                                    Price = price ?? 0
                                 });
                             }
                         }
@@ -1237,7 +1244,8 @@ namespace onetouch.AppItems
                 .Where(x => (string.Equals(x.Code, "MSRP", StringComparison.OrdinalIgnoreCase) ||
                              string.Equals(x.Code, "RRP", StringComparison.OrdinalIgnoreCase)) &&
                             x.CurrencyCode == currencyCode)
-                .OrderBy(x => string.Equals(x.Code, "MSRP", StringComparison.OrdinalIgnoreCase) ? 0 : 1)
+                .OrderBy(x => x.Price == 0)
+                .ThenBy(x => string.Equals(x.Code, "MSRP", StringComparison.OrdinalIgnoreCase) ? 0 : 1)
                 .Select(x => (decimal?)x.Price)
                 .FirstOrDefault();
         }
