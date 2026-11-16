@@ -153,8 +153,10 @@ namespace onetouch.AppDashboards
                 .Where(z => z.EntityId == dashboard.Id &&
                 z.SharedUserId == AbpSession.UserId).FirstOrDefaultAsync();
                     if (sharing != null)
+                    {
+                        if (sharing.LastViewDate.Date != (new DateTime(1,1,1)).Date)
                         dashboard.LastViewDate = sharing.LastViewDate;
-
+                    }
 
                     //Timezone Conversion[start]
                     if (input.TimeZoneValue != null)
