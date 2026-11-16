@@ -387,4 +387,7 @@ export class AppTransactionsBrowseComponent extends AppComponentBase implements 
     }
     
 
+     ngOnDestroy(): void {
+    localStorage.removeItem('marketplaceAccountsBrowseState');
+  }
 }
