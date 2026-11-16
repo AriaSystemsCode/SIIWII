@@ -75,7 +75,7 @@
         <div *ngSwitchCase="'FOUR_BLOCKS_GROUP'" class="four-blocks-carousel-wrapper">
 
           <p-carousel [value]="getFourBlocksSections(s)" [numVisible]="fourBlocksNumVisible" [numScroll]="1"
-            [circular]="false" [showIndicators]="false" [showNavigators]="getFourBlocksSections(s).length > 3"
+            [circular]="false" [showIndicators]="false" [showNavigators]="getFourBlocksSections(s).length > 4"
             [responsiveOptions]="fourBlocksResponsiveOptions">
 
             <ng-template pTemplate="item" let-section>

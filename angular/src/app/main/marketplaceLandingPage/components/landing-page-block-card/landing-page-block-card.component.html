@@ -19,8 +19,9 @@
   </div>
 
   <div class="block-info">
-    <span class="block-name" [title]="blockName">
-      {{ blockName }}
+    <span class="block-name"  [pTooltip]="blockName" tooltipPosition="bottom"   [tooltipEvent]="isSmallScreen ? 'focus' : 'hover'" [autoHide]="true" [showDelay]="100" [hideDelay]="100"
+                [tabindex]="isSmallScreen ? 0 : null">
+      {{ blockName | textSubstring : 20 }}
     </span>
   </div>
 

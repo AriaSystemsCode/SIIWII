@@ -270,4 +270,14 @@ export class LandingPageBlocksService {
   }
 
 
+  viewContact(block: PageSettingDto): void {
+  const accountId = block?.getAccountForViewDto?.account?.id;
+
+  if (accountId) {
+    this.router.navigate([
+      '/app/main/account/view-marketplace-acc',
+      accountId
+    ]);
+  }
+}
 }
