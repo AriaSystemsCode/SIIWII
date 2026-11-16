@@ -465,7 +465,7 @@ namespace onetouch.AppDashboards
                 entity.EntityObjectTypeId = dashboardObjectTypeId;
                 var entityId = await _appEntitiesAppService.SaveEntity(entity);
                 await CurrentUnitOfWork.SaveChangesAsync();
-                await UpdateViewDate(entityId);
+                //await UpdateViewDate(entityId);
 
             }
             else
