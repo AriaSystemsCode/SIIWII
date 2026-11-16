@@ -1147,7 +1147,7 @@ namespace onetouch.AppItemsLists
                 var localList = await _appItemsListRepository.GetAll()
                     .Include(x => x.ItemSharingFkList).ThenInclude(x => x.UserFk)
                     .FirstOrDefaultAsync(x => x.Id == input.Id && x.TenantId == AbpSession.TenantId);
-                AppMarketplaceItemList marketplaceList = null;
+                AppMarketplaceItemLists.AppMarketplaceItemLists marketplaceList = null;
                 if (localList != null)
                 {
                     var relationship = await _appEntitiesRelationshipRepository.GetAll()
