@@ -714,13 +714,9 @@ getTableProductImage(item: GetAppItemForViewDto): any {
 }
 
 getRemainingTagsTooltip(values: string[]): string {
-    if (!values || values.length <= 3) {
-        return '';
-    }
-
-    return values
-        .slice(3)
-        .join('\n');
+    return values?.length > 2
+        ? values.slice(2).join('\n')
+        : '';
 }
 
 onTableAction(

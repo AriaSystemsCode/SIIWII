@@ -187,7 +187,7 @@
                                                 </span>
 
                                             </button>
-                                          
+
                                             <div class="btn-group dropdown view-mode-dropdown" dropdown>
 
                                                 <button type="button" class="btn view-mode-toggle dropdown-toggle"
@@ -314,7 +314,7 @@
                                 </div>
 
 
-                                <!-- TABLE VIEW -->
+
                                 <!-- TABLE VIEW -->
                                 <div class="table-responsive product-table-wrapper" *ngIf="viewMode === 'table'">
 
@@ -407,57 +407,81 @@
 
                                                 <!-- CATEGORIES -->
                                                 <td>
-                                                    <div class="table-tags">
+                                                    <div class="table-tags-wrapper">
 
-                                                        <span class="table-tag"
-                                                            *ngFor="let category of item.entityObjectCategoryNames | slice:0:3">
 
-                                                            {{ category }}
+                                                        <div class="table-tags">
 
-                                                        </span>
+                                                            <span class="table-tag"
+                                                                *ngFor="let category of item.entityObjectCategoryNames | slice:0:2"
+                                                                [pTooltip]="category" tooltipPosition="top">
 
-                                                        <span *ngIf="item.entityObjectCategoryNames?.length > 3"
-                                                            class="table-tag-more" [pTooltip]="getRemainingTagsTooltip(
-                                item.entityObjectCategoryNames
-                            )" tooltipPosition="top" [escape]="false">
+                                                                {{ category }}
+                                                            </span>
+                                                            <div *ngIf="item.entityObjectCategoryNames?.length > 2"
+                                                                class="table-tag-more-wrapper">
 
-                                                            +{{ item.entityObjectCategoryNames.length - 3 }}
+                                                                <span class="table-tag-more">
+                                                                    +{{ item.entityObjectCategoryNames.length - 2 }}
+                                                                </span>
 
-                                                        </span>
+                                                                <div class="table-tags-popup">
+                                                                    <div class="table-tags-popup-item"
+                                                                        *ngFor="let category of item.entityObjectCategoryNames | slice:2">
 
-                                                        <span *ngIf="!item.entityObjectCategoryNames?.length"
-                                                            class="text-muted">
-                                                            —
-                                                        </span>
+                                                                        {{ category }}
 
+                                                                    </div>
+                                                                </div>
+                                                            </div>
+
+                                                            <span *ngIf="!item.entityObjectCategoryNames?.length"
+                                                                class="text-muted">
+                                                                —
+                                                            </span>
+
+                                                        </div>
                                                     </div>
                                                 </td>
 
+
                                                 <!-- CLASSIFICATIONS -->
                                                 <td>
-                                                    <div class="table-tags">
+                                                    <div class="table-tags-wrapper">
 
-                                                        <span class="table-tag"
-                                                            *ngFor="let classification of item.entityClassificationNames | slice:0:3">
 
-                                                            {{ classification }}
+                                                        <div class="table-tags">
 
-                                                        </span>
+                                                            <span class="table-tag"
+                                                                *ngFor="let classification of item.entityClassificationNames | slice:0:2"
+                                                                [pTooltip]="classification" tooltipPosition="top">
 
-                                                        <span *ngIf="item.entityClassificationNames?.length > 3"
-                                                            class="table-tag-more" [pTooltip]="getRemainingTagsTooltip(
-                                item.entityClassificationNames
-                            )" tooltipPosition="top" [escape]="false">
+                                                                {{ classification }}
+                                                            </span>
 
-                                                            +{{ item.entityClassificationNames.length - 3 }}
+                                                            <div *ngIf="item.entityClassificationNames?.length > 2"
+                                                                class="table-tag-more-wrapper">
 
-                                                        </span>
+                                                                <span class="table-tag-more">
+                                                                    +{{ item.entityClassificationNames.length - 2 }}
+                                                                </span>
 
-                                                        <span *ngIf="!item.entityClassificationNames?.length"
-                                                            class="text-muted">
-                                                            —
-                                                        </span>
+                                                                <div class="table-tags-popup">
+                                                                    <div class="table-tags-popup-item"
+                                                                        *ngFor="let classification of item.entityClassificationNames | slice:2">
 
+                                                                        {{ classification }}
+
+                                                                    </div>
+                                                                </div>
+                                                            </div>
+
+                                                            <span *ngIf="!item.entityClassificationNames?.length"
+                                                                class="text-muted">
+                                                                —
+                                                            </span>
+
+                                                        </div>
                                                     </div>
                                                 </td>
 
