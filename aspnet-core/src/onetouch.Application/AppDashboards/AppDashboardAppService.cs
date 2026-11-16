@@ -133,8 +133,15 @@ namespace onetouch.AppDashboards
 
                     var userCreator = await UserManager.GetUserByIdAsync(dashboard.CreatorUserId);
                     if (userCreator != null)
+                    {
                         dashboard.CreatorUserName = userCreator.FullName;
-
+                        using (UnitOfWorkManager.Current.DisableFilter(AbpDataFilters.MustHaveTenant, AbpDataFilters.MayHaveTenant))
+                        {
+                            var userInfo = await _appEntitiesAppService.GetUserInformation(dashboard.CreatorUserId);
+                            if (userInfo != null)
+                                dashboard.OwnerUserImg = userInfo.UserImage;
+                        }
+                    }
                     if (!string.IsNullOrEmpty(dashboard.SpreadsheetFilePath) &&
                         System.IO.File.Exists(dashboard.SpreadsheetFilePath))
                     {
