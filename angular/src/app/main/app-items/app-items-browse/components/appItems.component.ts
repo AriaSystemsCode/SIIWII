@@ -42,7 +42,8 @@ import { ImportStepInfo } from "@shared/components/import-steps/models/ImportSte
 import { ImportStepsEnum } from "@shared/components/import-steps/models/ImportStepsEnum";
 import { MainImportService } from "@shared/components/import-steps/services/mainImport.service";
 import Swal from "sweetalert2";
-
+import { AppConsts } from "@shared/AppConsts";
+type AppItemsViewMode = 'grid' | 'list' | 'table';
 @Component({
     selector: "app-app-items",
     templateUrl: "./appItems.component.html",
@@ -53,7 +54,7 @@ export class AppItemsComponent extends AppComponentBase {
     appItemListId:number;
     @Output() eventTriggered :EventEmitter<ActionsMenuEventEmitter<AppItemBrowseEvents>> = new EventEmitter<ActionsMenuEventEmitter<AppItemBrowseEvents>>()
 
-    singleItemPerRowMode: boolean = false;
+    // singleItemPerRowMode: boolean = false;
     @ViewChild("entityTypeHistoryModal", { static: true })  entityTypeHistoryModal: EntityTypeHistoryModalComponent;
 
     @ViewChild("dataTable", { static: true }) dataTable: Table;
@@ -117,6 +118,15 @@ showOverlay :boolean=false
 
     currentLang:string
     isArabic:boolean = true
+   viewMode: AppItemsViewMode = 'grid';
+
+viewModeOptions = [
+    { label: 'Cards', value: 'grid', icon: 'fas fa-th-large' },
+    { label: 'One Item Per Row', value: 'list', icon: 'fas fa-list' },
+    { label: 'Table', value: 'table', icon: 'fas fa-table' }
+];
+
+    languageSettingName = AppConsts.languageSettingName;
     constructor(
         injector: Injector,
         private _importService: MainImportService,
@@ -565,20 +575,20 @@ showOverlay :boolean=false
             this.reloadPage();
         });
     }
-    saveUserPreferenceForListView() {
-        const key = "appitem-list-view-mode";
-        const value = String(Number(this.singleItemPerRowMode));
-        localStorage.setItem(key, value);
-    }
-    getUserPreferenceForListView() {
-        const key = "appitem-list-view-mode";
-        const value = localStorage.getItem(key);
-        if (value) this.singleItemPerRowMode = Boolean(Number(value));
-    }
-    triggerListView() {
-        this.singleItemPerRowMode = !this.singleItemPerRowMode;
-        this.saveUserPreferenceForListView();
-    }
+    // saveUserPreferenceForListView() {
+    //     const key = "appitem-list-view-mode";
+    //     const value = String(Number(this.singleItemPerRowMode));
+    //     localStorage.setItem(key, value);
+    // }
+    // getUserPreferenceForListView() {
+    //     const key = "appitem-list-view-mode";
+    //     const value = localStorage.getItem(key);
+    //     if (value) this.singleItemPerRowMode = Boolean(Number(value));
+    // }
+    // triggerListView() {
+    //     // this.singleItemPerRowMode = !this.singleItemPerRowMode;
+    //     this.saveUserPreferenceForListView();
+    // }
     showImportProducts(){
         let importService=AppItemsServiceProxy;
         let serviceUtilites=itemsImport;
@@ -643,4 +653,99 @@ showOverlay :boolean=false
     toggleFilterOverlay(){
         this.showOverlay = !this.showOverlay
     }
+
+
+setViewMode(mode: AppItemsViewMode): void {
+    this.viewMode = mode;
+    localStorage.setItem('appitem-list-view-mode', mode);
+}
+
+getUserPreferenceForListView(): void {
+    const savedMode = localStorage.getItem('appitem-list-view-mode');
+
+    if (savedMode === 'grid' || savedMode === 'list' || savedMode === 'table') {
+        this.viewMode = savedMode;
+    } else {
+        this.viewMode = 'grid';
+    }
+}
+
+get singleItemPerRowMode(): boolean {
+    return this.viewMode === 'list';
+}
+
+get canSelectItems(): boolean {
+    return this.browseMode === BrowseMode.Selection ||
+           this.browseMode === BrowseMode.ActionsAndSelections;
+}
+
+private pendingSelectionIds = new Set<number>();
+
+isSelectionPending(item: GetAppItemForViewDto): boolean {
+    return this.pendingSelectionIds.has(item.appItem.id);
+}
+
+onTableRowSelectionChange(
+    item: GetAppItemForViewDto,
+    checked: boolean
+): void {
+    const id = item.appItem.id;
+
+    if (this.pendingSelectionIds.has(id)) {
+        return;
+    }
+
+    this.pendingSelectionIds.add(id);
+
+    this.eventHandler({
+        event: checked
+            ? AppItemBrowseEvents.Select
+            : AppItemBrowseEvents.UnSelect,
+        data: item
+    });
+}
+
+selectionCompleted(itemId: number): void {
+    this.pendingSelectionIds.delete(itemId);
+}
+ attachmentBaseUrl: string = AppConsts.attachmentBaseUrl;
+getTableProductImage(item: GetAppItemForViewDto): any {
+    return this.attachmentBaseUrl + '/' + item.appItem.imageUrl ;
+}
+
+getRemainingTagsTooltip(values: string[]): string {
+    if (!values || values.length <= 3) {
+        return '';
+    }
+
+    return values
+        .slice(3)
+        .join('\n');
+}
+
+onTableAction(
+    event: ActionsMenuEventEmitter<AppItemBrowseEvents>,
+    item: GetAppItemForViewDto,
+    index: number
+): void {
+
+    switch (event.event) {
+        case AppItemBrowseEvents.PublishListing:
+            item.appItem.published = true;
+            break;
+
+        case AppItemBrowseEvents.UnPublishListing:
+            item.appItem.published = false;
+            this.notify.success(this.l('UnPublishedSuccessfully'));
+            break;
+    }
+
+    this.eventHandler(event, index);
+}
+
+showSideFilters: boolean = false;
+
+toggleSideFilters(): void {
+    this.showSideFilters = !this.showSideFilters;
+}
 }

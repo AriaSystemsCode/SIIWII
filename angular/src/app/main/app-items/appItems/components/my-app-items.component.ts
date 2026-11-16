@@ -196,22 +196,43 @@ export class MyAppItemsComponent
     reloadPage() {
         this.appItemsBrowseComponent.reloadPage();
     }
+    // selectItem(item: GetAppItemForViewDto) {
+    //     const body = new CreateOrEditAppItemSelectorDto({
+    //         key: this.multiSelectionInfo.sessionSelectionKey,
+    //         selectedId: item.appItem.id,
+    //         id: 0,
+    //     });
+    //     this.appItemSelectorsServiceProxy.createOrEdit(body).subscribe(
+    //         (totalSelection) => {
+    //             this.multiSelectionInfo.totalCount = totalSelection;
+    //             item.selected = true;
+    //         },
+    //         (err) => {
+    //             item.selected = false;
+    //         }
+    //     );
+    // }
+
     selectItem(item: GetAppItemForViewDto) {
-        const body = new CreateOrEditAppItemSelectorDto({
-            key: this.multiSelectionInfo.sessionSelectionKey,
-            selectedId: item.appItem.id,
-            id: 0,
-        });
-        this.appItemSelectorsServiceProxy.createOrEdit(body).subscribe(
+    const body = new CreateOrEditAppItemSelectorDto({
+        key: this.multiSelectionInfo.sessionSelectionKey,
+        selectedId: item.appItem.id,
+        id: 0
+    });
+
+    this.appItemSelectorsServiceProxy.createOrEdit(body)
+        .subscribe(
             (totalSelection) => {
                 this.multiSelectionInfo.totalCount = totalSelection;
                 item.selected = true;
+                this.appItemsBrowseComponent.selectionCompleted(item.appItem.id);
             },
-            (err) => {
+            () => {
                 item.selected = false;
+                this.appItemsBrowseComponent.selectionCompleted(item.appItem.id);
             }
         );
-    }
+}
     unSelectItem(item: GetAppItemForViewDto) {
         this.appItemSelectorsServiceProxy
             .delete(

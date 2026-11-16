@@ -18,6 +18,7 @@ import { AccordionModule } from 'primeng/accordion';
 import { PaginatorModule } from 'primeng/paginator';
 import { TreeModule } from 'primeng/tree';
 import { InputSwitchModule } from 'primeng/inputswitch';
+import { TooltipModule } from 'primeng/tooltip';
 
 @NgModule({
     declarations: [
@@ -41,7 +42,8 @@ import { InputSwitchModule } from 'primeng/inputswitch';
         PaginatorModule,
         BulkImportModule,
         ModalModule.forRoot(),
-        InputSwitchModule
+        InputSwitchModule,
+        TooltipModule
     ],
     exports : [
         AppItemsComponent,
