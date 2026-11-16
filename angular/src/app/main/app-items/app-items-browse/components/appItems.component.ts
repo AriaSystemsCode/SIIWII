@@ -643,4 +643,8 @@ showOverlay :boolean=false
     toggleFilterOverlay(){
         this.showOverlay = !this.showOverlay
     }
+
+     ngOnDestroy(): void {
+    localStorage.removeItem('marketplaceAccountsBrowseState');
+  }
 }

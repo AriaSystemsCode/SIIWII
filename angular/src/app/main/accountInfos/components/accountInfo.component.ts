@@ -1321,4 +1321,8 @@ export class AccountInfoComponent extends AppComponentBase implements OnInit, Af
     getCodeValue(code: string) {
         this.accountInfoTemp.code = code;
     }
+
+     ngOnDestroy(): void {
+    localStorage.removeItem('marketplaceAccountsBrowseState');
+  }
 }

@@ -189,4 +189,9 @@ export class AppitemslistCatalogueReportComponent extends AppComponentBase imple
             })
         } 
     }
+
+
+     ngOnDestroy(): void {
+    localStorage.removeItem('marketplaceAccountsBrowseState');
+  }
 }
