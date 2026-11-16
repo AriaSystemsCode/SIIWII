@@ -565,12 +565,19 @@ dashboardNotFound = false;
         return `${name}.pdf`;
     }
 
-    async exportDashboardPdf(): Promise<void> {
+
+        async exportDashboardPdf(): Promise<void> {
         if (this.exportingPdf || !this.saved) {
             return;
         }
 
         this.exportingPdf = true;
+
+        // stop the mobile layout from resizing/re-rendering charts while we capture them
+        this.layoutTimers.forEach(t => clearTimeout(t));
+        this.layoutTimers = [];
+        clearTimeout(this.resizeTimer);
+
         this.cdr.detectChanges();
 
         // let the "Preparing PDF" overlay paint first
@@ -585,9 +592,10 @@ dashboardNotFound = false;
             }
 
             const pdf = new jsPDF({ orientation: 'landscape', unit: 'mm', format: 'a4' });
+            const expectedCharts = this.collectCharts(sheets[index]).length;
 
-            if (this.collectCharts(sheets[index]).length > 0) {
-                await this.addChartsToPdf(pdf);
+            if (expectedCharts > 0) {
+                await this.addChartsToPdf(pdf, expectedCharts);
             } else {
                 this.addDataTableToPdf(pdf, sheets[index]);
             }
@@ -595,9 +603,9 @@ dashboardNotFound = false;
             pdf.save(this.pdfFileName);
         } catch (error) {
             console.error('Dashboard PDF export failed:', error);
-           this.notify.error(
-    this.l('DashboardPdfExportFailed')
-);
+            this.notify.error(
+                this.l('DashboardPdfExportFailed')
+            );
         } finally {
             this.exportingPdf = false;
             this.cdr.detectChanges();
@@ -610,8 +618,16 @@ dashboardNotFound = false;
         return new Promise((resolve, reject) => {
             const copy = svg.cloneNode(true) as SVGSVGElement;
             copy.setAttribute('xmlns', 'http://www.w3.org/2000/svg');
+            copy.setAttribute('xmlns:xlink', 'http://www.w3.org/1999/xlink');
             copy.setAttribute('width', String(width));
             copy.setAttribute('height', String(height));
+
+            if (!copy.getAttribute('viewBox')) {
+                copy.setAttribute('viewBox', `0 0 ${width} ${height}`);
+            }
+
+            // make sure nothing is left invisible by an unfinished animation / hover state
+            copy.querySelectorAll('[id$="_tooltip"], [id$="_Crosshair"], [id*="_Trackball"]').forEach(n => n.remove());
 
             const url = URL.createObjectURL(
                 new Blob([new XMLSerializer().serializeToString(copy)], { type: 'image/svg+xml;charset=utf-8' })
@@ -621,8 +637,8 @@ dashboardNotFound = false;
 
             img.onload = () => {
                 const canvas = document.createElement('canvas');
-                canvas.width = width * scale;
-                canvas.height = height * scale;
+                canvas.width = Math.round(width * scale);
+                canvas.height = Math.round(height * scale);
 
                 const ctx = canvas.getContext('2d')!;
                 ctx.fillStyle = '#ffffff';
@@ -642,18 +658,19 @@ dashboardNotFound = false;
         });
     }
 
-    private async addChartsToPdf(pdf: jsPDF): Promise<void> {
+    /** Reads every rendered chart currently in the dashboard (current on-screen position and size). */
+    private collectChartItems(): ChartExportItem[] {
         const host = this.dashboardExportArea?.nativeElement;
 
         if (!host) {
-            throw new Error('Dashboard not ready.');
+            return [];
         }
 
-        const items = (Array.from(host.querySelectorAll('.e-ss-overlay')) as HTMLElement[])
+        return (Array.from(host.querySelectorAll('.e-ss-overlay')) as HTMLElement[])
             .map((o): ChartExportItem | null => {
                 const svg = o.querySelector('svg[id$="_svg"]') as SVGSVGElement | null;
 
-                if (!svg) {
+                if (!svg || svg.childElementCount === 0) {
                     return null;
                 }
 
@@ -663,51 +680,137 @@ dashboardNotFound = false;
                     svg,
                     w: Math.round(box.width),
                     h: Math.round(box.height),
-                    // original desktop position (saved by the mobile layout code), else the current one
-                    left: Number(o.dataset.origLeft ?? (parseFloat(o.style.left) || 0)),
-                    top: Number(o.dataset.origTop ?? (parseFloat(o.style.top) || 0))
+                    left: parseFloat(o.style.left) || 0,
+                    top: parseFloat(o.style.top) || 0
                 };
             })
             .filter((x): x is ChartExportItem => !!x && x.w > 0 && x.h > 0)
             .sort((a, b) => (a.top - b.top) || (a.left - b.left));
+    }
+
+    /**
+     * Waits until all charts exist and have stopped changing
+     * (animations finished, no re-render in progress).
+     */
+    private async waitForChartsReady(expected: number, timeoutMs = 8000): Promise<ChartExportItem[]> {
+        const started = Date.now();
+        const serializer = new XMLSerializer();
+
+        let lastSignature = '';
+        let stableTicks = 0;
+
+        while (Date.now() - started < timeoutMs) {
+            const items = this.collectChartItems();
+
+            const signature = items
+                .map(i => `${i.w}x${i.h}@${i.left},${i.top}:${serializer.serializeToString(i.svg).length}`)
+                .join('|');
+
+            if (items.length >= expected && items.length > 0 && signature === lastSignature) {
+                stableTicks++;
+
+                if (stableTicks >= 2) {
+                    return items;
+                }
+            } else {
+                stableTicks = 0;
+            }
+
+            lastSignature = signature;
+            await new Promise<void>(r => setTimeout(r, 250));
+        }
+
+        const items = this.collectChartItems();
 
         if (!items.length) {
             throw new Error('Charts are not rendered yet.');
         }
 
-        const margin = 8;
-        const pageW = pdf.internal.pageSize.getWidth() - margin * 2;
-        const pageH = pdf.internal.pageSize.getHeight() - margin * 2;
-
-        // px -> mm: fit the dashboard width to the page, but do not blow up small layouts
-        const layoutW = Math.max(...items.map(i => i.left + i.w));
-        const k = Math.min(pageW / layoutW, 0.35);
-
-        let currentPage = 0;
-
-        for (const item of items) {
-            const x = margin + item.left * k;
-            const w = item.w * k;
-            const h = item.h * k;
-
-            let page = Math.floor((item.top * k) / pageH);
-            let y = (item.top * k) % pageH;
-
-            // do not cut a chart between two pages
-            if (y + h > pageH) {
-                page++;
-                y = 0;
-            }
-
-            while (currentPage < page) {
-                pdf.addPage();
-                currentPage++;
-            }
-
-            const png = await this.svgToPng(item.svg, item.w, item.h);
-            pdf.addImage(png, 'PNG', x, margin + y, w, h);
-        }
+        return items;
     }
+
+   private async addChartsToPdf(
+    pdf: jsPDF,
+    expectedCharts = 0
+): Promise<void> {
+    const host = this.dashboardExportArea?.nativeElement;
+
+    if (!host || !this.saved) {
+        throw new Error('Dashboard not ready.');
+    }
+
+    const sheets: any[] =
+        getWorkbookRoot(this.saved.workbookJson)?.sheets ?? [];
+
+    const index = this.findDashboardIndex(sheets);
+
+    if (index < 0) {
+        throw new Error('Dashboard sheet not found.');
+    }
+
+    const sheet = sheets[index];
+    const items = await this.waitForChartsReady(expectedCharts);
+
+    const margin = 8;
+    const pageW = pdf.internal.pageSize.getWidth() - margin * 2;
+    const pageH = pdf.internal.pageSize.getHeight() - margin * 2;
+
+    const layoutW = Math.max(
+        ...items.map(i => i.left + i.w)
+    );
+
+    const maxH = Math.max(...items.map(i => i.h));
+
+    const k = Math.min(
+        pageW / layoutW,
+        0.35,
+        pageH / maxH
+    );
+
+    let pageStartY = 0;
+
+    // Draw the first page background.
+    this.drawDashboardBackground(
+        pdf, sheet, k, pageStartY,
+        margin, pageW, pageH
+    );
+
+    for (const item of items) {
+        const w = item.w * k;
+        const h = item.h * k;
+        const x = margin + item.left * k;
+
+        let y = item.top * k - pageStartY;
+
+        if (y + h > pageH) {
+            pdf.addPage();
+
+            pageStartY = item.top * k;
+            y = 0;
+
+            // Draw background on the new page.
+            this.drawDashboardBackground(
+                pdf, sheet, k, pageStartY,
+                margin, pageW, pageH
+            );
+        }
+
+        const png = await this.svgToPng(
+            item.svg,
+            item.w,
+            item.h
+        );
+
+        pdf.addImage(
+            png,
+            'PNG',
+            x,
+            margin + y,
+            w,
+            h
+        );
+    }
+}
 
     // ---------- data table (no charts) ----------
 
@@ -899,4 +1002,148 @@ dashboardNotFound = false;
             }
         });
     }
+
+
+    private drawDashboardBackground(
+    pdf: jsPDF,
+    sheet: any,
+    scale: number,
+    pageStartY: number,
+    margin: number,
+    pageW: number,
+    pageH: number
+): void {
+    const rows = sheet?.rows ?? [];
+    const columns = sheet?.columns ?? [];
+
+    const defaultRowHeight = sheet?.standardHeight || 20;
+    const defaultColWidth = sheet?.standardWidth || 64;
+
+    const rowPositions: number[] = [];
+    const colPositions: number[] = [];
+
+    const getRowTop = (index: number): number => {
+        for (let i = rowPositions.length; i <= index; i++) {
+            rowPositions[i] = i === 0
+                ? 0
+                : rowPositions[i - 1] +
+                  (rows[i - 1]?.height ?? defaultRowHeight);
+        }
+        return rowPositions[index];
+    };
+
+    const getColLeft = (index: number): number => {
+        for (let i = colPositions.length; i <= index; i++) {
+            colPositions[i] = i === 0
+                ? 0
+                : colPositions[i - 1] +
+                  (columns[i - 1]?.width ?? defaultColWidth);
+        }
+        return colPositions[index];
+    };
+
+    let rowIndex = 0;
+
+    for (const row of rows) {
+        if (row?.index !== undefined) {
+            rowIndex = row.index;
+        }
+
+        if (row?.hidden) {
+            rowIndex++;
+            continue;
+        }
+
+        let colIndex = 0;
+
+        for (const cell of row?.cells ?? []) {
+            if (cell?.index !== undefined) {
+                colIndex = cell.index;
+            }
+
+            const color = cell?.style?.backgroundColor;
+
+            if (!color || columns[colIndex]?.hidden) {
+                colIndex++;
+                continue;
+            }
+
+            const rgb = this.pdfColorToRgb(color);
+
+            if (!rgb) {
+                colIndex++;
+                continue;
+            }
+
+            const cellX = getColLeft(colIndex) * scale;
+            const cellY = getRowTop(rowIndex) * scale - pageStartY;
+
+            const cellW =
+                (columns[colIndex]?.width ?? defaultColWidth) * scale;
+
+            const cellH =
+                (row?.height ?? defaultRowHeight) * scale;
+
+            // Clip the cell to the current PDF page.
+            const left = Math.max(0, cellX);
+            const top = Math.max(0, cellY);
+            const right = Math.min(pageW, cellX + cellW);
+            const bottom = Math.min(pageH, cellY + cellH);
+
+            if (right > left && bottom > top) {
+                pdf.setFillColor(rgb[0], rgb[1], rgb[2]);
+
+                pdf.rect(
+                    margin + left,
+                    margin + top,
+                    right - left,
+                    bottom - top,
+                    'F'
+                );
+            }
+
+            colIndex++;
+        }
+
+        rowIndex++;
+    }
+}
+
+private pdfColorToRgb(
+    color: string
+): [number, number, number] | null {
+    const value = color.trim();
+
+    const hex = value.match(
+        /^#([0-9a-f]{3}|[0-9a-f]{6})$/i
+    );
+
+    if (hex) {
+        let code = hex[1];
+
+        if (code.length === 3) {
+            code = code.split('').map(c => c + c).join('');
+        }
+
+        return [
+            parseInt(code.substring(0, 2), 16),
+            parseInt(code.substring(2, 4), 16),
+            parseInt(code.substring(4, 6), 16)
+        ];
+    }
+
+    const rgb = value.match(
+        /^rgb\(\s*(\d+)\s*,\s*(\d+)\s*,\s*(\d+)\s*\)$/i
+    );
+
+    if (rgb) {
+        return [
+            Number(rgb[1]),
+            Number(rgb[2]),
+            Number(rgb[3])
+        ];
+    }
+
+    return null;
+}
 }

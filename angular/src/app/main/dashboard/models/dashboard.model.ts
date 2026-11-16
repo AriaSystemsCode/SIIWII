@@ -238,3 +238,11 @@ export type FilterConditionNode =
         isLoaded: boolean;
     }
     
+
+       export interface ChartExportItem {
+        svg: SVGSVGElement;
+        w: number;
+        h: number;
+        left: number;
+        top: number;
+    }

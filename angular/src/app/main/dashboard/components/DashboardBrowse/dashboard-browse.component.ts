@@ -320,24 +320,23 @@ export class DashboardBrowseComponent
             });
     }
 
-    goToLastDashboardPage(): void {
+     goToLastDashboardPage(): void {
+    const pageSize =
+        this.maxResultCount > 0
+            ? this.maxResultCount
+            : this.primengTableHelper.defaultRecordsCountPerPage || 10;
 
-        const pageSize =
-            this.maxResultCount > 0
-                ? this.maxResultCount
-                : this.primengTableHelper.defaultRecordsCountPerPage || 10;
-
-        this.appDashboardsAppService
-            .getAll(
-                this.filterText || null,
-                this.selectedDashboardFilter.value,
-                Intl.DateTimeFormat().resolvedOptions().timeZone,
-                this.sorting || null,
-                0,
-                1
-            )
-            .subscribe(result => {
-
+    this.appDashboardsAppService
+        .getAll(
+            this.filterText || null,
+            this.selectedDashboardFilter.value,
+             Intl.DateTimeFormat().resolvedOptions().timeZone,
+            this.sorting || null,
+            0,
+            1
+        )
+        .subscribe({
+            next: result => {
                 const totalRecords = result?.totalCount || 0;
 
                 const lastPageIndex = Math.max(
@@ -351,17 +350,26 @@ export class DashboardBrowseComponent
                 this.maxResultCount = pageSize;
 
                 if (this.paginator) {
+                    const currentPage = this.paginator.getPage();
 
-                    this.paginator.changePage(lastPageIndex);
-
+                    if (currentPage !== lastPageIndex) {
+                        this.paginator.changePage(lastPageIndex);
+                    } else {
+                        // Refresh even when already on the same page
+                        this.getDashboards();
+                    }
                 } else {
-
                     this.getDashboards();
-
                 }
+            },
+            error: error => {
+                console.error('Failed to refresh dashboards:', error);
+                this.getDashboards();
+            }
+        });
+}
 
-            });
-    }
+
 
     startRename(row: any): void {
         this.cancelCreate();
