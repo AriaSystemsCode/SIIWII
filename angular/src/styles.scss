@@ -743,3 +743,12 @@ body .modal.show .modal-dialog.modalCenter.upload-modal .modal-content.upload-mo
 [dir="rtl"] .p-datatable th {
     text-align: right !important;
 }
+body .modal.show .modal-dialog.modalCenter.upload-status-modal {
+    width: min(900px, calc(100vw - 2rem)) !important;
+    max-width: 900px !important;
+}
+
+body .modal.show .modal-dialog.modalCenter.upload-status-modal .modal-content.upload-status-modal {
+    width: 100% !important;
+    max-width: 900px !important;
+}

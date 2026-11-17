@@ -16,6 +16,26 @@ import { ReorderTreeListDragDropHelper } from "@node_modules/@devexpress/analyti
 import { UploadActionEnum } from "../models/UploadActionEnum";
 import { DomSanitizer, SafeHtml } from "@node_modules/@angular/platform-browser";
 
+interface UploadStatusColumn {
+  name: string;
+  key?: string;
+  showFor?: string;
+}
+
+interface UploadStatusRecord {
+  [key: string]: any;
+  id?: any;
+  recordType?: string;
+  status?: string;
+  excelDto?: { [key: string]: any };
+  showActions?: boolean;
+}
+
+interface UploadStatusResult {
+  [key: string]: any;
+  excelRecords: UploadStatusRecord[];
+}
+
 @Component({
   selector: "uploadStatusModal",
   templateUrl: "./uploadStatus.component.html",
@@ -23,22 +43,22 @@ import { DomSanitizer, SafeHtml } from "@node_modules/@angular/platform-browser"
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class uploadStatusComponent extends AppComponentBase implements OnInit, OnChanges {
-  @ViewChild("uploadStatus", { static: true }) modal: ModalDirective;
+  @ViewChild("uploadStatus", { static: true }) modal!: ModalDirective;
 
-  @Input() uploadingResult: any = null;
+  @Input() uploadingResult: UploadStatusResult = null as any;
   @Output() goNextstep = new EventEmitter<any>();
   @Output() close = new EventEmitter<boolean>();
   @Output() totalPassedRecords = new EventEmitter<number>();
   @Output() totalFailedRecords = new EventEmitter<number>();
   @Output() onDownloadLogFile = new EventEmitter<boolean>();
-  importType: ImportTypes;
+  importType!: ImportTypes;
   ImportTypes = ImportTypes;
   activeRecordType: string = 'Data';
-  uploadStatsColumnsName;
-  visibleColumns;
+  uploadStatsColumnsName: UploadStatusColumn[] = [];
+  visibleColumns: UploadStatusColumn[] = [];
 
-  @Input() imagesList;
-  acceptedAspectRatio;
+  @Input() imagesList: any[] = [];
+  acceptedAspectRatio: any;
   currentActionRecord: any = null;
 
   @ViewChildren('parentCodeInputContainer') ParentCodeInputContainers!: QueryList<ElementRef>;
@@ -47,9 +67,9 @@ export class uploadStatusComponent extends AppComponentBase implements OnInit, O
 
   @ViewChildren('rowRef') rowRefs!: QueryList<ElementRef>;
   @Output() searchItemCode = new EventEmitter<any>();
-  LinkToExistingITEM_Ret_Data;
-  LinkToExistingItemColor_Ret_Data;
-  LinkToExistingColorLookup_Ret_Data;
+  LinkToExistingITEM_Ret_Data: any;
+  LinkToExistingItemColor_Ret_Data: any;
+  LinkToExistingColorLookup_Ret_Data: any;
   activeRecord: any = null;
   @ViewChild('codeInputRef') codeInputRef!: ElementRef<HTMLInputElement>;
   @Output() selectSugItemCode = new EventEmitter<any>();
@@ -57,22 +77,25 @@ export class uploadStatusComponent extends AppComponentBase implements OnInit, O
   @Input() _resetRecords: boolean = false;
 
 
-  @Input() imData: boolean;
-  @Input() imImages: boolean;
+  @Input() imData!: boolean;
+  @Input() imImages!: boolean;
   hasDataRecords: boolean = false;
   hasImageRecords: boolean = false;
   UploadActionEnum = UploadActionEnum;
-  @Output() updatedRecords = new EventEmitter<any[]>();
-  @Output() _validateRecord = new EventEmitter<any[]>();
+  @Output() updatedRecords = new EventEmitter<UploadStatusResult>();
+  @Output() _validateRecord = new EventEmitter<UploadStatusRecord>();
   @Output() loadMoreRecords = new EventEmitter<{ skipCount: number; maxResultCount: number; recordType: string }>();
   isConfirm: boolean = false;
-  linkNewParentItem_Data;
-  linkNewItemColor_Data;
-  linkNewColorLookup_Data;
+  linkNewParentItem_Data: any;
+  linkNewItemColor_Data: any;
+  linkNewColorLookup_Data: any;
   @Output() _resetRecordsCompleted = new EventEmitter<void>();
   pageSize: number = 25;
   loadingMoreRecords: boolean = false;
   private recordTotals: { [recordType: string]: number } = {};
+  private loadingAssociatedDataRecords: boolean = false;
+  private associatedDataSearchRecord: UploadStatusRecord = null as any;
+  private associatedDataSearchValue: string = '';
 
 
   public constructor(
@@ -104,6 +127,8 @@ export class uploadStatusComponent extends AppComponentBase implements OnInit, O
       }));
 
       const allRecords = this.uploadingResult?.excelRecords || [];
+      if (this.uploadingResult?.totalDisplayRecords !== undefined)
+        this.recordTotals['Data'] = this.uploadingResult.totalDisplayRecords;
       // A paged result may contain only data rows on its first page. Keep the
       // tabs selected by the user visible until the corresponding rows load.
       this.hasDataRecords = !!this.imData || allRecords.some(r => r.recordType !== 'Image');
@@ -158,7 +183,7 @@ export class uploadStatusComponent extends AppComponentBase implements OnInit, O
 
   }
 
-  mergeRecord(record: any, newData: any) {
+  mergeRecord(record: UploadStatusRecord, newData: any) {
     const merged = JSON.parse(JSON.stringify(record)); // clone record
 
     const deepMergeValues = (target: any, source: any) => {
@@ -202,8 +227,8 @@ export class uploadStatusComponent extends AppComponentBase implements OnInit, O
 
     if (!this.uploadingResult?.isPagedResult || isImagesOnlyImport) {
       this.uploadingResult.totalPassedRecords =
-        (this.uploadingResult?.excelRecords?.filter(r => r.status.toLowerCase() == 'passed')?.length || 0) +
-        (this.uploadingResult?.excelRecords?.filter(r => r.status.toLowerCase() == 'warning')?.length || 0);
+        (this.uploadingResult.excelRecords.filter(r => (r.status || '').toLowerCase() == 'passed').length || 0) +
+        (this.uploadingResult.excelRecords.filter(r => (r.status || '').toLowerCase() == 'warning').length || 0);
 
       this.uploadingResult.totalFailedRecords = isImagesOnlyImport
         ? Math.max(
@@ -211,7 +236,7 @@ export class uploadStatusComponent extends AppComponentBase implements OnInit, O
             (this.uploadingResult?.totalDisplayRecords || this.uploadingResult?.excelRecords?.length || 0) -
               this.uploadingResult.totalPassedRecords
           )
-        : this.uploadingResult?.excelRecords?.filter(r => r.status.toLowerCase() == 'failed')?.length;
+        : this.uploadingResult.excelRecords.filter(r => (r.status || '').toLowerCase() == 'failed').length;
     }
 
     if (this.uploadingResult.totalPassedRecords == 0) {
@@ -229,7 +254,7 @@ export class uploadStatusComponent extends AppComponentBase implements OnInit, O
       this.goNextstep.emit();
 
       this.records.forEach(updatedRec => {
-        const originalRec = this.uploadingResult?.excelRecords.find(r => r.id === updatedRec.id);
+        const originalRec = this.uploadingResult.excelRecords.find(r => r.id === updatedRec.id);
         if (originalRec) {
           Object.assign(originalRec, updatedRec);
         }
@@ -250,7 +275,7 @@ export class uploadStatusComponent extends AppComponentBase implements OnInit, O
     this.close.emit(true);
   }
 
-  resetRecords(record: any, originalIndex: number) {
+  resetRecords(record: UploadStatusRecord, originalIndex: number) {
     const resetFlags = (rec: any) => {
       rec._isDataRecord = false;
       rec._isLinkingParent = false;
@@ -293,7 +318,7 @@ export class uploadStatusComponent extends AppComponentBase implements OnInit, O
   }
 
 
-  filteredRecords() {
+  filteredRecords(): UploadStatusRecord[] {
     if (!this.uploadingResult?.excelRecords?.length) return [];
 
     if (this.activeRecordType == 'Data')
@@ -304,7 +329,7 @@ export class uploadStatusComponent extends AppComponentBase implements OnInit, O
 
   }
 
-  records;
+  records: UploadStatusRecord[] = [];
 
   appendRecords(newRecords: any[], totalCount?: number, recordType?: string) {
     if (recordType && totalCount !== undefined)
@@ -339,6 +364,11 @@ export class uploadStatusComponent extends AppComponentBase implements OnInit, O
     this.hasImageRecords = !!this.imImages || this.uploadingResult.excelRecords.some(r => r.recordType === 'Image');
     this.loadingMoreRecords = false;
     this.cdr.detectChanges();
+
+    if (this.loadingAssociatedDataRecords) {
+      this.refreshAssociatedDataSuggestions();
+      this.loadNextAssociatedDataPage();
+    }
 
     // Image rows can be after several pages of data rows. When the Images tab
     // is selected, continue paging until an image row is found or all rows are loaded.
@@ -387,6 +417,50 @@ export class uploadStatusComponent extends AppComponentBase implements OnInit, O
     return recordType === 'Image'
       ? records.filter(r => r?.recordType === 'Image').length
       : records.filter(r => r?.recordType !== 'Image').length;
+  }
+
+  private loadNextAssociatedDataPage(): void {
+    if (!this.loadingAssociatedDataRecords || this.loadingMoreRecords || !this.uploadingResult?.isPagedResult)
+      return;
+
+    const loadedCount = this.getLoadedRecordCount('Data');
+    const totalCount = this.recordTotals['Data']
+      ?? this.uploadingResult?.totalDisplayRecords
+      ?? this.uploadingResult?.totalRecords
+      ?? 0;
+
+    if (loadedCount >= totalCount) {
+      this.loadingAssociatedDataRecords = false;
+      return;
+    }
+
+    this.loadingMoreRecords = true;
+    this.loadMoreRecords.emit({
+      skipCount: loadedCount,
+      maxResultCount: this.pageSize,
+      recordType: 'Data'
+    });
+  }
+
+  stopLoadingMoreRecords(): void {
+    this.loadingMoreRecords = false;
+    this.loadingAssociatedDataRecords = false;
+  }
+
+  private refreshAssociatedDataSuggestions(): void {
+    if (this.associatedDataSearchRecord && this.associatedDataSearchValue) {
+      const suggestions = this.getAssCodeSuggestions(
+        this.associatedDataSearchValue,
+        this.associatedDataSearchRecord
+      );
+
+      if (this.associatedDataSearchRecord._isLinkNewParent)
+        this.linkNewParentItem_Data = suggestions;
+      else if (this.associatedDataSearchRecord._isLinkNewItemColor)
+        this.linkNewItemColor_Data = suggestions;
+      else if (this.associatedDataSearchRecord._isLinkNewColorLookup)
+        this.linkNewColorLookup_Data = suggestions;
+    }
   }
 
 
@@ -471,17 +545,23 @@ export class uploadStatusComponent extends AppComponentBase implements OnInit, O
   }
 
   setRecordValue(record: any, key: string, value: any): void {
+    if (!record) return;
+
     if (record?.hasOwnProperty(key)) {
       record[key] = value;
     } else if (record?.excelDto?.hasOwnProperty(key)) {
       record.excelDto[key] = value;
+    } else if (record.excelDto) {
+      record.excelDto[key] = value;
+    } else {
+      record[key] = value;
     }
   }
 
 
 
   mapColumnNameToKey(columnName: string): string {
-    const map = {
+    const map: Record<string, string> = {
       "Code": "code",
       "Name": "name",
       "Record Type": "recordType",
@@ -672,15 +752,15 @@ export class uploadStatusComponent extends AppComponentBase implements OnInit, O
 
 
 
-  ValidateDataRecord(record) {
+  ValidateDataRecord(record: UploadStatusRecord) {
     record._isDataRecord = true;
   }
 
-  ValidateRecord(record) {
+  ValidateRecord(record: UploadStatusRecord) {
     this._validateRecord.emit(record);
   }
 
-  LinkToExistingITEM(record) {
+  LinkToExistingITEM(record: UploadStatusRecord) {
     record._isLinkingParent = true;
 
     // Scroll after DOM updated
@@ -703,7 +783,7 @@ export class uploadStatusComponent extends AppComponentBase implements OnInit, O
 
   }
 
-  LinkToExistingITEMCOLOR(record) {
+  LinkToExistingITEMCOLOR(record: UploadStatusRecord) {
     record._isLinkingItemColor = true;
 
     // Scroll after DOM updated
@@ -726,7 +806,7 @@ export class uploadStatusComponent extends AppComponentBase implements OnInit, O
 
   }
 
-  LinkToExistingCOLORLOOKUP(record) {
+  LinkToExistingCOLORLOOKUP(record: UploadStatusRecord) {
     record._isLinkingColorLookup = true;
 
     // Scroll after DOM updated
@@ -752,7 +832,7 @@ export class uploadStatusComponent extends AppComponentBase implements OnInit, O
 
 
 
-  CreateNewParentItemAndLinkAsDefaultImage(record) {
+  CreateNewParentItemAndLinkAsDefaultImage(record: UploadStatusRecord) {
     record._isCreateParent = true;
     this.setRecordValue(record, this.mapColumnNameToKey('No. Of dimensions'), '1');
 
@@ -781,7 +861,7 @@ export class uploadStatusComponent extends AppComponentBase implements OnInit, O
   }
 
 
-  CreateNewItemColorAndLinkImageAsDefaultImage(record) {
+  CreateNewItemColorAndLinkImageAsDefaultImage(record: UploadStatusRecord) {
     record._isCreateItemColor = true;
     this.setRecordValue(record, this.mapColumnNameToKey('No. Of dimensions'), '1');
 
@@ -809,7 +889,7 @@ export class uploadStatusComponent extends AppComponentBase implements OnInit, O
   }
 
 
-  CreateNewColorLookupAndLinkImage(record) {
+  CreateNewColorLookupAndLinkImage(record: UploadStatusRecord) {
     record._isCreateColorLookup = true;
 
 
@@ -838,7 +918,7 @@ export class uploadStatusComponent extends AppComponentBase implements OnInit, O
   }
 
 
-  LinkToNewParentItemCodeFromAssociatedData(record) {
+  LinkToNewParentItemCodeFromAssociatedData(record: UploadStatusRecord) {
     record._isLinkNewParent = true;
     this.setRecordValue(record, this.mapColumnNameToKey('Code'), '');
 
@@ -864,7 +944,7 @@ export class uploadStatusComponent extends AppComponentBase implements OnInit, O
   }
 
 
-  LinkToNewItemVariantCodeFromAssociatedData(record) {
+  LinkToNewItemVariantCodeFromAssociatedData(record: UploadStatusRecord) {
     record._isLinkNewItemColor = true;
     this.setRecordValue(record, this.mapColumnNameToKey('Code'), '');
 
@@ -889,7 +969,7 @@ export class uploadStatusComponent extends AppComponentBase implements OnInit, O
 
   }
 
-  LinkToNewColorLookupCodeFromAssociatedData(record) {
+  LinkToNewColorLookupCodeFromAssociatedData(record: UploadStatusRecord) {
     record._isLinkNewColorLookup = true;
     this.setRecordValue(record, this.mapColumnNameToKey('colorCode'), '');
 
@@ -1005,12 +1085,10 @@ export class uploadStatusComponent extends AppComponentBase implements OnInit, O
   }
 
   getAspectatio() {
-    let sycAttachmentCategoryImage;
     this.getSycAttachmentCategoriesByCodes(['LOGO', "BANNER", "IMAGE"]).subscribe((result) => {
       result.forEach(item => {
-        if (item.code == "IMAGE") {
-          sycAttachmentCategoryImage = item
-          let [width, height, border] = sycAttachmentCategoryImage.aspectRatio.split(':')
+        if (item.code == "IMAGE" && item.aspectRatio) {
+          const [width, height] = item.aspectRatio.split(':');
           this.acceptedAspectRatio = Number(width) / Number(height);
           return;
         }
@@ -1066,6 +1144,8 @@ export class uploadStatusComponent extends AppComponentBase implements OnInit, O
 
   onAssCodeInputChange(record: any, value: string) {
     record._selectionMade = false;
+    this.associatedDataSearchRecord = record;
+    this.associatedDataSearchValue = value || '';
 
     if (record._isLinkNewParent || record._isLinkNewItemColor) {
       this.setRecordValue(record, 'code', value);
@@ -1081,6 +1161,12 @@ export class uploadStatusComponent extends AppComponentBase implements OnInit, O
       this.linkNewItemColor_Data = result;
     } else if (record._isLinkNewColorLookup) {
       this.linkNewColorLookup_Data = result;
+    }
+
+    if (this.uploadingResult?.isPagedResult && this.getLoadedRecordCount('Data') <
+      (this.recordTotals['Data'] ?? this.uploadingResult?.totalDisplayRecords ?? this.uploadingResult?.totalRecords ?? 0)) {
+      this.loadingAssociatedDataRecords = true;
+      this.loadNextAssociatedDataPage();
     }
   }
 
@@ -1102,32 +1188,31 @@ export class uploadStatusComponent extends AppComponentBase implements OnInit, O
     }
 
     else if (record._isLinkNewItemColor) {
-      const uniqueRecords = Object.values(
-        this.uploadingResult.excelRecords
-          .filter(r =>
-            r.id !== record.id &&
-            r.recordType === "Item Variant" &&
-            r.code &&
-            r.code.toLowerCase().includes(value.toLowerCase())
-          )
-          .reduce((acc, r) => {
-            const baseName = r.code.replace(/-([^-]+)$/, "").trim();
+      const recordsByBaseName = this.uploadingResult.excelRecords
+        .filter(r =>
+          r.id !== record.id &&
+          r.recordType === "Item Variant" &&
+          r.code &&
+          r.code.toLowerCase().includes(value.toLowerCase())
+        )
+        .reduce((acc, r) => {
+          const baseName = r.code.replace(/-([^-]+)$/, "").trim();
 
-            if (!acc[baseName]) {
-              acc[baseName] = {
-                id: r.id,
-                ids: "",
-                displayName: baseName
-              };
-            }
+          if (!acc[baseName]) {
+            acc[baseName] = {
+              id: r.id,
+              ids: "",
+              displayName: baseName
+            };
+          }
 
-            acc[baseName].ids = acc[baseName].ids
-              ? acc[baseName].ids + "," + r.id
-              : String(r.id);
+          acc[baseName].ids = acc[baseName].ids
+            ? acc[baseName].ids + "," + r.id
+            : String(r.id);
 
-            return acc;
-          }, {} as Record<string, { id: number; ids: string; displayName: string }>)
-      );
+          return acc;
+        }, {} as Record<string, { id: number; ids: string; displayName: string }>);
+      const uniqueRecords = Object.keys(recordsByBaseName).map(key => recordsByBaseName[key]);
 
       return uniqueRecords;
 
@@ -1139,13 +1224,13 @@ export class uploadStatusComponent extends AppComponentBase implements OnInit, O
         .filter(r =>
           r.id !== record.id &&
           r.recordType === "Color" &&
-          r.excelDto.colorCode &&
+          r.excelDto?.colorCode &&
           r.excelDto.colorCode.toLowerCase().includes(value.toLowerCase())
         )
         .map(r => ({
           id: r.id,
-          displayName: r.excelDto.colorCode,
-          colorName: r.excelDto.colorName
+          displayName: r.excelDto?.colorCode,
+          colorName: r.excelDto?.colorName
         }));
     }
     return [];
@@ -1182,7 +1267,7 @@ export class uploadStatusComponent extends AppComponentBase implements OnInit, O
     }
   }
 
-  resumeConfirm(record) {
+  resumeConfirm(record: UploadStatusRecord) {
     const originalIndex = record.__originalIndex;
     if (Array.isArray(this.uploadingResult?.excelRecords)) {
       const loadedIndex = this.uploadingResult.excelRecords.findIndex(r => r.id === record.id);
@@ -1245,10 +1330,9 @@ export class uploadStatusComponent extends AppComponentBase implements OnInit, O
       }
     }
 
-    setTimeout(() => {
-      record._selectionMade = true;
-      this.activeRecord = null;
-    }, 0);
+    record._selectionMade = true;
+    this.activeRecord = null;
+    this.cdr.markForCheck();
 
     if (!this.isCreateNewCases(record))
       this.selectSugItemCode.emit({ selectedItem, record });
@@ -1269,7 +1353,6 @@ export class uploadStatusComponent extends AppComponentBase implements OnInit, O
     'Product Category Code',
     'Product Category Description',
     'Price',
-    'Price Currency Code',
     'Material Content',
     'Sold Out Date',
     'Brand Code',
@@ -1304,7 +1387,6 @@ export class uploadStatusComponent extends AppComponentBase implements OnInit, O
     'Product Category Code',
     'Product Category Description',
     'Price',
-    'Price Currency Code',
     'Color Code',
     'Color Name',
     'Size Scale Name',
@@ -1409,21 +1491,22 @@ export class uploadStatusComponent extends AppComponentBase implements OnInit, O
 
 
   isCreateNewCase(record: any, columnName: string): boolean {
-    if (!record.excelDto.actions) return false;
+    const action = Number(record.excelDto?.actions);
+    if (!action) return false;
 
-    const editableColumnsMap = {
+    const editableColumnsMap: Record<number, string[]> = {
       [this.UploadActionEnum.CreateNewParentItemAndLinkAsDefaultImage]: this.editableColumnsForCreateNewParent,
       [this.UploadActionEnum.CreateNewItemColorAndLinkImageAsDefaultImage]: this.editableColumnsForCreateNewItemColor,
       [this.UploadActionEnum.CreateNewColorLookupAndLinkImage]: this.editableColumnsForCreateNewColorLookup
     };
 
-    const editableColumns = editableColumnsMap[record.excelDto.actions] || [];
-    return editableColumns.includes(columnName);
+    const editableColumns = editableColumnsMap[action] || [];
+    return editableColumns.indexOf(columnName) !== -1;
   }
 
 
   getExampleTextForCases(record: any, columnName: string): string {
-    const exampleTextsMap = {
+    const exampleTextsMap: Record<number, Record<string, string>> = {
       [this.UploadActionEnum.CreateNewParentItemAndLinkAsDefaultImage]: this.exampleTextsForCreateNewParent,
       [this.UploadActionEnum.CreateNewItemColorAndLinkImageAsDefaultImage]: this.exampleTextsForCreateNewItemColor,
       [this.UploadActionEnum.CreateNewColorLookupAndLinkImage]: this.exampleTextsForCreateNewColorLookup,
@@ -1433,18 +1516,18 @@ export class uploadStatusComponent extends AppComponentBase implements OnInit, O
 
     };
 
-    return exampleTextsMap[record.excelDto.actions]?.[columnName] || '';
+    return exampleTextsMap[Number(record.excelDto?.actions)]?.[columnName] || '';
   }
 
 
 
   isRequiredColumnForCreateNewCase(record: any, columnName: string): boolean {
-    const requiredColumnsMap = {
+    const requiredColumnsMap: Record<number, string[]> = {
       [this.UploadActionEnum.CreateNewParentItemAndLinkAsDefaultImage]: this.requiredColumnsForCreateNewParent,
       [this.UploadActionEnum.CreateNewItemColorAndLinkImageAsDefaultImage]: this.requiredColumnsForCreateNewItemColor,
       [this.UploadActionEnum.CreateNewColorLookupAndLinkImage]: this.requiredColumnsForCreateNewColorLookup
     };
-    return requiredColumnsMap[record.excelDto.actions]?.includes(columnName) || false;
+    return requiredColumnsMap[Number(record.excelDto?.actions)]?.indexOf(columnName) !== -1;
   }
 
   onCodeSelected(record: any, selectedCode: string) {
@@ -1457,6 +1540,8 @@ export class uploadStatusComponent extends AppComponentBase implements OnInit, O
 
     else if (record._isLinkingColorLookup || record._isLinkNewColorLookup)
       return !!record._selectionMade && !!this.getRecordValue(record, 'colorCode')
+
+    return false;
   }
   isRestrictedCase(record: any): boolean {
     return record._isLinkingParent || record._isLinkingItemColor || record._isLinkingColorLookup || record._isLinkNewParent || record._isLinkNewItemColor || record._isLinkNewColorLookup;
@@ -1471,19 +1556,20 @@ export class uploadStatusComponent extends AppComponentBase implements OnInit, O
     return record._isLinkNewParent || record._isLinkNewItemColor || record._isLinkNewColorLookup;
   }
   hasAllRequiredFields(record: any): boolean {
-    const requiredColumnsMap = {
+    const requiredColumnsMap: Record<number, string[]> = {
       [this.UploadActionEnum.CreateNewParentItemAndLinkAsDefaultImage]: this.requiredColumnsForCreateNewParent,
       [this.UploadActionEnum.CreateNewItemColorAndLinkImageAsDefaultImage]: this.requiredColumnsForCreateNewItemColor,
       [this.UploadActionEnum.CreateNewColorLookupAndLinkImage]: this.requiredColumnsForCreateNewColorLookup
     };
 
-    const requiredColumns = requiredColumnsMap[record.excelDto.actions] || [];
+    const requiredColumns = requiredColumnsMap[Number(record.excelDto?.actions)] || [];
 
-    return requiredColumns.every(colName => !!this.getRecordValue(record, this.mapColumnNameToKey(colName)));
+    return requiredColumns.every((colName: string) => !!this.getRecordValue(record, this.mapColumnNameToKey(colName)));
   }
 
 
   canConfirm(record: any): boolean {
+    debugger;
     if (this.isRestrictedCase(record)) {
       return this.isCodeValid(record);
     }
