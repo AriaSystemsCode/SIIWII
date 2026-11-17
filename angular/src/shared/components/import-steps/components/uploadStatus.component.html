@@ -458,8 +458,10 @@
 
                                 <input *ngIf="column.name === 'Price Currency Code'" type="text"
                                   class="form-control link-parent-input force-uppercase"
-                                  [ngModel]="getRecordValue(record, 'priceCurrencyCode')"
-                                  (ngModelChange)="setRecordValue(record, 'priceCurrencyCode', $event?.toUpperCase())" />
+                                  [ngModel]="getRecordValue(record, column.key)"
+                                  (ngModelChange)="setRecordValue(record, column.key, $event?.toUpperCase())"
+                                  [disabled]="record.recordType === 'Image'"
+                                  [ngStyle]="{ 'cursor': record.recordType === 'Image' ? 'not-allowed' : 'text' }" />
 
 
 
