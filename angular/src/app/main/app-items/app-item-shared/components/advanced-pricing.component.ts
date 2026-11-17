@@ -6,11 +6,10 @@ import { MatrixGridColumns } from '@app/shared/common/matrix-grid/models/MatrixG
 import { MatrixGridRows } from '@app/shared/common/matrix-grid/models/MatrixGridRows';
 import { MatrixGridSelectItem } from '@app/shared/common/matrix-grid/models/MatrixGridSelectItem';
 import { AppComponentBase } from '@shared/common/app-component-base';
-import { AppItemPriceInfo, CreateOrEditAppItemDto, CurrencyInfoDto } from '@shared/service-proxies/service-proxies';
+import { AppItemPriceInfo, CreateOrEditAppItemDto, CurrencyInfoDto, VariationItemDto } from '@shared/service-proxies/service-proxies';
 import { ModalDirective } from 'ngx-bootstrap/modal';
 import { SelectItem } from 'primeng/api';
 import { PricingHelpersService } from '../services/pricing-helpers.service';
-import { AppConsts } from '@shared/AppConsts';
 
 @Component({
   selector: 'app-advanced-pricing',
@@ -22,6 +21,7 @@ export class AdvancedPricingComponent extends AppComponentBase implements OnChan
   @ViewChild('bsModal', { static: true }) modal: ModalDirective;
 
   @Input() prices:AppItemPriceInfo[] = []
+  @Input() variations:VariationItemDto[] = []
   @Input() readOnly:boolean 
   @Input() allCurrencies:CurrencyInfoDto[] = []
   @Input()  appItem: CreateOrEditAppItemDto = new CreateOrEditAppItemDto();
@@ -83,7 +83,11 @@ export class AdvancedPricingComponent extends AppComponentBase implements OnChan
     
     this.cols = this.pricingHelpersService.getDefaultCols();
     this.rows = []
-    this.prices.forEach(item=>{
+    const variationRetailPrices = this.readOnly
+      ? this.variations.reduce((prices, variation) => prices.concat(variation.appItemPriceInfos || []), [] as AppItemPriceInfo[])
+          .filter(price => price.code === 'RRP' || price.code === 'MSRP')
+      : [];
+    [...this.prices, ...variationRetailPrices].forEach(item=>{
       let currencyRowIndex : number = this.rows.findIndex(row=>row.rowHeader.value == item.currencyId)
       if(currencyRowIndex == -1) {
         const newRow :MatrixGridRows  = new MatrixGridRows({
@@ -106,17 +110,23 @@ export class AdvancedPricingComponent extends AppComponentBase implements OnChan
         currencyRowIndex = this.rows.length - 1
         }
       }
-     // const matrixCellIndex : number = this.rows[currencyRowIndex].rowValues.findIndex(cell=>cell.label == item.code)
-    let languageSettingName  =AppConsts.languageSettingName;
-     const matrixCellIndex : number = this.rows[currencyRowIndex].rowValues.findIndex(cell =>
-       cell.label == (languageSettingName != 'en-GB'
-         ? item.code
-         : item.code !== 'MSRP' 
-           ? item.code
-           :'RRP' )
-     )
-     if(matrixCellIndex > -1) this.rows[currencyRowIndex].rowValues[matrixCellIndex].value = item.price
     })
+    const levels = [this.pricingHelpersService.defaultLevel, ...this.pricingHelpersService.levels];
+    this.rows.forEach(row => {
+      row.rowValues.forEach((cell, index) => {
+        const priceIndex = this.pricingHelpersService.getPricingIndex(this.prices, levels[index], row.rowHeader.value);
+        let price = this.prices[priceIndex]?.price ?? 0;
+        if (this.readOnly && index === 0 && price === 0) {
+          const variationPrices = this.variations.map(variation => {
+            const prices = variation.appItemPriceInfos || [];
+            const retailIndex = this.pricingHelpersService.getPricingIndex(prices, levels[index], row.rowHeader.value);
+            return prices[retailIndex]?.price;
+          }).filter(value => value != null && value !== 0);
+          if (variationPrices.length > 0) price = Math.min(...variationPrices);
+        }
+        cell.value = price;
+      });
+    });
   }
   addNewCurrency() {
     this.matrixGrid.addNewRows([{ rowHeader: { label: '', value: '' }, rowValues: this.pricingHelpersService.setRowValues() }])
@@ -150,9 +160,6 @@ export class AdvancedPricingComponent extends AppComponentBase implements OnChan
   }
 
   mapRowsToAppItemPricesDto(){
-    const getPriceInfoIndex = ( currencyCode:string, level:string ) :number=>{
-      return this.prices.findIndex(item=>item.currencyCode == currencyCode && item.code == level)
-    }
     const newPrices : AppItemPriceInfo[] = []
     this.rows.forEach(row=>{
       const currencyCode : string = row.rowHeader.code
@@ -161,13 +168,13 @@ export class AdvancedPricingComponent extends AppComponentBase implements OnChan
       row.rowValues.forEach(cell=>{
        // if(!cell.value) return
         const level = cell?.label
-        const oldItemIndex :number = getPriceInfoIndex( currencyCode, level ) 
+        const oldItemIndex = this.pricingHelpersService.getPricingIndex(this.prices, level, currencyId);
         const item = new AppItemPriceInfo()
         if(oldItemIndex > -1) item.init(this.prices[oldItemIndex])
         item.currencyCode = currencyCode
         item.currencyId = currencyId
         item.currencyName = currencyName
-        item.code = level
+        item.code = oldItemIndex > -1 ? this.prices[oldItemIndex].code : level
         item.price = cell?.value
         newPrices.push(item)
       })
