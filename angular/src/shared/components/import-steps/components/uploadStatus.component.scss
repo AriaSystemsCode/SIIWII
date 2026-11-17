@@ -144,6 +144,72 @@
   }
 }
 
+.upload-status-list {
+  flex: 1 1 auto;
+  min-height: 0;
+  max-height: 60vh;
+  overflow-y: auto;
+  padding: 0 1.25rem;
+}
+
+.upload-status-record {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 1rem;
+  padding: 1rem 0;
+}
+
+.upload-status-record-details {
+  flex: 1 1 auto;
+  min-width: 0;
+  overflow-wrap: anywhere;
+}
+
+.upload-status-record-details h5,
+.upload-status-record-details h6 {
+  margin-bottom: 0.5rem;
+}
+
+.upload-status-badge {
+  flex: 0 0 100px;
+  margin: 0;
+}
+
+.upload-status-footer {
+  flex: 0 0 auto;
+}
+
+:host ::ng-deep .modal-dialog.modalCenter.upload-status-modal {
+  max-height: calc(100vh - 2rem);
+}
+
+:host ::ng-deep .modal-content.upload-status-modal {
+  display: flex;
+  flex-direction: column;
+  max-height: calc(100vh - 2rem);
+  overflow: hidden;
+}
+
+@media (max-width: 576px) {
+  .upload-status-list {
+    padding: 0 0.75rem;
+  }
+
+  .upload-status-record {
+    gap: 0.5rem;
+  }
+
+  .upload-status-badge {
+    flex-basis: 92px;
+  }
+
+  .upload-status-footer {
+    margin: 0 !important;
+    padding: 1rem !important;
+  }
+}
+
 /* ============================
    Error Text
 ============================ */
