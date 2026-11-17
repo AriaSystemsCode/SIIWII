@@ -133,8 +133,15 @@ namespace onetouch.AppDashboards
 
                     var userCreator = await UserManager.GetUserByIdAsync(dashboard.CreatorUserId);
                     if (userCreator != null)
+                    {
                         dashboard.CreatorUserName = userCreator.FullName;
-
+                        using (UnitOfWorkManager.Current.DisableFilter(AbpDataFilters.MustHaveTenant, AbpDataFilters.MayHaveTenant))
+                        {
+                            var userInfo = await _appEntitiesAppService.GetUserInformation(dashboard.CreatorUserId);
+                            if (userInfo != null)
+                                dashboard.OwnerUserImg = userInfo.UserImage;
+                        }
+                    }
                     if (!string.IsNullOrEmpty(dashboard.SpreadsheetFilePath) &&
                         System.IO.File.Exists(dashboard.SpreadsheetFilePath))
                     {
@@ -146,8 +153,10 @@ namespace onetouch.AppDashboards
                 .Where(z => z.EntityId == dashboard.Id &&
                 z.SharedUserId == AbpSession.UserId).FirstOrDefaultAsync();
                     if (sharing != null)
+                    {
+                        if (sharing.LastViewDate.Date != (new DateTime(1,1,1)).Date)
                         dashboard.LastViewDate = sharing.LastViewDate;
-
+                    }
 
                     //Timezone Conversion[start]
                     if (input.TimeZoneValue != null)
@@ -465,7 +474,7 @@ namespace onetouch.AppDashboards
                 entity.EntityObjectTypeId = dashboardObjectTypeId;
                 var entityId = await _appEntitiesAppService.SaveEntity(entity);
                 await CurrentUnitOfWork.SaveChangesAsync();
-                await UpdateViewDate(entityId);
+                //await UpdateViewDate(entityId);
 
             }
             else

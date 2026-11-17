@@ -24,6 +24,7 @@ namespace onetouch.AppDashboards.Dtos
         public virtual string SpreadsheetFilePath { get; set;}
         public virtual bool IsEditable { set; get; }
         public virtual bool IsTheOwner { set; get; }
+        public virtual string OwnerUserImg { set; get; }
         public virtual int SharingLevel { get; set; }
     }
     public class GetAllDashboardsInput : PagedAndSortedResultRequestDto
