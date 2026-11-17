@@ -29,7 +29,6 @@ import { ImportStepInfo } from "../models/ImportStepInfo";
 import { ImportStepsEnum } from "../models/ImportStepsEnum";
 import { videoTutorialComponent } from "./videoTutorial.component";
 import { imageCroppingComponent } from "./imageCropping.Component";
-import { debug } from "console";
 
 @Component({
     selector: "MainImportModal",
@@ -40,19 +39,19 @@ export class MainImportComponent
     extends AppComponentBase
     implements OnInit {
     @ViewChild("BrowseModal", { static: true })
-    BrowseModal: BrowseFolderComponent;
+    BrowseModal!: BrowseFolderComponent;
     @ViewChild("ProgressModal", { static: true })
-    ProgressModal: ProgressComponent;
+    ProgressModal!: ProgressComponent;
     @ViewChild("StatusModal", { static: true })
-    StatusModal: uploadStatusComponent;
+    StatusModal!: uploadStatusComponent;
     @ViewChild("AutoCropModal", { static: true })
-    AutoCropModal: autoCropComponent;
+    AutoCropModal!: autoCropComponent;
     @ViewChild("imageCroppingModal", { static: true })
-    imageCroppingModal: imageCroppingComponent;
+    imageCroppingModal!: imageCroppingComponent;
     @ViewChild("importConfirmationModal", { static: true })
-    importConfirmationModal: importConfirmationComponent;
+    importConfirmationModal!: importConfirmationComponent;
     @ViewChild("successfullyImportModal", { static: true })
-    successfullyImportModal: successfullyImportComponent;
+    successfullyImportModal!: successfullyImportComponent;
 
 
     //Step1
@@ -60,20 +59,20 @@ export class MainImportComponent
     imagesName: string[] = [];
     imagesList: ImageFile[] = [];
     uploadUrl: string = "";
-    uploader: FileUploader;
-    imagesUploader: FileUploaderCustom;
+    uploader: FileUploader = null as any;
+    imagesUploader!: FileUploaderCustom;
     _guid: string = "";
-    progress: number;
+    progress: number = 0;
 
     //Step2
-    progressHeader: string;
-    ProgressDetail: string;
+    progressHeader: string = '';
+    ProgressDetail: string = '';
 
     //Step3
     uploadingResult: any = null;
-    uploadindResultExcelList: any[] = null;
-    totalPassedRecords: number;
-    totalFailedRecords: number;
+    uploadindResultExcelList: any[] | null = null;
+    totalPassedRecords: number = 0;
+    totalFailedRecords: number = 0;
 
     //Step4
     imageFailed: number = 0;
@@ -84,42 +83,42 @@ export class MainImportComponent
     finalImages: ImageFile[] = [];
     finalUploadedImages: ImageFile[] = [];
     guids: string[] = [];
-    finishCropping: boolean;
+    finishCropping: boolean = false;
     Previous: boolean = false;
-    OnChange: boolean;
+    OnChange: boolean = false;
 
     //Step6
-    finalCountFailed: number;
-    finalCountPassed: number;
-    repreateHandler: number;
+    finalCountFailed: number = 0;
+    finalCountPassed: number = 0;
+    repreateHandler: number = 0;
     passedImages: File[] = [];
 
     //step7
-    logFileUrl: string;
-    logFileName: string;
-    importType: ImportTypes;
+    logFileUrl: string = '';
+    logFileName: string = '';
+    importType!: ImportTypes;
     importService: any;
     importServiceProxy: any;
     serviceUtilitesProxy: any;
     serviceUtilites: any;
-    sycAttachmentCategory: { [key: string]: SycAttachmentCategoryDto };
-    skipAutoCropModal: boolean;
-    hasImages: boolean;
-    currentStep: ImportStepInfo;
-    importStepsInfo: ImportStepInfo[];
+    sycAttachmentCategory: { [key: string]: SycAttachmentCategoryDto } = {};
+    skipAutoCropModal: boolean = false;
+    hasImages: boolean = false;
+    currentStep!: ImportStepInfo;
+    importStepsInfo: ImportStepInfo[] = [];
     @Output() finishImport = new EventEmitter<boolean>();
-    validMethodName;
-    saveMethodName;
+    validMethodName: string = '';
+    saveMethodName: string = '';
 
     @ViewChild("videoModal", { static: true })
-    videoModal: videoTutorialComponent;
+    videoModal!: videoTutorialComponent;
     updateLookups: boolean = false;
     folder_details: boolean = false;
     imData: boolean = false;
     imImages: boolean = false;
     invalidImport: boolean = false;
     limitImImages = 100;
-    updatedRecordData;
+    updatedRecordData: any;
     _resetRecords: boolean = false;
     callValid: boolean = false;
 
@@ -137,7 +136,7 @@ export class MainImportComponent
         this.guids = [];
     }
 
-    aspectRatioNumbers;
+    aspectRatioNumbers: string = '';
     async show(importType: ImportTypes, importService: any, serviceUtilites: any, attachmetnCategoriesCodes: string[], hasImages: boolean, importStepsInfo: ImportStepInfo[]) {
         this.invalidImport = false;
         this.importStepsInfo = importStepsInfo;
@@ -150,6 +149,7 @@ export class MainImportComponent
         if (attachmetnCategoriesCodes) {
             this.getSycAttachmentCategoriesByCodes(attachmetnCategoriesCodes).subscribe((result) => {
                 result.forEach(attach => {
+                    if (!attach.code) return;
                     var _aspectRatioNumbers = attach.aspectRatio ? attach.aspectRatio : "1:1";
                     this.aspectRatioNumbers=  attach?.name?.toLowerCase()?.includes('image')  ?   _aspectRatioNumbers  :"1:1" ; 
                     this.BrowseModal.aspectRatioNumbers =  this.aspectRatioNumbers;
@@ -174,7 +174,7 @@ export class MainImportComponent
         this.imagesName = [];
         this.imagesList = [];
         this.uploadUrl = "";
-        this.uploader = null;
+        this.uploader = null as any;
         this._guid = "";
         this.progress = 0;
         this.progressHeader = "";
@@ -199,6 +199,7 @@ export class MainImportComponent
     }
 
     onUploadedFolder($event: any) {
+        debugger;
         this.BrowseModal.hide();
         this.UploadedFolder = $event;
         this.uploadUrl = "/Attachment/UploadFiles";
@@ -336,7 +337,7 @@ export class MainImportComponent
                             this.ProgressModal.hide();
                         }
                         ))
-                        .subscribe((result) => {
+                        .subscribe((result: any) => {
                             this.logFileUrl =
                                 result?.excelLogDTO?.excelLogPath;
                             this.logFileName =
@@ -400,7 +401,7 @@ export class MainImportComponent
                     clearInterval(interval);
                     this.ProgressModal.hide();
                 }
-                )).subscribe((result) => {
+                )).subscribe((result: any) => {
                     this.logFileUrl =
                         result?.excelLogDTO?.excelLogPath;
                     this.logFileName =
@@ -439,11 +440,11 @@ export class MainImportComponent
         return extension === 'jpg' || extension === 'jpeg' || extension === 'png';
     }
 
-    ontotalFailedRecords($event) {
+    ontotalFailedRecords($event: number) {
         this.totalFailedRecords = $event;
     }
 
-    ontotalPassedRecords($event) {
+    ontotalPassedRecords($event: number) {
         this.totalPassedRecords = $event;
     }
 
@@ -502,10 +503,10 @@ export class MainImportComponent
         this.finishCropping = $event;
     }
 
-    onfinalCountFailed($event) {
+    onfinalCountFailed($event: number) {
         this.finalCountFailed = $event;
     }
-    onfinalCountPassed($event) {
+    onfinalCountPassed($event: number) {
         this.finalCountPassed = $event;
     }
 
@@ -552,7 +553,7 @@ export class MainImportComponent
 
     }
 
-    remainingFiles;
+    remainingFiles: number = 0;
     estimatedRemainingTime = 0;
     avgTimePerFile = 0;
     uploadStartTime = Date.now();
@@ -569,7 +570,7 @@ export class MainImportComponent
                     this.spinnerService.hide();
                 }))
                 .subscribe(
-                    (result) => {
+                    (result: any) => {
                         this.logFileUrl = result.excelLogPath;
                         this.logFileName = result.excelLogFileName;
                     },
@@ -589,7 +590,7 @@ export class MainImportComponent
                    // this.notify.success("Your import has been completed successfully.");
                 }))
                 .subscribe(
-                    (result) => {
+                    (result: any) => {
                         this.logFileUrl = result.excelLogPath;
                         this.logFileName = result.excelLogFileName;
                     },
@@ -605,7 +606,7 @@ export class MainImportComponent
                 this.uploadingResult.from = this.uploadingResult?.fromList[iterationNo];
                 this.uploadingResult.to = this.uploadingResult?.toList[iterationNo];
     
-                this.uploadingResult.excelRecords = this.uploadindResultExcelList.slice(
+                this.uploadingResult.excelRecords = (this.uploadindResultExcelList || []).slice(
                     this.uploadingResult.from - 2,
                     this.uploadingResult.to - 2 + 1
                 );
@@ -625,7 +626,7 @@ export class MainImportComponent
                 }
             }))
             .subscribe(
-                (result) => {
+                (result: any) => {
                     if (shouldFinish) {
                         this.logFileUrl = result.excelLogPath;
                         this.logFileName = result.excelLogFileName;
@@ -645,7 +646,7 @@ export class MainImportComponent
 
     onLoadMoreValidateExcelRecords($event: { skipCount: number; maxResultCount: number; recordType: string }) {
         if (!this.uploadingResult?.resultKey || !this.importServiceProxy?.getValidateExcelResultPage) {
-            this.StatusModal.loadingMoreRecords = false;
+            this.StatusModal.stopLoadingMoreRecords();
             return;
         }
 
@@ -657,7 +658,7 @@ export class MainImportComponent
                 $event.recordType
             )
             .subscribe(
-                (result) => {
+                (result: any) => {
                     this.StatusModal.appendRecords(
                         result?.excelRecords || [],
                         result?.totalDisplayRecords,
@@ -665,7 +666,7 @@ export class MainImportComponent
                     );
                 },
                 () => {
-                    this.StatusModal.loadingMoreRecords = false;
+                    this.StatusModal.stopLoadingMoreRecords();
                 }
             );
     }
@@ -691,7 +692,7 @@ export class MainImportComponent
         return uploader;
     }
 
-    onDownloadLogFile($event) {
+    onDownloadLogFile($event: boolean) {
         let attach = AppConsts.attachmentBaseUrl;
         let fullURL = `${attach}/${this.logFileUrl}`;
         //let fullURL = `${url}`; // FOR Local Use
@@ -761,7 +762,7 @@ export class MainImportComponent
             case ImportStepsEnum.importConfirmationModalStep:
                 const hasDuplicateWarning = this.uploadingResult?.hasDuplication === true ||
                     this.uploadingResult?.HasDuplication === true ||
-                    (this.uploadingResult?.excelRecords || []).some(record => {
+                    (this.uploadingResult?.excelRecords || []).some((record: any) => {
                         const messages = [
                             ...(record?.fieldsErrors || []),
                             record?.errorMessage || ''
@@ -860,7 +861,7 @@ export class MainImportComponent
                     this.uploadingResult = ret;
                     debugger
                     if (Array.isArray(this.uploadingResult.excelRecords)) {
-                        this.uploadingResult.excelRecords = this.uploadingResult.excelRecords.map(item => {
+                        this.uploadingResult.excelRecords = this.uploadingResult.excelRecords.map((item: any) => {
                             if (item?.image) {
                                 const match = this.finalUploadedImages.find(img =>
                                     img.code.toLowerCase() === item.image.toLowerCase()
@@ -896,18 +897,18 @@ export class MainImportComponent
         }
     }
 
-    onFinishImport($event) {
+    onFinishImport($event: boolean) {
         this.finishImport.emit($event);
     }
 
-    onOpenVideoModal($event) {
+    onOpenVideoModal($event: boolean) {
         if ($event) {
             this.videoModal.show("");
             this.spinnerService.show();
             this.importServiceProxy
                 .getImportVideo()
                 .pipe(finalize(() => this.spinnerService.hide()))
-                .subscribe((videoTutorial) => {
+                .subscribe((videoTutorial: any) => {
                     this.BrowseModal.hide();
                     this.videoModal.show(videoTutorial);
                 })
@@ -919,38 +920,38 @@ export class MainImportComponent
         this.BrowseModal.show(this.importType, this.importService, this.hasImages);
     }
 
-    onUpdateLookups($event) {
+    onUpdateLookups($event: boolean) {
         this.updateLookups = $event;
     }
 
-    _totalFiles;
-    _totalSizeMB;
-    _folderName;
-    settotalFiles($event) {
+    _totalFiles: number = 0;
+    _totalSizeMB: number = 0;
+    _folderName: string = '';
+    settotalFiles($event: number) {
         this._totalFiles = $event;
     }
 
-    settotalSizeMB($event) {
+    settotalSizeMB($event: number) {
         this._totalSizeMB = $event;
     }
 
-    setfolderName($event) {
+    setfolderName($event: string) {
         this._folderName = $event;
     }
 
-    setImData($event) {
+    setImData($event: boolean) {
         this.imData = $event;
     }
-    setImImages($event) {
+    setImImages($event: boolean) {
         this.imImages = $event;
     }
 
-    setHasImages($event) {
+    setHasImages($event: boolean) {
         this.hasImages = $event;
     }
 
 
-    onsSearchItemCode($event) {
+    onsSearchItemCode($event: any) {
         if ($event?.isCodeItem) {
             this.importServiceProxy
                 .getAllLookUp(
@@ -978,7 +979,7 @@ export class MainImportComponent
                     0,
                     100
                 )
-                .subscribe((result) => {
+                .subscribe((result: any) => {
                     this.StatusModal.LinkToExistingITEM_Ret_Data = result;
                 });
         }
@@ -1011,7 +1012,7 @@ export class MainImportComponent
                     0,
                     100
                 )
-                .subscribe((result) => {
+                .subscribe((result: any) => {
                     this.StatusModal.LinkToExistingItemColor_Ret_Data = result;
                 });
         }
@@ -1026,7 +1027,7 @@ export class MainImportComponent
                     undefined, undefined, undefined, undefined, undefined, undefined, undefined, "", 0, 100
 
                 )
-                .subscribe((result) => {
+                .subscribe((result: any) => {
                     this.StatusModal.LinkToExistingColorLookup_Ret_Data = result;
                 });
         }
@@ -1115,7 +1116,7 @@ export class MainImportComponent
                         this.hideMainSpinner();
                     })
                 )
-                .subscribe((result) => {
+                .subscribe((result: any) => {
                     this.updatedRecordData = {
                         record,
                         newData: result
@@ -1201,7 +1202,7 @@ export class MainImportComponent
                     finalize(() => {
                         this.hideMainSpinner();
                     })
-                ).subscribe((result) => {
+                ).subscribe((result: any) => {
                     this.updatedRecordData = {
                         record,
                         newData: result
@@ -1227,11 +1228,11 @@ export class MainImportComponent
         }
     }
 
-    onUpdatedRecords($event) {
+    onUpdatedRecords($event: any) {
         this.uploadingResult = $event;
     }
 
-    onValidateRecord(record) {
+    onValidateRecord(record: any) {
         
         let _ImportItemInputDto: ImportItemInputDto = new ImportItemInputDto();
        

@@ -1,7 +1,7 @@
 <div bsModal #uploadStatus="bs-modal" class="modal fade" tabindex="-1" role="dialog" aria-labelledby="uploadStatus"
   aria-hidden="true" [config]="{backdrop: 'static'}">
-  <div class="modal-dialog modal-xl modalCenter">
-    <div class="modal-content">
+  <div class="modal-dialog modal-xl modalCenter upload-status-modal">
+    <div class="modal-content upload-status-modal">
       <div class="modal-header-custom">
         <h5 class="modal-title font-weight-bold">Import {{ImportTypes[importType]}} information</h5>
         <div>
@@ -34,19 +34,19 @@
         </div>
       </div>
 
-      <div class="modal-body p-0 pl-4 uploadStatusContainer">
+      <div class="modal-body p-0 uploadStatusContainer">
 
-        <div *ngIf="importType != ImportTypes.Items" class="_body">
+        <div *ngIf="importType != ImportTypes.Items" class="_body upload-status-list">
           <ng-container *ngIf="uploadingResult && uploadingResult?.excelRecords?.length > 0; else noData">
-            <div *ngFor="let record of uploadingResult.excelRecords" class="border-bottom modal-body pb-4 row">
-              <div class="col-10">
+            <div *ngFor="let record of uploadingResult.excelRecords" class="upload-status-record border-bottom">
+              <div class="upload-status-record-details">
                 <h5>{{record.recordType}} {{record.code}} </h5>
                 <h6>{{record.name}} </h6>
                 <span class="{{record.status| uppercase}}STATUS font-weight-bold"> {{record.errorMessage}}</span>
 
               </div>
 
-              <div class="Status ml-3   pt-2 text-center">
+              <div class="Status upload-status-badge pt-2 text-center">
                 <img src="../../../../assets/accounts/importAccounts/{{record.status | uppercase}}.svg" class="pr-2" />
                 <span
                   class="{{record.status| uppercase}}STATUS font-weight-bold">{{record.status+"STATUS"|uppercase|localize}}
@@ -347,37 +347,18 @@
                               </ng-template>
 
                               <ng-template #editableInput>
-                                <!-- Special case for Price Currency Code -->
-                                <ng-container *ngIf="column.name === 'Price Currency Code'; else normalEditableInput">
-                                  <input type="text" class="form-control text-uppercase force-uppercase"
-                                    [attr.data-record-id]="record.id"
-                                    [ngModel]="getRecordValue(record, column.key)"
-                                    (ngModelChange)="setRecordValue(record, column.key, $event?.toUpperCase())"
-                                    [ngClass]="{
-                                                'border-danger': isRequiredColumnForCreateNewCase(record, column.name) &&
-                                                                 !getRecordValue(record, column.key)
-                                              }" />
-                                  <small class="text-danger" *ngIf="isRequiredColumnForCreateNewCase(record, column.name) &&
-                                        !getRecordValue(record, column.key)">
-                                    {{ getExampleTextForCases(record, column.name) }}
-                                  </small>
-                                </ng-container>
-
-                                <!-- Fallback to normal input -->
-                                <ng-template #normalEditableInput>
-                                  <input type="text" class="form-control" [attr.data-record-id]="record.id"
-                                    [ngModel]="getRecordValue(record, column.key)"
-                                    (ngModelChange)="setRecordValue(record, column.key, $event)"
-                                    [ngClass]="{
+                                <input type="text" class="form-control" [attr.data-record-id]="record.id"
+                                  [ngModel]="getRecordValue(record, column.key)"
+                                  (ngModelChange)="setRecordValue(record, column.key, $event)"
+                                  [ngClass]="{
                                           'border-danger': isRequiredColumnForCreateNewCase(record, column.name) &&
                                                            !getRecordValue(record, column.key)
                                         }" />
-                                  <small class="text-danger"
-                                    *ngIf="isRequiredColumnForCreateNewCase(record, column.name) &&
+                                <small class="text-danger"
+                                  *ngIf="isRequiredColumnForCreateNewCase(record, column.name) &&
                                                                   !getRecordValue(record, column.key)">
-                                    {{ getExampleTextForCases(record, column.name) }}
-                                  </small>
-                                </ng-template>
+                                  {{ getExampleTextForCases(record, column.name) }}
+                                </small>
                               </ng-template>
 
 
@@ -457,11 +438,8 @@
                                 </ng-container>
 
                                 <input *ngIf="column.name === 'Price Currency Code'" type="text"
-                                  class="form-control link-parent-input force-uppercase"
-                                  [ngModel]="getRecordValue(record, column.key)"
-                                  (ngModelChange)="setRecordValue(record, column.key, $event?.toUpperCase())"
-                                  [disabled]="record.recordType === 'Image'"
-                                  [ngStyle]="{ 'cursor': record.recordType === 'Image' ? 'not-allowed' : 'text' }" />
+                                  class="form-control text-uppercase force-uppercase"
+                                  [value]="getRecordValue(record, column.key)" disabled />
 
 
 
@@ -530,7 +508,7 @@
 
 
 
-        <div class="pb-4 pl-5 border-top pt-4 mt-4 text-right mr-4">
+        <div class="upload-status-footer pb-4 pl-5 border-top pt-4 mt-4 text-right mr-4">
           <ng-container *ngIf="!isActionInProgress(); else disableBtn">
             <button class="Next-Btn" (click)="GoNextstep()">
               {{ "Next" | localize }}
