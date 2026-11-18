@@ -19258,6 +19258,7 @@ export class AppItemsListsServiceProxy {
 
     /**
      * @param id (optional) 
+     * @param isMarketplaceList (optional) 
      * @return Success
      */
     getAppItemsListForView(id: number | undefined, isMarketplaceList: boolean | undefined): Observable<GetAppItemsListForEditOutput> {
@@ -83244,12 +83245,12 @@ export class PublishItemOptions implements IPublishItemOptions {
             this.itemListId = _data["itemListId"];
             this.sharingLevel = _data["sharingLevel"];
             this.message = _data["message"];
-            this.numberOfSubscribers = _data["numberOfSubscribers"];
             if (Array.isArray(_data["itemSharing"])) {
                 this.itemSharing = [] as any;
                 for (let item of _data["itemSharing"])
                     this.itemSharing!.push(ItemSharingDto.fromJS(item));
             }
+            this.numberOfSubscribers = _data["numberOfSubscribers"];
         }
     }
 
@@ -83270,12 +83271,12 @@ export class PublishItemOptions implements IPublishItemOptions {
         data["itemListId"] = this.itemListId;
         data["sharingLevel"] = this.sharingLevel;
         data["message"] = this.message;
-        data["numberOfSubscribers"] = this.numberOfSubscribers;
         if (Array.isArray(this.itemSharing)) {
             data["itemSharing"] = [];
             for (let item of this.itemSharing)
                 data["itemSharing"].push(item.toJSON());
         }
+        data["numberOfSubscribers"] = this.numberOfSubscribers;
         return data;
     }
 }
@@ -86075,6 +86076,7 @@ export class CreateOrEditAppItemsListDto implements ICreateOrEditAppItemsListDto
     usersCount!: number;
     statusCode!: string | undefined;
     statusId!: number | undefined;
+    ssin!: string | undefined;
     id!: number | undefined;
 
     [key: string]: any;
@@ -86109,6 +86111,7 @@ export class CreateOrEditAppItemsListDto implements ICreateOrEditAppItemsListDto
             this.usersCount = _data["usersCount"];
             this.statusCode = _data["statusCode"];
             this.statusId = _data["statusId"];
+            this.ssin = _data["ssin"];
             this.id = _data["id"];
         }
     }
@@ -86141,6 +86144,7 @@ export class CreateOrEditAppItemsListDto implements ICreateOrEditAppItemsListDto
         data["usersCount"] = this.usersCount;
         data["statusCode"] = this.statusCode;
         data["statusId"] = this.statusId;
+        data["ssin"] = this.ssin;
         data["id"] = this.id;
         return data;
     }
@@ -86158,6 +86162,7 @@ export interface ICreateOrEditAppItemsListDto {
     usersCount: number;
     statusCode: string | undefined;
     statusId: number | undefined;
+    ssin: string | undefined;
     id: number | undefined;
 
     [key: string]: any;
