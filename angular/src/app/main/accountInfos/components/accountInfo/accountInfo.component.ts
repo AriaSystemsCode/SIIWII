@@ -530,7 +530,11 @@ export class AccountInfoComponent extends AppComponentBase implements OnInit {
                 if (this.isManualAccount) {
                     this.accountInfoTemp.accountTypeId = 19;
                     this.accountInfoTemp.accountType = 'BUSINESS';
+
                 }
+                  this.getExtrAttributes();
+
+
             });
     }
 
