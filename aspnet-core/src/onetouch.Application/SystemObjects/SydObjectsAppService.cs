@@ -907,26 +907,26 @@ namespace onetouch.SystemObjects
         }
 
         [AbpAllowAnonymous]
-        public async Task SendContactUsInfo(string firstName, string lastName, string email,string phone,string message)
+        public async Task SendContactUsInfo(string firstName, string lastName, string email,string phone,string message,string subject)
         {
             string salesEmail = await _appEntitiesAppService.GetHostSettingValue(1219);
             string contactUsEmailTemplate = await _appEntitiesAppService.GetHostSettingValue(1220);
             
             //string salesEmail = "customercare@ariasystems.biz";
             string contactUsData = "<font size=\"4\"><strong>Details:</strong><br>" +
-                        "<strong>Name:</strong>" + firstName +" "+lastName+ "\r\n" +
+                        "<strong>Name: </strong>" + firstName +" "+lastName+ "\r\n" +
                         //"Last Name:" + lastName + "\r\n" +
-                        "<strong>Email:</strong>" + email + "\r\n" +
-                        "<strong>Phone :</strong>" + phone + "\r\n" + "<br>"+
-                        "<strong>Message:</strong><br>" + message + "</font>\r\n";
+                        "<strong>Email: </strong>" + email + "\r\n" +
+                        "<strong>Phone: </strong>" + phone + "\r\n" + "<br>"+
+                        "<strong>Message: </strong><br>" + message + "</font>\r\n";
             string body = contactUsEmailTemplate.Replace("CONTACTUSINFO", contactUsData);
-            body = body.Replace("\r\n", "<br><br>");
-            body = body.Replace("\n", "<br><br>");
+            body = body.Replace("\r\n", "<br>");
+            body = body.Replace("\n", "<br>");
             await _emailSender.SendAsync(new MailMessage
             {
                 To = { salesEmail },
-                Subject = "Registration Request",
-                Body = "<!DOCTYPE html><html><head/><body><p>"+body+ "<br><br></body></html>",
+                Subject = subject,//"Registration Request",
+                Body = "<!DOCTYPE html><html><head/><body><p>"+body+ "<br></body></html>",
                 /*Body = "<!DOCTYPE html><html><head/><body><p>Dear Support, " + "<br><br>" +
                         "A new enquiry has been made on the Orbit website,\r\nDetails are as follows:" + "<br><br>" +
                         "First Name:"+ firstName + "<br><br>"+
