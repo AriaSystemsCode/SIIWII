@@ -54,7 +54,7 @@
     <div class="d-flex spreadsheet-workspace">
 
         <!-- SPREADSHEET -->
-        <div class="spreadsheet-editor flex-grow-1 position-relative" (click)="onSheetClick($event)" >
+        <div class="spreadsheet-editor flex-grow-1 position-relative" (pointerdown)="onSheetPointerDown($event)" >
             <ejs-spreadsheet     *ngIf="syncfusionLocaleReady" #spreadsheet width="100%" height="100%" [sheets]="sheets" [scrollSettings]="scrollSettings"
                 [showAggregate]="showAggregate" [showSheetTabs]="true" (created)="onCreated()"     [allowSave]="true"
     [saveUrl]="spreadsheetSaveUrl"   [locale]="syncfusionLocale"  [enableRtl]="syncfusionRtl"
@@ -95,7 +95,7 @@
                 <div class="pivot-analysis-layout bg-white">
                     <!-- Table / chart -->
                     <div class="flex-grow-1" style="min-width: 0; height: 100%; overflow-x: hidden;">
-                        <ejs-pivotview      *ngIf="syncfusionLocaleReady"   [locale]="syncfusionLocale"
+                        <ejs-pivotview      *ngIf="syncfusionLocaleReady"   [locale]="syncfusionLocale"   [enableValueSorting]="true"
     [enableRtl]="syncfusionRtl" #pivotView id="PivotView" width="100%" height="100%"
                             [dataSourceSettings]="pivotSettings" [showFieldList]="false" [showToolbar]="true"
                             [toolbar]="pivotToolbar" [showGroupingBar]="true" [allowCalculatedField]="true"
