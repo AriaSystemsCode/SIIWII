@@ -53116,9 +53116,10 @@ export class SydObjectsServiceProxy {
      * @param email (optional) 
      * @param phone (optional) 
      * @param message (optional) 
+     * @param subject (optional) 
      * @return Success
      */
-    sendContactUsInfo(firstName: string | null | undefined, lastName: string | null | undefined, email: string | null | undefined, phone: string | null | undefined, message: string | null | undefined): Observable<void> {
+    sendContactUsInfo(firstName: string | null | undefined, lastName: string | null | undefined, email: string | null | undefined, phone: string | null | undefined, message: string | null | undefined, subject: string | null | undefined): Observable<void> {
         let url_ = this.baseUrl + "/api/services/app/SydObjects/SendContactUsInfo?";
         if (firstName !== undefined && firstName !== null)
             url_ += "firstName=" + encodeURIComponent("" + firstName) + "&";
@@ -53130,6 +53131,8 @@ export class SydObjectsServiceProxy {
             url_ += "phone=" + encodeURIComponent("" + phone) + "&";
         if (message !== undefined && message !== null)
             url_ += "message=" + encodeURIComponent("" + message) + "&";
+        if (subject !== undefined && subject !== null)
+            url_ += "subject=" + encodeURIComponent("" + subject) + "&";
         url_ = url_.replace(/[?&]$/, "");
 
         let options_ : any = {
