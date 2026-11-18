@@ -143,17 +143,26 @@ namespace onetouch.Web.Startup
 
         public async Task Invoke(HttpContext context)
         {
-            // Read Origin header
+            // Swagger can send an explicit client URL because its requests may not
+            // include the browser's Origin header.
+            var clientUrl = context.Request.Headers["X-Client-Url"].FirstOrDefault();
+            if (!string.IsNullOrWhiteSpace(clientUrl))
+            {
+                context.Items["XXXClientUrl"] = clientUrl;
+            }
+
+            // Prefer Origin for FE calls because its host identifies the client UI.
             var origin = context.Request.Headers["Origin"].FirstOrDefault();
 
-            if (!string.IsNullOrEmpty(origin))
+            if (string.IsNullOrWhiteSpace(origin))
             {
-                // Example: log it, or attach to HttpContext.Items
-                Console.WriteLine($"[OriginMiddleware] Request Origin: {origin}");
-
-                // Store in HttpContext for later use
-                context.Items["XXXRequestOrigin"] = origin;
+                // Browser navigations and direct API calls may omit Origin. In that
+                // case, resolve the client from the host serving this request.
+                origin = $"{context.Request.Scheme}://{context.Request.Host}";
             }
+
+            Console.WriteLine($"[OriginMiddleware] Request client URL: {origin}");
+            context.Items["XXXRequestOrigin"] = origin;
 
             await _next(context);
         }

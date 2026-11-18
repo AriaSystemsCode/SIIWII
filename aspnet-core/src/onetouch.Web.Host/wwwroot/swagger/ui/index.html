@@ -80,6 +80,15 @@
             configObject.requestInterceptor = function (request) {
                 var token = abp.security.antiForgery.getToken();
                 request.headers[abp.security.antiForgery.tokenHeaderName] = token;
+
+                // The Swagger JSON is shared, but API calls need an explicit client
+                // when the browser does not send an Origin header. Use this page's
+                // origin so users do not need to add a client URL manually.
+                var requestPath = new URL(request.url, window.location.href).pathname;
+                if (requestPath.indexOf("/swagger/") !== 0) {
+                    request.headers["X-Client-Url"] = window.location.origin;
+                }
+
                 return request;
             };
 
