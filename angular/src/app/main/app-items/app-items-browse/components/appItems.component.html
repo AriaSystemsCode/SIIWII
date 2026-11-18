@@ -44,17 +44,33 @@
                     </div>
 
                     <div>
-                        <button class=" btn-applySelection" [disabled]="!multiSelectionInfo?.totalCount"
+                        <button class=" btn-applySelection mx-1" [disabled]="!multiSelectionInfo?.totalCount"
                             (click)="applySelection()">{{ applySelectionTitle | localize }}</button>
 
 
 
-                        <button type="button" class="btn-open-spreadsheet" *ngIf="multiSelectionInfo?.totalCount > 0">
+                     
+<button
+    type="button"
+    class="btn-applySelection"
+    *ngIf="multiSelectionInfo?.totalCount > 0"
+    [disabled]="openingSpreadsheet || loading"
+    (click)="openSelectedInSpreadsheet()">
 
-                            <i class="fas fa-file-excel mr-2"></i>
-                            {{ 'OpenInSpreadsheet' | localize }}
+    <i
+        class="mr-2"
+        [ngClass]="openingSpreadsheet
+            ? 'fas fa-spinner fa-spin'
+            : 'fas fa-file-excel'">
+    </i>
 
-                        </button>
+    {{
+        (openingSpreadsheet
+            ? 'Loading'
+            : 'OpenInSpreadsheet') | localize
+    }}
+</button>
+
                     </div>
                 </div>
             </div>
@@ -342,7 +358,7 @@
 
                                                 <th>{{ 'Classifications' | localize }}</th>
 
-                                                <th>{{ 'Status' | localize }}</th>
+                                                <th>{{ 'SharingLevel' | localize }}</th>
 
                                                 <th>{{ 'Actions' | localize }}</th>
                                             </tr>

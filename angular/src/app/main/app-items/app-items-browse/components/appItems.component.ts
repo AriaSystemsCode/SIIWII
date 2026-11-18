@@ -43,6 +43,10 @@ import { ImportStepsEnum } from "@shared/components/import-steps/models/ImportSt
 import { MainImportService } from "@shared/components/import-steps/services/mainImport.service";
 import Swal from "sweetalert2";
 import { AppConsts } from "@shared/AppConsts";
+import { firstValueFrom } from 'rxjs';
+import {
+    TemporarySpreadsheetService
+} from '../../../dashboard/services/temporary-spreadsheet.service';
 type AppItemsViewMode = 'grid' | 'list' | 'table';
 @Component({
     selector: "app-app-items",
@@ -127,6 +131,7 @@ viewModeOptions = [
 ];
 
     languageSettingName = AppConsts.languageSettingName;
+    openingSpreadsheet = false;
     constructor(
         injector: Injector,
         private _importService: MainImportService,
@@ -135,7 +140,8 @@ viewModeOptions = [
         private _appItemsActionService: AppItemsActionsService,
         private _AccountsServiceProxy: AccountsServiceProxy,
         private _router: Router,
-        private _fb : FormBuilder
+        private _fb : FormBuilder,
+        private temporarySpreadsheetService: TemporarySpreadsheetService
     ) {
         super(injector);
     }
@@ -744,4 +750,148 @@ showSideFilters: boolean = false;
 toggleSideFilters(): void {
     this.showSideFilters = !this.showSideFilters;
 }
+
+async openSelectedInSpreadsheet(): Promise<void> {
+
+    if (this.openingSpreadsheet) {
+        return;
+    }
+
+    const totalSelected =
+        this.multiSelectionInfo?.totalCount || 0;
+
+    const selectionKey =
+        this.multiSelectionInfo?.sessionSelectionKey;
+
+    if (!totalSelected || !selectionKey) {
+        this.notify.warn('Please select products first.');
+        return;
+    }
+
+    this.openingSpreadsheet = true;
+
+    try {
+
+        const selectedRecords: GetAppItemForViewDto[] = [];
+
+        const batchSize = 500;
+        let skipCount = 0;
+
+        // Copy the same filters used by the Browse.
+        const filters = GetAllAppItemsInput.fromJS(
+            this.filterBody.toJSON()
+        );
+
+        filters.selectorKey = selectionKey;
+        filters.selectorOnly = true;
+
+        while (skipCount < totalSelected) {
+
+            const result = await firstValueFrom(
+                this._appItemsServiceProxy.getAll(
+                    filters.tenantId,
+                    filters.appItemListId,
+                    true,
+                    filters.filter,
+                    filters.filterType,
+                    filters.lastKey,
+                    selectionKey,
+                    filters.priceListId,
+                    filters.arrtibuteFilters,
+                    filters.classificationFilters,
+                    filters.categoryFilters,
+                    filters.filterSizeScale,
+                    filters.departmentFilters,
+                    filters.entityObjectTypeId,
+                    filters.minimumPrice,
+                    filters.maximumPrice,
+                    filters.itemType,
+                    filters.listingStatus,
+                    filters.publishStatus,
+                    filters.visibilityStatus,
+                    filters.sorting,
+                    skipCount,
+                    batchSize
+                )
+            );
+
+            const batch = result?.items || [];
+
+            if (!batch.length) {
+                break;
+            }
+
+            selectedRecords.push(...batch);
+
+            skipCount += batch.length;
+        }
+
+        // Remove duplicates.
+        const uniqueRecords = Array.from(
+            new Map(
+                selectedRecords.map(item => [
+                    item.appItem.id,
+                    item
+                ])
+            ).values()
+        );
+
+        if (uniqueRecords.length !== totalSelected) {
+            throw new Error(
+                `Expected ${totalSelected} selected records, ` +
+                `received ${uniqueRecords.length}.`
+            );
+        }
+
+        const records = uniqueRecords.map(item => ({
+            Id: item.appItem.id,
+            Code: item.appItem.code || '',
+            Name: item.appItem.name || '',
+            Price: item.appItem.price ?? 0,
+            Categories:
+                (item.entityObjectCategoryNames || []).join(', '),
+            Classifications:
+                (item.entityClassificationNames || []).join(', '),
+            SharingLevel: item.appItem.sharingLevel || ''
+        }));
+
+        // Transfer the records to the existing
+        // spreadsheet component.
+        this.temporarySpreadsheetService.set({
+            title: 'Selected Products',
+            sheetName: 'Products',
+            returnUrl: this._router.url,
+            records
+        });
+
+        // Open the existing spreadsheet in temporary mode.
+        const navigated = await this._router.navigate(
+            ['/app/main/dashboards/dashboard-edit'],
+            {
+                queryParams: {
+                    mode: 'temporary'
+                }
+            }
+        );
+
+        if (!navigated) {
+            this.temporarySpreadsheetService.clear();
+        }
+
+    } catch (error) {
+
+        console.error(
+            '[Open Selected In Spreadsheet]',
+            error
+        );
+
+        this.notify.error(
+            'Unable to open selected products in spreadsheet.'
+        );
+
+    } finally {
+        this.openingSpreadsheet = false;
+    }
+}
+
 }

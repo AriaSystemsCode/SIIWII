@@ -13,6 +13,7 @@ const routes: Routes = [
       { path: 'my-dashboards', component: DashboardBrowseComponent, },
       { path: 'dashboard-details/:id', component: DashboardDetailComponent, },
       { path: 'dashboard-edit/:id', component: CreateOrEditSpreadsheetComponent, },
+      { path: 'dashboard-edit', component: CreateOrEditSpreadsheetComponent, },
 
   
 ];

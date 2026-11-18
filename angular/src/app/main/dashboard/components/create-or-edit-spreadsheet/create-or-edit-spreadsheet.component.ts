@@ -1,5 +1,5 @@
 import { ChangeDetectorRef, Component, EventEmitter, Injector, OnDestroy, OnInit, Output, ViewChild } from '@angular/core';
-import { ActivatedRoute } from '@angular/router';
+import { ActivatedRoute, Router } from '@angular/router';
 import { firstValueFrom } from 'rxjs';
 import * as moment from 'moment';
 
@@ -57,6 +57,11 @@ import {
 import { HttpClient } from '@angular/common/http';
 import { L10n, setCulture } from '@syncfusion/ej2-base';
 import { AppConsts } from '@shared/AppConsts';
+
+import {
+    TemporarySpreadsheetService,
+    TemporarySpreadsheetPayload
+} from '../../services/temporary-spreadsheet.service';
 
 @Component({
     selector: 'app-create-or-edit-spreadsheet',
@@ -183,6 +188,11 @@ export class CreateOrEditSpreadsheetComponent extends AppComponentBase implement
     private knownSheetNames = new Map<any, string>();
 
 
+isTemporaryMode = false;
+temporaryTitle = '';
+private temporaryReturnUrl = '/app/main';
+
+
     constructor(
         injector: Injector,
         private route: ActivatedRoute,
@@ -190,7 +200,11 @@ export class CreateOrEditSpreadsheetComponent extends AppComponentBase implement
         private refreshService: SpreadsheetRefreshService,
         private drilldown: DrilldownService,
         private http: HttpClient,
-        private cdr: ChangeDetectorRef
+        private cdr: ChangeDetectorRef,
+
+private router: Router,
+private temporarySpreadsheetService: TemporarySpreadsheetService
+
     ) {
         super(injector);
 
@@ -201,10 +215,6 @@ export class CreateOrEditSpreadsheetComponent extends AppComponentBase implement
     // =====================================================
     // SMALL HELPERS
     // =====================================================
-
-    /** Untyped access to Syncfusion APIs missing from the typings. */
-
-
 
     private async initializeSyncfusionLocale(): Promise<void> {
         this.syncfusionLocaleReady = false;
@@ -408,15 +418,27 @@ export class CreateOrEditSpreadsheetComponent extends AppComponentBase implement
     //         const id = params.get('id');
     //         this.dashboardId = id ? Number(id) : null;
     //     });
-    // }
-    ngOnInit(): void {
-        this.route.paramMap.subscribe(params => {
-            const id = params.get('id');
-            this.dashboardId = id ? Number(id) : null;
-        });
 
-        void this.initializeSyncfusionLocale();
+    //     void this.initializeSyncfusionLocale();
+    // }
+
+
+ngOnInit(): void {
+
+    this.isTemporaryMode =
+        this.route.snapshot.queryParamMap.get('mode')
+            === 'temporary';
+
+    if (this.isTemporaryMode) {
+        this.dashboardId = null;
+    } else {
+        const id = this.route.snapshot.paramMap.get('id');
+        this.dashboardId = id ? Number(id) : null;
     }
+
+    void this.initializeSyncfusionLocale();
+}
+
 
     ngOnDestroy(): void {
         this.stopSheetWatcher();
@@ -424,15 +446,34 @@ export class CreateOrEditSpreadsheetComponent extends AppComponentBase implement
         clearTimeout(this.pivotSyncTimer);
     }
 
-    onCreated(): void {
-        if (!this.spreadsheet) {
-            return;
-        }
+    // onCreated(): void {
+    //     if (!this.spreadsheet) {
+    //         return;
+    //     }
 
-        this.addRibbonButtons();
-        this.startListRibbonObserver();
-        this.loadDashboard();
+    //     this.addRibbonButtons();
+    //     this.startListRibbonObserver();
+    //     this.loadDashboard();
+    // }
+
+
+onCreated(): void {
+
+    if (!this.spreadsheet) {
+        return;
     }
+
+    this.addRibbonButtons();
+    this.startListRibbonObserver();
+
+    if (this.isTemporaryMode) {
+        void this.loadTemporarySpreadsheet();
+        return;
+    }
+
+    this.loadDashboard();
+}
+
 
     private loadDashboard(): void {
         if (!this.dashboardId || !this.spreadsheet) {
@@ -577,51 +618,9 @@ export class CreateOrEditSpreadsheetComponent extends AppComponentBase implement
     // CHART PANEL + DRILLDOWN
     // =====================================================
 
-    onSheetClick(event: MouseEvent): void {
-        const target = event.target as HTMLElement | null;
-        const overlay = target?.closest('.e-datavisualization-chart') as HTMLElement | null;
-
-        if (!overlay || !this.spreadsheet) {
-            return;
-        }
-
-        // Ctrl / Cmd + click on a chart point = drilldown. A normal click opens the chart panel.
-        if ((event.ctrlKey || event.metaKey) && this.openDrilldown(event)) {
-            return;
-        }
-
-        const innerChart = overlay.querySelector('.e-control') as HTMLElement | null;
-        const chart = this.findChart(text(innerChart?.id), text(overlay.id));
-
-        if (!chart) {
-            this.notify.warn('Unable to find the selected chart in the workbook.');
-            return;
-        }
-
-        const ownerSheet = this.allSheets.find(sheet =>
-            getSheetCharts(sheet).some((c: any) => c === chart || text(c?.id) === text(chart?.id))
-        );
-
-        this.selectedChart = chart;
-        this.chartSheet = text(ownerSheet?.name) || this.activeSheetName;
-        this.chartAggregation = (chart.aggregation as ChartAggregation) || 'None';
-        this.chartRange = text(chart.originalRange ?? chart.range);
-
-        if (chart.categoryRange && Array.isArray(chart.seriesRanges) && chart.seriesRanges.length) {
-            this.categoryRange = text(chart.categoryRange);
-            this.seriesRanges = chart.seriesRanges
-                .map((range: any) => ({ range: text(typeof range === 'string' ? range : range?.range) }))
-                .filter((item: any) => !!item.range);
-        } else {
-            // Newly inserted chart: derive ranges from the original selected range.
-            this.splitRangeToSeries();
-        }
-
-        this.showDataPanel = false;
-        this.showChartPanel = true;
-        this.cdr.detectChanges();
-        this.resizeLater(100);
-    }
+    // NOTE: the old onSheetClick() handler was removed.
+    // Chart selection is handled ONLY by onSheetPointerDown() (see bottom of file).
+    // Remove (click)="onSheetClick($event)" from the template.
 
     private openDrilldown(event: MouseEvent): boolean {
         const result = this.drilldown.fromClick(event, {
@@ -657,7 +656,8 @@ export class CreateOrEditSpreadsheetComponent extends AppComponentBase implement
         this.seriesRanges = [];
         this.isApplyingChart = false;
         this.cdr.detectChanges();
-        this.resizeLater();
+        // No resizeLater() here: the panel floats over the sheet, so no resize is needed
+        // and a resize would re-render the ribbon.
     }
 
     addSeries(): void {
@@ -666,6 +666,31 @@ export class CreateOrEditSpreadsheetComponent extends AppComponentBase implement
 
     removeSeries(index: number): void {
         this.seriesRanges = this.seriesRanges.filter((_s, i) => i !== index);
+    }
+
+    /**
+     * Makes sure the contextual "Chart Design" ribbon tab is visible and active
+     * after our panel opened.
+     */
+    private showChartDesignTab(): void {
+        const root = this.grid?.element as HTMLElement | undefined;
+
+        if (!root) {
+            return;
+        }
+
+        const headers = Array.from(
+            root.querySelectorAll('.e-ribbon .e-tab-header .e-toolbar-item')
+        ) as HTMLElement[];
+
+        const tab = headers.find(h => {
+            const label = (h.textContent ?? '').trim().toLowerCase();
+            return label === 'chart design' || label === this.l('ChartDesign').toLowerCase();
+        });
+
+        if (tab && !tab.classList.contains('e-active')) {
+            ((tab.querySelector('.e-tab-wrap') as HTMLElement) ?? tab).click();
+        }
     }
 
     /** Applies independent category + series ranges (they do not need to be adjacent). */
@@ -930,7 +955,8 @@ export class CreateOrEditSpreadsheetComponent extends AppComponentBase implement
     }
 
     private updateListRibbonButton(): void {
-        if (!this.spreadsheet) {
+        // While a chart is selected, do not touch the ribbon (it would fight the Chart Design tab).
+        if (!this.spreadsheet || this.showChartPanel) {
             return;
         }
 
@@ -970,6 +996,10 @@ export class CreateOrEditSpreadsheetComponent extends AppComponentBase implement
 
         // Syncfusion re-renders the ribbon text: restore our label when that happens.
         this.listRibbonObserver = new MutationObserver(() => {
+            if (this.showChartPanel) {
+                return;
+            }
+
             const textElement = this.listRibbonButton?.querySelector('.e-tbar-btn-text, .e-btn-text');
 
             if (textElement && textElement.textContent !== this.lastListRibbonLabel) {
@@ -1017,7 +1047,6 @@ export class CreateOrEditSpreadsheetComponent extends AppComponentBase implement
     // =====================================================
     // ADD / EDIT DATA PANEL
     // =====================================================
-
 
     openDataPanel(): void {
         const activeSheet = this.activeSheet;
@@ -1833,7 +1862,6 @@ export class CreateOrEditSpreadsheetComponent extends AppComponentBase implement
         try {
             this.updateAnalysis();
 
-            // const matrix = this.getPivotResultMatrix();
             const matrix = this.refreshService.removeGrandTotalFromChart(
                 this.getPivotResultMatrix()
             );
@@ -1884,7 +1912,6 @@ export class CreateOrEditSpreadsheetComponent extends AppComponentBase implement
         try {
             this.updateAnalysis();
 
-            // const matrix = this.getPivotResultMatrix();
             const matrix = this.refreshService.removeGrandTotalFromChart(
                 this.getPivotResultMatrix()
             );
@@ -2466,7 +2493,7 @@ export class CreateOrEditSpreadsheetComponent extends AppComponentBase implement
 
     /** Syncs ids/names before save (also handles renamed/deleted tabs). */
     private syncSheetIdentity(): void {
-            this.syncRenamedSheets();
+        this.syncRenamedSheets();
 
         const existingSheets = this.allSheets.filter((sheet: any) => !!text(sheet?.name));
         const existingNames = new Set(existingSheets.map((sheet: any) => text(sheet.name)));
@@ -2522,6 +2549,7 @@ export class CreateOrEditSpreadsheetComponent extends AppComponentBase implement
             }
 
             // Also synchronize on initial load and after ribbon rendering.
+            // (updateListRibbonButton() itself is a no-op while the chart panel is open.)
             this.updateListRibbonButton();
         };
 
@@ -2607,20 +2635,18 @@ export class CreateOrEditSpreadsheetComponent extends AppComponentBase implement
             state.dashboardWidgets = clone(this.widgets);
             // A normal Save must not advance the data refresh cursor.
 
-              const user = this.appSession.user;
-            
-            
-                    const fullName = [
-                        user?.name,
-                        user?.surname
-                    ].filter(Boolean).join(' ');
-            
-                    const now = moment.utc().format('YYYY-MM-DDTHH:mm:ss[Z]');
-            
-                    // state.lastRefreshDate = now;
-                    state.refreshedBy = `${fullName}`;
-                    state.updatedDate = now;
+            const user = this.appSession.user;
 
+            const fullName = [
+                user?.name,
+                user?.surname
+            ].filter(Boolean).join(' ');
+
+            const now = moment.utc().format('YYYY-MM-DDTHH:mm:ss[Z]');
+
+            // state.lastRefreshDate = now;
+            state.refreshedBy = `${fullName}`;
+            state.updatedDate = now;
 
             await firstValueFrom(
                 this.dashboardService.saveSpreadSheetJson(dashboardId, {
@@ -2826,321 +2852,598 @@ export class CreateOrEditSpreadsheetComponent extends AppComponentBase implement
     }
 
 
-  
-async refreshSpreadsheet(): Promise<void> {
+    async refreshSpreadsheet(): Promise<void> {
 
-    if (this.isRefreshing || !this.spreadsheet || !this.dashboardId) {
-        return;
-    }
-
-    this.isRefreshing = true;
-    this.showLoading('Refreshing Spreadsheet...');
-
-    // Capture the refresh boundary BEFORE requesting changes.
-    const refreshStartedAtUtc = moment.utc().format('YYYY-MM-DDTHH:mm:ss[Z]');
-
-    const activeSheetBefore = this.activeSheetName;
-    const pivotBefore = this.showPivot ? text(this.pivotSheet) : '';
-
-    try {
-
-        // ============================================
-        // 1. CLOSE OPEN PANELS
-        // ============================================
-
-        this.closeChartPanel();
-        this.closeDataPanel();
-
-        if (this.showPivot) {
-            await this.closePivot();
+        if (this.isRefreshing || !this.spreadsheet || !this.dashboardId) {
+            return;
         }
-        const current = await this.buildSavedState();
 
-        const refreshed = await this.refreshService.refresh(current, {
-            tenantId: this.appSession.tenantId,
-            highlight: true,
-            onProgress: (message, done, total) => {
-                this.loadingMessage = message;
-                this.setProgress(done, total);
-                this.cdr.detectChanges();
+        this.isRefreshing = true;
+        this.showLoading('Refreshing Spreadsheet...');
+
+        // Capture the refresh boundary BEFORE requesting changes.
+        const refreshStartedAtUtc = moment.utc().format('YYYY-MM-DDTHH:mm:ss[Z]');
+
+        const activeSheetBefore = this.activeSheetName;
+        const pivotBefore = this.showPivot ? text(this.pivotSheet) : '';
+
+        try {
+
+            // ============================================
+            // 1. CLOSE OPEN PANELS
+            // ============================================
+
+            this.closeChartPanel();
+            this.closeDataPanel();
+
+            if (this.showPivot) {
+                await this.closePivot();
             }
-        });
+            const current = await this.buildSavedState();
 
-        // ============================================
-        // 4. UPDATE REFRESH INFORMATION
-        // ============================================
+            const refreshed = await this.refreshService.refresh(current, {
+                tenantId: this.appSession.tenantId,
+                highlight: true,
+                onProgress: (message, done, total) => {
+                    this.loadingMessage = message;
+                    this.setProgress(done, total);
+                    this.cdr.detectChanges();
+                }
+            });
 
-        this.loadingMessage = 'Saving refreshed Spreadsheet...';
+            // ============================================
+            // 4. UPDATE REFRESH INFORMATION
+            // ============================================
 
-        const user = this.appSession.user;
+            this.loadingMessage = 'Saving refreshed Spreadsheet...';
 
-        const fullName = [user?.name, user?.surname]
-            .filter(Boolean)
-            .join(' ');
+            const user = this.appSession.user;
 
-        // Save timestamps as UTC.
-        refreshed.updatedDate = refreshStartedAtUtc;
-        refreshed.lastRefreshDate = refreshStartedAtUtc;
-        refreshed.refreshedBy = fullName;
+            const fullName = [user?.name, user?.surname]
+                .filter(Boolean)
+                .join(' ');
 
-        // ============================================
-        // 5. SAVE REFRESHED WORKBOOK
-        // ============================================
+            // Save timestamps as UTC.
+            refreshed.updatedDate = refreshStartedAtUtc;
+            refreshed.lastRefreshDate = refreshStartedAtUtc;
+            refreshed.refreshedBy = fullName;
 
-        await firstValueFrom(
-            this.dashboardService.saveSpreadSheetJson(
-                this.dashboardId,
-                {
-                    ...refreshed,
-                    recordCount: this.countRecords(refreshed.workbookJson)
-                } as any
-            )
-        );
+            // ============================================
+            // 5. SAVE REFRESHED WORKBOOK
+            // ============================================
 
-        // ============================================
-        // 6. REOPEN SAVED WORKBOOK
-        // ============================================
-
-        this.ignoreSpreadsheetChanges = true;
-
-        await this.openWorkbook(refreshed);
-
-        // ============================================
-        // 7. RESTORE ACTIVE SHEET
-        // ============================================
-
-        if (
-            activeSheetBefore &&
-            this.findSheet(activeSheetBefore) &&
-            this.activeSheetName !== activeSheetBefore
-        ) {
-            await this.activateSheet(activeSheetBefore);
-        }
-
-        // ============================================
-        // 8. RESTORE PIVOT
-        // ============================================
-
-        const pivotAnalysis = pivotBefore
-            ? this.findAnalysis(pivotBefore)
-            : null;
-
-        if (pivotAnalysis) {
-            await this.openPivot(pivotAnalysis);
-        }
-
-
-        this.isDirty = false;
-        this.notify.success(
-            'Spreadsheet refreshed and saved successfully.'
-        );
-
-    } catch (error) {
-
-        console.error(
-            '[Spreadsheet] Refresh or save failed:',
-            error
-        );
-
-        this.notify.error(
-            'Unable to complete Spreadsheet refresh and save.'
-        );
-
-    } finally {
-
-        this.ignoreSpreadsheetChanges = false;
-        this.isRefreshing = false;
-
-        this.hideLoading();
-        this.cdr.detectChanges();
-        this.resizeLater(100);
-    }
-}
-
-  async onDataSourceCleared(event: {
-    sheetName: string;
-    clearWorksheetData: boolean;
-}): Promise<void> {
-
-    const { sheetName, clearWorksheetData } = event;
-
-    if (!this.spreadsheet || !sheetName) {
-        return;
-    }
-
-    const sheet = this.findSheet(sheetName);
-
-    if (!sheet) {
-        this.notify.warn('Worksheet not found.');
-        return;
-    }
-
-    const hasSource = this.sheetSources.some(
-        source => source.sheetName === sheetName
-    );
-
-    if (!hasSource) {
-        this.notify.warn('No linked data source found.');
-        return;
-    }
-
-    try {
-
-        // Clear cells only when the checkbox is checked.
-        if (clearWorksheetData) {
-            await this.clearSheetForEdit(sheetName);
-        }
-
-        // Always remove the linked data source.
-        this.sheetSources = this.sheetSources.filter(
-            source => source.sheetName !== sheetName
-        );
-
-        // Remove linked record tracking.
-        delete this.sheetRecordIds[sheetName];
-
-        // Reset temporary loading state.
-        this.newDataSheetName = null;
-        this.newDataSheetFields = [];
-        this.newDataSheetLoadedRows = 0;
-
-        // Close panel and update UI.
-        this.closeDataPanel();
-        this.updateListRibbonButton();
-
-        // Require Save to persist the change.
-        this.markDirty();
-
-        if (clearWorksheetData) {
-            this.notify.success(
-                'Data source removed and worksheet cleared. Click Save on the spreadsheet to persist this change.'
+            await firstValueFrom(
+                this.dashboardService.saveSpreadSheetJson(
+                    this.dashboardId,
+                    {
+                        ...refreshed,
+                        recordCount: this.countRecords(refreshed.workbookJson)
+                    } as any
+                )
             );
-        } else {
+
+            // ============================================
+            // 6. REOPEN SAVED WORKBOOK
+            // ============================================
+
+            this.ignoreSpreadsheetChanges = true;
+
+            await this.openWorkbook(refreshed);
+
+            // ============================================
+            // 7. RESTORE ACTIVE SHEET
+            // ============================================
+
+            if (
+                activeSheetBefore &&
+                this.findSheet(activeSheetBefore) &&
+                this.activeSheetName !== activeSheetBefore
+            ) {
+                await this.activateSheet(activeSheetBefore);
+            }
+
+            // ============================================
+            // 8. RESTORE PIVOT
+            // ============================================
+
+            const pivotAnalysis = pivotBefore
+                ? this.findAnalysis(pivotBefore)
+                : null;
+
+            if (pivotAnalysis) {
+                await this.openPivot(pivotAnalysis);
+            }
+
+
+            this.isDirty = false;
             this.notify.success(
-                'Data source removed. Existing worksheet data has been kept. Click Save on the spreadsheet to persist this change.'
+                'Spreadsheet refreshed and saved successfully.'
             );
+
+        } catch (error) {
+
+            console.error(
+                '[Spreadsheet] Refresh or save failed:',
+                error
+            );
+
+            this.notify.error(
+                'Unable to complete Spreadsheet refresh and save.'
+            );
+
+        } finally {
+
+            this.ignoreSpreadsheetChanges = false;
+            this.isRefreshing = false;
+
+            this.hideLoading();
+            this.cdr.detectChanges();
+            this.resizeLater(100);
+        }
+    }
+
+    async onDataSourceCleared(event: {
+        sheetName: string;
+        clearWorksheetData: boolean;
+    }): Promise<void> {
+
+        const { sheetName, clearWorksheetData } = event;
+
+        if (!this.spreadsheet || !sheetName) {
+            return;
         }
 
-    } catch (error) {
+        const sheet = this.findSheet(sheetName);
 
-        console.error(
-            '[Spreadsheet] Failed to remove data source:',
-            error
+        if (!sheet) {
+            this.notify.warn('Worksheet not found.');
+            return;
+        }
+
+        const hasSource = this.sheetSources.some(
+            source => source.sheetName === sheetName
         );
 
-        this.notify.error(
-            'Unable to remove the linked data source.'
-        );
-    }
-}
-
-private captureSheetNames(): void {
-    this.knownSheetNames.clear();
-
-    this.allSheets.forEach(sheet => {
-        if (sheet?.id != null) {
-            this.knownSheetNames.set(sheet.id, text(sheet.name));
-        }
-    });
-}
-
-private syncRenamedSheets(): void {
-    for (const sheet of this.allSheets) {
-        if (sheet?.id == null) continue;
-
-        const oldName = this.knownSheetNames.get(sheet.id);
-        const newName = text(sheet.name);
-
-        if (oldName && oldName !== newName) {
-            this.applySheetRename(oldName, newName);
+        if (!hasSource) {
+            this.notify.warn('No linked data source found.');
+            return;
         }
 
-        this.knownSheetNames.set(sheet.id, newName);
-    }
-}
-private applySheetRename(oldName: string, newName: string): void {
-    if (!oldName || !newName || oldName === newName) return;
+        try {
 
-    const renameRange = (range: string): string => {
-        if (!range) return range;
+            // Clear cells only when the checkbox is checked.
+            if (clearWorksheetData) {
+                await this.clearSheetForEdit(sheetName);
+            }
 
-        const parsed = parseRange(range);
+            // Always remove the linked data source.
+            this.sheetSources = this.sheetSources.filter(
+                source => source.sheetName !== sheetName
+            );
 
-        if (!parsed || parsed.sheetName !== oldName) {
-            return range;
-        }
+            // Remove linked record tracking.
+            delete this.sheetRecordIds[sheetName];
 
-        const address = range.slice(range.lastIndexOf('!') + 1);
-        return `${quoteSheetName(newName)}!${address}`;
-    };
+            // Reset temporary loading state.
+            this.newDataSheetName = null;
+            this.newDataSheetFields = [];
+            this.newDataSheetLoadedRows = 0;
 
-    // Data source metadata
-    this.sheetSources.forEach(source => {
-        if (source.sheetName === oldName) {
-            source.sheetName = newName;
-        }
-    });
+            // Close panel and update UI.
+            this.closeDataPanel();
+            this.updateListRibbonButton();
 
-    // Record ID mapping
-    if (Object.prototype.hasOwnProperty.call(this.sheetRecordIds, oldName)) {
-        this.sheetRecordIds[newName] = this.sheetRecordIds[oldName];
-        delete this.sheetRecordIds[oldName];
-    }
+            // Require Save to persist the change.
+            this.markDirty();
 
-    // Pivot analysis metadata
-    this.analyses.forEach((analysis: any) => {
-        if (analysis.sourceSheetName === oldName) {
-            analysis.sourceSheetName = newName;
-        }
-
-        if (analysis.sheetName === oldName) {
-            analysis.sheetName = newName;
-        }
-    });
-
-    // Dashboard widget metadata
-    this.widgets.forEach((widget: any) => {
-        if (widget.sourceSheetName === oldName) {
-            widget.sourceSheetName = newName;
-        }
-
-        if (widget.dashboardSheetName === oldName) {
-            widget.dashboardSheetName = newName;
-        }
-
-        if (widget.sourceRange) {
-            widget.sourceRange = renameRange(widget.sourceRange);
-        }
-    });
-
-    // Chart source references
-    this.allSheets.forEach(sheet => {
-        getSheetCharts(sheet).forEach((chart: any) => {
-            chart.range = renameRange(chart.range);
-            chart.originalRange = renameRange(chart.originalRange);
-            chart.categoryRange = renameRange(chart.categoryRange);
-
-            if (Array.isArray(chart.seriesRanges)) {
-                chart.seriesRanges = chart.seriesRanges.map((item: any) =>
-                    typeof item === 'string'
-                        ? renameRange(item)
-                        : { ...item, range: renameRange(item.range) }
+            if (clearWorksheetData) {
+                this.notify.success(
+                    'Data source removed and worksheet cleared. Click Save on the spreadsheet to persist this change.'
+                );
+            } else {
+                this.notify.success(
+                    'Data source removed. Existing worksheet data has been kept. Click Save on the spreadsheet to persist this change.'
                 );
             }
+
+        } catch (error) {
+
+            console.error(
+                '[Spreadsheet] Failed to remove data source:',
+                error
+            );
+
+            this.notify.error(
+                'Unable to remove the linked data source.'
+            );
+        }
+    }
+
+    private captureSheetNames(): void {
+        this.knownSheetNames.clear();
+
+        this.allSheets.forEach(sheet => {
+            if (sheet?.id != null) {
+                this.knownSheetNames.set(sheet.id, text(sheet.name));
+            }
         });
-    });
+    }
 
-    // Current UI state
-    if (this.sourceSheet === oldName) this.sourceSheet = newName;
-    if (this.pivotSheet === oldName) this.pivotSheet = newName;
-    if (this.editingSheetName === oldName) this.editingSheetName = newName;
-    if (this.dataPanelTargetSheetName === oldName) this.dataPanelTargetSheetName = newName;
-    if (this.chartSheet === oldName) this.chartSheet = newName;
-    if (this.newDataSheetName === oldName) this.newDataSheetName = newName;
+    private syncRenamedSheets(): void {
+        for (const sheet of this.allSheets) {
+            if (sheet?.id == null) continue;
 
-    this.markDirty();
+            const oldName = this.knownSheetNames.get(sheet.id);
+            const newName = text(sheet.name);
 
-    console.log(`[Spreadsheet] Renamed "${oldName}" to "${newName}"`);
+            if (oldName && oldName !== newName) {
+                this.applySheetRename(oldName, newName);
+            }
+
+            this.knownSheetNames.set(sheet.id, newName);
+        }
+    }
+
+    private applySheetRename(oldName: string, newName: string): void {
+        if (!oldName || !newName || oldName === newName) return;
+
+        const renameRange = (range: string): string => {
+            if (!range) return range;
+
+            const parsed = parseRange(range);
+
+            if (!parsed || parsed.sheetName !== oldName) {
+                return range;
+            }
+
+            const address = range.slice(range.lastIndexOf('!') + 1);
+            return `${quoteSheetName(newName)}!${address}`;
+        };
+
+        // Data source metadata
+        this.sheetSources.forEach(source => {
+            if (source.sheetName === oldName) {
+                source.sheetName = newName;
+            }
+        });
+
+        // Record ID mapping
+        if (Object.prototype.hasOwnProperty.call(this.sheetRecordIds, oldName)) {
+            this.sheetRecordIds[newName] = this.sheetRecordIds[oldName];
+            delete this.sheetRecordIds[oldName];
+        }
+
+        // Pivot analysis metadata
+        this.analyses.forEach((analysis: any) => {
+            if (analysis.sourceSheetName === oldName) {
+                analysis.sourceSheetName = newName;
+            }
+
+            if (analysis.sheetName === oldName) {
+                analysis.sheetName = newName;
+            }
+        });
+
+        // Dashboard widget metadata
+        this.widgets.forEach((widget: any) => {
+            if (widget.sourceSheetName === oldName) {
+                widget.sourceSheetName = newName;
+            }
+
+            if (widget.dashboardSheetName === oldName) {
+                widget.dashboardSheetName = newName;
+            }
+
+            if (widget.sourceRange) {
+                widget.sourceRange = renameRange(widget.sourceRange);
+            }
+        });
+
+        // Chart source references
+        this.allSheets.forEach(sheet => {
+            getSheetCharts(sheet).forEach((chart: any) => {
+                chart.range = renameRange(chart.range);
+                chart.originalRange = renameRange(chart.originalRange);
+                chart.categoryRange = renameRange(chart.categoryRange);
+
+                if (Array.isArray(chart.seriesRanges)) {
+                    chart.seriesRanges = chart.seriesRanges.map((item: any) =>
+                        typeof item === 'string'
+                            ? renameRange(item)
+                            : { ...item, range: renameRange(item.range) }
+                    );
+                }
+            });
+        });
+
+        // Current UI state
+        if (this.sourceSheet === oldName) this.sourceSheet = newName;
+        if (this.pivotSheet === oldName) this.pivotSheet = newName;
+        if (this.editingSheetName === oldName) this.editingSheetName = newName;
+        if (this.dataPanelTargetSheetName === oldName) this.dataPanelTargetSheetName = newName;
+        if (this.chartSheet === oldName) this.chartSheet = newName;
+        if (this.newDataSheetName === oldName) this.newDataSheetName = newName;
+
+        this.markDirty();
+    }
+
+    /**
+     * The ONLY chart-selection handler. Bind in the template as:
+     *   (pointerdown)="onSheetPointerDown($event)"
+     * and remove (click)="onSheetClick($event)".
+     */
+    onSheetPointerDown(event: PointerEvent): void {
+        if (event.button !== 0 || this.showPivot || !this.spreadsheet) {
+            return;
+        }
+
+        const target = event.target as Element | null;
+        const root = this.grid?.element as HTMLElement | undefined;
+
+        if (!target || !root) {
+            return;
+        }
+
+        const overlay = target.closest(
+            '.e-datavisualization-chart'
+        ) as HTMLElement | null;
+
+        // Clicked something that is not a chart: close the chart panel
+        // when the click happened inside the spreadsheet (a normal cell, a tab, ...).
+        if (!overlay || !root.contains(overlay)) {
+            if (this.showChartPanel && root.contains(target)) {
+                this.closeChartPanel();
+            }
+            return;
+        }
+
+        const chartElement = overlay.querySelector(
+            '.e-chart, .e-accumulationchart'
+        ) as HTMLElement | null;
+
+        const chart = this.findChart(
+            chartElement?.id || '',
+            overlay.id
+        );
+
+        if (!chart) {
+            return;
+        }
+
+        const ctrlClick = event.ctrlKey || event.metaKey;
+
+        // Wait for the mouse-up event rather than opening
+        // the panel during Syncfusion's pointer interaction.
+        const onMouseUp = (mouseEvent: MouseEvent): void => {
+            document.removeEventListener('mouseup', onMouseUp, true);
+
+            if (mouseEvent.button !== 0) {
+                return;
+            }
+
+            setTimeout(() => {
+                if (!this.spreadsheet || this.showPivot) {
+                    return;
+                }
+
+                if (ctrlClick && this.openDrilldown(mouseEvent)) {
+                    return;
+                }
+
+                const ownerSheet = this.allSheets.find((sheet: any) =>
+                    getSheetCharts(sheet).some((item: any) =>
+                        item === chart ||
+                        text(item?.id) === text(chart?.id)
+                    )
+                );
+
+                this.selectedChart = chart;
+                this.chartSheet =
+                    text(ownerSheet?.name) || this.activeSheetName;
+
+                this.chartAggregation =
+                    (chart.aggregation as ChartAggregation) || 'None';
+
+                this.chartRange = text(
+                    chart.originalRange ?? chart.range
+                );
+
+                if (
+                    chart.categoryRange &&
+                    Array.isArray(chart.seriesRanges) &&
+                    chart.seriesRanges.length
+                ) {
+                    this.categoryRange = text(chart.categoryRange);
+
+                    this.seriesRanges = chart.seriesRanges
+                        .map((range: any) => ({
+                            range: text(
+                                typeof range === 'string'
+                                    ? range
+                                    : range?.range
+                            )
+                        }))
+                        .filter((item: any) => !!item.range);
+                } else {
+                    this.splitRangeToSeries();
+                }
+
+                this.showDataPanel = false;
+                this.showChartPanel = true;
+                this.cdr.markForCheck();
+
+                // No resize here (it re-renders the ribbon and drops the contextual tab).
+                // Only make sure the Chart Design tab is visible.
+                setTimeout(() => this.showChartDesignTab(), 150);
+
+            }, 50);
+        };
+
+        document.addEventListener('mouseup', onMouseUp, {
+            capture: true,
+            once: true
+        });
+    }
+
+
+private async loadTemporarySpreadsheet(): Promise<void> {
+
+    const payload = this.temporarySpreadsheetService.get();
+
+    if (!payload || !payload.records?.length) {
+        this.notify.warn('No selected records available.');
+        await this.router.navigate(['/app/main']);
+        return;
+    }
+
+    this.ignoreSpreadsheetChanges = true;
+
+    this.temporaryTitle = payload.title;
+    this.temporaryReturnUrl = payload.returnUrl;
+
+    this.dashboardId = null;
+    this.dashboardTtle = '';
+    this.spreadsheetNotFound = false;
+
+    this.sheetSources = [];
+    this.analyses = [];
+    this.widgets = [];
+    this.sheetRecordIds = {};
+
+    this.showLoading('Loading selected records...');
+
+    try {
+        // Keep one sheet for the selected records.
+        const sheetName = payload.sheetName || 'Selected Records';
+
+        const fields = Object.keys(payload.records[0])
+            .filter(key => key.toLowerCase() !== 'id');
+
+        const rows = [
+            {
+                cells: fields.map(field => ({
+                    value: field,
+                    style: {
+                        fontWeight: 'bold',
+                        backgroundColor: '#f3f4f6'
+                    }
+                }))
+            },
+            ...payload.records.map(record => ({
+                cells: fields.map(field => ({
+                    value: this.temporaryCellValue(
+                        record[field]
+                    )
+                }))
+            }))
+        ];
+
+        // Replace the initial workbook sheets.
+        // Avoid dashboard-only initialization.
+        this.grid.openFromJson({
+            file: {
+                Workbook: {
+                    sheets: [{
+                        name: sheetName,
+                        rows,
+                        frozenRows: 1,
+                        columns: fields.map(() => ({
+                            width: 150
+                        }))
+                    }],
+                    activeSheetIndex: 0
+                }
+            }
+        });
+
+        await this.settle();
+
+        const sheet = this.findSheet(sheetName);
+
+        if (!sheet) {
+            throw new Error(
+                'Temporary worksheet could not be initialized.'
+            );
+        }
+
+        // Required by your existing readPivotRecords().
+        this.sheetRecordIds[sheetName] =
+            payload.records.map(record => record.Id);
+
+        this.upsertSheetSource({
+            sheetId: sheet.id,
+            sheetName,
+            sheetRecordIds: [...this.sheetRecordIds[sheetName]],
+            source: {
+                type: sheetName,
+                sourceKey: sheetName,
+                mode: 'all',
+                columns: [...fields],
+                filters: {
+                    conditions: [],
+                    matchMode: 'all',
+                    filterTree: null
+                }
+            }
+        });
+
+        this.syncSheetIdentity();
+        this.syncSheetToUi();
+
+        this.isDirty = false;
+        this.ignoreSpreadsheetChanges = false;
+
+        this.startSheetWatcher();
+        this.resizeLater(100);
+
+    } catch (error) {
+        console.error(
+            '[Temporary Spreadsheet] Load failed:',
+            error
+        );
+        this.notify.error('Unable to load selected records.');
+    } finally {
+        this.ignoreSpreadsheetChanges = false;
+        this.hideLoading();
+        this.cdr.detectChanges();
+    }
 }
+
+private temporaryCellValue(value: any): string | number {
+
+    if (value === null || value === undefined) {
+        return '';
+    }
+
+    if (typeof value === 'number') {
+        return value;
+    }
+
+    if (typeof value === 'boolean') {
+        return value ? 'Yes' : 'No';
+    }
+
+    if (typeof value === 'object') {
+        return JSON.stringify(value);
+    }
+
+    const str = String(value);
+
+    // Treat imported values as text, not formulas.
+    if (/^[=+\-@]/.test(str)) {
+        return "'" + str;
+    }
+
+    return str;
+}
+
+async closeTemporarySpreadsheet(): Promise<void> {
+    const returnUrl = this.temporaryReturnUrl;
+
+    this.temporarySpreadsheetService.clear();
+
+    await this.router.navigateByUrl(returnUrl);
+}
+
 
 }
