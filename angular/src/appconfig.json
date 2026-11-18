@@ -1,7 +1,7 @@
 {
-"attachmentBaseUrl": "https://localhost:44313",
-"remoteServiceBaseUrl": "https://localhost:44313",
-"appBaseUrl": "http://localhost:4213",
+"attachmentBaseUrl": "https://localhost:44315",
+"remoteServiceBaseUrl": "https://localhost:44315",
+"appBaseUrl": "http://localhost:4215",
 "siiwiiName": "Revolutionfabrics",
   "localeMappings": {
     "angular": [
