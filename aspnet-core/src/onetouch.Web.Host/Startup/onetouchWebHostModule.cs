@@ -81,7 +81,9 @@ namespace onetouch.Web.Startup
         public override string GetNameOrConnectionString(ConnectionStringResolveArgs args)
         {
 
-            var origin = _httpContextAccessor.HttpContext?.Items["XXXRequestOrigin"]?.ToString();
+            var explicitClientUrl = _httpContextAccessor.HttpContext?.Items["XXXClientUrl"]?.ToString();
+            var origin = explicitClientUrl
+                ?? _httpContextAccessor.HttpContext?.Items["XXXRequestOrigin"]?.ToString();
             //return "Server=AriaSQL\\AriaNexus; Database=onetouchDevDb3;TrustServerCertificate=True; User=sa; Password=Aria@2021;";
             //Aria.MASTER
             if (!string.IsNullOrWhiteSpace(origin))
@@ -98,9 +100,12 @@ namespace onetouch.Web.Startup
                 {
                     conn.Open();
                      
-                    using (var cmd = new SqlCommand("SELECT TOP 1 * FROM Clients WHERE Url = @Url", conn))
+                    using (var cmd = new SqlCommand(
+                        "SELECT TOP 1 * FROM Clients WHERE Url = @Url OR Url = @UrlWithSlash", conn))
                     {
-                        cmd.Parameters.AddWithValue("@Url", origin);
+                        var normalizedOrigin = origin.TrimEnd('/');
+                        cmd.Parameters.AddWithValue("@Url", normalizedOrigin);
+                        cmd.Parameters.AddWithValue("@UrlWithSlash", normalizedOrigin + "/");
                         using (var reader = cmd.ExecuteReader())
                         {
                             if (reader.Read()) // only first row
@@ -129,7 +134,8 @@ namespace onetouch.Web.Startup
                                 }
                             }
 
-                            // fallback if no row or no valid connection string
+                            // No matching client (or no client database connection): use the
+                            // configured default connection string.
                             return base.GetNameOrConnectionString(args);
                         }
                     }
