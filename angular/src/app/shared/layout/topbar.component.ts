@@ -484,6 +484,10 @@ export class TopBarComponent extends ThemesLayoutBaseComponent implements OnInit
             });
 
     }
+
+
+
+    // merge
 CreateBusiness_GroupAccount(
     accout_type: string,
     account_name: string
