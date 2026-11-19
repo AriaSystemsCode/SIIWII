@@ -670,6 +670,8 @@ showOverlay :boolean=false
         // P-SII-20260606.0005 - Open / Save As / Save actions are kept for later use.
         // this.showExportActions(downloadUrl, filename);
 
+
+          // P-SII-20260606.0005 -remove zip file from assets/attachments/IX546.zip 
         this.downloadExportedZip(downloadUrl, filename);
     }
 
