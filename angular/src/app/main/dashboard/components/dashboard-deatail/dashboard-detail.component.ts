@@ -566,168 +566,271 @@ dashboardNotFound = false;
     }
 
 
-        async exportDashboardPdf(): Promise<void> {
-        if (this.exportingPdf || !this.saved) {
-            return;
+  
+async exportDashboardPdf(): Promise<void> {
+
+    if (
+        this.exportingPdf ||
+        this.refreshing ||
+        this.loading ||
+        !this.dashboardWorkbookReady ||
+        !this.saved
+    ) {
+        return;
+    }
+
+    this.exportingPdf = true;
+
+    this.layoutTimers.forEach(timer => clearTimeout(timer));
+    this.layoutTimers = [];
+    clearTimeout(this.resizeTimer);
+
+    this.cdr.detectChanges();
+
+    try {
+        const sheets: any[] =
+            getWorkbookRoot(this.saved.workbookJson)?.sheets ?? [];
+
+        const index = this.findDashboardIndex(sheets);
+
+        if (index < 0) {
+            throw new Error('Dashboard sheet not found.');
         }
 
-        this.exportingPdf = true;
+        const expectedCharts = this.collectCharts(sheets[index]).length;
 
-        // stop the mobile layout from resizing/re-rendering charts while we capture them
-        this.layoutTimers.forEach(t => clearTimeout(t));
-        this.layoutTimers = [];
-        clearTimeout(this.resizeTimer);
+        const pdf = new jsPDF({
+            orientation: 'landscape',
+            unit: 'mm',
+            format: 'a4'
+        });
 
+        if (expectedCharts > 0) {
+            await this.addChartsToPdf(pdf, expectedCharts);
+        } else {
+            this.addDataTableToPdf(pdf, sheets[index]);
+        }
+
+        pdf.save(this.pdfFileName);
+
+    } catch (error) {
+        console.error('[Dashboard PDF] Export failed:', error);
+
+        this.notify.error(
+            this.l('DashboardPdfExportFailed')
+        );
+
+    } finally {
+        this.exportingPdf = false;
         this.cdr.detectChanges();
 
-        // let the "Preparing PDF" overlay paint first
-        await new Promise<void>(r => setTimeout(r, 50));
-
-        try {
-            const sheets: any[] = getWorkbookRoot(this.saved.workbookJson)?.sheets;
-            const index = this.findDashboardIndex(sheets);
-
-            if (index < 0) {
-                throw new Error('Dashboard sheet not found.');
-            }
-
-            const pdf = new jsPDF({ orientation: 'landscape', unit: 'mm', format: 'a4' });
-            const expectedCharts = this.collectCharts(sheets[index]).length;
-
-            if (expectedCharts > 0) {
-                await this.addChartsToPdf(pdf, expectedCharts);
-            } else {
-                this.addDataTableToPdf(pdf, sheets[index]);
-            }
-
-            pdf.save(this.pdfFileName);
-        } catch (error) {
-            console.error('Dashboard PDF export failed:', error);
-            this.notify.error(
-                this.l('DashboardPdfExportFailed')
-            );
-        } finally {
-            this.exportingPdf = false;
-            this.cdr.detectChanges();
-        }
+        // Restore responsive chart positioning after export.
+        this.scheduleMobileLayout();
     }
+}
 
     // ---------- charts ----------
 
-    private svgToPng(svg: SVGSVGElement, width: number, height: number, scale = 2): Promise<string> {
-        return new Promise((resolve, reject) => {
-            const copy = svg.cloneNode(true) as SVGSVGElement;
-            copy.setAttribute('xmlns', 'http://www.w3.org/2000/svg');
-            copy.setAttribute('xmlns:xlink', 'http://www.w3.org/1999/xlink');
-            copy.setAttribute('width', String(width));
-            copy.setAttribute('height', String(height));
+private svgToPng(
+    svg: SVGSVGElement,
+    width: number,
+    height: number,
+    scale = 2
+): Promise<string> {
 
-            if (!copy.getAttribute('viewBox')) {
-                copy.setAttribute('viewBox', `0 0 ${width} ${height}`);
-            }
+    return new Promise((resolve, reject) => {
+        const copy = svg.cloneNode(true) as SVGSVGElement;
 
-            // make sure nothing is left invisible by an unfinished animation / hover state
-            copy.querySelectorAll('[id$="_tooltip"], [id$="_Crosshair"], [id*="_Trackball"]').forEach(n => n.remove());
+        copy.setAttribute('xmlns', 'http://www.w3.org/2000/svg');
+        copy.setAttribute('width', String(width));
+        copy.setAttribute('height', String(height));
 
-            const url = URL.createObjectURL(
-                new Blob([new XMLSerializer().serializeToString(copy)], { type: 'image/svg+xml;charset=utf-8' })
-            );
-
-            const img = new Image();
-
-            img.onload = () => {
-                const canvas = document.createElement('canvas');
-                canvas.width = Math.round(width * scale);
-                canvas.height = Math.round(height * scale);
-
-                const ctx = canvas.getContext('2d')!;
-                ctx.fillStyle = '#ffffff';
-                ctx.fillRect(0, 0, canvas.width, canvas.height);
-                ctx.drawImage(img, 0, 0, canvas.width, canvas.height);
-
-                URL.revokeObjectURL(url);
-                resolve(canvas.toDataURL('image/png'));
-            };
-
-            img.onerror = () => {
-                URL.revokeObjectURL(url);
-                reject(new Error('Chart image failed.'));
-            };
-
-            img.src = url;
-        });
-    }
-
-    /** Reads every rendered chart currently in the dashboard (current on-screen position and size). */
-    private collectChartItems(): ChartExportItem[] {
-        const host = this.dashboardExportArea?.nativeElement;
-
-        if (!host) {
-            return [];
+        if (!copy.getAttribute('viewBox')) {
+            copy.setAttribute('viewBox', `0 0 ${width} ${height}`);
         }
 
-        return (Array.from(host.querySelectorAll('.e-ss-overlay')) as HTMLElement[])
-            .map((o): ChartExportItem | null => {
-                const svg = o.querySelector('svg[id$="_svg"]') as SVGSVGElement | null;
+        const xml = new XMLSerializer().serializeToString(copy);
 
-                if (!svg || svg.childElementCount === 0) {
-                    return null;
+        const blob = new Blob([xml], {
+            type: 'image/svg+xml;charset=utf-8'
+        });
+
+        const url = URL.createObjectURL(blob);
+        const img = new Image();
+
+        img.onload = () => {
+            try {
+                const canvas = document.createElement('canvas');
+
+                canvas.width = Math.ceil(width * scale);
+                canvas.height = Math.ceil(height * scale);
+
+                const ctx = canvas.getContext('2d');
+
+                if (!ctx) {
+                    throw new Error('Canvas context unavailable');
                 }
 
-                const box = svg.getBoundingClientRect();
+                ctx.fillStyle = '#ffffff';
+                ctx.fillRect(0, 0, canvas.width, canvas.height);
 
-                return {
-                    svg,
-                    w: Math.round(box.width),
-                    h: Math.round(box.height),
-                    left: parseFloat(o.style.left) || 0,
-                    top: parseFloat(o.style.top) || 0
-                };
-            })
-            .filter((x): x is ChartExportItem => !!x && x.w > 0 && x.h > 0)
-            .sort((a, b) => (a.top - b.top) || (a.left - b.left));
+                ctx.scale(scale, scale);
+                ctx.drawImage(img, 0, 0, width, height);
+
+                resolve(canvas.toDataURL('image/png'));
+            } catch (error) {
+                reject(error);
+            } finally {
+                URL.revokeObjectURL(url);
+            }
+        };
+
+        img.onerror = () => {
+            URL.revokeObjectURL(url);
+            reject(new Error('Failed to convert chart SVG'));
+        };
+
+        img.src = url;
+    });
+}
+
+
+    /** Reads every rendered chart currently in the dashboard (current on-screen position and size). */
+ 
+private collectChartItems(): ChartExportItem[] {
+    const host = this.dashboardExportArea?.nativeElement;
+
+    if (!host) {
+        return [];
     }
+
+    const overlays = Array.from(
+        host.querySelectorAll('.e-ss-overlay')
+    ) as HTMLElement[];
+
+    const items: ChartExportItem[] = [];
+
+    overlays.forEach((overlay) => {
+
+        // Supports normal charts and accumulation charts (Pie/Doughnut).
+        const chartEl = overlay.querySelector(
+            '.e-chart, .e-accumulationchart, .e-donut'
+        ) as HTMLElement | null;
+
+        if (!chartEl) {
+            return;
+        }
+
+        // Get the main chart SVG, avoiding nested decorative SVGs.
+        const svg = (
+            chartEl.querySelector('svg[id$="_svg"]') ||
+            chartEl.querySelector('svg')
+        ) as SVGSVGElement | null;
+
+        if (!svg) {
+            return;
+        }
+
+        const rect = svg.getBoundingClientRect();
+
+        const width = Math.round(rect.width);
+        const height = Math.round(rect.height);
+
+        if (width <= 0 || height <= 0) {
+            return;
+        }
+
+        // Check for actual chart drawing elements.
+        const hasContent = !!svg.querySelector(
+            'path, rect, circle, ellipse, polygon, polyline, text'
+        );
+
+        if (!hasContent) {
+            return;
+        }
+
+        // Chart position within the Dashboard sheet.
+        const left = parseFloat(overlay.style.left) || 0;
+        const top = parseFloat(overlay.style.top) || 0;
+
+        items.push({
+            svg,
+            w: width,
+            h: height,
+            left,
+            top
+        });
+    });
+
+    // Preserve chart layout order.
+    return items.sort(
+        (a, b) =>
+            (a.top - b.top) ||
+            (a.left - b.left)
+    );
+}
 
     /**
      * Waits until all charts exist and have stopped changing
      * (animations finished, no re-render in progress).
      */
-    private async waitForChartsReady(expected: number, timeoutMs = 8000): Promise<ChartExportItem[]> {
-        const started = Date.now();
-        const serializer = new XMLSerializer();
 
-        let lastSignature = '';
-        let stableTicks = 0;
+private async waitForChartsReady(
+    expected: number,
+    timeoutMs = 15000
+): Promise<ChartExportItem[]> {
 
-        while (Date.now() - started < timeoutMs) {
-            const items = this.collectChartItems();
+    const started = Date.now();
+    let previousSignature = '';
+    let stableCount = 0;
 
-            const signature = items
-                .map(i => `${i.w}x${i.h}@${i.left},${i.top}:${serializer.serializeToString(i.svg).length}`)
-                .join('|');
-
-            if (items.length >= expected && items.length > 0 && signature === lastSignature) {
-                stableTicks++;
-
-                if (stableTicks >= 2) {
-                    return items;
-                }
-            } else {
-                stableTicks = 0;
-            }
-
-            lastSignature = signature;
-            await new Promise<void>(r => setTimeout(r, 250));
-        }
+    while (Date.now() - started < timeoutMs) {
 
         const items = this.collectChartItems();
 
-        if (!items.length) {
-            throw new Error('Charts are not rendered yet.');
+        if (items.length === expected) {
+
+            const signature = items.map(item => {
+                const svg = item.svg;
+
+                return [
+                    item.w,
+                    item.h,
+                    item.left,
+                    item.top,
+                    new XMLSerializer().serializeToString(svg)
+                ].join(':');
+            }).join('|');
+
+            if (signature === previousSignature) {
+                stableCount++;
+            } else {
+                stableCount = 0;
+            }
+
+            if (stableCount >= 3) {
+                return items;
+            }
+
+            previousSignature = signature;
+
+        } else {
+            stableCount = 0;
+            previousSignature = '';
         }
 
-        return items;
+        await new Promise<void>(
+            resolve => setTimeout(resolve, 300)
+        );
     }
+
+    const actual = this.collectChartItems().length;
+
+    throw new Error(
+        `Dashboard charts not ready. Expected ${expected}, found ${actual}.`
+    );
+}
+
 
    private async addChartsToPdf(
     pdf: jsPDF,
@@ -750,6 +853,28 @@ dashboardNotFound = false;
 
     const sheet = sheets[index];
     const items = await this.waitForChartsReady(expectedCharts);
+
+
+const chartImages: string[] = [];
+
+for (let i = 0; i < items.length; i++) {
+    const item = items[i];
+
+    const png = await this.svgToPng(
+        item.svg,
+        item.w,
+        item.h
+    );
+
+    chartImages.push(png);
+}
+
+if (chartImages.length !== expectedCharts) {
+    throw new Error(
+        `PDF export incomplete: ${chartImages.length}/${expectedCharts} charts.`
+    );
+}
+
 
     const margin = 8;
     const pageW = pdf.internal.pageSize.getWidth() - margin * 2;
@@ -775,41 +900,38 @@ dashboardNotFound = false;
         margin, pageW, pageH
     );
 
-    for (const item of items) {
-        const w = item.w * k;
-        const h = item.h * k;
-        const x = margin + item.left * k;
+    
+for (let i = 0; i < items.length; i++) {
+    const item = items[i];
 
-        let y = item.top * k - pageStartY;
+    const w = item.w * k;
+    const h = item.h * k;
+    const x = margin + item.left * k;
 
-        if (y + h > pageH) {
-            pdf.addPage();
+    let y = item.top * k - pageStartY;
 
-            pageStartY = item.top * k;
-            y = 0;
+    if (y + h > pageH) {
+        pdf.addPage();
 
-            // Draw background on the new page.
-            this.drawDashboardBackground(
-                pdf, sheet, k, pageStartY,
-                margin, pageW, pageH
-            );
-        }
+        pageStartY = item.top * k;
+        y = 0;
 
-        const png = await this.svgToPng(
-            item.svg,
-            item.w,
-            item.h
-        );
-
-        pdf.addImage(
-            png,
-            'PNG',
-            x,
-            margin + y,
-            w,
-            h
+        this.drawDashboardBackground(
+            pdf, sheet, k, pageStartY,
+            margin, pageW, pageH
         );
     }
+
+    pdf.addImage(
+        chartImages[i],
+        'PNG',
+        x,
+        margin + y,
+        w,
+        h
+    );
+}
+
 }
 
     // ---------- data table (no charts) ----------

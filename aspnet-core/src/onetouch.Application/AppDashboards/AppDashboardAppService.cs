@@ -680,8 +680,8 @@ namespace onetouch.AppDashboards
                             var allUsersRecords = await _appEntitySharingRepository.GetAll()
                         .Where(z => z.EntityId == dashboardObj.Id &&
                         z.SharedTenantId == AbpSession.TenantId &&
-                        z.SharedUserId != null &&
-                        z.CanEdit != ShareDashboardInfo.CanEdit).ToListAsync();
+                        z.SharedUserId != null && z.SharedUserId != dashboardObj.CreatorUserId
+                        && z.CanEdit != ShareDashboardInfo.CanEdit).ToListAsync();
                             if (allUsersRecords != null)
                             {
                                 foreach (var user in allUsersRecords)
@@ -700,8 +700,8 @@ namespace onetouch.AppDashboards
                         var allUsersRecords = await _appEntitySharingRepository.GetAll()
                        .Where(z => z.EntityId == dashboardObj.Id &&
                        z.SharedTenantId == AbpSession.TenantId &&
-                       z.SharedUserId != null &&
-                       z.CanEdit != ShareDashboardInfo.CanEdit).ToListAsync();
+                       z.SharedUserId != null && z.SharedUserId != dashboardObj.CreatorUserId
+                       && z.CanEdit != ShareDashboardInfo.CanEdit).ToListAsync();
                         if (allUsersRecords != null)
                         {
                             foreach (var user in allUsersRecords)
@@ -730,7 +730,7 @@ namespace onetouch.AppDashboards
                         var allUsersRecords = await _appEntitySharingRepository.GetAll()
                        .Where(z => z.EntityId == dashboardObj.Id &&
                        z.SharedTenantId == AbpSession.TenantId &&
-                       z.SharedUserId != null).ToListAsync();
+                       z.SharedUserId != null && z.SharedUserId!= dashboardObj.CreatorUserId).ToListAsync();
                         if (allUsersRecords != null && allUsersRecords.Count > 0)
                         {
                             foreach (var sharUser in allUsersRecords)
