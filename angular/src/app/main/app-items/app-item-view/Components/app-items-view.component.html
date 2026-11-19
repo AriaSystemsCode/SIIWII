@@ -1381,6 +1381,7 @@
 <app-advanced-pricing
     *ngIf="showAdvancedPricing"
     [prices]="appItemForViewDto.appItemPriceInfos"
+    [variations]="appItemForViewDto.variationItems || []"
     [readOnly]="true"
     (_cancel)="hideAdvancedPricingModal()"
 >
