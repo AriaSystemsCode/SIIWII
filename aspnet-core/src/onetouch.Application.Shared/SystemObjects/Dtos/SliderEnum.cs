@@ -17,7 +17,10 @@ namespace onetouch.SystemObjects.Dtos
         SRCTA,
         MRCTA,
         PF,
-        SM
+        SM,
+        Menu,
+        IASCTA,
+        FBS,
         //I49[End]
     }
 }

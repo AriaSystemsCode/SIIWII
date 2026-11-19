@@ -1,0 +1,28 @@
+
+<div class="landing-block-card"
+     [class.compact]="compact"
+     (click)="openBlock()"
+     role="button"
+     tabindex="0"
+     (keydown.enter)="openBlock()"
+     (keydown.space)="$event.preventDefault(); openBlock()">
+
+  <div class="block-image-wrapper">
+
+    <img
+      class="block-image"
+      [src]="blockImage"
+      [alt]="blockName"
+      loading="lazy"
+      (error)="onImageError($event)" />
+
+  </div>
+
+  <div class="block-info">
+    <span class="block-name"  [pTooltip]="blockName" tooltipPosition="bottom"   [tooltipEvent]="isSmallScreen ? 'focus' : 'hover'" [autoHide]="true" [showDelay]="100" [hideDelay]="100"
+                [tabindex]="isSmallScreen ? 0 : null">
+      {{ blockName | textSubstring : 20 }}
+    </span>
+  </div>
+
+</div>
