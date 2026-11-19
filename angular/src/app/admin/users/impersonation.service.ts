@@ -14,55 +14,137 @@ export class ImpersonationService {
 
     }
 
-    impersonate(userId: number, tenantId?: number): void {
+    // impersonate(userId: number, tenantId?: number): void {
 
+    //     const input = new ImpersonateInput();
+    //     input.userId = userId;
+    //     input.tenantId = tenantId;
+
+    //     this._accountService.impersonate(input)
+    //         .subscribe((result: ImpersonateOutput) => {
+    //             this._authService.logout(false);
+
+    //             let targetUrl = this._appUrlService.getAppRootUrlOfTenant(result.tenancyName) + '?impersonationToken=' + result.impersonationToken;
+    //             if (input.tenantId) {
+    //                 targetUrl = targetUrl + '&tenantId=' + input.tenantId;
+    //             }
+
+    //             location.href = targetUrl;
+    //         });
+    // }
+
+    
+    // delegatedImpersonate(userDelegationId: number, tenantId?: number): void {
+
+    //     const input = new DelegatedImpersonateInput();
+    //     input.userDelegationId = userDelegationId;
+
+    //     this._accountService.delegatedImpersonate(input)
+    //         .subscribe((result: ImpersonateOutput) => {
+    //             this._authService.logout(false);
+
+    //             let targetUrl = this._appUrlService.getAppRootUrlOfTenant(result.tenancyName) + '?impersonationToken=' + result.impersonationToken;
+    //             targetUrl = targetUrl + '&userDelegationId=' + userDelegationId;
+    //             if (tenantId) {
+    //                 targetUrl = targetUrl + '&tenantId=' + tenantId;
+    //             }
+
+    //             location.href = targetUrl;
+    //         });
+    // }
+
+    // backToImpersonator(): void {
+    //     this._accountService.backToImpersonator()
+    //         .subscribe((result: ImpersonateOutput) => {
+    //             this._authService.logout(false);
+
+    //             let targetUrl = this._appUrlService.getAppRootUrlOfTenant(result.tenancyName) + '?impersonationToken=' + result.impersonationToken;
+    //             if (abp.session.impersonatorTenantId) {
+    //                 targetUrl = targetUrl + '&tenantId=' + abp.session.impersonatorTenantId;
+    //             }
+
+    //             location.href = targetUrl;
+    //         });
+    // }
+
+       private getImpersonationUrl(
+        token: string,
+        tenantId?: number,
+        userDelegationId?: number
+    ): string {
+
+        const baseUrl = window.location.origin + '/';
+
+        let targetUrl =
+            baseUrl +
+            '?impersonationToken=' +
+            encodeURIComponent(token);
+
+        if (tenantId != null) {
+            targetUrl += '&tenantId=' + tenantId;
+        }
+
+        if (userDelegationId != null) {
+            targetUrl += '&userDelegationId=' + userDelegationId;
+        }
+
+        return targetUrl;
+    }
+   impersonate(userId: number, tenantId?: number): void {
         const input = new ImpersonateInput();
         input.userId = userId;
         input.tenantId = tenantId;
 
         this._accountService.impersonate(input)
             .subscribe((result: ImpersonateOutput) => {
+
+                const targetUrl = this.getImpersonationUrl(
+                    result.impersonationToken,
+                    input.tenantId
+                );
+
                 this._authService.logout(false);
-
-                let targetUrl = this._appUrlService.getAppRootUrlOfTenant(result.tenancyName) + '?impersonationToken=' + result.impersonationToken;
-                if (input.tenantId) {
-                    targetUrl = targetUrl + '&tenantId=' + input.tenantId;
-                }
-
-                location.href = targetUrl;
+                window.location.href = targetUrl;
             });
     }
 
-    delegatedImpersonate(userDelegationId: number, tenantId?: number): void {
+    delegatedImpersonate(
+        userDelegationId: number,
+        tenantId?: number
+    ): void {
 
         const input = new DelegatedImpersonateInput();
         input.userDelegationId = userDelegationId;
 
         this._accountService.delegatedImpersonate(input)
             .subscribe((result: ImpersonateOutput) => {
+
+                const targetUrl = this.getImpersonationUrl(
+                    result.impersonationToken,
+                    tenantId,
+                    userDelegationId
+                );
+
                 this._authService.logout(false);
-
-                let targetUrl = this._appUrlService.getAppRootUrlOfTenant(result.tenancyName) + '?impersonationToken=' + result.impersonationToken;
-                targetUrl = targetUrl + '&userDelegationId=' + userDelegationId;
-                if (tenantId) {
-                    targetUrl = targetUrl + '&tenantId=' + tenantId;
-                }
-
-                location.href = targetUrl;
+                window.location.href = targetUrl;
             });
     }
 
     backToImpersonator(): void {
         this._accountService.backToImpersonator()
             .subscribe((result: ImpersonateOutput) => {
+
+                const tenantId =
+                    abp.session.impersonatorTenantId;
+
+                const targetUrl = this.getImpersonationUrl(
+                    result.impersonationToken,
+                    tenantId
+                );
+
                 this._authService.logout(false);
-
-                let targetUrl = this._appUrlService.getAppRootUrlOfTenant(result.tenancyName) + '?impersonationToken=' + result.impersonationToken;
-                if (abp.session.impersonatorTenantId) {
-                    targetUrl = targetUrl + '&tenantId=' + abp.session.impersonatorTenantId;
-                }
-
-                location.href = targetUrl;
+                window.location.href = targetUrl;
             });
     }
+
 }
