@@ -42,6 +42,7 @@ import { ImportStepInfo } from "@shared/components/import-steps/models/ImportSte
 import { ImportStepsEnum } from "@shared/components/import-steps/models/ImportStepsEnum";
 import { MainImportService } from "@shared/components/import-steps/services/mainImport.service";
 import Swal from "sweetalert2";
+import { AppConsts } from "@shared/AppConsts";
 
 @Component({
     selector: "app-app-items",
@@ -640,4 +641,59 @@ showOverlay :boolean=false
      ngOnDestroy(): void {
     localStorage.removeItem('marketplaceAccountsBrowseState');
   }
+    exportSelectedItems(): void {
+        const selectedItemIds: number[] = this.items
+            .filter((item) => item.selected)
+            .map((item) => item.appItem.id);
+
+        if (!selectedItemIds.length) {
+            this.notify.warn(this.l("PleaseSelectAnItem"));
+            return;
+        }
+        
+        // P-SII-20260606.0005
+        // .exportItems(selectedItemIds, this.multiSelectionInfo?.sessionSelectionKey)
+        // .subscribe((exportResult) => {
+        //     const downloadUrl = this.attachmentBaseUrl+"/" +exportResult?.attachmentUrl;
+        //     if (downloadUrl) {
+        //         this.downloadExportedZip(downloadUrl);
+        //     }
+        // });
+
+        debugger
+        const downloadUrl = "/assets/attachments/IX546.zip";
+        this.downloadExportedZip(downloadUrl);
+    }
+
+    private async downloadExportedZip(downloadUrl: string): Promise<void> {
+        try {
+            const response = await fetch(downloadUrl);
+
+            if (!response.ok) {
+                throw new Error(`Unable to download ZIP file. Status: ${response.status}`);
+            }
+
+            const blob = await response.blob();
+            const zipBlob = new Blob([blob], { type: "application/zip" });
+            const objectUrl = URL.createObjectURL(zipBlob);
+
+            const filename = downloadUrl
+                .split("?")[0]
+                .split("#")[0]
+                .split("/")
+                .pop() || "items-export.zip";
+
+            const link = document.createElement("a");
+            link.href = objectUrl;
+            link.download = decodeURIComponent(filename);
+            document.body.appendChild(link);
+            link.click();
+            link.remove();
+
+            window.setTimeout(() => URL.revokeObjectURL(objectUrl), 1000);
+        } catch (error) {
+            console.error("Unable to download exported ZIP", error);
+            this.notify.error(this.l("Export File Unavailable"));
+        }
+    }
 }
