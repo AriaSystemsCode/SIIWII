@@ -20,6 +20,8 @@
                                 l("UpdateAccountInformation") }}</span>
                         </span>
                     </div>
+
+                    <!-- action btns -->
                     <div class="kt-subheader__toolbar">
 
                         <div class="kt-subheader__wrapper" *ngIf="
@@ -354,7 +356,7 @@
                                             <svg *ngIf="currentTab == accountInfoPageTabsEnum.Payments" width="18"
                                                 height="18" viewBox="0 0 18 18" fill="none"
                                                 xmlns="http://www.w3.org/2000/svg">
-                                                <!-- keep your existing payment active svg here -->
+                                
                                             </svg>
                                         </span>
 
@@ -414,7 +416,8 @@
                                     </a>
                                 </li>
 
-                                <li class="nav-item" *ngIf="relationId && relationId > 0 && (roleSeller || roleEmployer)">
+                                <li class="nav-item"
+                                    *ngIf="relationId && relationId > 0 && (roleSeller || roleEmployer)">
                                     <a class="nav-link profile-nav-link"
                                         (click)="changeTab(accountInfoPageTabsEnum.RelationshipSettings)"
                                         [ngClass]="currentTab == accountInfoPageTabsEnum.RelationshipSettings ? 'active' : ''">
@@ -721,15 +724,10 @@
                                                 <!-- <div class="d-flex flex-grow-1"> -->
                                                 <div class="flex-grow-1 mr-1 account-page">
 
-                                                    <p-dropdown
-                                                        *ngIf="accountLevel == accountLevelEnum.Manual"
-                                                        [options]="accountTypes"
-                                                        optionLabel="label"
-                                                        optionValue="value"
-                                                        [(ngModel)]="accountInfoTemp.accountTypeId"
-                                                        name="accountType"
-                                                        #manualAccountTypeInput="ngModel"
-                                                        [filter]="false"
+                                                    <p-dropdown *ngIf="accountLevel == accountLevelEnum.Manual"
+                                                        [options]="accountTypes" optionLabel="label" optionValue="value"
+                                                        [(ngModel)]="accountInfoTemp.accountTypeId" name="accountType"
+                                                        #manualAccountTypeInput="ngModel" [filter]="false"
                                                         styleClass="ticket-dropdown form-control aria-select text-left"
                                                         required>
                                                     </p-dropdown>
@@ -849,22 +847,6 @@
 
                                             </div>
                                         </div>
-
-                                        <!--  <div class="form-group row"
-                                            *ngIf="(accountLevel == accountLevelEnum.Manual || (accountDataForView?.isConnected && currentTab === accountInfoPageTabsEnum.ProfileCreateOrEdit)) && !isRecordOwner">
-                                            <label for="colFormLabelSm"
-                                                class="col-sm-2 col-form-label col-form-label-sm label-form">{{l("PriceLevel")}}</label>
-                                            <div class="col-sm-8">
-                                                <p-dropdown [options]="allPriceLevel"
-                                                    styleClass="form-control aria-select" [filter]="false"
-                                                    name="PriceLevelId" [(ngModel)]="accountInfoTemp.priceLevel"
-                                                    (onChange)="changeTouchState()"
-                                                    [placeholder]="'PleaseSelect' | localize"></p-dropdown> 
-
-                                            </div>
-                                            <span  *ngIf="accountInfoTemp?.priceLevel" class="mt-2"><a class="reset-link" (click)="accountInfoTemp.priceLevel =null; changeTouchState()">Reset</a></span>
-                                        </div>
- -->
 
                                         <div class="form-group row"
                                             *ngIf="isRecordOwner && accountLevel == accountLevelEnum.Profile && accountInfoTemp?.accountTypeId != 21">
