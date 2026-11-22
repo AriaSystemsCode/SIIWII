@@ -182,9 +182,11 @@ namespace onetouch.AppItems
              IAbpStartupConfiguration abpStartupConfiguration,
              IRepository<AppContact, long> appContactRepository,
              RoleManager roleManager,
-             UserManager userManager
+             UserManager userManager,
+             onetouch.Storage.ITempFileCacheManager productExportFileCache
             )
         {
+            _productExportFileCache = productExportFileCache;
             _roleManager = roleManager;
             _userManager = userManager;
             _backgroundJobManager = backgroundJobManager;
