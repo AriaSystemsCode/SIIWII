@@ -2,11 +2,12 @@
     <div
         class="kt-content kt-grid__item kt-grid__item--fluid kt-grid kt-grid--hor font-weight-normal"
     >
-        <div
+       <div
             class="kt-subheader kt-grid__item"
             [ngStyle]="{
                 position : appItemViewInput?.marketPlace ? 'fixed'  : 'absolute',
-                'z-index' : !addingToList ? '5'  : '1041'
+                'z-index' : !addingToList ? '5'  : '1041',
+                'margin': '0px 10px'
             }"
         >
             <div [class]="containerClass">

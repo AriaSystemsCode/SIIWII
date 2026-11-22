@@ -21329,6 +21329,7 @@ export class AppItemsListsServiceProxy {
 
     /**
      * @param id (optional) 
+     * @param isMarketplaceList (optional) 
      * @return Success
      */
     getAppItemsListForView(id: number | undefined, isMarketplaceList: boolean | undefined): Observable<GetAppItemsListForEditOutput> {
@@ -23573,155 +23574,6 @@ export class AppMarketplaceItemsServiceProxy {
     }
 
     /**
-     * @param contactSSIN (optional) 
-     * @param accountSSIN (optional) 
-     * @param tenantId (optional) 
-     * @param appItemListId (optional) 
-     * @param selectorOnly (optional) 
-     * @param filter (optional) 
-     * @param lastKey (optional) 
-     * @param selectorKey (optional) 
-     * @param arrtibuteFilters (optional) 
-     * @param departmentFilters (optional) 
-     * @param minimumPrice (optional) 
-     * @param maximumPrice (optional) 
-     * @param onlyAvialbleStock (optional) 
-     * @param soldOutFromDate (optional) 
-     * @param soldOutToDate (optional) 
-     * @param startShipFromDate (optional) 
-     * @param startShipToDate (optional) 
-     * @param brands (optional) 
-     * @param currencyCode (optional) 
-     * @param itemSSIN (optional) 
-     * @param categoryFilters (optional) 
-     * @param filterCondition (optional) 
-     * @param sorting (optional) 
-     * @param skipCount (optional) 
-     * @param maxResultCount (optional) 
-     * @return Success
-     */
-    getAppItemRelatedItems(contactSSIN: string | null | undefined, accountSSIN: string | null | undefined, tenantId: number | null | undefined, appItemListId: number | null | undefined, selectorOnly: boolean | null | undefined, filter: string | null | undefined, lastKey: string | null | undefined, selectorKey: string | null | undefined, arrtibuteFilters: ArrtibuteFilter[] | null | undefined, departmentFilters: number[] | null | undefined, minimumPrice: number | null | undefined, maximumPrice: number | null | undefined, sharingLevel: SharingLevels, onlyAvialbleStock: boolean | undefined, soldOutFromDate: moment.Moment | undefined, soldOutToDate: moment.Moment | undefined, startShipFromDate: moment.Moment | undefined, startShipToDate: moment.Moment | undefined, brands: number[] | null | undefined, currencyCode: string | null | undefined, itemSSIN: string | null | undefined, categoryFilters: number[] | null | undefined, filterCondition: string | null | undefined, sorting: string | null | undefined, skipCount: number | undefined, maxResultCount: number | undefined): Observable<PagedResultDtoOfGetAppMarketItemForViewDto> {
-        let url_ = this.baseUrl + "/api/services/app/AppMarketplaceItems/GetAppItemRelatedItems?";
-        if (contactSSIN !== undefined && contactSSIN !== null)
-            url_ += "ContactSSIN=" + encodeURIComponent("" + contactSSIN) + "&";
-        if (accountSSIN !== undefined && accountSSIN !== null)
-            url_ += "AccountSSIN=" + encodeURIComponent("" + accountSSIN) + "&";
-        if (tenantId !== undefined && tenantId !== null)
-            url_ += "TenantId=" + encodeURIComponent("" + tenantId) + "&";
-        if (appItemListId !== undefined && appItemListId !== null)
-            url_ += "AppItemListId=" + encodeURIComponent("" + appItemListId) + "&";
-        if (selectorOnly !== undefined && selectorOnly !== null)
-            url_ += "SelectorOnly=" + encodeURIComponent("" + selectorOnly) + "&";
-        if (filter !== undefined && filter !== null)
-            url_ += "Filter=" + encodeURIComponent("" + filter) + "&";
-        if (lastKey !== undefined && lastKey !== null)
-            url_ += "LastKey=" + encodeURIComponent("" + lastKey) + "&";
-        if (selectorKey !== undefined && selectorKey !== null)
-            url_ += "SelectorKey=" + encodeURIComponent("" + selectorKey) + "&";
-        if (arrtibuteFilters !== undefined && arrtibuteFilters !== null)
-            arrtibuteFilters && arrtibuteFilters.forEach((item, index) => {
-                for (let attr in item)
-        			if (item.hasOwnProperty(attr)) {
-        				url_ += "ArrtibuteFilters[" + index + "]." + attr + "=" + encodeURIComponent("" + (item as any)[attr]) + "&";
-        			}
-            });
-        if (departmentFilters !== undefined && departmentFilters !== null)
-            departmentFilters && departmentFilters.forEach(item => { url_ += "departmentFilters=" + encodeURIComponent("" + item) + "&"; });
-        if (minimumPrice !== undefined && minimumPrice !== null)
-            url_ += "MinimumPrice=" + encodeURIComponent("" + minimumPrice) + "&";
-        if (maximumPrice !== undefined && maximumPrice !== null)
-            url_ += "MaximumPrice=" + encodeURIComponent("" + maximumPrice) + "&";
-        if (sharingLevel === undefined || sharingLevel === null)
-            throw new Error("The parameter 'sharingLevel' must be defined and cannot be null.");
-        else
-            url_ += "SharingLevel=" + encodeURIComponent("" + sharingLevel) + "&";
-        if (onlyAvialbleStock === null)
-            throw new Error("The parameter 'onlyAvialbleStock' cannot be null.");
-        else if (onlyAvialbleStock !== undefined)
-            url_ += "OnlyAvialbleStock=" + encodeURIComponent("" + onlyAvialbleStock) + "&";
-        if (soldOutFromDate === null)
-            throw new Error("The parameter 'soldOutFromDate' cannot be null.");
-        else if (soldOutFromDate !== undefined)
-            url_ += "SoldOutFromDate=" + encodeURIComponent(soldOutFromDate ? "" + soldOutFromDate.toISOString() : "") + "&";
-        if (soldOutToDate === null)
-            throw new Error("The parameter 'soldOutToDate' cannot be null.");
-        else if (soldOutToDate !== undefined)
-            url_ += "SoldOutToDate=" + encodeURIComponent(soldOutToDate ? "" + soldOutToDate.toISOString() : "") + "&";
-        if (startShipFromDate === null)
-            throw new Error("The parameter 'startShipFromDate' cannot be null.");
-        else if (startShipFromDate !== undefined)
-            url_ += "StartShipFromDate=" + encodeURIComponent(startShipFromDate ? "" + startShipFromDate.toISOString() : "") + "&";
-        if (startShipToDate === null)
-            throw new Error("The parameter 'startShipToDate' cannot be null.");
-        else if (startShipToDate !== undefined)
-            url_ += "StartShipToDate=" + encodeURIComponent(startShipToDate ? "" + startShipToDate.toISOString() : "") + "&";
-        if (brands !== undefined && brands !== null)
-            brands && brands.forEach(item => { url_ += "Brands=" + encodeURIComponent("" + item) + "&"; });
-        if (currencyCode !== undefined && currencyCode !== null)
-            url_ += "CurrencyCode=" + encodeURIComponent("" + currencyCode) + "&";
-        if (itemSSIN !== undefined && itemSSIN !== null)
-            url_ += "ItemSSIN=" + encodeURIComponent("" + itemSSIN) + "&";
-        if (categoryFilters !== undefined && categoryFilters !== null)
-            categoryFilters && categoryFilters.forEach(item => { url_ += "CategoryFilters=" + encodeURIComponent("" + item) + "&"; });
-        if (filterCondition !== undefined && filterCondition !== null)
-            url_ += "FilterCondition=" + encodeURIComponent("" + filterCondition) + "&";
-        if (sorting !== undefined && sorting !== null)
-            url_ += "Sorting=" + encodeURIComponent("" + sorting) + "&";
-        if (skipCount === null)
-            throw new Error("The parameter 'skipCount' cannot be null.");
-        else if (skipCount !== undefined)
-            url_ += "SkipCount=" + encodeURIComponent("" + skipCount) + "&";
-        if (maxResultCount === null)
-            throw new Error("The parameter 'maxResultCount' cannot be null.");
-        else if (maxResultCount !== undefined)
-            url_ += "MaxResultCount=" + encodeURIComponent("" + maxResultCount) + "&";
-        url_ = url_.replace(/[?&]$/, "");
-
-        let options_ : any = {
-            observe: "response",
-            responseType: "blob",
-            headers: new HttpHeaders({
-                "Accept": "text/plain"
-            })
-        };
-
-        return this.http.request("get", url_, options_).pipe(_observableMergeMap((response_ : any) => {
-            return this.processGetAppItemRelatedItems(response_);
-        })).pipe(_observableCatch((response_: any) => {
-            if (response_ instanceof HttpResponseBase) {
-                try {
-                    return this.processGetAppItemRelatedItems(response_ as any);
-                } catch (e) {
-                    return _observableThrow(e) as any as Observable<PagedResultDtoOfGetAppMarketItemForViewDto>;
-                }
-            } else
-                return _observableThrow(response_) as any as Observable<PagedResultDtoOfGetAppMarketItemForViewDto>;
-        }));
-    }
-
-    protected processGetAppItemRelatedItems(response: HttpResponseBase): Observable<PagedResultDtoOfGetAppMarketItemForViewDto> {
-        const status = response.status;
-        const responseBlob =
-            response instanceof HttpResponse ? response.body :
-            (response as any).error instanceof Blob ? (response as any).error : undefined;
-
-        let _headers: any = {}; if (response.headers) { for (let key of response.headers.keys()) { _headers[key] = response.headers.get(key); }}
-        if (status === 200) {
-            return blobToText(responseBlob).pipe(_observableMergeMap((_responseText: string) => {
-            let result200: any = null;
-            let resultData200 = _responseText === "" ? null : JSON.parse(_responseText, this.jsonParseReviver);
-            result200 = PagedResultDtoOfGetAppMarketItemForViewDto.fromJS(resultData200);
-            return _observableOf(result200);
-            }));
-        } else if (status !== 200 && status !== 204) {
-            return blobToText(responseBlob).pipe(_observableMergeMap((_responseText: string) => {
-            return throwException("An unexpected server error occurred.", status, _responseText, _headers);
-            }));
-        }
-        return _observableOf(null as any);
-    }
-
-    /**
      * @param itemId (optional) 
      * @param itemEntityId (optional) 
      * @param sorting (optional) 
@@ -24121,6 +23973,155 @@ export class AppMarketplaceItemsServiceProxy {
             let result200: any = null;
             let resultData200 = _responseText === "" ? null : JSON.parse(_responseText, this.jsonParseReviver);
             result200 = GetAppMarketItemForViewDto.fromJS(resultData200);
+            return _observableOf(result200);
+            }));
+        } else if (status !== 200 && status !== 204) {
+            return blobToText(responseBlob).pipe(_observableMergeMap((_responseText: string) => {
+            return throwException("An unexpected server error occurred.", status, _responseText, _headers);
+            }));
+        }
+        return _observableOf(null as any);
+    }
+
+    /**
+     * @param contactSSIN (optional) 
+     * @param accountSSIN (optional) 
+     * @param tenantId (optional) 
+     * @param appItemListId (optional) 
+     * @param selectorOnly (optional) 
+     * @param filter (optional) 
+     * @param lastKey (optional) 
+     * @param selectorKey (optional) 
+     * @param arrtibuteFilters (optional) 
+     * @param departmentFilters (optional) 
+     * @param minimumPrice (optional) 
+     * @param maximumPrice (optional) 
+     * @param onlyAvialbleStock (optional) 
+     * @param soldOutFromDate (optional) 
+     * @param soldOutToDate (optional) 
+     * @param startShipFromDate (optional) 
+     * @param startShipToDate (optional) 
+     * @param brands (optional) 
+     * @param currencyCode (optional) 
+     * @param itemSSIN (optional) 
+     * @param categoryFilters (optional) 
+     * @param filterCondition (optional) 
+     * @param sorting (optional) 
+     * @param skipCount (optional) 
+     * @param maxResultCount (optional) 
+     * @return Success
+     */
+    getAppItemRelatedItems(contactSSIN: string | null | undefined, accountSSIN: string | null | undefined, tenantId: number | null | undefined, appItemListId: number | null | undefined, selectorOnly: boolean | null | undefined, filter: string | null | undefined, lastKey: string | null | undefined, selectorKey: string | null | undefined, arrtibuteFilters: ArrtibuteFilter[] | null | undefined, departmentFilters: number[] | null | undefined, minimumPrice: number | null | undefined, maximumPrice: number | null | undefined, sharingLevel: SharingLevels, onlyAvialbleStock: boolean | undefined, soldOutFromDate: moment.Moment | undefined, soldOutToDate: moment.Moment | undefined, startShipFromDate: moment.Moment | undefined, startShipToDate: moment.Moment | undefined, brands: number[] | null | undefined, currencyCode: string | null | undefined, itemSSIN: string | null | undefined, categoryFilters: number[] | null | undefined, filterCondition: string | null | undefined, sorting: string | null | undefined, skipCount: number | undefined, maxResultCount: number | undefined): Observable<PagedResultDtoOfGetAppMarketItemForViewDto> {
+        let url_ = this.baseUrl + "/api/services/app/AppMarketplaceItems/GetAppItemRelatedItems?";
+        if (contactSSIN !== undefined && contactSSIN !== null)
+            url_ += "ContactSSIN=" + encodeURIComponent("" + contactSSIN) + "&";
+        if (accountSSIN !== undefined && accountSSIN !== null)
+            url_ += "AccountSSIN=" + encodeURIComponent("" + accountSSIN) + "&";
+        if (tenantId !== undefined && tenantId !== null)
+            url_ += "TenantId=" + encodeURIComponent("" + tenantId) + "&";
+        if (appItemListId !== undefined && appItemListId !== null)
+            url_ += "AppItemListId=" + encodeURIComponent("" + appItemListId) + "&";
+        if (selectorOnly !== undefined && selectorOnly !== null)
+            url_ += "SelectorOnly=" + encodeURIComponent("" + selectorOnly) + "&";
+        if (filter !== undefined && filter !== null)
+            url_ += "Filter=" + encodeURIComponent("" + filter) + "&";
+        if (lastKey !== undefined && lastKey !== null)
+            url_ += "LastKey=" + encodeURIComponent("" + lastKey) + "&";
+        if (selectorKey !== undefined && selectorKey !== null)
+            url_ += "SelectorKey=" + encodeURIComponent("" + selectorKey) + "&";
+        if (arrtibuteFilters !== undefined && arrtibuteFilters !== null)
+            arrtibuteFilters && arrtibuteFilters.forEach((item, index) => {
+                for (let attr in item)
+        			if (item.hasOwnProperty(attr)) {
+        				url_ += "ArrtibuteFilters[" + index + "]." + attr + "=" + encodeURIComponent("" + (item as any)[attr]) + "&";
+        			}
+            });
+        if (departmentFilters !== undefined && departmentFilters !== null)
+            departmentFilters && departmentFilters.forEach(item => { url_ += "departmentFilters=" + encodeURIComponent("" + item) + "&"; });
+        if (minimumPrice !== undefined && minimumPrice !== null)
+            url_ += "MinimumPrice=" + encodeURIComponent("" + minimumPrice) + "&";
+        if (maximumPrice !== undefined && maximumPrice !== null)
+            url_ += "MaximumPrice=" + encodeURIComponent("" + maximumPrice) + "&";
+        if (sharingLevel === undefined || sharingLevel === null)
+            throw new Error("The parameter 'sharingLevel' must be defined and cannot be null.");
+        else
+            url_ += "SharingLevel=" + encodeURIComponent("" + sharingLevel) + "&";
+        if (onlyAvialbleStock === null)
+            throw new Error("The parameter 'onlyAvialbleStock' cannot be null.");
+        else if (onlyAvialbleStock !== undefined)
+            url_ += "OnlyAvialbleStock=" + encodeURIComponent("" + onlyAvialbleStock) + "&";
+        if (soldOutFromDate === null)
+            throw new Error("The parameter 'soldOutFromDate' cannot be null.");
+        else if (soldOutFromDate !== undefined)
+            url_ += "SoldOutFromDate=" + encodeURIComponent(soldOutFromDate ? "" + soldOutFromDate.toISOString() : "") + "&";
+        if (soldOutToDate === null)
+            throw new Error("The parameter 'soldOutToDate' cannot be null.");
+        else if (soldOutToDate !== undefined)
+            url_ += "SoldOutToDate=" + encodeURIComponent(soldOutToDate ? "" + soldOutToDate.toISOString() : "") + "&";
+        if (startShipFromDate === null)
+            throw new Error("The parameter 'startShipFromDate' cannot be null.");
+        else if (startShipFromDate !== undefined)
+            url_ += "StartShipFromDate=" + encodeURIComponent(startShipFromDate ? "" + startShipFromDate.toISOString() : "") + "&";
+        if (startShipToDate === null)
+            throw new Error("The parameter 'startShipToDate' cannot be null.");
+        else if (startShipToDate !== undefined)
+            url_ += "StartShipToDate=" + encodeURIComponent(startShipToDate ? "" + startShipToDate.toISOString() : "") + "&";
+        if (brands !== undefined && brands !== null)
+            brands && brands.forEach(item => { url_ += "Brands=" + encodeURIComponent("" + item) + "&"; });
+        if (currencyCode !== undefined && currencyCode !== null)
+            url_ += "CurrencyCode=" + encodeURIComponent("" + currencyCode) + "&";
+        if (itemSSIN !== undefined && itemSSIN !== null)
+            url_ += "ItemSSIN=" + encodeURIComponent("" + itemSSIN) + "&";
+        if (categoryFilters !== undefined && categoryFilters !== null)
+            categoryFilters && categoryFilters.forEach(item => { url_ += "CategoryFilters=" + encodeURIComponent("" + item) + "&"; });
+        if (filterCondition !== undefined && filterCondition !== null)
+            url_ += "FilterCondition=" + encodeURIComponent("" + filterCondition) + "&";
+        if (sorting !== undefined && sorting !== null)
+            url_ += "Sorting=" + encodeURIComponent("" + sorting) + "&";
+        if (skipCount === null)
+            throw new Error("The parameter 'skipCount' cannot be null.");
+        else if (skipCount !== undefined)
+            url_ += "SkipCount=" + encodeURIComponent("" + skipCount) + "&";
+        if (maxResultCount === null)
+            throw new Error("The parameter 'maxResultCount' cannot be null.");
+        else if (maxResultCount !== undefined)
+            url_ += "MaxResultCount=" + encodeURIComponent("" + maxResultCount) + "&";
+        url_ = url_.replace(/[?&]$/, "");
+
+        let options_ : any = {
+            observe: "response",
+            responseType: "blob",
+            headers: new HttpHeaders({
+                "Accept": "text/plain"
+            })
+        };
+
+        return this.http.request("get", url_, options_).pipe(_observableMergeMap((response_ : any) => {
+            return this.processGetAppItemRelatedItems(response_);
+        })).pipe(_observableCatch((response_: any) => {
+            if (response_ instanceof HttpResponseBase) {
+                try {
+                    return this.processGetAppItemRelatedItems(response_ as any);
+                } catch (e) {
+                    return _observableThrow(e) as any as Observable<PagedResultDtoOfGetAppMarketItemForViewDto>;
+                }
+            } else
+                return _observableThrow(response_) as any as Observable<PagedResultDtoOfGetAppMarketItemForViewDto>;
+        }));
+    }
+
+    protected processGetAppItemRelatedItems(response: HttpResponseBase): Observable<PagedResultDtoOfGetAppMarketItemForViewDto> {
+        const status = response.status;
+        const responseBlob =
+            response instanceof HttpResponse ? response.body :
+            (response as any).error instanceof Blob ? (response as any).error : undefined;
+
+        let _headers: any = {}; if (response.headers) { for (let key of response.headers.keys()) { _headers[key] = response.headers.get(key); }}
+        if (status === 200) {
+            return blobToText(responseBlob).pipe(_observableMergeMap((_responseText: string) => {
+            let result200: any = null;
+            let resultData200 = _responseText === "" ? null : JSON.parse(_responseText, this.jsonParseReviver);
+            result200 = PagedResultDtoOfGetAppMarketItemForViewDto.fromJS(resultData200);
             return _observableOf(result200);
             }));
         } else if (status !== 200 && status !== 204) {
@@ -78741,6 +78742,7 @@ export class GetDashboardForViewDto implements IGetDashboardForViewDto {
     spreadsheetFilePath!: string | undefined;
     isEditable!: boolean;
     isTheOwner!: boolean;
+    ownerUserImg!: string | undefined;
     sharingLevel!: number;
 
     [key: string]: any;
@@ -78775,6 +78777,7 @@ export class GetDashboardForViewDto implements IGetDashboardForViewDto {
             this.spreadsheetFilePath = _data["spreadsheetFilePath"];
             this.isEditable = _data["isEditable"];
             this.isTheOwner = _data["isTheOwner"];
+            this.ownerUserImg = _data["ownerUserImg"];
             this.sharingLevel = _data["sharingLevel"];
         }
     }
@@ -78807,6 +78810,7 @@ export class GetDashboardForViewDto implements IGetDashboardForViewDto {
         data["spreadsheetFilePath"] = this.spreadsheetFilePath;
         data["isEditable"] = this.isEditable;
         data["isTheOwner"] = this.isTheOwner;
+        data["ownerUserImg"] = this.ownerUserImg;
         data["sharingLevel"] = this.sharingLevel;
         return data;
     }
@@ -78824,6 +78828,7 @@ export interface IGetDashboardForViewDto {
     spreadsheetFilePath: string | undefined;
     isEditable: boolean;
     isTheOwner: boolean;
+    ownerUserImg: string | undefined;
     sharingLevel: number;
 
     [key: string]: any;
@@ -88339,12 +88344,12 @@ export class PublishItemOptions implements IPublishItemOptions {
             this.itemListId = _data["itemListId"];
             this.sharingLevel = _data["sharingLevel"];
             this.message = _data["message"];
-            this.numberOfSubscribers = _data["numberOfSubscribers"];
             if (Array.isArray(_data["itemSharing"])) {
                 this.itemSharing = [] as any;
                 for (let item of _data["itemSharing"])
                     this.itemSharing!.push(ItemSharingDto.fromJS(item));
             }
+            this.numberOfSubscribers = _data["numberOfSubscribers"];
         }
     }
 
@@ -88365,12 +88370,12 @@ export class PublishItemOptions implements IPublishItemOptions {
         data["itemListId"] = this.itemListId;
         data["sharingLevel"] = this.sharingLevel;
         data["message"] = this.message;
-        data["numberOfSubscribers"] = this.numberOfSubscribers;
         if (Array.isArray(this.itemSharing)) {
             data["itemSharing"] = [];
             for (let item of this.itemSharing)
                 data["itemSharing"].push(item.toJSON());
         }
+        data["numberOfSubscribers"] = this.numberOfSubscribers;
         return data;
     }
 }
@@ -91122,6 +91127,7 @@ export class CreateOrEditAppItemsListDto implements ICreateOrEditAppItemsListDto
     usersCount!: number;
     statusCode!: string | undefined;
     statusId!: number | undefined;
+    ssin!: string | undefined;
     id!: number | undefined;
 
     [key: string]: any;
@@ -91156,6 +91162,7 @@ export class CreateOrEditAppItemsListDto implements ICreateOrEditAppItemsListDto
             this.usersCount = _data["usersCount"];
             this.statusCode = _data["statusCode"];
             this.statusId = _data["statusId"];
+            this.ssin = _data["ssin"];
             this.id = _data["id"];
         }
     }
@@ -91188,6 +91195,7 @@ export class CreateOrEditAppItemsListDto implements ICreateOrEditAppItemsListDto
         data["usersCount"] = this.usersCount;
         data["statusCode"] = this.statusCode;
         data["statusId"] = this.statusId;
+        data["ssin"] = this.ssin;
         data["id"] = this.id;
         return data;
     }
@@ -91205,6 +91213,7 @@ export interface ICreateOrEditAppItemsListDto {
     usersCount: number;
     statusCode: string | undefined;
     statusId: number | undefined;
+    ssin: string | undefined;
     id: number | undefined;
 
     [key: string]: any;
@@ -92407,6 +92416,7 @@ export class AppMarketplaceItemForViewDto implements IAppMarketplaceItemForViewD
             }
             this.orderByPrePack = _data["orderByPrePack"];
             this.hasPriceLevel = _data["hasPriceLevel"];
+            this.ssin = _data["ssin"];
             this.code = _data["code"];
             this.name = _data["name"];
             this.entityId = _data["entityId"];
@@ -92547,6 +92557,7 @@ export class AppMarketplaceItemForViewDto implements IAppMarketplaceItemForViewD
         }
         data["orderByPrePack"] = this.orderByPrePack;
         data["hasPriceLevel"] = this.hasPriceLevel;
+        data["ssin"] = this.ssin;
         data["code"] = this.code;
         data["name"] = this.name;
         data["entityId"] = this.entityId;
@@ -121352,6 +121363,9 @@ export enum SliderEnum {
     MRCTA = 5,
     PF = 6,
     SM = 7,
+    Menu = 8,
+    IASCTA = 9,
+    FBS = 10,
 }
 
 export class PageSettingDto implements IPageSettingDto {
@@ -121376,6 +121390,8 @@ export class PageSettingDto implements IPageSettingDto {
     entityAttachments!: AppEntityAttachmentDto[] | undefined;
     getAppEventForViewDto!: GetAppEventForViewDto;
     blockTypeIsSingleOrMixed!: string | undefined;
+    backgroundColor!: string | undefined;
+    textColor!: string | undefined;
 
     [key: string]: any;
 
@@ -121419,6 +121435,8 @@ export class PageSettingDto implements IPageSettingDto {
             }
             this.getAppEventForViewDto = _data["getAppEventForViewDto"] ? GetAppEventForViewDto.fromJS(_data["getAppEventForViewDto"]) : <any>undefined;
             this.blockTypeIsSingleOrMixed = _data["blockTypeIsSingleOrMixed"];
+            this.backgroundColor = _data["backgroundColor"];
+            this.textColor = _data["textColor"];
         }
     }
 
@@ -121460,6 +121478,8 @@ export class PageSettingDto implements IPageSettingDto {
         }
         data["getAppEventForViewDto"] = this.getAppEventForViewDto ? this.getAppEventForViewDto.toJSON() : <any>undefined;
         data["blockTypeIsSingleOrMixed"] = this.blockTypeIsSingleOrMixed;
+        data["backgroundColor"] = this.backgroundColor;
+        data["textColor"] = this.textColor;
         return data;
     }
 }
@@ -121486,6 +121506,8 @@ export interface IPageSettingDto {
     entityAttachments: AppEntityAttachmentDto[] | undefined;
     getAppEventForViewDto: GetAppEventForViewDto;
     blockTypeIsSingleOrMixed: string | undefined;
+    backgroundColor: string | undefined;
+    textColor: string | undefined;
 
     [key: string]: any;
 }
