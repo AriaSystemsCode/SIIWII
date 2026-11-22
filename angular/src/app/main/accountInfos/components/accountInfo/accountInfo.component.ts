@@ -1963,4 +1963,8 @@ if (this.accountInfoTemp?.accountTypeId === 21) {
     openConnectionsDialog(): void {
         this.showConnectionsDialog = true;
     }
+
+         ngOnDestroy(): void {
+    localStorage.removeItem('marketplaceAccountsBrowseState');
+  }
 }
