@@ -455,6 +455,30 @@ namespace onetouch.AppDashboards
 
             return dashboard;
         }
+        public async Task MarkDashboardAsDefault(long dashboardID)
+        {
+            var dashboardObjectTypeId = await _helper.SystemTables.GetEntityObjectTypeDashboard();
+            var defaultDashboard = await _appEntitySharingRepository.GetAll()
+                .Where(z=>z.EntityFk.EntityObjectTypeId == dashboardObjectTypeId
+                && z.SharedUserId== AbpSession.UserId &&
+                z.IsDefault==true).FirstOrDefaultAsync();
+            if (defaultDashboard != null && defaultDashboard.Id != dashboardID)
+            {
+                defaultDashboard.IsDefault = false;
+                _appEntitySharingRepository.UpdateAsync(defaultDashboard);
+            }
+            var newDefaultDashboard = await _appEntitySharingRepository.GetAll()
+                .Where(z => z.EntityFk.EntityObjectTypeId == dashboardObjectTypeId
+                && z.SharedUserId == AbpSession.UserId &&
+                z.EntityId == dashboardID).FirstOrDefaultAsync();
+            if (newDefaultDashboard != null && newDefaultDashboard.IsDefault == false)
+            {
+                newDefaultDashboard.IsDefault= true;
+                await _appEntitySharingRepository.UpdateAsync(newDefaultDashboard);
+            }
+            await CurrentUnitOfWork.SaveChangesAsync();
+
+        }
         [AbpAuthorize(AppPermissions.Pages_Dashboards_CreateOrEdit)]
         public async Task<bool> CreateOrEdit(CreateOrEditDashboard input)
         {

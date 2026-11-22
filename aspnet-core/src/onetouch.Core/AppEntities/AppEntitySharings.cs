@@ -33,5 +33,7 @@ namespace onetouch.AppEntities
         public virtual DateTime LastViewDate { get; set; }
         public virtual bool CanEdit { get; set; }
         //I52[End]
+        public virtual bool IsDefault { get; set; }
+        public virtual bool IsFavorite { get; set; }
     }
 }
