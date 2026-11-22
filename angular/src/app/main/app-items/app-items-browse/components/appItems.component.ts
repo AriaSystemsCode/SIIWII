@@ -650,47 +650,27 @@ showOverlay :boolean=false
             .filter((item) => item.selected)
             .map((item) => item.appItem.id);
 
-        if (!selectedItemIds.length) {
+        const selectionKey = this.multiSelectionInfo?.sessionSelectionKey;
+        if (!selectedItemIds.length && !(selectionKey && (this.multiSelectionInfo?.totalCount ?? 0) > 0)) {
             this.notify.warn(this.l("PleaseSelectAnItem"));
             return;
         }
-        
-        // P-SII-20260606.0005
-        // .exportItems(selectedItemIds, this.multiSelectionInfo?.sessionSelectionKey)
-        // .subscribe((exportResult) => {
-        //     const downloadUrl = this.attachmentBaseUrl+"/" +exportResult?.attachmentUrl;
-        //     if (downloadUrl) {
-        //         this.downloadExportedZip(downloadUrl);
-        //     }
-        // });
 
-        const downloadUrl = `${window.location.origin}/assets/attachments/IX546.zip`;
-        const filename = this.getExportFilename(downloadUrl);
-
-        // P-SII-20260606.0005 - Open / Save As / Save actions are kept for later use.
-        // this.showExportActions(downloadUrl, filename);
-
-
-          // P-SII-20260606.0005 -remove zip file from assets/attachments/IX546.zip 
-        this.downloadExportedZip(downloadUrl, filename);
-    }
-
-    private getExportFilename(downloadUrl: string): string {
-        const filename = downloadUrl
-            .split("?")[0]
-            .split("#")[0]
-            .split("/")
-            .pop();
-
-        if (!filename) {
-            return "items-export.zip";
-        }
-
-        try {
-            return decodeURIComponent(filename);
-        } catch {
-            return filename;
-        }
+        this.showMainSpinner();
+        this._appItemsServiceProxy
+            .exportItems(selectionKey, selectedItemIds)
+            .pipe(finalize(() => this.hideMainSpinner()))
+            .subscribe((result) => {
+                const query = new URLSearchParams({
+                    fileType: result.fileType,
+                    fileToken: result.fileToken,
+                    fileName: result.fileName
+                });
+                this.showExportActions(
+                    `${AppConsts.remoteServiceBaseUrl}/File/DownloadTempFile?${query}`,
+                    result.fileName
+                );
+            });
     }
 
     private async saveExportAs(downloadUrl: string, filename: string): Promise<void> {
@@ -757,35 +737,50 @@ showOverlay :boolean=false
         }
     }
 
-    // P-SII-20260606.0005 - Restore by calling this method from exportSelectedItems.
-    private showExportActions(downloadUrl: string, filename: string): void {
-        Swal.fire({
-            title: '',
-            text: "What do you want to do with this ZIP file?",
-            icon: "info",
-            showCancelButton: true,
-            showDenyButton: true,
-            confirmButtonText: "Open",
-            denyButtonText: "Save as",
-            cancelButtonText: "Save",
-            reverseButtons: false,
-            customClass: {
-                denyButton: "swal-save-as-button"
+    private async showExportActions(downloadUrl: string, filename: string): Promise<void> {
+        let objectUrl: string;
+        try {
+            const response = await fetch(downloadUrl);
+            if (!response.ok) {
+                throw new Error(`Unable to download ZIP file. Status: ${response.status}`);
             }
-        }).then((result) => {
+            objectUrl = URL.createObjectURL(await response.blob());
+        } catch (error) {
+            console.error("Unable to load exported ZIP", error);
+            this.notify.error(this.l("Export File Unavailable"));
+            return;
+        }
+
+        try {
+            const result = await Swal.fire({
+                text: `What do you want to do with ${filename}?`,
+                icon: "info",
+                showCancelButton: true,
+                showDenyButton: true,
+                showCloseButton: true,
+                confirmButtonText: "Open",
+                denyButtonText: "Save as",
+                cancelButtonText: "Save",
+                reverseButtons: false,
+                customClass: {
+                    denyButton: "swal-save-as-button"
+                }
+            });
             if (result.isConfirmed) {
-                window.open(downloadUrl, "_blank", "noopener,noreferrer");
+                window.open(objectUrl, "_blank", "noopener,noreferrer");
                 return;
             }
 
             if (result.isDenied) {
-                this.saveExportAs(downloadUrl, filename);
+                await this.saveExportAs(objectUrl, filename);
                 return;
             }
 
             if (result.dismiss === Swal.DismissReason.cancel) {
-                this.downloadExportedZip(downloadUrl, filename);
+                await this.downloadExportedZip(objectUrl, filename);
             }
-        });
+        } finally {
+            window.setTimeout(() => URL.revokeObjectURL(objectUrl), 1000);
+        }
     }
 }
