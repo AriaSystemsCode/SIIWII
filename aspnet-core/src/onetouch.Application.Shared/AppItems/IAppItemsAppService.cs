@@ -36,6 +36,7 @@ namespace onetouch.AppItems
         Task Delete(EntityDto<long> input);
 
         Task<FileDto> GetAppItemsToExcel(GetAllAppItemsForExcelInput input);
+        Task<FileDto> ExportItems(long[] selectedItemIds, Guid? sessionSelectionKey = null);
         Task ShareProduct(SharingItemOptions input);
 
         Task<long> ShareSelectedProducts(Guid key);
