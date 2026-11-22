@@ -1909,4 +1909,9 @@ export class CreateOrEditAppItemComponent
             this.appItem.published = false;
         });
     }
+
+
+closeAttachmentPopup(): void {
+    this.showAttachmentPanel = false;
+}
 }

@@ -1,6 +1,16 @@
 
 <div class="attachment-uploader">
 
+       <!-- TOP RIGHT CLOSE BUTTON -->
+    <button
+        type="button"
+        class="uploader-close-btn"
+        [attr.aria-label]="'Close' | localize"
+        (click)="cancel()">
+        <i class="fas fa-times"></i>
+    </button>
+
+
     <!-- SCROLLABLE CONTENT -->
     <div class="attachment-uploader-content">
 

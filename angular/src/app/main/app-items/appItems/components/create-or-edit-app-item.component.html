@@ -463,7 +463,8 @@
                                                 [allowPdf]="true"
                                                 [allowVideo]="true"
                                                 [showThumbnailForMedia]="true"
-                                                (attachmentSelected)="onSharedAttachmentSelected($event)">
+                                                (attachmentSelected)="onSharedAttachmentSelected($event)"
+                                                (cancelled)="closeAttachmentPopup()">
                                             </app-attachment-uploader>
                                         </div>
                                     </div>
