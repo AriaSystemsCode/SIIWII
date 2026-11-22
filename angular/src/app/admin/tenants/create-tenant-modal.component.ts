@@ -133,7 +133,8 @@ export class CreateTenantModalComponent extends AppComponentBase {
         if (this.isUnlimited || this.tenant.editionId <= 0) {
             this.tenant.subscriptionEndDateUtc = null;
         }
-
+        // merge
+        this.tenant.adminName = this.tenant.firstName + this.tenant.lastName
         this._tenantService.createTenant(this.tenant)
             .pipe(finalize(() => this.saving = false))
             .subscribe(() => {
