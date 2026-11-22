@@ -69,6 +69,8 @@ export class BrowseFolderComponent extends AppComponentBase implements OnInit {
   }
 
   show(importType: ImportTypes, importService: any, hasImages: boolean) {
+       this.imData = false;
+    this.imImages = false;
     this.hasImages = hasImages;
     this.itemType = "";
     this.itemTypeId = 0;
