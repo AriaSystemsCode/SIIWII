@@ -38,12 +38,14 @@
               <input type="text"
               class="form-control form-control-sm"
               name="subject"
-              value="Registration request"
-              disabled
               [(ngModel)]="model.subject"
               required
               minlength="2"
               maxlength="100" />
+                    <small class="text-danger"
+                     *ngIf="contactForm.submitted && !contactForm.controls.subject?.valid">
+                     {{'Subject' | localize}} {{'Required' | localize}}
+              </small>
   
             </div>
 

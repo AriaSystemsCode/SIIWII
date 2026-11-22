@@ -19,7 +19,7 @@ export class ContactUsModalComponent extends AppComponentBase {
   saving = false;
   isContactUsFound :boolean
   model = {
-    subject: 'Registration request',
+    subject: '',
     firstName: '',
     lastName: '',
     email: '',
@@ -54,7 +54,7 @@ export class ContactUsModalComponent extends AppComponentBase {
     this.saving = true;
 
   
-    this.SydObjectsServiceProxy.sendContactUsInfo(this.model.firstName,this.model.lastName,this.model.email,this.model.telephone,this.model.message)
+    this.SydObjectsServiceProxy.sendContactUsInfo(this.model.firstName,this.model.lastName,this.model.email,this.model.telephone,this.model.message,this.model.subject)
       .pipe(finalize(() => {
         this.saving = false;
         this.notify.info(this.l('YourRequestHasBeenSubmitted'));
@@ -67,7 +67,7 @@ export class ContactUsModalComponent extends AppComponentBase {
 
   private resetForm(): void {
     this.model = {
-      subject: 'Registration request',
+      subject: '',
       firstName: '',
       lastName: '',
       email: '',
