@@ -1073,41 +1073,81 @@ previewImageUrl = '';
     }
     showSizeRatio() {}
 
-    openShareProductListingModal() {
-        console.log(">> listing");
-        const listingId: number = this.productId;
-        const alreadyPublished: boolean = true;
-        const currentSharingStatus = this._publishAppItemListingService.productId === this.productId &&
-            this._publishAppItemListingService.sharingStatus !== undefined &&
-            this._publishAppItemListingService.sharingStatus !== null
-                ? this._publishAppItemListingService.sharingStatus
-                : this.appItemForViewDto.sharingLevel;
+    // openShareProductListingModal() {
+    //     console.log(">> listing");
+    //     const listingId: number = this.productId;
+    //     const alreadyPublished: boolean = true;
+    //     const currentSharingStatus = this._publishAppItemListingService.productId === this.productId &&
+    //         this._publishAppItemListingService.sharingStatus !== undefined &&
+    //         this._publishAppItemListingService.sharingStatus !== null
+    //             ? this._publishAppItemListingService.sharingStatus
+    //             : this.appItemForViewDto.sharingLevel;
 
-        this._publishAppItemListingService.subscribersNumber =
-            this.appItemForViewDto.numberOfSubscribers;
-        this._publishAppItemListingService.sharingStatus = currentSharingStatus;
-        this._publishAppItemListingService.itemSharing =
-            this.appItemForViewDto.itemSharing;
-        this._publishAppItemListingService.productId = this.productId;
-        this._publishAppItemListingService.screen = 1;
+    //     this._publishAppItemListingService.subscribersNumber =
+    //         this.appItemForViewDto.numberOfSubscribers;
+    //     this._publishAppItemListingService.sharingStatus = currentSharingStatus;
+    //     this._publishAppItemListingService.itemSharing =
+    //         this.appItemForViewDto.itemSharing;
+    //     this._publishAppItemListingService.productId = this.productId;
+    //     this._publishAppItemListingService.screen = 1;
 
-        const successCallBack = () => {
-            this.appItemForViewDto.sharingLevel = this._publishAppItemListingService.sharingStatus;
-            this.appItemForViewDto.itemSharing = this._publishAppItemListingService.itemSharing;
-            this.notify.success(this.l("PublishedSuccessfully"));
-            // this.eventTriggered.emit({
-            //     event: AppItemBrowseEvents.PublishListing,
-            //     data: true,
-            // });
-        };
-        const optinalData="mai";
-        this._publishAppItemListingService.openProductListingSharingModal(
-            alreadyPublished,
-            listingId,
-            successCallBack,
-            optinalData
-        );
+    //     const successCallBack = () => {
+    //         this.appItemForViewDto.sharingLevel = this._publishAppItemListingService.sharingStatus;
+    //         this.appItemForViewDto.itemSharing = this._publishAppItemListingService.itemSharing;
+    //         this.notify.success(this.l("PublishedSuccessfully"));
+    //         // this.eventTriggered.emit({
+    //         //     event: AppItemBrowseEvents.PublishListing,
+    //         //     data: true,
+    //         // });
+    //     };
+    //     const optinalData="mai";
+    //     this._publishAppItemListingService.openProductListingSharingModal(
+    //         alreadyPublished,
+    //         listingId,
+    //         successCallBack,
+    //         optinalData
+    //     );
+    // }
+    openShareProductListingModal(): void {
+    if (!this.appItemForViewDto) {
+        return;
     }
+
+    const service = this._publishAppItemListingService;
+
+    // Use the actual saved product status
+    service.productId = this.productId;
+    service.screen = 1;
+
+    service.sharingStatus =
+        this.appItemForViewDto.sharingLevel ?? 0;
+
+    service.subscribersNumber =
+        this.appItemForViewDto.numberOfSubscribers ?? 0;
+
+    // Avoid sharing the original recipients array
+    service.itemSharing = (
+        this.appItemForViewDto.itemSharing || []
+    ).map(item => ({ ...item })) as any;
+
+    const successCallBack = () => {
+        // Runs after a successful sharing action
+        this.appItemForViewDto.sharingLevel =
+            service.sharingStatus;
+
+        this.appItemForViewDto.itemSharing =
+            (service.itemSharing || []).map(item => ({ ...item })) as any;
+
+        this.notify.success(this.l("PublishedSuccessfully"));
+    };
+
+    service.openProductListingSharingModal(
+        true,
+        this.productId,
+        successCallBack,
+        "mai"
+    );
+}
     btnLoader: boolean = false;
     syncProduct() {
         this.btnLoader = true;
