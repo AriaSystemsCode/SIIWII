@@ -108,6 +108,7 @@
                                 <i class="pi pi-trash dfv-remove" title="Remove" (click)="removeField(field)"></i>
                             </div>
 
+                            <!-- //Ix- Dynamic input component for the field -->
                             <app-dynamicInputs *ngIf="getInputObject(field) as inputObject"
                                 [extraAttributeObject]="inputObject" [singleColumn]="true">
                             </app-dynamicInputs>
