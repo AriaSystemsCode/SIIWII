@@ -480,6 +480,21 @@
                                            >
                                     </div>
 
+                                    <!-- Uploader side panel -->
+                                    <div class="attachment-panel-overlay" *ngIf="showAttachmentPanel"
+                                        (click)="closeAttachmentPanel()">
+                                        <div class="attachment-panel-container" (click)="$event.stopPropagation()">
+                                            <app-attachment-uploader
+                                                [maxFileSizeMB]="5"
+                                                [aspectRatio]="'16:9'"
+                                                [allowPdf]="true"
+                                                [allowVideo]="true"
+                                                [showThumbnailForMedia]="true"
+                                                (attachmentSelected)="onSharedAttachmentSelected($event)"
+                                                (cancelled)="closeAttachmentPopup()">
+                                            </app-attachment-uploader>
+                                        </div>
+                                    </div>
                                 </div>
                             </div>
                         </div>
