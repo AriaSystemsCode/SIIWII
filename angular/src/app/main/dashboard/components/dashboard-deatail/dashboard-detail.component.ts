@@ -1,5 +1,5 @@
 import { ChangeDetectorRef, Component, ElementRef, HostListener, Injector, OnDestroy, OnInit, ViewChild } from '@angular/core';
-import { ActivatedRoute } from '@angular/router';
+import { ActivatedRoute , Router } from '@angular/router';
 import { MessageService } from 'primeng/api';
 import { SpreadsheetComponent } from '@syncfusion/ej2-angular-spreadsheet';
 import jsPDF from 'jspdf';
@@ -78,6 +78,8 @@ syncfusionLocale = 'en';
 syncfusionRtl = false;
 syncfusionLocaleReady = false;
 dashboardNotFound = false;
+
+dashboardList: any[] = [];
     constructor(
         injector: Injector,
         private route: ActivatedRoute,
@@ -85,6 +87,7 @@ dashboardNotFound = false;
         private refreshService: SpreadsheetRefreshService,
         private drilldown: DrilldownService,
             private http: HttpClient,
+            private router: Router,
         private cdr: ChangeDetectorRef
     ) {
         super(injector);
@@ -102,6 +105,7 @@ dashboardNotFound = false;
     }
 
     await this.initializeSyncfusionLocale();
+this.loadDashboardList();
 
     this.loadDashboard();
 }
@@ -1268,4 +1272,133 @@ private pdfColorToRgb(
 
     return null;
 }
+
+backToBrowse(): void {
+    this.router.navigate(['/app/main/dashboards/my-dashboards']);
+}
+switchDashboard(item: any): void {
+    if (!item?.id || item.id === this.dashboardId) {
+        return;
+    }
+
+    this.router.navigate([
+        '/app/main/dashboards/dashboard-details',
+        item.id
+    ]).then(navigated => {
+        if (navigated) {
+            this.dashboardId = item.id;
+            this.loadDashboard();
+        }
+    });
+}
+
+
+loadDashboardList(): void {
+    this.appDashboardService
+        .getAll(
+            null,
+            0,
+            Intl.DateTimeFormat().resolvedOptions().timeZone,
+            null,
+            0,
+            100
+        )
+        .subscribe({
+            next: result => {
+                // this.dashboardList = result?.items || [];
+                this.dashboardList=[
+                        {
+            id: 1,
+            title: 'Sales Performance Dashboard',
+            isFavourite: false,
+            isDefault: true,
+            creatorUserName: 'Ahmed Mohamed',
+            ownerUserImg: '',
+            isTheOwner: true,
+            isEditable: true,
+            lastViewDate: '2026-11-22T14:30:00',
+            lastModificationDate: '2026-11-21T10:15:00',
+            sharedWithUsers: [
+                { userName: 'Sara Ali', userImage: '' },
+                { userName: 'Omar Hassan', userImage: '' }
+            ]
+        },
+        {
+            id: 2,
+            title: 'Financial Overview Dashboard',
+            isFavourite: true,
+            isDefault: false,
+            creatorUserName: 'Menna Ramadan',
+            ownerUserImg: '',
+            isTheOwner: true,
+            isEditable: true,
+            lastViewDate: '2026-11-20T09:45:00',
+            lastModificationDate: '2026-11-19T16:20:00',
+            sharedWithUsers: []
+        },
+        {
+            id: 3,
+            title: 'Inventory Management Dashboard',
+            creatorUserName: 'Mohamed Ali',
+            isFavourite: true,
+            isDefault: false,
+            ownerUserImg: '',
+            isTheOwner: false,
+            isEditable: true,
+            lastViewDate: '2026-11-18T11:00:00',
+            lastModificationDate: '2026-11-17T13:30:00',
+            sharedWithUsers: [
+                { userName: 'Menna Ramadan', userImage: '' },
+                { userName: 'Ahmed Mohamed', userImage: '' },
+                { userName: 'Sara Ali', userImage: '' },
+                { userName: 'Omar Hassan', userImage: '' }
+            ]
+        },
+        {
+            id: 4,
+            title: 'Marketing Analytics Dashboard',
+            creatorUserName: 'Sara Ali',
+            ownerUserImg: '',
+            isTheOwner: false,
+            isEditable: false,
+            lastViewDate: null,
+            lastModificationDate: '2026-11-15T08:00:00',
+            sharedWithUsers: []
+        }
+                ]
+            },
+            error: error => {
+                console.error('Failed to load dashboards:', error);
+            }
+        });
+}
+
+
+toggleFavourite(): void {
+    if (!this.dashboard?.id) {
+        return;
+    }
+
+    this.appDashboardService
+        .setDashboardAsFavorite(this.dashboard.id)
+        .subscribe({
+            next: () => {
+                this.dashboard.isFavourite =
+                    !this.dashboard.isFavourite;
+
+                const item = this.dashboardList.find(
+                    x => x.id === this.dashboard.id
+                );
+
+                if (item) {
+                    item.isFavourite = this.dashboard.isFavourite;
+                }
+            },
+            error: error => {
+                console.error('Failed to update favourite:', error);
+            }
+        });
+}
+
+
 }
