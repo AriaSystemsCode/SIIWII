@@ -6719,6 +6719,110 @@ export class AppDashboardServiceProxy {
     }
 
     /**
+     * @param dashboardID (optional) 
+     * @return Success
+     */
+    setDashboardAsFavorite(dashboardID: number | undefined): Observable<void> {
+        let url_ = this.baseUrl + "/api/services/app/AppDashboard/SetDashboardAsFavorite?";
+        if (dashboardID === null)
+            throw new Error("The parameter 'dashboardID' cannot be null.");
+        else if (dashboardID !== undefined)
+            url_ += "dashboardID=" + encodeURIComponent("" + dashboardID) + "&";
+        url_ = url_.replace(/[?&]$/, "");
+
+        let options_ : any = {
+            observe: "response",
+            responseType: "blob",
+            headers: new HttpHeaders({
+            })
+        };
+
+        return this.http.request("post", url_, options_).pipe(_observableMergeMap((response_ : any) => {
+            return this.processSetDashboardAsFavorite(response_);
+        })).pipe(_observableCatch((response_: any) => {
+            if (response_ instanceof HttpResponseBase) {
+                try {
+                    return this.processSetDashboardAsFavorite(response_ as any);
+                } catch (e) {
+                    return _observableThrow(e) as any as Observable<void>;
+                }
+            } else
+                return _observableThrow(response_) as any as Observable<void>;
+        }));
+    }
+
+    protected processSetDashboardAsFavorite(response: HttpResponseBase): Observable<void> {
+        const status = response.status;
+        const responseBlob =
+            response instanceof HttpResponse ? response.body :
+            (response as any).error instanceof Blob ? (response as any).error : undefined;
+
+        let _headers: any = {}; if (response.headers) { for (let key of response.headers.keys()) { _headers[key] = response.headers.get(key); }}
+        if (status === 200) {
+            return blobToText(responseBlob).pipe(_observableMergeMap((_responseText: string) => {
+            return _observableOf(null as any);
+            }));
+        } else if (status !== 200 && status !== 204) {
+            return blobToText(responseBlob).pipe(_observableMergeMap((_responseText: string) => {
+            return throwException("An unexpected server error occurred.", status, _responseText, _headers);
+            }));
+        }
+        return _observableOf(null as any);
+    }
+
+    /**
+     * @param dashboardID (optional) 
+     * @return Success
+     */
+    markDashboardAsDefault(dashboardID: number | undefined): Observable<void> {
+        let url_ = this.baseUrl + "/api/services/app/AppDashboard/MarkDashboardAsDefault?";
+        if (dashboardID === null)
+            throw new Error("The parameter 'dashboardID' cannot be null.");
+        else if (dashboardID !== undefined)
+            url_ += "dashboardID=" + encodeURIComponent("" + dashboardID) + "&";
+        url_ = url_.replace(/[?&]$/, "");
+
+        let options_ : any = {
+            observe: "response",
+            responseType: "blob",
+            headers: new HttpHeaders({
+            })
+        };
+
+        return this.http.request("post", url_, options_).pipe(_observableMergeMap((response_ : any) => {
+            return this.processMarkDashboardAsDefault(response_);
+        })).pipe(_observableCatch((response_: any) => {
+            if (response_ instanceof HttpResponseBase) {
+                try {
+                    return this.processMarkDashboardAsDefault(response_ as any);
+                } catch (e) {
+                    return _observableThrow(e) as any as Observable<void>;
+                }
+            } else
+                return _observableThrow(response_) as any as Observable<void>;
+        }));
+    }
+
+    protected processMarkDashboardAsDefault(response: HttpResponseBase): Observable<void> {
+        const status = response.status;
+        const responseBlob =
+            response instanceof HttpResponse ? response.body :
+            (response as any).error instanceof Blob ? (response as any).error : undefined;
+
+        let _headers: any = {}; if (response.headers) { for (let key of response.headers.keys()) { _headers[key] = response.headers.get(key); }}
+        if (status === 200) {
+            return blobToText(responseBlob).pipe(_observableMergeMap((_responseText: string) => {
+            return _observableOf(null as any);
+            }));
+        } else if (status !== 200 && status !== 204) {
+            return blobToText(responseBlob).pipe(_observableMergeMap((_responseText: string) => {
+            return throwException("An unexpected server error occurred.", status, _responseText, _headers);
+            }));
+        }
+        return _observableOf(null as any);
+    }
+
+    /**
      * @param body (optional) 
      * @return Success
      */
@@ -78734,6 +78838,7 @@ export class GetDashboardForViewDto implements IGetDashboardForViewDto {
     spreadsheetFilePath!: string | undefined;
     isEditable!: boolean;
     isTheOwner!: boolean;
+    ownerUserImg!: string | undefined;
     sharingLevel!: number;
 
     [key: string]: any;
@@ -78768,6 +78873,7 @@ export class GetDashboardForViewDto implements IGetDashboardForViewDto {
             this.spreadsheetFilePath = _data["spreadsheetFilePath"];
             this.isEditable = _data["isEditable"];
             this.isTheOwner = _data["isTheOwner"];
+            this.ownerUserImg = _data["ownerUserImg"];
             this.sharingLevel = _data["sharingLevel"];
         }
     }
@@ -78800,6 +78906,7 @@ export class GetDashboardForViewDto implements IGetDashboardForViewDto {
         data["spreadsheetFilePath"] = this.spreadsheetFilePath;
         data["isEditable"] = this.isEditable;
         data["isTheOwner"] = this.isTheOwner;
+        data["ownerUserImg"] = this.ownerUserImg;
         data["sharingLevel"] = this.sharingLevel;
         return data;
     }
@@ -78817,6 +78924,7 @@ export interface IGetDashboardForViewDto {
     spreadsheetFilePath: string | undefined;
     isEditable: boolean;
     isTheOwner: boolean;
+    ownerUserImg: string | undefined;
     sharingLevel: number;
 
     [key: string]: any;
