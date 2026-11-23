@@ -72,6 +72,7 @@ import { SelectionModalComponent } from "./selection-modals/selection-modal.comp
 import { SendMessageModalComponent } from "@app/main/Messages/SendMessage-Modal.Component";
 import { EditorModule } from 'primeng/editor';
 import { AppAddOnsSideBarComponent } from "@app/admin/sideBarComponents/app-add-ons-side-bar/app-add-ons-side-bar.component";
+// merge
 import { AttachmentUploaderComponent } from './attachment-uploader/attachment-uploader.component';
 
 @NgModule({

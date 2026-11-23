@@ -50,7 +50,7 @@ import { finalize } from "rxjs";
 import { DomSanitizer } from "@node_modules/@angular/platform-browser";
 import * as pdfjsLib from 'pdfjs-dist/legacy/build/pdf';
 
-
+// merge
 interface ProductAttachmentView extends AppEntityAttachmentDto {
     previewAttachment?: AppEntityAttachmentDto;
 }
@@ -1166,6 +1166,8 @@ previewImageUrl = '';
 
       
 
+
+    // mergeeeee
 
 private setActiveAttachments(
     list: AppEntityAttachmentDto[]

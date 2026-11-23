@@ -1,4 +1,4 @@
-
+// merge
 import {
     Component,
     EventEmitter,
@@ -50,7 +50,7 @@ export class AttachmentUploaderComponent implements OnDestroy {
     constructor() {
     (pdfjsLib as any).GlobalWorkerOptions.workerSrc = '/assets/pdfjs/pdf.worker.min.mjs';
 }
-
+// merge
     get acceptedFormats(): string {
         const formats = [
             'image/png',
