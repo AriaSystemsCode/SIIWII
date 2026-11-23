@@ -1,0 +1,132 @@
+<div class="dfv-page">
+
+    <div class="dfv-header">
+        <i class="pi pi-th-large"></i>
+        <span>Dynamic Form Builder</span>
+    </div>
+
+    <div class="dfv-content">
+
+    <!-- Screens -->
+    <div class="dfv-screens">
+        <button *ngFor="let screen of screens" type="button" class="dfv-screen-tab"
+            [class.active]="screen === activeScreen" (click)="selectScreen(screen)">
+            {{ screen.name }}
+            <i *ngIf="screens.length > 1" class="pi pi-times dfv-screen-delete" title="Delete screen"
+                (click)="deleteScreen(screen,   $event)"></i>
+        </button>
+        <button type="button" class="dfv-screen-add" (click)="addScreen()">
+            <i class="pi pi-plus mr-1"></i>Add Screen
+        </button>
+    </div>
+
+    <!-- Toolbar -->
+    <div class="dfv-toolbar" *ngIf="activeScreen">
+        <div class="dfv-table-select">
+            <label class="dfv-table-label">{{ 'Table' | localize }}:</label>
+            <p-dropdown name="dynamic-form-table" [options]="tables" optionLabel="tableName" optionValue="tableName"
+                [ngModel]="activeScreen.selectedTable" (onChange)="onTableChange($event.value)"
+                [filter]="true" filterBy="tableName" [showClear]="true"
+                [disabled]="isLoadingTables || isLoadingColumns" [placeholder]="'SelectTable' | localize"
+                appendTo="body" styleClass="w-100" [style]="{ width: '100%' }">
+            </p-dropdown>
+        </div>
+
+        <div class="dfv-actions">
+            <button type="button" class="btn dfv-save" (click)="save()">
+                <i class="pi pi-save mr-2"></i>Save
+            </button>
+            <button type="button" class="btn dfv-reset" (click)="reset()">
+                <i class="pi pi-refresh mr-2"></i>Reset
+            </button>
+        </div>
+    </div>
+
+    <div class="dfv-body" *ngIf="activeScreen">
+
+        <!-- Available fields (LEFT) -->
+        <div class="dfv-available" pDroppable="dynamic-form-field" (onDragEnter)="onDragEnterAvailable()"
+            (onDrop)="onDropOnAvailable()">
+            <h6 class="dfv-panel-title"><i class="pi pi-database"></i>Available Fields</h6>
+
+            <div class="dfv-available-list">
+
+            <div *ngIf="isLoadingColumns" class="text-muted p-2">
+                <i class="fa fa-spinner fa-spin mr-2"></i>{{ 'Loading' | localize }}
+            </div>
+
+            <div *ngIf="!isLoadingColumns && !activeScreen.selectedTable" class="text-muted p-2">
+                Select a table to see its fields.
+            </div>
+
+            <div *ngIf="!isLoadingColumns && activeScreen.selectedTable && !availableFields.length"
+                class="text-muted p-2">
+                No available fields.
+            </div>
+
+            <div *ngFor="let field of availableFields; trackBy: trackByAttribute" class="dfv-field-item"
+                pDraggable="dynamic-form-field" (onDragStart)="onDragStart('available', field)"
+                (onDragEnd)="onDragEnd()">
+                <i [class]="iconFor(field)" [title]="kindLabel(field)"></i>
+                <span class="dfv-field-name">{{ field.name }}</span>
+                <small class="dfv-field-type">({{ kindLabel(field) }})</small>
+            </div>
+            </div>
+        </div>
+
+        <!-- Form builder (RIGHT) -->
+        <div class="dfv-builder-panel">
+            <h6 class="dfv-panel-title">
+                <i class="pi pi-table"></i>Form Builder
+                <button type="button" class="dfv-add-column" (click)="addColumn()">
+                    <i class="pi pi-plus mr-1"></i>Add Column
+                </button>
+            </h6>
+            <div class="dfv-builder">
+            <div *ngFor="let column of columns; let ci = index" class="dfv-column">
+                <h6 class="dfv-column-title">
+                    {{ column.title }}
+                    <i *ngIf="ci >= 2" class="pi pi-times dfv-column-remove" title="Remove column"
+                        (click)="removeColumn(column)"></i>
+                </h6>
+
+                <div class="dfv-column-body">
+
+                    <div *ngFor="let field of columnLists[column.id]; let i = index; trackBy: trackByInstance"
+                        class="dfv-slot" [class.drop-before]="isDropBefore(column.id, i)"
+                        pDroppable="dynamic-form-field" (onDragEnter)="onDragEnterSlot(column.id, i)"
+                        (onDrop)="onDropOnSlot(column.id, i)">
+
+                        <div class="dfv-drop-indicator"></div>
+
+                        <div class="dfv-card" pDraggable="dynamic-form-field" dragHandle=".dfv-card-icon"
+                            (onDragStart)="onDragStart('column', field)" (onDragEnd)="onDragEnd()">
+
+                            <div class="dfv-card-header">
+                                <i [class]="iconFor(field) + ' dfv-card-icon'" title="Drag to move"></i>
+                                <span class="dfv-field-name">{{ field.name }}</span>
+                                <i class="pi pi-trash dfv-remove" title="Remove" (click)="removeField(field)"></i>
+                            </div>
+
+                            <app-dynamicInputs *ngIf="getInputObject(field) as inputObject"
+                                [extraAttributeObject]="inputObject" [singleColumn]="true">
+                            </app-dynamicInputs>
+                        </div>
+                    </div>
+
+                    <!-- Empty area: drop here to append to the end of the column -->
+                    <div class="dfv-column-end" [class.drop-before]="isDropBefore(column.id, columnLists[column.id].length)"
+                        pDroppable="dynamic-form-field"
+                        (onDragEnter)="onDragEnterSlot(column.id, columnLists[column.id].length)"
+                        (onDrop)="onDropOnColumnEnd(column.id)">
+                        <div class="dfv-drop-indicator"></div>
+                        <span *ngIf="!columnLists[column.id].length" class="text-muted">Drop fields here</span>
+                    </div>
+
+                </div>
+            </div>
+            </div>
+        </div>
+    </div>
+    </div>
+</div>

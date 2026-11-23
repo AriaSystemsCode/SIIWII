@@ -21,6 +21,7 @@ export class AppNavigationService {
             new AppMenuItem('My Transactions', 'Pages.AppSiiwiiTransactions', 'flaticon-more', '/app/main/transactions/appTransactions/MyTransactions'),
             new AppMenuItem('My Connections', 'Pages.Accounts', 'flaticon-more', '/app/main/accounts'),
                  new AppMenuItem('Dashboards', 'Pages.Tenant.Dashboard', 'pi pi-chart-bar', '/app/main/dashboards/my-dashboards'),
+            new AppMenuItem('Dynamic form view', '', 'pi pi-th-large', '/app/main/dynamic-form-view'),
         ]);
     
      
