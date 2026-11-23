@@ -1802,7 +1802,8 @@
 <text name="Draft">مسودة</text>
 <text name="COLOR">اللون</text>
 <text name="Color">اللون</text>
-
+		<text name="RegistrationEmailSentTo">تم إرسال بريد إلكتروني للتسجيل إلى</text>
+		<text name="PleaseClickRegisterLinkToCreateAccount">يرجى الضغط على رابط التسجيل الموجود في البريد الإلكتروني لإنشاء حساب {0} الجديد.</text>
     
   </texts>
 </localizationDictionary>
