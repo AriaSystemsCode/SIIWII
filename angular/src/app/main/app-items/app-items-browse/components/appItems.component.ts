@@ -650,43 +650,22 @@ showOverlay :boolean=false
             this.notify.warn(this.l("PleaseSelectAnItem"));
             return;
         }
-        
-        // P-SII-20260606.0005
-        // .exportItems(selectedItemIds, this.multiSelectionInfo?.sessionSelectionKey)
-        // .subscribe((exportResult) => {
-        //     const downloadUrl = this.attachmentBaseUrl+"/" +exportResult?.attachmentUrl;
-        //     if (downloadUrl) {
-        //         this.downloadExportedZip(downloadUrl);
-        //     }
-        // });
 
-        const downloadUrl = `${window.location.origin}/assets/attachments/IX546.zip`;
-        const filename = this.getExportFilename(downloadUrl);
-
-        // P-SII-20260606.0005 - Open / Save As / Save actions are kept for later use.
-        // this.showExportActions(downloadUrl, filename);
-
-
-          // P-SII-20260606.0005 -remove zip file from assets/attachments/IX546.zip 
-        this.downloadExportedZip(downloadUrl, filename);
-    }
-
-    private getExportFilename(downloadUrl: string): string {
-        const filename = downloadUrl
-            .split("?")[0]
-            .split("#")[0]
-            .split("/")
-            .pop();
-
-        if (!filename) {
-            return "items-export.zip";
-        }
-
-        try {
-            return decodeURIComponent(filename);
-        } catch {
-            return filename;
-        }
+        this.showMainSpinner();
+        this._appItemsServiceProxy
+            .exportItems(selectionKey, selectedItemIds)
+            .pipe(finalize(() => this.hideMainSpinner()))
+            .subscribe((result) => {
+                const query = new URLSearchParams({
+                    fileType: result.fileType,
+                    fileToken: result.fileToken,
+                    fileName: result.fileName
+                });
+                this.downloadExportedZip(
+                    `${AppConsts.remoteServiceBaseUrl}/File/DownloadTempFile?${query}`,
+                    result.fileName
+                );
+            });
     }
 
     private async saveExportAs(downloadUrl: string, filename: string): Promise<void> {
