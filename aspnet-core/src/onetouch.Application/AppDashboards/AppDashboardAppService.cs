@@ -469,6 +469,47 @@ namespace onetouch.AppDashboards
             }
             await CurrentUnitOfWork.SaveChangesAsync();
         }
+        public async Task<PagedResultDto<GetAllFavoriteDashboardsOutputDto>> GetAllFavoriteDashboards(PagedAndSortedResultRequestDto input)
+        {
+
+            var dashboardObjectTypeId = await _helper.SystemTables.GetEntityObjectTypeDashboard();
+            var favoriteDashboards = _appEntitySharingRepository.GetAll().Include(z => z.EntityFk)
+               .Where(z => z.EntityFk.EntityObjectTypeId == dashboardObjectTypeId
+               && z.SharedUserId == AbpSession.UserId &&
+               z.IsFavorite == true);
+            var pagedAndFilteredDashboards = favoriteDashboards
+                    .OrderBy(input.Sorting ?? "id asc")
+                    .PageBy(input);
+            var _dashboards = from o in pagedAndFilteredDashboards
+                              select new GetAllFavoriteDashboardsOutputDto
+                              {
+                                  Id = o.Id,
+                                  Title = o.EntityFk.Name
+
+                              };
+            var dashboardsList =await _dashboards.ToListAsync();
+            var totalCount = await favoriteDashboards.CountAsync();
+
+            var x = new PagedResultDto<GetAllFavoriteDashboardsOutputDto>(
+                        totalCount,
+                        dashboardsList
+                    );
+
+            return x;
+        }
+        public async Task<GetDashboardForViewDto> GetDefaultDashboard()
+        {
+            var dashboardObjectTypeId = await _helper.SystemTables.GetEntityObjectTypeDashboard();
+            var defaultDashboard = await _appEntitySharingRepository.GetAll()
+                .Where(z => z.EntityFk.EntityObjectTypeId == dashboardObjectTypeId
+                && z.SharedUserId == AbpSession.UserId &&
+                z.IsDefault == true).FirstOrDefaultAsync();
+            if (defaultDashboard != null)
+            { 
+                return await GetDashboardForView(defaultDashboard.Id);
+            }
+            return null;
+        }
         public async Task MarkDashboardAsDefault(long dashboardID)
         {
             var dashboardObjectTypeId = await _helper.SystemTables.GetEntityObjectTypeDashboard();
