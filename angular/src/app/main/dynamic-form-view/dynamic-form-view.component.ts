@@ -353,6 +353,7 @@ export class DynamicFormViewComponent extends AppComponentBase implements OnInit
             lists[columnId].splice(targetIndex, 0, moving);
         } else {
             const original = drag.field as ExtraAttribute;
+            //Ix- 
             const kind = this.getKind(original);
 
             lists[columnId].splice(targetIndex, 0, {
