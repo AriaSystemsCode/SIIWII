@@ -104,69 +104,6 @@ export class DashboardBrowseComponent
     currentLang: string = ''
     isArabic: boolean = false
 
-
-    staticDashboards: any[] = [
-        {
-            id: 1,
-            title: 'Sales Performance Dashboard',
-            isFavourite: false,
-            isDefault: true,
-            creatorUserName: 'Ahmed Mohamed',
-            ownerUserImg: '',
-            isTheOwner: true,
-            isEditable: true,
-            lastViewDate: '2026-11-22T14:30:00',
-            lastModificationDate: '2026-11-21T10:15:00',
-            sharedWithUsers: [
-                { userName: 'Sara Ali', userImage: '' },
-                { userName: 'Omar Hassan', userImage: '' }
-            ]
-        },
-        {
-            id: 2,
-            title: 'Financial Overview Dashboard',
-            isFavourite: true,
-            isDefault: false,
-            creatorUserName: 'Menna Ramadan',
-            ownerUserImg: '',
-            isTheOwner: true,
-            isEditable: true,
-            lastViewDate: '2026-11-20T09:45:00',
-            lastModificationDate: '2026-11-19T16:20:00',
-            sharedWithUsers: []
-        },
-        {
-            id: 3,
-            title: 'Inventory Management Dashboard',
-            creatorUserName: 'Mohamed Ali',
-            isFavourite: true,
-            isDefault: false,
-            ownerUserImg: '',
-            isTheOwner: false,
-            isEditable: true,
-            lastViewDate: '2026-11-18T11:00:00',
-            lastModificationDate: '2026-11-17T13:30:00',
-            sharedWithUsers: [
-                { userName: 'Menna Ramadan', userImage: '' },
-                { userName: 'Ahmed Mohamed', userImage: '' },
-                { userName: 'Sara Ali', userImage: '' },
-                { userName: 'Omar Hassan', userImage: '' }
-            ]
-        },
-        {
-            id: 4,
-            title: 'Marketing Analytics Dashboard',
-            creatorUserName: 'Sara Ali',
-            ownerUserImg: '',
-            isTheOwner: false,
-            isEditable: false,
-            lastViewDate: null,
-            lastModificationDate: '2026-11-15T08:00:00',
-            sharedWithUsers: []
-        }
-    ];
-
-
     constructor(
         injector: Injector,
         private router: Router,
@@ -180,6 +117,7 @@ export class DashboardBrowseComponent
         this.currentLang = abp.utils.getCookieValue('Abp.Localization.CultureName')
         this.currentLang == 'ar' || this.currentLang == 'ar-EG' ? this.isArabic = true : this.isArabic = false
         this.maxResultCount = this.primengTableHelper.defaultRecordsCountPerPage || 10;
+        this.GetDefaultDashboard()
         this.setDashboardTitleValidation();
         this.getDashboards();
         this.checkScreenSize();
@@ -432,8 +370,6 @@ export class DashboardBrowseComponent
             });
     }
 
-
-
     startRename(row: any): void {
         this.cancelCreate();
         this.editingDashboardId = row.id;
@@ -601,73 +537,35 @@ export class DashboardBrowseComponent
         this.getDashboards();
     }
 
-    // getDashboards(): void {
-    //     const validMaxResultCount = this.maxResultCount && this.maxResultCount > 0 ? this.maxResultCount : this.primengTableHelper.defaultRecordsCountPerPage || 10;
-    //     this.showMainSpinner();
-    //     const subs = this.appDashboardsAppService
-    //         .getAll(
-    //             this.filterText || null,
-    //             this.selectedDashboardFilter.value,
-    //             Intl.DateTimeFormat().resolvedOptions().timeZone,
-    //             this.sorting || null,
-    //             this.skipCount || 0,
-    //             validMaxResultCount
-    //         )
-    //         .pipe(
-    //             finalize(() => {
-    //                 this.hideMainSpinner();
-    //             })
-    //         )
-    //         .subscribe({
-    //             next: result => {
-    //                 this.dashboards = result?.items || [];
-    //                 this.primengTableHelper.records = result?.items || [];
-    //                 this.primengTableHelper.totalRecordsCount = result?.totalCount || 0;
-
-    //             }
-    //         });
-
-    //     this.subscriptions.push(subs);
-
-    // }
-
     getDashboards(): void {
-        let data = [...this.staticDashboards];
+        const validMaxResultCount = this.maxResultCount && this.maxResultCount > 0 ? this.maxResultCount : this.primengTableHelper.defaultRecordsCountPerPage || 10;
+        this.showMainSpinner();
+        const subs = this.appDashboardsAppService
+            .getAll(
+                this.filterText || null,
+                this.selectedDashboardFilter.value,
+                Intl.DateTimeFormat().resolvedOptions().timeZone,
+                this.sorting || null,
+                this.skipCount || 0,
+                validMaxResultCount
+            )
+            .pipe(
+                finalize(() => {
+                    this.hideMainSpinner();
+                })
+            )
+            .subscribe({
+                next: result => {
+                    this.dashboards = result?.items || [];
+                    this.primengTableHelper.records = result?.items || [];
+                    this.primengTableHelper.totalRecordsCount = result?.totalCount || 0;
 
-        // Search by dashboard title or owner
-        if (this.filterText) {
-            const search = this.filterText.toLowerCase();
+                }
+            });
 
-            data = data.filter(row =>
-                row.title?.toLowerCase().includes(search) ||
-                row.creatorUserName?.toLowerCase().includes(search)
-            );
-        }
+        this.subscriptions.push(subs);
 
-        // Dashboard filters
-        switch (this.selectedDashboardFilter.value) {
-            case 1: // My Dashboards
-                data = data.filter(row => row.isTheOwner);
-                break;
-
-            case 2: // Shared With Me
-                data = data.filter(row => !row.isTheOwner);
-                break;
-        }
-
-        // Total records before pagination
-        this.primengTableHelper.totalRecordsCount = data.length;
-
-        // Pagination
-        const pageSize = this.maxResultCount || 10;
-        const start = this.skipCount || 0;
-
-        this.primengTableHelper.records =
-            data.slice(start, start + pageSize);
-
-        this.dashboards = this.primengTableHelper.records;
     }
-
 
     onDashboardCreated(res: any): void {
         this.skipCount = 0;
@@ -705,8 +603,8 @@ export class DashboardBrowseComponent
             row?.appEntitySharings?.length ?? 0
         );
     }
-    toggleFavourite(row: any, event: Event): void {
-        event.stopPropagation();
+    toggleFavourite(row: any, event?: Event): void {
+        // event?.stopPropagation();
 
         this.appDashboardsAppService
             .setDashboardAsFavorite(row.id)
@@ -720,23 +618,67 @@ export class DashboardBrowseComponent
             });
     }
 
-    setDefaultDashboard(row: any, event: Event): void {
-        event.stopPropagation();
 
-        this.appDashboardsAppService
-            .markDashboardAsDefault(row.id)
-            .subscribe({
-                next: () => {
-                    // Only one dashboard can be default
-                    this.primengTableHelper.records.forEach(dashboard => {
-                        dashboard.isDefault = dashboard.id === row.id;
-                    });
-                },
-                error: error => {
-                    console.error('Failed to set default dashboard:', error);
+setDefaultDashboard(row: any, event: Event): void {
+    event.stopPropagation();
+
+    this.appDashboardsAppService
+        .markDashboardAsDefault(row.id)
+        .subscribe({
+            next: () => {
+
+                // Only one dashboard can be default
+                this.primengTableHelper.records.forEach(dashboard => {
+                    dashboard.isDefault =
+                        dashboard.id === row.id;
+                });
+
+                // Already favourite: no need to toggle
+                if (row.isFavourite) {
+                    return;
                 }
-            });
-    }
 
+                // Automatically add to favourites
+                this.appDashboardsAppService
+                    .setDashboardAsFavorite(row.id)
+                    .subscribe({
+                        next: () => {
+                            row.isFavourite = true;
+                        },
+                        error: error => {
+                            console.error(
+                                'Failed to add default dashboard to favourites:',
+                                error
+                            );
+                            this.notify.error(
+                                'Default dashboard saved, but adding to favourites failed.'
+                            );
+                        }
+                    });
+            },
+            error: error => {
+                console.error(
+                    'Failed to set default dashboard:',
+                    error
+                );
+            }
+        });
+}
+
+GetDefaultDashboard(){
+    this.appDashboardsAppService
+        .getDefaultDashboard()
+        .subscribe({
+            next: () => {
+
+            },
+            error: error => {
+                console.error(
+                    'Failed to set default dashboard:',
+                    error
+                );
+            }
+        });
+}
 
 }

@@ -4,17 +4,25 @@
     [ngClass]="!isArLang ? 'mt-en-dt mt-md-3':''">
 
     <!-- ================= HEADER ================= -->
-    <!-- <div class="dash-topbar" *ngIf="!dashboardNotFound">
+    <div class="dash-topbar" *ngIf="!dashboardNotFound">
+
+        <!-- Back to Browse -->
+        <div class="dashboard-browse-link mb-0">
+            <a href="javascript:;" (click)="backToBrowse()">
+                <i class="pi pi-angle-double-left"></i>
+                {{ 'BrowseAllDashboards' | localize }}
+            </a>
+        </div>
+
         <div class="dashboard-topbar-content">
 
+            <!-- Last Refreshed -->
             <div class="dashboard-header-info" *ngIf="dashboard?.spreadsheet?.lastRefreshDate">
 
                 <div class="dash-meta">
                     <i class="pi pi-clock"></i>
-
                     <span>
                         {{ 'LastRefreshed' | localize }}:
-
                         <b>
                             {{ dashboard?.spreadsheet?.lastRefreshDate | momentFormat:'L' }}
                             {{ dashboard?.spreadsheet?.lastRefreshDate | momentFormat:'h:mm a' }}
@@ -22,20 +30,57 @@
                     </span>
                 </div>
 
-                <b class="text-end" *ngIf="dashboard?.spreadsheet?.refreshedBy">
+                <b *ngIf="dashboard?.spreadsheet?.refreshedBy">
                     {{ 'by' | localize }}
                     {{ dashboard?.spreadsheet?.refreshedBy }}
                 </b>
             </div>
 
-            <h2 class="dash-title text-truncate" [title]="dashboard?.title">
-                {{ dashboard?.title }}
-            </h2>
+            <!-- Center: Favourite + Title + Dropdown -->
+            <div class="dashboard-title-wrapper">
 
+                <!-- Favourite -->
+                <div type="button" class="dashboard-favourite-btn"
+                    [class.active]="dashboard?.isFavourite"
+                    [class.disabled]="loading || !dashboard?.id"
+                    (click)="toggleFavourite()">
+                    <i [ngClass]="dashboard?.isFavourite ? 'fas fa-star' : 'far fa-star'"></i>
+                </div>
+
+                <!-- Dashboard Title -->
+                <h2 class="dash-title text-truncate" [title]="dashboard?.title">
+                    {{ dashboard?.title }}
+                </h2>
+
+                <!-- Dropdown -->
+                <div class="dashboard-switch-dropdown" dropdown container="body">
+
+                    <button type="button" class="dashboard-dropdown-btn" dropdownToggle [disabled]="loading">
+                        <i class="pi pi-chevron-down"></i>
+                    </button>
+
+                    <ul *dropdownMenu class="dropdown-menu dashboard-switch-menu">
+
+                        <li *ngFor="let item of dashboardList">
+                            <button type="button" class="dropdown-item dashboard-switch-item"
+                                [class.selected]="item.id === dashboardId" (click)="switchDashboard(item)">
+
+                                <span>{{ item.title }}</span>
+
+                                <i class="pi pi-check ml-auto" *ngIf="item.id === dashboardId"></i>
+                            </button>
+                        </li>
+
+                    </ul>
+                </div>
+
+            </div>
+
+            <!-- Right Actions -->
             <div class="dashboard-actions">
+
                 <button pButton type="button" icon="pi pi-refresh" [label]="'Refresh' | localize"
-                    class="p-button-outlined dashboard-refresh-btn" [pTooltip]="'RefreshDashboard' | localize"
-                    tooltipPosition="bottom" [loading]="refreshing"
+                    class="p-button-outlined dashboard-refresh-btn" [loading]="refreshing"
                     [disabled]="loading || refreshing || exportingPdf || !dashboardWorkbookReady"
                     (click)="refreshDashboard()">
                 </button>
@@ -45,143 +90,20 @@
                     [disabled]="loading || refreshing || exportingPdf || !dashboardWorkbookReady"
                     (click)="exportDashboardPdf()">
                 </button>
+
             </div>
 
         </div>
-    </div> -->
-
-
-
-
-<!-- ================= HEADER ================= -->
-<div class="dash-topbar" *ngIf="!dashboardNotFound">
-
-    <!-- Back to Browse -->
-    <div class="dashboard-browse-link mb-0">
-        <a href="javascript:;" (click)="backToBrowse()">
-            <i class="pi pi-angle-double-left"></i>
-            {{ 'BrowseAllDashboards' | localize }}
-        </a>
     </div>
-
-    <div class="dashboard-topbar-content">
-
-        <!-- Last Refreshed -->
-        <div class="dashboard-header-info"
-            *ngIf="dashboard?.spreadsheet?.lastRefreshDate">
-
-            <div class="dash-meta">
-                <i class="pi pi-clock"></i>
-                <span>
-                    {{ 'LastRefreshed' | localize }}:
-                    <b>
-                        {{ dashboard?.spreadsheet?.lastRefreshDate | momentFormat:'L' }}
-                        {{ dashboard?.spreadsheet?.lastRefreshDate | momentFormat:'h:mm a' }}
-                    </b>
-                </span>
-            </div>
-
-            <b *ngIf="dashboard?.spreadsheet?.refreshedBy">
-                {{ 'by' | localize }}
-                {{ dashboard?.spreadsheet?.refreshedBy }}
-            </b>
-        </div>
-
-        <!-- Center: Favourite + Title + Dropdown -->
-        <div class="dashboard-title-wrapper">
-
-            <!-- Favourite -->
-            <div
-                type="button"
-                class="dashboard-favourite-btn"
-              
-                >
-
-                <i class="fas fa-star">
-                </i>
-            </div>
-
-            <!-- Dashboard Title -->
-            <h2 class="dash-title text-truncate"
-                [title]="dashboard?.title">
-                {{ dashboard?.title }}
-            </h2>
-
-            <!-- Dropdown -->
-            <div class="dashboard-switch-dropdown"
-                dropdown
-                container="body">
-
-                <button
-                    type="button"
-                    class="dashboard-dropdown-btn"
-                    dropdownToggle
-                    [disabled]="loading">
-
-                    <i class="pi pi-chevron-down"></i>
-                </button>
-
-                <ul *dropdownMenu
-                    class="dropdown-menu dashboard-switch-menu">
-
-                    <li *ngFor="let item of dashboardList">
-                        <button
-                            type="button"
-                            class="dropdown-item dashboard-switch-item"
-                            [class.selected]="item.id === dashboardId"
-                            (click)="switchDashboard(item)">
-
-
-                            <span>{{ item.title }}</span>
-
-                            <i class="pi pi-check ml-auto"
-                                *ngIf="item.id === dashboardId">
-                            </i>
-
-                        </button>
-                    </li>
-
-                </ul>
-            </div>
-
-        </div>
-
-        <!-- Right Actions -->
-        <div class="dashboard-actions">
-
-            <button
-                pButton
-                type="button"
-                icon="pi pi-refresh"
-                [label]="'Refresh' | localize"
-                class="p-button-outlined dashboard-refresh-btn"
-                [loading]="refreshing"
-                [disabled]="loading || refreshing || exportingPdf || !dashboardWorkbookReady"
-                (click)="refreshDashboard()">
-            </button>
-
-            <button
-                pButton
-                type="button"
-                icon="pi pi-file-pdf"
-                [label]="'ExportToPDF' | localize"
-                class="dashboard-export-btn"
-                [loading]="exportingPdf"
-                [disabled]="loading || refreshing || exportingPdf || !dashboardWorkbookReady"
-                (click)="exportDashboardPdf()">
-            </button>
-
-        </div>
-
-    </div>
-</div>
 
     <!-- ================= VIEW ================= -->
     <div class="dashboard-page-body">
         <div class="dashboard-view-container">
 
-            <!-- Error -->
+            <!-- Error / empty content -->
             <div *ngIf="!loading && dashboardLoadError" class="dashboard-state dashboard-error">
+                <i class="pi pi-exclamation-triangle"></i>
+                <p>{{ dashboardLoadError }}</p>
             </div>
 
             <!-- Dashboard Not Found -->
