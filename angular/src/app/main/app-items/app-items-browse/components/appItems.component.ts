@@ -666,7 +666,7 @@ showOverlay :boolean=false
                     fileToken: result.fileToken,
                     fileName: result.fileName
                 });
-                this.showExportActions(
+                this.downloadExportedZip(
                     `${AppConsts.remoteServiceBaseUrl}/File/DownloadTempFile?${query}`,
                     result.fileName
                 );
