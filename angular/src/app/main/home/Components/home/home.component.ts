@@ -144,5 +144,10 @@ export class HomeComponent extends AppComponentBase implements OnInit {
                 this.router.navigate(['/app/main/account'])
             });
         }
+
+
+         ngOnDestroy(): void {
+    localStorage.removeItem('marketplaceAccountsBrowseState');
+  }
  
 }

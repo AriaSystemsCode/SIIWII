@@ -262,5 +262,8 @@ export class AppItemListListComponent extends AppComponentBase implements OnInit
             this.notify.success(this.l("unPublishedSuccessfully"))
         })
     }
+     ngOnDestroy(): void {
+    localStorage.removeItem('marketplaceAccountsBrowseState');
+  }
 
 }

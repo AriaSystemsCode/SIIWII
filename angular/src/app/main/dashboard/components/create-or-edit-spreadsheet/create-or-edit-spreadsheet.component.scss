@@ -3061,3 +3061,18 @@ gap: 4px;
         color: #6b7280;
     }
 }
+
+
+.pivot-range-link {
+    cursor: pointer;
+
+    input {
+        cursor: pointer;
+        color: #4a0d4a;
+        font-weight: 600;
+    }
+
+    &:hover input {
+        text-decoration: underline;
+    }
+}
