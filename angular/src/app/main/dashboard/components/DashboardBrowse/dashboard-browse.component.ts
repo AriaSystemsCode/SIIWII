@@ -117,7 +117,7 @@ export class DashboardBrowseComponent
         this.currentLang = abp.utils.getCookieValue('Abp.Localization.CultureName')
         this.currentLang == 'ar' || this.currentLang == 'ar-EG' ? this.isArabic = true : this.isArabic = false
         this.maxResultCount = this.primengTableHelper.defaultRecordsCountPerPage || 10;
-        this.GetDefaultDashboard()
+
         this.setDashboardTitleValidation();
         this.getDashboards();
         this.checkScreenSize();
@@ -603,20 +603,25 @@ export class DashboardBrowseComponent
             row?.appEntitySharings?.length ?? 0
         );
     }
-    toggleFavourite(row: any, event?: Event): void {
-        // event?.stopPropagation();
+  toggleFavourite(row: any, event?: Event): void {
 
-        this.appDashboardsAppService
-            .setDashboardAsFavorite(row.id)
-            .subscribe({
-                next: () => {
-                    row.isFavourite = !row.isFavourite;
-                },
-                error: error => {
-                    console.error('Failed to update favourite:', error);
-                }
-            });
-    }
+    event?.stopPropagation();
+
+    const isFavorite = row.isFavorite;
+
+    const request$ = isFavorite
+        ? this.appDashboardsAppService.removeFromFavoriteDashboards([row.id])
+        : this.appDashboardsAppService.setDashboardAsFavorite(row.id);
+
+    request$.subscribe({
+        next: () => {
+            row.isFavorite = !isFavorite;
+        },
+        error: error => {
+            console.error('Failed to update favourite:', error);
+        }
+    });
+}
 
 
 setDefaultDashboard(row: any, event: Event): void {
@@ -665,20 +670,6 @@ setDefaultDashboard(row: any, event: Event): void {
         });
 }
 
-GetDefaultDashboard(){
-    this.appDashboardsAppService
-        .getDefaultDashboard()
-        .subscribe({
-            next: () => {
 
-            },
-            error: error => {
-                console.error(
-                    'Failed to set default dashboard:',
-                    error
-                );
-            }
-        });
-}
 
 }

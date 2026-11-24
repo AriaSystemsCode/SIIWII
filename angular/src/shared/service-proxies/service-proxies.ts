@@ -6771,6 +6771,56 @@ export class AppDashboardServiceProxy {
     }
 
     /**
+     * @param dashboardIdsList (optional) 
+     * @return Success
+     */
+    removeFromFavoriteDashboards(dashboardIdsList: number[] | null | undefined): Observable<void> {
+        let url_ = this.baseUrl + "/api/services/app/AppDashboard/RemoveFromFavoriteDashboards?";
+        if (dashboardIdsList !== undefined && dashboardIdsList !== null)
+            dashboardIdsList && dashboardIdsList.forEach(item => { url_ += "dashboardIdsList=" + encodeURIComponent("" + item) + "&"; });
+        url_ = url_.replace(/[?&]$/, "");
+
+        let options_ : any = {
+            observe: "response",
+            responseType: "blob",
+            headers: new HttpHeaders({
+            })
+        };
+
+        return this.http.request("delete", url_, options_).pipe(_observableMergeMap((response_ : any) => {
+            return this.processRemoveFromFavoriteDashboards(response_);
+        })).pipe(_observableCatch((response_: any) => {
+            if (response_ instanceof HttpResponseBase) {
+                try {
+                    return this.processRemoveFromFavoriteDashboards(response_ as any);
+                } catch (e) {
+                    return _observableThrow(e) as any as Observable<void>;
+                }
+            } else
+                return _observableThrow(response_) as any as Observable<void>;
+        }));
+    }
+
+    protected processRemoveFromFavoriteDashboards(response: HttpResponseBase): Observable<void> {
+        const status = response.status;
+        const responseBlob =
+            response instanceof HttpResponse ? response.body :
+            (response as any).error instanceof Blob ? (response as any).error : undefined;
+
+        let _headers: any = {}; if (response.headers) { for (let key of response.headers.keys()) { _headers[key] = response.headers.get(key); }}
+        if (status === 200) {
+            return blobToText(responseBlob).pipe(_observableMergeMap((_responseText: string) => {
+            return _observableOf(null as any);
+            }));
+        } else if (status !== 200 && status !== 204) {
+            return blobToText(responseBlob).pipe(_observableMergeMap((_responseText: string) => {
+            return throwException("An unexpected server error occurred.", status, _responseText, _headers);
+            }));
+        }
+        return _observableOf(null as any);
+    }
+
+    /**
      * @param sorting (optional) 
      * @param skipCount (optional) 
      * @param maxResultCount (optional) 
@@ -78955,6 +79005,8 @@ export class GetDashboardForViewDto implements IGetDashboardForViewDto {
     isTheOwner!: boolean;
     ownerUserImg!: string | undefined;
     sharingLevel!: number;
+    isDefault!: boolean;
+    isFavorite!: boolean;
 
     [key: string]: any;
 
@@ -78990,6 +79042,8 @@ export class GetDashboardForViewDto implements IGetDashboardForViewDto {
             this.isTheOwner = _data["isTheOwner"];
             this.ownerUserImg = _data["ownerUserImg"];
             this.sharingLevel = _data["sharingLevel"];
+            this.isDefault = _data["isDefault"];
+            this.isFavorite = _data["isFavorite"];
         }
     }
 
@@ -79023,6 +79077,8 @@ export class GetDashboardForViewDto implements IGetDashboardForViewDto {
         data["isTheOwner"] = this.isTheOwner;
         data["ownerUserImg"] = this.ownerUserImg;
         data["sharingLevel"] = this.sharingLevel;
+        data["isDefault"] = this.isDefault;
+        data["isFavorite"] = this.isFavorite;
         return data;
     }
 }
@@ -79041,6 +79097,8 @@ export interface IGetDashboardForViewDto {
     isTheOwner: boolean;
     ownerUserImg: string | undefined;
     sharingLevel: number;
+    isDefault: boolean;
+    isFavorite: boolean;
 
     [key: string]: any;
 }

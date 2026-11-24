@@ -55,7 +55,7 @@
                 <!-- Dropdown -->
                 <div class="dashboard-switch-dropdown" dropdown container="body">
 
-                    <button type="button" class="dashboard-dropdown-btn" dropdownToggle [disabled]="loading">
+                    <button type="button" class="dashboard-dropdown-btn" dropdownToggle [disabled]="loading || dashboardList?.length ==0">
                         <i class="pi pi-chevron-down"></i>
                     </button>
 
@@ -102,7 +102,7 @@
 
             <!-- Error / empty content -->
             <div *ngIf="!loading && dashboardLoadError" class="dashboard-state dashboard-error">
-                <i class="pi pi-exclamation-triangle"></i>
+                <!-- <i class="pi pi-exclamation-triangle"></i> -->
                 <p>{{ dashboardLoadError }}</p>
             </div>
 

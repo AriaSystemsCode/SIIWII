@@ -160,11 +160,11 @@
         <button
             type="button"
             class="dashboard-icon-btn favourite-btn"
-            [class.is-favourite]="row.isFavourite"
-            [title]="row.isFavourite ? 'Remove Favourite' : 'Set Favourite'"
+            [class.is-favourite]="row.isFavorite"
+            [title]="row.isFavorite ? 'Remove Favourite' : 'Set Favourite'"
             (click)="toggleFavourite(row, $event)">
             <i
-                [class]="row.isFavourite ? 'fas fa-star' : 'far fa-star'">
+                [class]="row.isFavorite ? 'fas fa-star' : 'far fa-star'">
             </i>
         </button>
 

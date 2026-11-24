@@ -5,17 +5,17 @@ import { UrlHelper } from '@shared/helpers/UrlHelper';
 import { DOCUMENT } from '@angular/common';
 import { OffcanvasOptions } from '@metronic/app/core/_base/layout/directives/offcanvas.directive';
 import { AppConsts } from '@shared/AppConsts';
-import { AccountsServiceProxy} from '@shared/service-proxies/service-proxies';
+import { AccountsServiceProxy , AppDashboardServiceProxy} from '@shared/service-proxies/service-proxies';
 import {  NavigationEnd,Router } from '@angular/router';
 import { Subscription } from 'rxjs';
-import { filter } from 'rxjs/operators';
 import { AppNavigationService } from '../../nav/app-navigation.service';
 import { AppMenu } from '../../nav/app-menu';
-import { OnDestroy } from '@angular/core';
-import { Subject } from 'rxjs';
-import { takeUntil } from 'rxjs/operators';
 import { AccountRefreshService } from '@shared/utils/account-refresh.service';
-
+import {
+    filter,
+    takeUntil,
+    finalize
+} from 'rxjs/operators';
 
 
 @Component({
@@ -55,7 +55,7 @@ export class DefaultLayoutComponent extends ThemesLayoutBaseComponent implements
     isAuthenticated = this.appSession?.user
     hideTopbar: boolean = false;
 
-    
+    checkingDefaultDashboard = false;
 
     constructor(
         injector: Injector,
@@ -63,7 +63,8 @@ export class DefaultLayoutComponent extends ThemesLayoutBaseComponent implements
         private _accountsServiceProxy: AccountsServiceProxy,
         private _router:Router,
         private _appNavigationService: AppNavigationService,
-private accountRefreshService: AccountRefreshService
+private accountRefreshService: AccountRefreshService,
+private _appDashboardsAppService: AppDashboardServiceProxy
 
 
     ) {
@@ -94,6 +95,7 @@ this.accountRefreshService.accountUpdated$
         this.installationMode = UrlHelper.isInstallUrl(location.href);
         this.getSidebarInfo();
         this.menu = this._appNavigationService.getMenu();
+        console.log(this.menu,'menu')
 
         this.currentRouteUrl = this._router.url.split(/[?#]/)[0];
         this.updateTopbarVisibility(this.currentRouteUrl);
@@ -214,6 +216,73 @@ getSidebarInfo(): void {
         );
       }
 
+
+
+onMenuItemClick(item: any, event: MouseEvent): void {
+
+    // Preserve existing sidebar behavior
+    if (item.name !== 'Administration') {
+        this.isMinimized = true;
+    }
+
+    // Keep normal navigation for other menu items
+    if (item.name !== 'Dashboards') {
+        return;
+    }
+
+    // event.preventDefault();
+    // event.stopPropagation();
+
+    this.openSub = false;
+    this.openAdSub = false;
+
+    // Prevent duplicate API calls
+    if (this.checkingDefaultDashboard) {
+        return;
+    }
+
+    this.checkingDefaultDashboard = true;
+
+    this._appDashboardsAppService
+        .getDefaultDashboard()
+        .pipe(
+            takeUntil(this.destroy$),
+            finalize(() => {
+                this.checkingDefaultDashboard = false;
+            })
+        )
+        .subscribe({
+            next: result => {
+
+                if (result?.id > 0) {
+
+                    // Open default dashboard
+                    this._router.navigate([
+                        '/app/main/dashboards/dashboard-details',
+                        result.id
+                    ]);
+
+                } else {
+
+                    // Open dashboards browse
+                    this._router.navigate([
+                        '/app/main/dashboards/my-dashboards'
+                    ]);
+                }
+            },
+            error: error => {
+
+                console.error(
+                    'Failed to get default dashboard:',
+                    error
+                );
+
+                this._router.navigate([
+                    '/app/main/dashboards/my-dashboards'
+                ]);
+            }
+        });
+}
 
 ngOnDestroy(): void {
     this.destroy$.next(true);
