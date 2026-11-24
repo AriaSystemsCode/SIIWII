@@ -471,6 +471,26 @@ namespace onetouch.AppDashboards
             }
             await CurrentUnitOfWork.SaveChangesAsync();
         }
+        public async Task RemoveFromFavoriteDashboards(List<long> dashboardIdsList)
+        {
+            var dashboardObjectTypeId = await _helper.SystemTables.GetEntityObjectTypeDashboard();
+            if (dashboardIdsList != null && dashboardIdsList.Count > 0)
+            {
+                foreach (var dashboardID in dashboardIdsList)
+                {
+                    var sharedDashboard = await _appEntitySharingRepository.GetAll()
+                        .Where(z => z.EntityFk.EntityObjectTypeId == dashboardObjectTypeId
+                        && z.SharedUserId == AbpSession.UserId &&
+                        z.EntityId == dashboardID).FirstOrDefaultAsync();
+                    if (sharedDashboard != null && sharedDashboard.IsFavorite == true)
+                    {
+                        sharedDashboard.IsFavorite = false;
+                        await _appEntitySharingRepository.UpdateAsync(sharedDashboard);
+                    }
+                }
+                await CurrentUnitOfWork.SaveChangesAsync();
+            }
+        }
         public async Task<PagedResultDto<GetAllFavoriteDashboardsOutputDto>> GetAllFavoriteDashboards(PagedAndSortedResultRequestDto input)
         {
 
