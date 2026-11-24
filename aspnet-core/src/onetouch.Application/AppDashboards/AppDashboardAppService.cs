@@ -508,7 +508,7 @@ namespace onetouch.AppDashboards
                 z.IsDefault == true).FirstOrDefaultAsync();
             if (defaultDashboard != null)
             { 
-                return await GetDashboardForView(defaultDashboard.Id);
+                return await GetDashboardForView(defaultDashboard.EntityId);
             }
             return null;
         }
