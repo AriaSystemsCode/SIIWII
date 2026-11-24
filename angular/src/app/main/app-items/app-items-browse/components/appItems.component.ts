@@ -653,7 +653,7 @@ showOverlay :boolean=false
 
         this.showMainSpinner();
         this._appItemsServiceProxy
-            .exportItems(selectionKey, selectedItemIds)
+            .exportItems(this.multiSelectionInfo?.sessionSelectionKey, selectedItemIds)
             .pipe(finalize(() => this.hideMainSpinner()))
             .subscribe((result) => {
                 const query = new URLSearchParams({
