@@ -9,12 +9,27 @@
 
     <!-- Screens -->
     <div class="dfv-screens">
-        <button *ngFor="let screen of screens" type="button" class="dfv-screen-tab"
-            [class.active]="screen === activeScreen" (click)="selectScreen(screen)">
-            {{ screen.name }}
-            <i *ngIf="screens.length > 1" class="pi pi-times dfv-screen-delete" title="Delete screen"
-                (click)="deleteScreen(screen,   $event)"></i>
-        </button>
+        <div *ngFor="let screen of screens" class="dfv-screen-tab"
+            [class.active]="screen === activeScreen" (click)="selectScreen(screen)"
+            [attr.role]="'tab'" [attr.tabindex]="0">
+            <input *ngIf="editingScreenId === screen.id" type="text" class="dfv-screen-name-input"
+                [(ngModel)]="screenNameDraft" maxlength="80" aria-label="Screen name"
+                (click)="$event.stopPropagation()" (keydown.enter)="saveScreenRename(screen, $event)"
+                (keydown.escape)="cancelScreenRename($event)" (blur)="saveScreenRename(screen)" />
+            <span *ngIf="editingScreenId !== screen.id">{{ screen.name }}</span>
+            <button *ngIf="editingScreenId === screen.id" type="button" class="dfv-screen-action"
+                title="Confirm name" (click)="saveScreenRename(screen, $event)">
+                <i class="pi pi-check"></i>
+            </button>
+            <button *ngIf="editingScreenId !== screen.id" type="button" class="dfv-screen-action"
+                title="Rename screen" (click)="startScreenRename(screen, $event)">
+                <i class="pi pi-pencil"></i>
+            </button>
+            <button *ngIf="screens.length > 1" type="button" class="dfv-screen-action dfv-screen-delete"
+                title="Delete screen" (click)="deleteScreen(screen, $event)">
+                <i class="pi pi-times"></i>
+            </button>
+        </div>
         <button type="button" class="dfv-screen-add" (click)="addScreen()">
             <i class="pi pi-plus mr-1"></i>Add Screen
         </button>
@@ -103,12 +118,11 @@
                             (onDragStart)="onDragStart('column', field)" (onDragEnd)="onDragEnd()">
 
                             <div class="dfv-card-header">
-                                <i [class]="iconFor(field) + ' dfv-card-icon'" title="Drag to move"></i>
-                                <span class="dfv-field-name">{{ field.name }}</span>
-                                <i class="pi pi-trash dfv-remove" title="Remove" (click)="removeField(field)"></i>
+                                <!-- <i [class]="iconFor(field) + ' dfv-card-icon'" title="Drag to move"></i> -->
+                                <i class="pi pi-trash dfv-remove" title="Remove" role="button" tabindex="0"
+                                    (click)="removeField(field)" (keydown.enter)="removeField(field)"></i>
                             </div>
 
-                            <!-- //Ix- Dynamic input component for the field -->
                             <app-dynamicInputs *ngIf="getInputObject(field) as inputObject"
                                 [extraAttributeObject]="inputObject" [singleColumn]="true">
                             </app-dynamicInputs>

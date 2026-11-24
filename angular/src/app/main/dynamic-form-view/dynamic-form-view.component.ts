@@ -66,6 +66,9 @@ export class DynamicFormViewComponent extends AppComponentBase implements OnInit
 
     screens: DynamicFormScreen[] = [];
     activeScreen: DynamicFormScreen | null = null;
+    editingScreenId: string | null = null;
+    screenNameDraft = '';
+    private originalScreenName = '';
 
     tables: TableInfo[] = [];
     tableColumns: ExtraAttribute[] = [];
@@ -104,6 +107,32 @@ export class DynamicFormViewComponent extends AppComponentBase implements OnInit
         const screen = this.createScreen(`Screen ${this.screens.length + 1}`);
         this.screens = [...this.screens, screen];
         void this.selectScreen(screen);
+    }
+
+    startScreenRename(screen: DynamicFormScreen, event: Event): void {
+        event.stopPropagation();
+        this.editingScreenId = screen.id;
+        this.screenNameDraft = screen.name;
+        this.originalScreenName = screen.name;
+    }
+
+    saveScreenRename(screen: DynamicFormScreen, event?: Event): void {
+        event?.stopPropagation();
+        if (this.editingScreenId !== screen.id) {
+            return;
+        }
+
+        const name = this.screenNameDraft.trim();
+        screen.name = name || this.originalScreenName;
+        this.editingScreenId = null;
+        this.originalScreenName = '';
+    }
+
+    cancelScreenRename(event: Event): void {
+        event.stopPropagation();
+        this.screenNameDraft = this.originalScreenName;
+        this.editingScreenId = null;
+        this.originalScreenName = '';
     }
 
     async selectScreen(screen: DynamicFormScreen): Promise<void> {
@@ -365,7 +394,6 @@ export class DynamicFormViewComponent extends AppComponentBase implements OnInit
             lists[columnId].splice(targetIndex, 0, moving);
         } else {
             const original = drag.field as ExtraAttribute;
-            //Ix- 
             const kind = this.getKind(original);
 
             lists[columnId].splice(targetIndex, 0, {

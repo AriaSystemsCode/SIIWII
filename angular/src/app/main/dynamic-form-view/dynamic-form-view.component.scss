@@ -38,6 +38,9 @@ $border: #e5e7ee;
 
 .dfv-screen-tab,
 .dfv-screen-add {
+    display: inline-flex;
+    align-items: center;
+    gap: 7px;
     padding: 8px 16px;
     border: 1px solid $border;
     border-radius: 7px;
@@ -45,6 +48,7 @@ $border: #e5e7ee;
     color: #343849;
     font-size: 13px;
     font-weight: 600;
+    cursor: pointer;
 
     &:hover {
         border-color: $primary;
@@ -52,9 +56,31 @@ $border: #e5e7ee;
 }
 
 .dfv-screen-delete {
-    margin-left: 8px;
-    font-size: 11px;
     opacity: 0.6;
+
+    &:hover {
+        opacity: 1;
+    }
+}
+
+.dfv-screen-name-input {
+    width: 140px;
+    min-width: 0;
+    padding: 2px 5px;
+    border: 1px solid $border;
+    border-radius: 4px;
+    color: inherit;
+    font: inherit;
+}
+
+.dfv-screen-action {
+    padding: 0;
+    border: 0;
+    background: transparent;
+    color: inherit;
+    font-size: 11px;
+    opacity: 0.65;
+    cursor: pointer;
 
     &:hover {
         opacity: 1;
@@ -309,7 +335,7 @@ $border: #e5e7ee;
 
 .dfv-card {
     padding: 8px 12px;
-    border: 1px solid $border;
+    border: none;
     border-radius: 8px;
     background: #fff;
 }
@@ -325,6 +351,7 @@ $border: #e5e7ee;
 }
 
 .dfv-remove {
+    margin-inline-start: auto;
     color: #74798a;
     cursor: pointer;
 

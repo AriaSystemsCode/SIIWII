@@ -7,7 +7,10 @@ import { DragDropModule } from 'primeng/dragdrop';
 import { AppCommonModule } from '@app/shared/common/app-common.module';
 import { UtilsModule } from '@shared/utils/utils.module';
 import { SharedDynamicInputsModule } from '@shared/shared-module';
-import { AppDashboardServiceProxy } from '@shared/service-proxies/service-proxies';
+import {
+    AppDashboardServiceProxy,
+    MarketplaceAccountsServiceProxy
+} from '@shared/service-proxies/service-proxies';
 import { DynamicApiDispatcherService } from '@shared/dynamicApiDispatcherService ';
 
 import { DynamicFormViewComponent } from './dynamic-form-view.component';
@@ -28,6 +31,7 @@ import { DynamicFormStorageService } from './services/dynamic-form-storage.servi
     ],
     providers: [
         AppDashboardServiceProxy,
+        MarketplaceAccountsServiceProxy,
         DynamicApiDispatcherService,
         TableFieldsService,
         DynamicFormStorageService

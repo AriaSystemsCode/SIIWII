@@ -54,6 +54,7 @@ export class dynamicInputs extends AppComponentBase implements OnInit, OnChanges
     calendar.overlayVisible = true;
   }
   ngOnChanges() {
+    debugger;
     this.fillSelectedValuesFromDto();
         this.onAnyInputChange();
 
