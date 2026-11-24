@@ -6512,6 +6512,18 @@ namespace onetouch.AppItems
                 }
             }
 
+            if (!string.IsNullOrWhiteSpace(itemExcelDto.SoldOutDate) &&
+                !string.Equals(itemExcelDto.SoldOutDate.Trim(), "1/1/1900 12:00:00 AM", StringComparison.OrdinalIgnoreCase) &&
+                !DateOnly.TryParse(itemExcelDto.SoldOutDate, out _))
+            {
+                returnList.Add(new ImportItemReturnDto
+                {
+                    RecordKey = itemExcelDto.Code,
+                    ErrorMessage = "Sold Out Date must be a valid date.",
+                    ErrorType = "Stopper"
+                });
+            }
+
             if (itemExcelDto.RecordType == "Item")
             {
                 if (!string.IsNullOrEmpty(itemExcelDto.SizeScaleName) && int.Parse(itemExcelDto.NoOfDimensions.ToString()) == 1
@@ -6645,6 +6657,18 @@ namespace onetouch.AppItems
                     {
                         returnList.Add(new ImportItemReturnDto { RecordKey = itemExcelDto.Code, ErrorMessage = res.ErrorMessage, ErrorType = "Stopper" });
                     }
+                }
+
+                if (!string.IsNullOrWhiteSpace(itemExcelDto.SoldOutDate) &&
+                    !string.Equals(itemExcelDto.SoldOutDate.Trim(), "1/1/1900 12:00:00 AM", StringComparison.OrdinalIgnoreCase) &&
+                    !DateOnly.TryParse(itemExcelDto.SoldOutDate, out _))
+                {
+                    returnList.Add(new ImportItemReturnDto
+                    {
+                        RecordKey = itemExcelDto.Code,
+                        ErrorMessage = "Sold Out Date must be a valid date.",
+                        ErrorType = "Stopper"
+                    });
                 }
 
                 if (itemExcelDto.RecordType == "Item")
@@ -9771,6 +9795,10 @@ namespace onetouch.AppItems
             IMappingExpression<ImportItemInputDto, AppItemExcelDto> mappingExpression;
 
             mappingExpression = CreateMap<ImportItemInputDto, AppItemExcelDto>();
+            mappingExpression.ForMember(dest => dest.SoldOutDate, act => act.MapFrom(src =>
+                string.IsNullOrWhiteSpace(src.SoldOutDate) || src.SoldOutDate == "1/1/1900 12:00:00 AM"
+                    ? default
+                    : DateOnly.Parse(src.SoldOutDate)));
             mappingExpression.ForMember(dest => dest.Id, act => act.MapFrom(src => 0));
             mappingExpression.ForMember(dest => dest.ProductType, act => act.MapFrom(src => src.ProductType.ToString()));
             mappingExpression.ForMember(dest => dest.RecordType, act => act.MapFrom(src => src.RecordType.ToString()));
