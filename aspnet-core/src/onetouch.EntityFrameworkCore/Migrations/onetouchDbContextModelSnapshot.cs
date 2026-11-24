@@ -2797,8 +2797,14 @@ namespace onetouch.Migrations
                     b.Property<bool>("CanEdit")
                         .HasColumnType("bit");
 
+                    b.Property<string>("EntityCode")
+                        .HasColumnType("nvarchar(max)");
+
                     b.Property<long>("EntityId")
                         .HasColumnType("bigint");
+
+                    b.Property<string>("EntityObjectTypeCode")
+                        .HasColumnType("nvarchar(max)");
 
                     b.Property<bool>("IsDefault")
                         .HasColumnType("bit");
@@ -2812,12 +2818,18 @@ namespace onetouch.Migrations
                     b.Property<long?>("SharedTenantId")
                         .HasColumnType("bigint");
 
+                    b.Property<string>("SharedTenantName")
+                        .HasColumnType("nvarchar(max)");
+
                     b.Property<string>("SharedUserEMail")
                         .HasMaxLength(50)
                         .HasColumnType("nvarchar(50)");
 
                     b.Property<long?>("SharedUserId")
                         .HasColumnType("bigint");
+
+                    b.Property<string>("SharedUserName")
+                        .HasColumnType("nvarchar(max)");
 
                     b.HasKey("Id");
 

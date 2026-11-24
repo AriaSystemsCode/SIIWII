@@ -154,6 +154,8 @@ namespace onetouch.AppDashboards
                 z.SharedUserId == AbpSession.UserId).FirstOrDefaultAsync();
                     if (sharing != null)
                     {
+                        dashboard.IsDefault = sharing.IsDefault;
+                        dashboard.IsFavorite = sharing.IsFavorite;
                         if (sharing.LastViewDate.Date != (new DateTime(1,1,1)).Date)
                         dashboard.LastViewDate = sharing.LastViewDate;
                     }
@@ -483,7 +485,7 @@ namespace onetouch.AppDashboards
             var _dashboards = from o in pagedAndFilteredDashboards
                               select new GetAllFavoriteDashboardsOutputDto
                               {
-                                  Id = o.Id,
+                                  Id = o.EntityId,
                                   Title = o.EntityFk.Name
 
                               };
@@ -793,8 +795,14 @@ namespace onetouch.AppDashboards
                         await CurrentUnitOfWork.SaveChangesAsync();
                         sharingPublic = new AppEntitySharings();
                         sharingPublic.EntityId = dashboardObj.Id;
+                        sharingPublic.EntityCode = dashboardObj.Code;
+                        sharingPublic.EntityObjectTypeCode = dashboardObj.EntityObjectTypeCode;
                         sharingPublic.CanEdit = ShareDashboardInfo.CanEdit;
                         sharingPublic.SharedTenantId = AbpSession.TenantId;
+                        var tenantObj = await TenantManager.GetByIdAsync(int.Parse(AbpSession.TenantId.ToString()));
+                        if (tenantObj != null)
+                            sharingPublic.SharedTenantName = tenantObj.TenancyName;
+
                         sharingPublic.SharedUserId = null;
                         await _appEntitySharingRepository.InsertAsync(sharingPublic);
                         await CurrentUnitOfWork.SaveChangesAsync();
@@ -841,9 +849,18 @@ namespace onetouch.AppDashboards
                             {
                                 AppEntitySharings sharingUser = new AppEntitySharings();
                                 sharingUser.EntityId = dashboardObj.Id;
+                                sharingUser.EntityCode = dashboardObj.Code;
+                                sharingUser.EntityObjectTypeCode = dashboardObj.EntityObjectTypeCode;
                                 sharingUser.CanEdit = user.CanEdit;
                                 sharingUser.SharedTenantId = AbpSession.TenantId;
+                                var tenantObj = await TenantManager.GetByIdAsync(int.Parse(AbpSession.TenantId.ToString()));
+                                if (tenantObj != null)
+                                    sharingUser.SharedTenantName = tenantObj.TenancyName;
+
                                 sharingUser.SharedUserId = user.UserId;
+                                var userObj = await UserManager.GetUserByIdAsync(user.UserId); 
+                                if (userObj != null)
+                                  sharingUser.SharedUserName = userObj.UserName;
                                 await _appEntitySharingRepository.InsertAsync(sharingUser);
                             }
                             await CurrentUnitOfWork.SaveChangesAsync();

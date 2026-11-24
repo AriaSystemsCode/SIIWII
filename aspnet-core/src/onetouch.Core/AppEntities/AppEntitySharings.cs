@@ -17,12 +17,18 @@ namespace onetouch.AppEntities
     public class AppEntitySharings : Entity<long>
     {
         public virtual long EntityId { get; set; }
+        public virtual string EntityCode { get; set; }
+        public virtual string EntityObjectTypeCode { get; set; }
 
         [ForeignKey("EntityId")]
         public AppEntity EntityFk { get; set; }
+
         public virtual long? SharedTenantId { get; set; }
+        public virtual string? SharedTenantName { get; set; }
 
         public virtual long? SharedUserId { get; set; }
+        public virtual string? SharedUserName { get; set; }
+
 
         [ForeignKey("SharedUserId")]
         public User UserFk { get; set; }

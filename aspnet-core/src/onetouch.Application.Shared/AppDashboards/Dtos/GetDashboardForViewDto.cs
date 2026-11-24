@@ -26,6 +26,8 @@ namespace onetouch.AppDashboards.Dtos
         public virtual bool IsTheOwner { set; get; }
         public virtual string OwnerUserImg { set; get; }
         public virtual int SharingLevel { get; set; }
+        public virtual bool IsDefault { set; get; }
+        public virtual bool IsFavorite { get; set; }
     }
     public class GetAllDashboardsInput : PagedAndSortedResultRequestDto
     {
