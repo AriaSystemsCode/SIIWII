@@ -95,11 +95,11 @@
                     <div *ngFor="let field of columnLists[column.id]; let i = index; trackBy: trackByInstance"
                         class="dfv-slot" [class.drop-before]="isDropBefore(column.id, i)"
                         pDroppable="dynamic-form-field" (onDragEnter)="onDragEnterSlot(column.id, i)"
-                        (onDrop)="onDropOnSlot(column.id, i)">
+                        (onDrop)="onDropOnSlot(column.id, i, $event)">
 
                         <div class="dfv-drop-indicator"></div>
 
-                        <div class="dfv-card" pDraggable="dynamic-form-field" dragHandle=".dfv-card-icon"
+                        <div class="dfv-card" pDraggable="dynamic-form-field"
                             (onDragStart)="onDragStart('column', field)" (onDragEnd)="onDragEnd()">
 
                             <div class="dfv-card-header">
@@ -119,7 +119,7 @@
                     <div class="dfv-column-end" [class.drop-before]="isDropBefore(column.id, columnLists[column.id].length)"
                         pDroppable="dynamic-form-field"
                         (onDragEnter)="onDragEnterSlot(column.id, columnLists[column.id].length)"
-                        (onDrop)="onDropOnColumnEnd(column.id)">
+                        (onDrop)="onDropOnColumnEnd(column.id, $event)">
                         <div class="dfv-drop-indicator"></div>
                         <span *ngIf="!columnLists[column.id].length" class="text-muted">Drop fields here</span>
                     </div>

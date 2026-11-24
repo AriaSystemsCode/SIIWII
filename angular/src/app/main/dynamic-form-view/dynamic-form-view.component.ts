@@ -270,7 +270,6 @@ export class DynamicFormViewComponent extends AppComponentBase implements OnInit
     // ---------------- Available fields ----------------
 
     get availableFields(): ExtraAttribute[] {
-        debugger;
         const placed = new Set((this.activeScreen?.fields ?? []).map(f => f.fieldId));
         return this.tableColumns.filter(column => !placed.has(column.attributeId));
     }
@@ -326,22 +325,35 @@ export class DynamicFormViewComponent extends AppComponentBase implements OnInit
         return this.dropTarget?.columnId === columnId && this.dropTarget.index === index;
     }
 
-    // Dropping on a card inserts the dragged field before that card.
-    onDropOnSlot(columnId: string, index: number): void {
+    // Dropping on either half of a card inserts before or after that card.
+    onDropOnSlot(columnId: string, index: number, event: DragEvent): void {
         const drag = this.dragState;
         this.onDragEnd();
 
-        if (!drag) {
+        if (!drag || !this.columnLists[columnId]) {
             return;
         }
 
         const lists = this.cloneLists();
         let targetIndex = index;
+        const targetElement = event.currentTarget as HTMLElement;
+        const targetRect = targetElement.getBoundingClientRect();
+        const dropAfter = event.clientY > targetRect.top + targetRect.height / 2;
+
+        if (dropAfter) {
+            targetIndex++;
+        }
 
         if (drag.source === 'column') {
             const moving = drag.field as DynamicFormField;
             const sourceList = lists[moving.columnId];
+            if (!sourceList) {
+                return;
+            }
             const sourceIndex = sourceList.findIndex(f => f.instanceId === moving.instanceId);
+            if (sourceIndex < 0) {
+                return;
+            }
 
             sourceList.splice(sourceIndex, 1);
 
@@ -371,8 +383,8 @@ export class DynamicFormViewComponent extends AppComponentBase implements OnInit
     }
 
     // Dropping on the empty area under the cards appends to the end of the column.
-    onDropOnColumnEnd(columnId: string): void {
-        this.onDropOnSlot(columnId, this.columnLists[columnId].length);
+    onDropOnColumnEnd(columnId: string, event: DragEvent): void {
+        this.onDropOnSlot(columnId, this.columnLists[columnId].length, event);
     }
 
     // Dropping back on the Available Fields panel removes the field from the form.
@@ -386,7 +398,6 @@ export class DynamicFormViewComponent extends AppComponentBase implements OnInit
     }
 
     removeField(field: DynamicFormField): void {
-        debugger;
         const lists = this.cloneLists();
         lists[field.columnId] = lists[field.columnId].filter(f => f.instanceId !== field.instanceId);
         this.inputCache.delete(field.instanceId);
@@ -428,21 +439,18 @@ export class DynamicFormViewComponent extends AppComponentBase implements OnInit
     // ---------------- Helpers ----------------
 
     private cloneLists(): { [columnId: string]: DynamicFormField[] } {
-        debugger;
         const lists: { [columnId: string]: DynamicFormField[] } = {};
         this.columns.forEach(c => (lists[c.id] = [...(this.columnLists[c.id] ?? [])]));
         return lists;
     }
 
     private commitLists(lists: { [columnId: string]: DynamicFormField[] }): void {
-        debugger;
         this.columns.forEach(c => lists[c.id].forEach((f, i) => (f.order = i)));
         this.columnLists = lists;
         this.syncActiveScreen();
     }
 
     private syncActiveScreen(): void {
-        debugger;
         if (this.activeScreen) {
             this.activeScreen.columns = this.columns.map(c => ({ ...c }));
             this.activeScreen.fields = this.columns.reduce(
@@ -453,8 +461,6 @@ export class DynamicFormViewComponent extends AppComponentBase implements OnInit
     }
 
     private rebuildColumnLists(): void {
-        debugger;
-
         const lists: { [columnId: string]: DynamicFormField[] } = {};
 
         const savedColumns = this.activeScreen?.columns;

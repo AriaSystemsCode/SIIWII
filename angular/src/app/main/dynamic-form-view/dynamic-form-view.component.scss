@@ -277,6 +277,14 @@ $border: #e5e7ee;
     margin-bottom: 8px;
 }
 
+.dfv-card {
+    cursor: grab;
+
+    &:active {
+        cursor: grabbing;
+    }
+}
+
 .dfv-column-end {
     position: relative;
     flex: 1;
