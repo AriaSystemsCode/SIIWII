@@ -6710,16 +6710,19 @@ namespace onetouch.AppItems
                         });
 
                 }
-                var itemExists = _appItemRepository.GetAll().FirstOrDefault(x => x.Code.Replace(" ", string.Empty) == itemExcelDto.Code.Replace(" ", string.Empty) && x.ItemType == 0);
+                var existingItemId = await _appItemRepository.GetAll()
+                    .Where(x => x.Code.Replace(" ", string.Empty) == itemExcelDto.Code.Replace(" ", string.Empty) && x.ItemType == 0)
+                    .Select(x => (long?)x.Id)
+                    .FirstOrDefaultAsync();
 
-                if (itemExists != null)
+                if (existingItemId.HasValue)
                 {
                     returnList.Add(new ImportItemReturnDto
                     {
                         RecordKey = itemExcelDto.Code,
                         ErrorMessage = "Code :" + itemExcelDto.Code + " already exists!",
                         ErrorType = "Duplication",
-                        Id = itemExists.Id
+                        Id = existingItemId
                     });
 
                 }
@@ -7825,7 +7828,7 @@ namespace onetouch.AppItems
                 pendingLeanImportItems = 0;
             }
 
-            async Task SaveImportedItemLean(AppItem importedItem)
+            async Task SaveImportedItemLean(AppItem importedItem, HashSet<long> repricedVariationIds)
             {
                 if (importedItem.Id == 0)
                 {
@@ -7859,16 +7862,8 @@ namespace onetouch.AppItems
                 }
                 else
                 {
-                    var importedItemIds = new List<long> { importedItem.Id };
-                    if (importedItem.ParentFkList != null)
-                    {
-                        importedItemIds.AddRange(importedItem.ParentFkList
-                            .Where(z => z.Id != 0)
-                            .Select(z => z.Id));
-                    }
-
                     await x.AppItemPrices
-                        .Where(z => importedItemIds.Contains(z.AppItemId))
+                        .Where(z => z.AppItemId == importedItem.Id || repricedVariationIds.Contains(z.AppItemId))
                         .DeleteAsync();
 
                     appItemModifyList.Add(importedItem);
@@ -7896,21 +7891,18 @@ namespace onetouch.AppItems
             var existingParentsById = existingParentIds.Count == 0
                 ? new Dictionary<long, AppItem>()
                 : (await _appItemRepository.GetAll()
-                    // Keep bulk-deleted price rows out of the change tracker.
-                    // UpdateRange below attaches only the replacement graph.
-                    .AsNoTracking()
+                    // Reuse one instance per key in the detached graph before UpdateRange.
+                    .AsNoTrackingWithIdentityResolution()
                     .AsSplitQuery()
                     .Where(z => existingParentIds.Contains(z.Id) && z.ListingItemId == null)
                     .Include(z => z.EntityFk).ThenInclude(z => z.EntityCategories)
                     .Include(z => z.EntityFk).ThenInclude(z => z.EntityClassifications)
                     .Include(z => z.EntityFk).ThenInclude(z => z.EntityAttachments).ThenInclude(z => z.AttachmentFk)
                     .Include(z => z.EntityFk).ThenInclude(z => z.EntityExtraData)
-                    .Include(z => z.ItemPricesFkList)
                     .Include(z => z.ParentFkList).ThenInclude(z => z.EntityFk).ThenInclude(z => z.EntityExtraData)
                     .Include(z => z.ParentFkList).ThenInclude(z => z.EntityFk).ThenInclude(z => z.EntityCategories)
                     .Include(z => z.ParentFkList).ThenInclude(z => z.EntityFk).ThenInclude(z => z.EntityClassifications)
                     .Include(z => z.ParentFkList).ThenInclude(z => z.EntityFk).ThenInclude(z => z.EntityAttachments).ThenInclude(z => z.AttachmentFk)
-                    .Include(z => z.ParentFkList).ThenInclude(z => z.ItemPricesFkList)
                     .ToListAsync())
                     .ToDictionary(z => z.Id);
             var existingItemScaleHeadersByItemId = existingParentIds.Count == 0
@@ -8798,6 +8790,7 @@ namespace onetouch.AppItems
                 var childItems = childrenByParentCode.TryGetValue(excelDto.Code, out var children)
                     ? children
                     : new List<AppItemExcelDto>();
+                var repricedVariationIds = new HashSet<long>();
                 bool firstItem = false;
                 foreach (var item in childItems)
                 {
@@ -8808,6 +8801,7 @@ namespace onetouch.AppItems
                         if (itemExist != null)
                         {
                             appChildItem = itemExist;
+                            repricedVariationIds.Add(appChildItem.Id);
                             appChildItem.Description = excelDto.ProductDescription;
                             appChildItem.Price = decimal.Parse(excelDto.Price);
                             appChildItem.Name = excelDto.Name;
@@ -9160,7 +9154,7 @@ namespace onetouch.AppItems
                 if (appItem.ParentFkList != null && appItem.ParentFkList.Any())
                     importedParentsWithVariations.Add(appItem);
 
-                await SaveImportedItemLean(appItem);
+                await SaveImportedItemLean(appItem, repricedVariationIds);
             }
 
             await FlushLeanImportBatch();
