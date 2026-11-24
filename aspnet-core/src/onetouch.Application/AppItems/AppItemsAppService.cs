@@ -7597,7 +7597,9 @@ namespace onetouch.AppItems
             var existingParentsById = existingParentIds.Count == 0
                 ? new Dictionary<long, AppItem>()
                 : (await _appItemRepository.GetAll()
-                    //.AsNoTracking()
+                    // Keep bulk-deleted price rows out of the change tracker.
+                    // UpdateRange below attaches only the replacement graph.
+                    .AsNoTracking()
                     .AsSplitQuery()
                     .Where(z => existingParentIds.Contains(z.Id) && z.ListingItemId == null)
                     .Include(z => z.EntityFk).ThenInclude(z => z.EntityCategories)
