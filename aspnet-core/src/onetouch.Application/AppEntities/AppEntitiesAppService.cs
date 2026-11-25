@@ -2803,7 +2803,7 @@ namespace onetouch.AppEntities
                         userInformationDto.JobTitle = relationship.EntityExtraData.FirstOrDefault(x => x.AttributeId == 706) == null ? "" : relationship.EntityExtraData.FirstOrDefault(x => x.AttributeId == 706).AttributeValue;
 
                     }
-                    userInformationDto.AccountName = buisnessAccount.Name;// contact.AccountFk== null?"":contact.AccountFk.Name;
+                    userInformationDto.AccountName = buisnessAccount!=null? buisnessAccount.Name:"";// contact.AccountFk== null?"":contact.AccountFk.Name;
                     userInformationDto.UserName = contact.Name;
                 }
                 return userInformationDto;
