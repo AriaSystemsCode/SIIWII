@@ -423,6 +423,7 @@ export class AppItemsFiltersComponent extends AppComponentBase implements OnInit
             undefined,
             undefined,
             undefined,
+            undefined,
             this.sortBy,
             this.appItemTypeFilterMetaData.listSkipCount,
             this.appItemTypeFilterMetaData.listMaxResultCount,

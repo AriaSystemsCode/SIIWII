@@ -166,7 +166,10 @@ dataSource?: {
     service: string;
     api: string;
     parameter: string;
+    valueParameter?: string;
     valueField?: string;
+    labelField?: string;
+    parameterValue?: any;
 };
 paginationSetting?: {
     list?: Array<{
@@ -214,6 +217,7 @@ export interface FilterConditionRule {
     field: string;
     operator: string;
     value: any;
+    value2?: any;
     datePeriod?: string;
     dateRange?: Date[];
 }
@@ -234,3 +238,11 @@ export type FilterConditionNode =
         isLoaded: boolean;
     }
     
+
+       export interface ChartExportItem {
+        svg: SVGSVGElement;
+        w: number;
+        h: number;
+        left: number;
+        top: number;
+    }

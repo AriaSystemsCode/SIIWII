@@ -102,7 +102,7 @@ BEGIN TRY
             AND f.TenantId IS NULL AND f.FieldName = s.FieldName
             AND f.FieldTypeId = t.Id AND f.EntitySycObjectId = @stringTypeId
             AND f.IsDeleted = 0
-        WHERE f.FieldLevelCode <> N'System'
+        WHERE f.FieldLevelCode NOT IN (N'System', N'Application')
            OR f.IsStandard <> 1 OR f.IsExtraField <> 0)
         THROW 51205, 'An existing Field Manager setting definition conflicts with the seed.', 1;
 

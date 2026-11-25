@@ -74,6 +74,7 @@ export class SelectAppItemTypeComponent
                 undefined,
                 undefined,
                 undefined,
+                undefined,
                 this.sortBy,
                 this.skipCount,
                 this.maxResultCount

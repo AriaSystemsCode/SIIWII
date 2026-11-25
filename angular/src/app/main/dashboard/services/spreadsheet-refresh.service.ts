@@ -163,15 +163,51 @@ export class SpreadsheetRefreshService {
     }
 
     /** The API wants a moment whose toISOString has no timezone suffix. */
-    private toApiDate(updatedDate?: string | null): any {
-        if (!updatedDate) {
-            return undefined;
-        }
+ 
+private toApiDate(
+    updatedDate?: string | null
+): moment.Moment | undefined {
 
-        const date = moment.utc(updatedDate);
-        date.toISOString = () => date.format('YYYY-MM-DDTHH:mm:ss');
-        return date;
+    if (!updatedDate) {
+        return undefined;
     }
+
+    const value = updatedDate.trim();
+
+    let date: moment.Moment;
+
+    // Already has timezone information (Z or +02:00)
+    if (/(Z|[+-]\d{2}:\d{2})$/i.test(value)) {
+        date = moment.parseZone(value);
+    } else {
+        // Legacy saved date without timezone.
+        // Assumes this timestamp represents local browser time.
+        date = moment(
+            value,
+            [
+                'YYYY-MM-DD HH:mm:ss',
+                'YYYY-MM-DDTHH:mm:ss',
+                'YYYY-MM-DDTHH:mm:ss.SSS'
+            ],
+            true
+        );
+    }
+
+    if (!date.isValid()) {
+        throw new Error(
+            `Invalid spreadsheet updatedDate: ${updatedDate}`
+        );
+    }
+
+    const utcDate = date.utc();
+
+    console.log('[Spreadsheet Refresh] Date:', {
+        original: updatedDate,
+        utc: utcDate.toISOString()
+    });
+
+    return utcDate;
+}
 
     private sourceFields(meta: SpreadsheetSheetDataSource): string[] {
         const names = (meta.source?.columns ?? []).map(f => String(f).trim()).filter(f => !!f && f.toLowerCase() !== 'id');

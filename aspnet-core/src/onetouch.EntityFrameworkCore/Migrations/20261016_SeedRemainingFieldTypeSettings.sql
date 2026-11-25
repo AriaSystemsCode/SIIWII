@@ -129,7 +129,7 @@ BEGIN TRY
         WHERE (f.FieldTypeId <> s.FieldTypeId
            AND NOT (s.OwnerCode = N'LD' AND s.FieldName = N'DropdownOptions'
                     AND f.FieldTypeId = @chipsTypeId))
-           OR f.FieldLevelCode <> N'System'
+           OR f.FieldLevelCode NOT IN (N'System', N'Application')
            OR f.IsStandard <> 1 OR f.IsExtraField <> 0)
         THROW 51405, 'An existing setting definition conflicts with the seed.', 1;
     IF EXISTS (SELECT 1 FROM #Settings s JOIN dbo.AppFields f

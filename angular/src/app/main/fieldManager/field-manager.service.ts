@@ -113,7 +113,7 @@ export class FieldManagerService {
         const selectedObjectTypeId = node?.nodeType === 'ObjectType' ? node.id : undefined;
         const selectedObjectId = node && node.nodeType !== 'ObjectType' ? node.sycObjectId : undefined;
         return this.appFieldManagerProxy.getFields(
-            selectedObjectId, selectedObjectTypeId, true,
+            selectedObjectId, selectedObjectTypeId, true,undefined,
             searchText || undefined, undefined, undefined, undefined, undefined, undefined, undefined,
             isStandard, undefined, undefined, undefined, undefined, sorting || undefined,
             skipCount, maxResultCount
@@ -145,7 +145,7 @@ export class FieldManagerService {
         const selectedObjectTypeId = node?.nodeType === 'ObjectType' ? node.id : undefined;
         const selectedObjectId = node && node.nodeType !== 'ObjectType' ? node.sycObjectId : undefined;
         return this.appFieldManagerProxy.getFields(
-            selectedObjectId, selectedObjectTypeId, true,
+            selectedObjectId, selectedObjectTypeId, true,undefined,
             undefined, undefined, undefined, undefined, undefined, undefined, undefined,
             undefined, undefined, undefined, undefined, undefined, undefined,
             skipCount, this.pageSize

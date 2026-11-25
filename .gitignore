@@ -29,3 +29,7 @@ angular/obj/Debug/netcoreapp3.1/onetouch.AngularUI.AssemblyInfo.cs
 /aspnet-core/src/onetouch.EntityFrameworkCore/Migrations/20260706064632_addTaxrateToMarketplaceItem.cs
 /aspnet-core/src/onetouch.EntityFrameworkCore/Migrations/20260706064632_addTaxrateToMarketplaceItem.Designer.cs
 /aspnet-core/src/onetouch.EntityFrameworkCore/Migrations/--onetouchDbContextModelSnapshot.cs
+
+# Local release publish outputs
+/aspnet-core/artifacts/host/
+/aspnet-core/artifacts/migrator/

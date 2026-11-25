@@ -24,12 +24,14 @@ namespace onetouch.AppDashboards.Dtos
         public virtual string SpreadsheetFilePath { get; set;}
         public virtual bool IsEditable { set; get; }
         public virtual bool IsTheOwner { set; get; }
+        public virtual string OwnerUserImg { set; get; }
         public virtual int SharingLevel { get; set; }
     }
     public class GetAllDashboardsInput : PagedAndSortedResultRequestDto
     {
         public string Filter { get; set; }
         public DashboardFilterType SharingLevel { get; set; } = 0;
+        public string? TimeZoneValue { get; set; }
     }
     public enum DashboardFilterType
     {
@@ -100,5 +102,11 @@ namespace onetouch.AppDashboards.Dtos
 
         public List<Dictionary<string, object>> Items { get; set; }
             = new List<Dictionary<string, object>>();
+    }
+    public class TableInfo 
+    {
+        public string TableName { set; get; }
+        public string ObjectCode { set; get; }
+        public long ObjectId { set; get; }
     }
 }

@@ -16,22 +16,28 @@
                     <input type="search" [(ngModel)]="entitySearchText" placeholder="Search entities..."
                         aria-label="Search entities" (ngModelChange)="onEntitySearchChange()" />
                 </div>
-                <ng-template #entityNodes let-nodes>
+                <ng-template #entityNodes let-nodes let-level="level">
                     <div class="field-entity-node" *ngFor="let node of nodes">
                         <button type="button" class="field-entity-node-button"
                             [class.selected]="selectedEntityKey === node.key" (click)="toggleEntity(node, $event)">
                             <i *ngIf="node.children?.length" class="fa"
                                 [class.fa-chevron-right]="!isEntityExpanded(node)"
                                 [class.fa-chevron-down]="isEntityExpanded(node)"></i>
+                            <img *ngIf="level === 0" class="field-entity-node-icon field-entity-child-icon"
+                                src="assets/fieldManager/entity.svg" alt="" aria-hidden="true" />
+                            <img *ngIf="level === 1" class="field-entity-node-icon field-entity-parent-icon"
+                                src="assets/fieldManager/entity-parent.svg" alt="" aria-hidden="true" />
+                            <img *ngIf="level >= 2" class="field-entity-node-icon field-entity-child-icon"
+                                src="assets/fieldManager/entity-child.svg" alt="" aria-hidden="true" />
                             <span>{{ node.name }}</span>
                         </button>
                         <div class="field-entity-children" *ngIf="node.children?.length && isEntityExpanded(node)">
-                            <ng-container *ngTemplateOutlet="entityNodes; context: { $implicit: getEntityChildren(node) }"></ng-container>
+                            <ng-container *ngTemplateOutlet="entityNodes; context: { $implicit: getEntityChildren(node), level: level + 1 }"></ng-container>
                         </div>
                     </div>
                 </ng-template>
                 <ng-container *ngIf="visibleEntityTree.length; else noEntitySearchResults"
-                    [ngTemplateOutlet]="entityNodes" [ngTemplateOutletContext]="{ $implicit: visibleEntityTree }"></ng-container>
+                    [ngTemplateOutlet]="entityNodes" [ngTemplateOutletContext]="{ $implicit: visibleEntityTree, level: 0 }"></ng-container>
                 <ng-template #noEntitySearchResults>
                     <div class="field-entity-search-empty">No entities found</div>
                 </ng-template>
@@ -46,7 +52,7 @@
                 <span *ngIf="last">{{ pathNode.name | localize }}</span>
             </ng-container>
         </div>
-        <div class="field-manager-actions" *ngIf="activePanel === 'entity' && selectedEntityId !== null">
+        <div class="field-manager-actions" *ngIf="canShowEntityActions">
             <button *ngIf="permissions.canAddExistingField" type="button" class="btn bgPurpleM add-existing-btn" (click)="addFromExisting()">
                 {{ 'AddfromExistingField(s)' | localize }} 
             </button>

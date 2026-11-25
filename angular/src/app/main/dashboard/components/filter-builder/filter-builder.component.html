@@ -1,4 +1,3 @@
-
 <div class="filter-builder">
 
     <div class="filter-content">
@@ -64,7 +63,8 @@
 
                 <div
                     *ngIf="isRule(node)"
-                    class="filter-rule-row">
+                    class="filter-rule-row"
+                    [class.has-date-range]="asRule(node).datePeriod === 'dateRange'">
 
                     <ng-container
                         *ngTemplateOutlet="ruleTemplate; context: { $implicit: asRule(node) }">
@@ -350,34 +350,38 @@
                             <ng-container
                                 *ngIf="isDatePeriodOperator(rule); else singleDate">
 
-                                <p-dropdown
-                                    [inputId]="getRuleId(rule) + '-period'"
-                                    [name]="getRuleId(rule) + '-period'"
-                                    [options]="datePeriodOptions"
-                                    [(ngModel)]="rule.datePeriod"
-                                    [ngModelOptions]="{ standalone: true }"
-                                    optionLabel="label"
-                                    optionValue="value"
-                                    [placeholder]="'SelectPeriod' | localize"
-                                    appendTo="body"
-                                    styleClass="w-100"
-                                    (onChange)="onDatePeriodChange(rule)">
-                                </p-dropdown>
+                                <div class="date-period-wrapper">
 
-                                <!-- CUSTOM DATE RANGE -->
-                                <p-calendar
-                                    *ngIf="rule.datePeriod === 'dateRange'"
-                                    [inputId]="getRuleId(rule) + '-range'"
-                                    [name]="getRuleId(rule) + '-range'"
-                                    [(ngModel)]="rule.dateRange"
-                                    [ngModelOptions]="{ standalone: true }"
-                                    selectionMode="range"
-                                    dateFormat="yy-mm-dd"
-                                    [showIcon]="true"
-                                    [showButtonBar]="true"
-                                    appendTo="body"
-                                    styleClass="w-100 mt-2">
-                                </p-calendar>
+                                    <p-dropdown
+                                        [inputId]="getRuleId(rule) + '-period'"
+                                        [name]="getRuleId(rule) + '-period'"
+                                        [options]="datePeriodOptions"
+                                        [(ngModel)]="rule.datePeriod"
+                                        [ngModelOptions]="{ standalone: true }"
+                                        optionLabel="label"
+                                        optionValue="value"
+                                        [placeholder]="'SelectPeriod' | localize"
+                                        appendTo="body"
+                                        styleClass="w-100"
+                                        (onChange)="onDatePeriodChange(rule)">
+                                    </p-dropdown>
+
+                                    <!-- CUSTOM DATE RANGE -->
+                                    <p-calendar
+                                        *ngIf="rule.datePeriod === 'dateRange'"
+                                        [inputId]="getRuleId(rule) + '-range'"
+                                        [name]="getRuleId(rule) + '-range'"
+                                        [(ngModel)]="rule.dateRange"
+                                        [ngModelOptions]="{ standalone: true }"
+                                        selectionMode="range"
+                                        dateFormat="yy-mm-dd"
+                                        [showIcon]="true"
+                                        [showButtonBar]="true"
+                                        appendTo="body"
+                                        styleClass="w-100">
+                                    </p-calendar>
+
+                                </div>
 
                             </ng-container>
 

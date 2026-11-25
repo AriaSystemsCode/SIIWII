@@ -2764,9 +2764,11 @@ namespace onetouch.AppEntities
                 return null;
             string businessAccSSIN = "";
             string personalAccSSIN = "";
+            var businessAccTypeId = await _helper.SystemTables.GetEntityObjectTypeParetnerId();
             var buisnessAccount = await _appMarketplaceContactsRepository
                 .GetAll().Where(z => z.TenantOwner == user.TenantId
-                && z.IsProfileData == true && z.ParentId == null && z.SharingLevel==1).FirstOrDefaultAsync();
+                && z.IsProfileData == true && z.ParentId == null && z.SharingLevel==1 &&
+                z.EntityObjectTypeId == businessAccTypeId).FirstOrDefaultAsync();
             if (buisnessAccount!=null)
             {
                 businessAccSSIN = buisnessAccount.SSIN;

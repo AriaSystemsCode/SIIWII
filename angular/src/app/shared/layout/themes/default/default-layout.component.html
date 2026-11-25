@@ -107,7 +107,7 @@
                         </clipPath>
                       </defs>
                     </svg>
-                  <i *ngIf="item.name != 'My Transactions' && item.name != 'My Connections' && item.name != 'MyProducts' && item.name != 'ProductsList' && item.name != 'Linesheet' && item.name != 'Administration'"  (click)=" item.name == 'System Objects'  ? openSub = !openSub : openSub = false  ; openAdSub = false "  [class]="item.icon" ></i>
+                  <i *ngIf="item.name != 'My Transactions' && item.name != 'My Connections' && item.name != 'MyProducts' && item.name != 'ProductsList' && item.name != 'Linesheet' && item.name != 'Administration'"  (click)=" item.name == 'System Objects'  ? openSub = !openSub : openSub = false  ; openAdSub = false "  [class]="item.icon" class="px-1"></i>
                   <a *ngIf="!isMinimized"  [queryParams]="item.parameters" (click)=" item.name == 'System Objects'  ? openSub = !openSub : openSub = false  ; item.name == 'Administration'  ? openAdSub = !openAdSub : openAdSub = false "  [routerLink]="item.name != 'Administration'  && item.name != 'System Objects'  ? item.route : null" class="ml-2 item-name">{{ item.name  | localize }}  <svg *ngIf="item.name == 'Administration' && !openAdSub"  width="15" height="8" viewBox="0 0 15 8" fill="none" xmlns="http://www.w3.org/2000/svg" class="mlIcon">
                     <path d="M13.5 1L7.5 7L1.5 1" stroke="#777777" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
                     </svg>

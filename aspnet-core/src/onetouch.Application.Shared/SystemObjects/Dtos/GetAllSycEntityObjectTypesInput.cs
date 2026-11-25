@@ -14,8 +14,8 @@ namespace onetouch.SystemObjects.Dtos
 
 		public string ExtraDataFilter { get; set; }
 
-
-		public string SydObjectNameFilter { get; set; }
+        public string SydObjectCodeFilter { get; set; }
+        public string SydObjectNameFilter { get; set; }
 		public long SydObjectIdFilter { get; set; }
 
 		public string SycEntityObjectTypeNameFilter { get; set; }

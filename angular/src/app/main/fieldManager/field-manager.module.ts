@@ -14,6 +14,8 @@ import { ViewFieldManagerComponent } from './components/view-field-manager/view-
 import { ExistingFieldsModalComponent } from './components/existing-fields-modal/existing-fields-modal.component';
 import { RevisionHistoryComponent } from './components/revision-history/revision-history.component';
 import { SharedDynamicInputsModule } from '@shared/shared-module';
+import { DynamicApiDispatcherService } from '@shared/dynamicApiDispatcherService ';
+import { AccountsServiceProxy, AppItemsServiceProxy, MarketplaceAccountsServiceProxy } from '@shared/service-proxies/service-proxies';
 
 @NgModule({
     declarations: [
@@ -34,6 +36,12 @@ import { SharedDynamicInputsModule } from '@shared/shared-module';
         SharedDynamicInputsModule,
         FieldManagerRoutingModule
     ],
-    providers: [FieldManagerService]
+    providers: [
+        FieldManagerService,
+        DynamicApiDispatcherService,
+        AccountsServiceProxy,
+        AppItemsServiceProxy,
+        MarketplaceAccountsServiceProxy 
+    ]
 })
 export class FieldManagerModule { }

@@ -21,7 +21,7 @@
 }
 
 .field-manager-sidebar {
-    flex: 0 0 195px;
+    flex: 0 0 15%;
     height: calc(100vh - 160px);
     min-height: 0;
     padding: 18px 0;
@@ -117,6 +117,22 @@
     font-size: 10px;
 }
 
+.field-entity-node-icon {
+    flex: 0 0 auto;
+    object-fit: contain;
+    margin-right: 6px;
+}
+
+.field-entity-parent-icon {
+    width: 21px;
+    height: 25px;
+}
+
+.field-entity-child-icon {
+    width: 34px;
+    height: 18px;
+}
+
 .field-entity-node-button.selected,
 .field-entity-node-button:hover {
     border-radius: 4px;
@@ -147,6 +163,7 @@
 .field-manager-breadcrumb {
     color: #2f3033;
     font-size: 16px;
+    font-weight: 700;
     line-height: 38px;
     white-space: nowrap;
 }

@@ -30,6 +30,7 @@ using onetouch.Authorization.Users;
 using onetouch.Configuration;
 using onetouch.DashboardCustomization;
 using onetouch.EntityFrameworkCore;
+using onetouch.Globals;
 using onetouch.Helpers;
 using onetouch.SycIdentifierDefinitions;
 using onetouch.SystemObjects;
@@ -57,14 +58,17 @@ namespace onetouch.AppDashboards
         private readonly IAppEntitiesAppService _appEntitiesAppService;
         private readonly SycIdentifierDefinitionsAppService _iAppSycIdentifierDefinitionsService;
         private readonly IAppFieldManagerAppService _iAppFieldManagerAppService;
+        private readonly TimeZoneInfoAppService _timeZoneInfoAppService;
         public AppDashboardAppService(IRepository<AppEntity, long> appEntityRepository,
             Helper helper, IRepository<AppEntitySharings, long> appEntitySharingRepository,
             IAppEntitiesAppService appEntitiesAppService,
             IAppConfigurationAccessor appConfigurationAccessor,
             SycIdentifierDefinitionsAppService iAppSycIdentifierDefinitionsService,
             IAppFieldManagerAppService iAppFieldManagerAppService,
-            IRepository<SydObject, long> sydObjectRepository)
+            IRepository<SydObject, long> sydObjectRepository,
+            TimeZoneInfoAppService timeZoneInfoAppService)
         {
+            _timeZoneInfoAppService = timeZoneInfoAppService;
             _sydObjectRepository = sydObjectRepository;
             _appEntityRepository = appEntityRepository;
             _helper = helper;
@@ -125,10 +129,19 @@ namespace onetouch.AppDashboards
 
                 foreach (var dashboard in dashboardsList)
                 {
+                    
+
                     var userCreator = await UserManager.GetUserByIdAsync(dashboard.CreatorUserId);
                     if (userCreator != null)
+                    {
                         dashboard.CreatorUserName = userCreator.FullName;
-
+                        using (UnitOfWorkManager.Current.DisableFilter(AbpDataFilters.MustHaveTenant, AbpDataFilters.MayHaveTenant))
+                        {
+                            var userInfo = await _appEntitiesAppService.GetUserInformation(dashboard.CreatorUserId);
+                            if (userInfo != null)
+                                dashboard.OwnerUserImg = userInfo.UserImage;
+                        }
+                    }
                     if (!string.IsNullOrEmpty(dashboard.SpreadsheetFilePath) &&
                         System.IO.File.Exists(dashboard.SpreadsheetFilePath))
                     {
@@ -140,7 +153,31 @@ namespace onetouch.AppDashboards
                 .Where(z => z.EntityId == dashboard.Id &&
                 z.SharedUserId == AbpSession.UserId).FirstOrDefaultAsync();
                     if (sharing != null)
+                    {
+                        if (sharing.LastViewDate.Date != (new DateTime(1,1,1)).Date)
                         dashboard.LastViewDate = sharing.LastViewDate;
+                    }
+
+                    //Timezone Conversion[start]
+                    if (input.TimeZoneValue != null)
+                    {
+                        var currentTimeZone = TimeZone.CurrentTimeZone.StandardName.ToString();
+                        if (dashboard.LastModificationDate != null)
+                        {
+                            
+                            var utcValue = _timeZoneInfoAppService
+                                .GetUTCDatetimeValue(DateTime.Parse(dashboard.LastModificationDate.ToString()), currentTimeZone);
+                            dashboard.LastModificationDate = _timeZoneInfoAppService.GetDatetimeValueFromUTC(utcValue, input.TimeZoneValue);
+                        }
+                        if (dashboard.LastViewDate!=null)
+                        {
+                            var utcValueView = _timeZoneInfoAppService
+                                .GetUTCDatetimeValue(DateTime.Parse(dashboard.LastViewDate.ToString()), currentTimeZone);
+                            dashboard.LastViewDate = _timeZoneInfoAppService.GetDatetimeValueFromUTC(utcValueView, input.TimeZoneValue);
+                        }
+                    }
+                    //Timezone {End}
+
 
                     dashboard.SharedWithUsers = new List<onetouch.AppEntities.Dtos.UserInformationDto>();
                     var entitySharingAll = await _appEntitySharingRepository.GetAll()
@@ -164,8 +201,21 @@ namespace onetouch.AppDashboards
                                 }
                                 using (UnitOfWorkManager.Current.DisableFilter(AbpDataFilters.MustHaveTenant, AbpDataFilters.MayHaveTenant))
                                 {
-                                    dashboard.SharedWithUsers.
-                                         Add(await _appEntitiesAppService.GetUserInformation(user.Id));
+                                    var userInfo = await _appEntitiesAppService.GetUserInformation(user.Id);
+                                    if (userInfo != null)
+                                    {
+                                        if (string.IsNullOrEmpty(userInfo.UserName))
+                                            userInfo.UserName = user.FullName;
+                                        dashboard.SharedWithUsers.
+                                     Add(userInfo);
+                                    }
+                                    else
+                                    {
+                                        UserInformationDto userInf = new UserInformationDto();
+                                        userInf.UserName = user.FullName;
+                                        dashboard.SharedWithUsers.
+                                     Add(userInf);
+                                    }
                                 }
 
                             }
@@ -424,7 +474,7 @@ namespace onetouch.AppDashboards
                 entity.EntityObjectTypeId = dashboardObjectTypeId;
                 var entityId = await _appEntitiesAppService.SaveEntity(entity);
                 await CurrentUnitOfWork.SaveChangesAsync();
-                await UpdateViewDate(entityId);
+                //await UpdateViewDate(entityId);
 
             }
             else
@@ -630,8 +680,8 @@ namespace onetouch.AppDashboards
                             var allUsersRecords = await _appEntitySharingRepository.GetAll()
                         .Where(z => z.EntityId == dashboardObj.Id &&
                         z.SharedTenantId == AbpSession.TenantId &&
-                        z.SharedUserId != null &&
-                        z.CanEdit != ShareDashboardInfo.CanEdit).ToListAsync();
+                        z.SharedUserId != null && z.SharedUserId != dashboardObj.CreatorUserId
+                        && z.CanEdit != ShareDashboardInfo.CanEdit).ToListAsync();
                             if (allUsersRecords != null)
                             {
                                 foreach (var user in allUsersRecords)
@@ -650,8 +700,8 @@ namespace onetouch.AppDashboards
                         var allUsersRecords = await _appEntitySharingRepository.GetAll()
                        .Where(z => z.EntityId == dashboardObj.Id &&
                        z.SharedTenantId == AbpSession.TenantId &&
-                       z.SharedUserId != null &&
-                       z.CanEdit != ShareDashboardInfo.CanEdit).ToListAsync();
+                       z.SharedUserId != null && z.SharedUserId != dashboardObj.CreatorUserId
+                       && z.CanEdit != ShareDashboardInfo.CanEdit).ToListAsync();
                         if (allUsersRecords != null)
                         {
                             foreach (var user in allUsersRecords)
@@ -680,7 +730,7 @@ namespace onetouch.AppDashboards
                         var allUsersRecords = await _appEntitySharingRepository.GetAll()
                        .Where(z => z.EntityId == dashboardObj.Id &&
                        z.SharedTenantId == AbpSession.TenantId &&
-                       z.SharedUserId != null).ToListAsync();
+                       z.SharedUserId != null && z.SharedUserId!= dashboardObj.CreatorUserId).ToListAsync();
                         if (allUsersRecords != null && allUsersRecords.Count > 0)
                         {
                             foreach (var sharUser in allUsersRecords)
@@ -784,7 +834,7 @@ namespace onetouch.AppDashboards
             if (sydobjct != null)
             {
                 var fieldsList = await _iAppFieldManagerAppService.GetFields(new GetFieldsInput { 
-                    SelectedObjectId= sydobjct.Id,AllFields= true,MaxResultCount=1000
+                    SelectedObjectId= sydobjct.Id,AllFields= true,IncludeDeletedAppliedFields= true,MaxResultCount=1000
                     });
                 if (fieldsList != null && fieldsList.TotalCount > 0)
                 {
@@ -880,15 +930,16 @@ namespace onetouch.AppDashboards
             var returnResult = await dynamicQueryAppService.Query(input);
             return returnResult;
         }
-        public async Task<List<string>> GetTablesList() 
+        public async Task<List<TableInfo>> GetTablesList() 
         {
-            List<string> returnList = new List<string>();
+            List<TableInfo> returnList = new List<TableInfo>();
             var dataTree = await _iAppFieldManagerAppService.GetObjectTypeTree();
             if (dataTree != null && dataTree.Count() > 0)
             {
                 foreach (var node in dataTree)
                 {
-                    var dataObjects = FindAllByNodeType(node, "DataObject");
+                    var objectCode = await _helper.SystemTables.GetObjectCodeById(node.SycObjectId);
+                    var dataObjects = FindAllByNodeType(node, "DataObject", objectCode, node.SycObjectId);
                     if (dataObjects != null && dataObjects.Count > 0)
                     {
                         returnList.AddRange(dataObjects);
@@ -898,22 +949,25 @@ namespace onetouch.AppDashboards
             return returnList;
 
         }
-        public static List<string> FindAllByNodeType(
+        public static List<TableInfo> FindAllByNodeType(
     ObjectTypeTreeNodeDto obj,
-    string nodeType)
+    string nodeType, string parentObjectCode,long parentObjectId)
         {
-            var results = new List<string>();
+            var results = new List<TableInfo>();
 
             if (obj == null)
                 return results;
 
             if (obj.NodeType == nodeType)
-                results.Add(obj.Name);
+                results.Add(new TableInfo {TableName= obj.Name,
+                    ObjectCode= parentObjectCode,
+                ObjectId = parentObjectId
+                });
 
             foreach (var child in obj.Children)
             {
                 results.AddRange(
-                    FindAllByNodeType(child, nodeType));
+                    FindAllByNodeType(child, nodeType, parentObjectCode, parentObjectId));
             }
 
             return results;

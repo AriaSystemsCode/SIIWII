@@ -250,7 +250,9 @@ namespace onetouch.AppFields
                             (x.SycEntityObjectTypeId == null || x.SycEntityObjectTypeId == selectedType.Id)) ||
                         (baseObjectIds.Contains(x.SycObjectId) && x.SycEntityObjectTypeId == null))
                         .AsNoTracking().ToListAsync();
+                    var activeKeys = input.IncludeDeletedAppliedFields ? null : await GetActiveFieldKeys(rows);
                     var filtered = FilterFields(SelectAppliedDefinitions(rows.Where(x =>
+                        (activeKeys == null || activeKeys.Contains(x.FieldDefinitionKey)) &&
                         !suppressedHostKeys.Contains(x.FieldDefinitionKey)), tenantId, objectIds).AsQueryable(), input);
                     count = filtered.Count();
                     page = SortFields(filtered, input.Sorting).Skip(input.SkipCount).Take(input.MaxResultCount).ToList();
@@ -260,30 +262,30 @@ namespace onetouch.AppFields
                     var objectIds = await GetEffectiveObjectIds(input.SelectedObjectId.Value);
                     var rows = await assignments.Include(x => x.SettingValues).Where(x => objectIds.Contains(x.SycObjectId) &&
                         x.SycEntityObjectTypeId == null).AsNoTracking().ToListAsync();
+                    var activeKeys = input.IncludeDeletedAppliedFields ? null : await GetActiveFieldKeys(rows);
                     var filtered = FilterFields(SelectAppliedDefinitions(rows.Where(x =>
+                        (activeKeys == null || activeKeys.Contains(x.FieldDefinitionKey)) &&
                         !suppressedHostKeys.Contains(x.FieldDefinitionKey)), tenantId, objectIds).AsQueryable(), input);
                     count = filtered.Count();
                     page = SortFields(filtered, input.Sorting).Skip(input.SkipCount).Take(input.MaxResultCount).ToList();
                 }
                 else
                 {
-                    using (UnitOfWorkManager.Current.DisableFilter(AbpDataFilters.SoftDelete))
-                    {
-                        var usedKeys = assignments.Select(x => x.FieldDefinitionKey);
-                        var query = FilterFields(VisibleFields()
-                            .Where(x => !x.IsDeleted || usedKeys.Contains(x.FieldDefinitionKey)), input);
-                        count = await query.CountAsync();
-                        page = await SortFields(query.Include(x => x.SettingValues), input.Sorting).Skip(input.SkipCount)
-                            .Take(input.MaxResultCount).AsNoTracking().ToListAsync();
-                    }
+                    var query = FilterFields(VisibleFields().Where(x => !x.IsDeleted), input);
+                    count = await query.CountAsync();
+                    page = await SortFields(query.Include(x => x.SettingValues), input.Sorting).Skip(input.SkipCount)
+                        .Take(input.MaxResultCount).AsNoTracking().ToListAsync();
                 }
                 var pageKeys = page.Select(x => x.FieldDefinitionKey).Distinct().ToList();
                 Dictionary<Guid, bool> archived;
+                HashSet<Guid> discontinuedKeys;
                 using (UnitOfWorkManager.Current.DisableFilter(AbpDataFilters.SoftDelete))
                 {
                     var catalog = await _fields.GetAll().Where(x => pageKeys.Contains(x.FieldDefinitionKey))
-                        .Select(x => new { x.FieldDefinitionKey, x.IsDeleted }).AsNoTracking().ToListAsync();
+                        .Select(x => new { x.FieldDefinitionKey, x.IsDeleted, x.FieldStatusCode }).AsNoTracking().ToListAsync();
                     archived = catalog.ToDictionary(x => x.FieldDefinitionKey, x => x.IsDeleted);
+                    discontinuedKeys = catalog.Where(x => !x.IsDeleted && x.FieldStatusCode == "Discontinued")
+                        .Select(x => x.FieldDefinitionKey).ToHashSet();
                 }
                 var creatorIds = page.Where(x => x.CreatorUserId.HasValue)
                     .Select(x => x.CreatorUserId.Value).Distinct().ToList();
@@ -336,6 +338,7 @@ namespace onetouch.AppFields
                     IsHidden = x.IsHidden,
                     CanEdit = canEdit && archived.TryGetValue(x.FieldDefinitionKey, out var editableArchived) && !editableArchived,
                     CanDelete = canDelete && archived.TryGetValue(x.FieldDefinitionKey, out var deletableArchived) && !deletableArchived &&
+                        discontinuedKeys.Contains(x.FieldDefinitionKey) &&
                         (!AbpSession.TenantId.HasValue || x.TenantId == AbpSession.TenantId),
                     CanHide = AbpSession.TenantId.HasValue && x.TenantId == null &&
                         archived.TryGetValue(x.FieldDefinitionKey, out var hideArchived) && !hideArchived,
@@ -372,6 +375,15 @@ namespace onetouch.AppFields
                     var assignment = group.First();
                     return assignment.ToAppField();
                 });
+        }
+
+        private async Task<HashSet<Guid>> GetActiveFieldKeys(List<AppTableField> rows)
+        {
+            var keys = rows.Select(x => x.FieldDefinitionKey).Distinct().ToList();
+            if (keys.Count == 0) return new HashSet<Guid>();
+            var activeKeys = await VisibleFields().Where(x => !x.IsDeleted && keys.Contains(x.FieldDefinitionKey))
+                .Select(x => x.FieldDefinitionKey).ToListAsync();
+            return activeKeys.ToHashSet();
         }
 
         private async Task<List<long>> GetEffectiveObjectIds(long objectId)
@@ -412,10 +424,10 @@ namespace onetouch.AppFields
             if (!input.AllFields) query = query.Where(x => x.IsExtraField);
             if (!string.IsNullOrWhiteSpace(input.SearchText))
             {
-                var search = input.SearchText.Trim();
-                query = query.Where(x => x.FieldCode.Contains(search) || x.FieldName.Contains(search) ||
-                    (x.Description != null && x.Description.Contains(search)) ||
-                    (x.TrackingNo != null && x.TrackingNo.Contains(search)));
+                var search = input.SearchText.Trim().ToLowerInvariant();
+                query = query.Where(x => x.FieldCode.ToLower().Contains(search) || x.FieldName.ToLower().Contains(search) ||
+                    (x.Description != null && x.Description.ToLower().Contains(search)) ||
+                    (x.TrackingNo != null && x.TrackingNo.ToLower().Contains(search)));
             }
             if (input.FieldTypeId.HasValue) query = query.Where(x => x.FieldTypeId == input.FieldTypeId.Value);
             if (input.FieldStatusId.HasValue) query = query.Where(x => x.FieldStatusId == input.FieldStatusId.Value);
@@ -593,7 +605,8 @@ namespace onetouch.AppFields
                         CanEditAttributes = canEdit,
                         CanCreateRevision = CanCreateRevision(field),
                         CanSync = canSync,
-                        CanDelete = !field.IsDeleted && own && PermissionChecker.IsGranted(AppPermissions.Pages_Administration_FieldManager_Delete),
+                        CanDelete = !field.IsDeleted && field.FieldStatusCode == "Discontinued" && own &&
+                            PermissionChecker.IsGranted(AppPermissions.Pages_Administration_FieldManager_Delete),
                         CanHide = !field.IsDeleted && AbpSession.TenantId.HasValue && field.TenantId == null,
                         IsTenantCustomCopyRequired = AbpSession.TenantId.HasValue && field.TenantId == null
                     }
@@ -766,6 +779,8 @@ namespace onetouch.AppFields
                 if (field == null) throw new UserFriendlyException("Field was not found.");
                 if (field.TenantId != AbpSession.TenantId)
                     throw new UserFriendlyException("A tenant cannot delete a host field.");
+                if (field.FieldStatusCode != "Discontinued")
+                    throw new UserFriendlyException("Only a discontinued field can be deleted.");
                 await ArchiveCurrentRevision(field);
                 field.CurrentRevisionNo = NextRevision(field.CurrentRevisionNo);
                 await RecordHistory(field, "Delete");
@@ -1140,6 +1155,7 @@ namespace onetouch.AppFields
 
             switch (field.FieldLevelCode)
             {
+                case "System":
                 case "Application":
                     return !AbpSession.TenantId.HasValue && !field.TenantId.HasValue;
                 case "Tenant":
