@@ -490,12 +490,26 @@ namespace onetouch.SystemObjects
                         var sectionTypeExtraDate = section.EntityExtraData.FirstOrDefault(z => z.AttributeId == 1001);
                         if (sectionTypeExtraDate != null)
                         {
-                            var sectionEntity = await _appEntityRepository.GetAll().Where(z => z.Id == long.Parse(sectionTypeExtraDate.AttributeValueId.ToString())).FirstOrDefaultAsync();
+                            var sectionEntity = await _appEntityRepository.GetAll().Include (z=>z.EntityExtraData).Where(z => z.Id == long.Parse(sectionTypeExtraDate.AttributeValueId.ToString())).FirstOrDefaultAsync();
                             if (sectionEntity != null)
                             {
                                 try
                                 {
+                                    if (sectionEntity.EntityExtraData != null && sectionEntity.EntityExtraData.Count > 0)
+                                    {
+                                        var backGround = sectionEntity.EntityExtraData.Where(z => z.AttributeId == 2000).FirstOrDefault();
+                                        if (backGround != null && !string.IsNullOrEmpty(backGround.AttributeValue))
+                                        {
+                                           item.BackgroundColor =   backGround.AttributeValue;
+                                        }
+                                        var txtClr = sectionEntity.EntityExtraData.Where(z => z.AttributeId == 2001).FirstOrDefault();
+                                        if (txtClr != null && !string.IsNullOrEmpty(txtClr.AttributeValue))
+                                        {
+                                            item.TextColor = txtClr.AttributeValue;
+                                        }
+                                    }
                                     item.Type = (SliderEnum)Enum.Parse(typeof(SliderEnum), sectionEntity.Code);
+
                                 }
                                 catch { }
                                 

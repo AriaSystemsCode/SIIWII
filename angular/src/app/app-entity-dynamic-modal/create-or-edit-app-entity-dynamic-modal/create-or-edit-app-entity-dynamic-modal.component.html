@@ -1,71 +1,66 @@
 <div bsModal #createOreEditLookups="bs-modal" class="modal fade" tabindex="-1" role="dialog"
     aria-labelledby="createOreEditLookups" aria-hidden="true">
     <div class="modal-dialog" [ngClass]="isArabic ? (active ? 'left-modal slide-left-in' : 'left-modal slide-left-out') : (active ? 'right-modal slide-right-in' : 'right-modal slide-right-out')" role="document">
-        <form class="h-100" *ngIf="active" #appEntityForm="ngForm" novalidate (ngSubmit)="save(appEntityForm)"
+        <form *ngIf="active" #appEntityForm="ngForm" novalidate (ngSubmit)="save(appEntityForm)"
             autocomplete="off">
 
             <div class="modal-content">
                 <div class="modal-content-wrapper">
                     <div class="modal-header entity-modal-header">
-                        <h4 class="modal-title text-left entity-modal-header__title">
+                        <h4 class="modal-title text-left entity-modal-header__title pt-0">
                             <span *ngIf="appEntity?.id" class="font-weight-bold">{{l("Edit")}}
                                 {{entityObjectType.name}}</span>
                             <span *ngIf="!appEntity?.id" class="font-weight-bold">{{l("CreateNew")}}
                                 {{entityObjectType.name}}</span>
                         </h4>
-                        <p>* {{l("PleaseFillTheBelowInformation")}}</p>
+                        <p class="mb-0">* {{l("PleaseFillTheBelowInformation")}}</p>
 
                         <button type="button" class="close modal-close-btn"
                             (click)="close()" aria-label="Close" [disabled]="saving">
                             <span aria-hidden="true">&times;</span>
                         </button>
                     </div>
+
                     <div class="modal-body" [ngClass]="isArabic ? 'text-right create-lookup-modal--arabic' : 'text-left'">
 
+                        <!-- Code -->
                         <div class="form-group">
                             <label for="AppEntity_Code">
                                 <span class="required">* </span>
                                 {{l("Code")}}
-                                <span class="text-danger ml-3" *ngIf="showCodeErrMsg">{{ 'CodeIsRequired' | localize
-                                    }}</span>
+                                <span class="text-danger ml-3" *ngIf="showCodeErrMsg">{{ 'CodeIsRequired' | localize }}</span>
                             </label>
-                            <input type="string" id="AppEntity_Code"
-                            class="form-control form-control-sm   mr-3 w-100" [(ngModel)]="appEntity.code"
-                            name="code" [disabled]="editMode && appEntity?.id" />
-                            <!-- Create -->
-                            <!-- <app-codes *ngIf="!appEntity?.id" [objectType]="entityObjectType.code"
-                                [code]="appEntity.code" [editMode]="false" placeHolder="Add your code"
-                                (getCodeValue)="getCodeValue($event)" [maxlength]="6">
-                            </app-codes> -->
-
-                            <!-- Edit -->
-                            <!-- <app-codes *ngIf="appEntity?.id" [objectType]="entityObjectType.code" [editMode]="true"
-                                [code]="appEntity.code" (getCodeValue)="getCodeValue($event)" [maxlength]="6">
-                            </app-codes> -->
-
-
+                            <input type="text" id="AppEntity_Code"
+                                class="form-control form-control-sm mr-3 w-100" [(ngModel)]="appEntity.code"
+                                name="code" [disabled]="editMode && appEntity?.id" />
                         </div>
 
+                        <!-- Status -->
                         <div class="mb-3"
-                            *ngIf="entityObjectType.code =='MARKETPLACESECTIONBLOCK' || entityObjectType.code =='MARKETPLACESECTION'">
+                            *ngIf="entityObjectType.code == 'MARKETPLACESECTIONBLOCK' || entityObjectType.code == 'MARKETPLACESECTION'">
                             <p>{{ 'Status' | localize }}</p>
                             <p-dropdown [options]="statusValues" optionLabel="displayName" optionValue="id"
                                 name="entityObjectStatusId" [(ngModel)]="appEntity.entityObjectStatusId"
                                 [styleClass]="'w-100 custom-dropdown'" [placeholder]="l('Select') + ' ' + ('Status' | localize)">
                             </p-dropdown>
                         </div>
+
+                        <!-- Name -->
                         <div class="form-group">
                             <span class="required">* </span> <label for="AppEntity_Name">{{l("Name")}} </label>
                             <input type="text" id="AppEntity_Name" class="form-control form-control-sm aria-input-text"
                                 [(ngModel)]="appEntity.name" name="Name" required />
                         </div>
+
+                        <!-- Default value -->
                         <div class="form-group d-flex">
                             <input type="checkbox" id="AppEntity_IsDefault"
-                                class="form-control form-control-sm  col-1 mr-3" [(ngModel)]="appEntity.isDefault"
+                                class="form-control form-control-sm col-1 mr-3" [(ngModel)]="appEntity.isDefault"
                                 name="isDefault" />
                             <label for="AppEntity_IsDefault" class="pt-2">{{l("SetDefaultValue")}} </label>
                         </div>
 
+                        <!-- Notes -->
                         <div class="form-group" *ngIf="addToLookup">
                             <label for="AppEntity_Notes">{{l("Notes")}}</label>
                             <input type="text" id="AppEntity_Notes"
@@ -73,22 +68,20 @@
                                 name="Notes" />
                         </div>
 
-
+                        <!-- Add to lookup -->
                         <div class="form-group d-flex"
                             *ngIf="(!appEntity?.id || appEntity.nonlookup) && !hideAddToLookupOption">
                             <input [disabled]="!enableAddToLookup" type="checkbox" id="AppEntity_AddToLookup"
-                                class="form-control form-control-sm  col-1 mr-3" [(ngModel)]="addToLookup"
+                                class="form-control form-control-sm col-1 mr-3" [(ngModel)]="addToLookup"
                                 name="addToLookup" />
                             <label for="AppEntity_AddToLookup" class="pt-2"> {{l("AddToLookup")}} </label>
                         </div>
 
-
-
+                        <!-- Visual type: solid / image -->
                         <div class="row col-12" *ngIf="_displayVisualTypes">
                             <div class="mr-3">
-                                <input type="radio" id="solid" name="visualType" class="form-control" [checked]="
-                                            visual.solid
-                                            " [value]="true" class="mr-2 radio" (change)="setSolid(true)" />
+                                <input type="radio" id="solid" name="visualType" class="form-control" [checked]="visual.solid"
+                                    [value]="true" class="mr-2 radio" (change)="setSolid(true)" />
                                 <label for="online">{{"Solid" | localize}}</label>
                             </div>
 
@@ -99,156 +92,119 @@
                             </div>
                         </div>
 
+                        <!-- Image type + orientation -->
                         <div class="row mb-3" *ngIf="visual.image">
                             <div class="col-12">
-                              <label class="d-block mb-2 fs-3 my-2">
-                                <span class="required">* </span>{{ 'ImageType' | localize }}
-                              </label>
-                          
-                              <p-dropdown
-                                class="w-100"
-                                [options]="imageTypeOptions"
-                                [(ngModel)]="imageAttachmentType"
-                                optionLabel="label"
-                                optionValue="value"
-                                [showClear]="true"
-                                [placeholder]="'SelectImageType' | localize"
-                             [disabled]=" (attachmentsSrcs  && attachmentsSrcs?.length >0 && attachmentsSrcs[0]!='' )"
-                                name="sectionImgType"
-                              >
-                              </p-dropdown>
+                                <label class="d-block mb-2 fs-3 my-2">
+                                    <span class="required">* </span>{{ 'ImageType' | localize }}
+                                </label>
+                                <p-dropdown
+                                    class="w-100"
+                                    [options]="imageTypeOptions"
+                                    [(ngModel)]="imageAttachmentType"
+                                    optionLabel="label"
+                                    optionValue="value"
+                                    [showClear]="true"
+                                    [placeholder]="'SelectImageType' | localize"
+                                    [disabled]="hasFirstAttachmentSrc"
+                                    name="sectionImgType">
+                                </p-dropdown>
                             </div>
 
-
-                             <div class="col-12">
-                              <label class="d-block mb-2 fs-3 my-2">
-                                <span class="required">* </span>{{ 'Orientation' | localize }}
-                              </label>
-                          
-                              <p-dropdown
-                                class="w-100"
-                                [options]="orientationOptions"
-                                [(ngModel)]="selectedOrientation"
-                                optionLabel="label"
-                                optionValue="value"
-                                [showClear]="true"
-                                [placeholder]="'SelectOrientationOptions' | localize"
-                                [disabled]=" (attachmentsSrcs  && attachmentsSrcs?.length >0 && attachmentsSrcs[0]!='' )"
-                                name="sectionOrientation"
-                              >
-                              </p-dropdown>
+                            <div class="col-12">
+                                <label class="d-block mb-2 fs-3 my-2">
+                                    <span class="required">* </span>{{ 'Orientation' | localize }}
+                                </label>
+                                <p-dropdown
+                                    class="w-100"
+                                    [options]="orientationOptions"
+                                    [(ngModel)]="selectedOrientation"
+                                    optionLabel="label"
+                                    optionValue="value"
+                                    [showClear]="true"
+                                    [placeholder]="'SelectOrientationOptions' | localize"
+                                    [disabled]="hasFirstAttachmentSrc"
+                                    name="sectionOrientation">
+                                </p-dropdown>
                             </div>
-                          </div>
-                          
+                        </div>
+
+                        <!-- Attachments -->
                         <div class="row align-items-baseline mb-5 item-photos m-1 py-3 px-1" *ngIf="visual.image"
-                            [ngClass]="{'item-photos--filled': attachmentsSrcs && attachmentsSrcs?.length > 0 && attachmentsSrcs[0] != ''}">
+                            [ngClass]="{'item-photos--filled': hasFirstAttachmentSrc}">
 
                             <div class="col-12 item-photos-header item-photos-header--plain pt-4 pb-2">
                                 <div class="d-flex flex-wrap justify-content-between">
-
-
-                                    <div class="upload-intro"
-                                        *ngIf="! (attachmentsSrcs  && attachmentsSrcs?.length >0 && attachmentsSrcs[0]!='' )">
+                                    <div class="upload-intro" *ngIf="!hasFirstAttachmentSrc">
                                         <img src="../../../assets/placeholders/Group 15.png" class="upload-intro__icon" />
                                         <div class="pt-3 upload-intro__content">
-                                            <p class="upload-intro__title">
-                                               {{ 'UploadFiles' | localize }}
-                                            </p>
-                                            <p>
-                                                {{ 'SelectAndUploadTheFiles' | localize }}
-                                            </p>
+                                            <p class="upload-intro__title">{{ 'UploadFiles' | localize }}</p>
+                                            <p>{{ 'SelectAndUploadTheFiles' | localize }}</p>
                                         </div>
                                     </div>
-                                    <div>
-
-                                    </div>
-
                                 </div>
                             </div>
-                            <div class="col-12 item-photos-body"
-                                                                [ngClass]="{'item-photos-body--filled': attachmentsSrcs && attachmentsSrcs.length > 0 && attachmentsSrcs[0] != ''}">
-                            <div class="row">
-                                <div class="image-wrapper mb-3" *ngFor="let i of displaySlots">
-<ng-container *ngIf="pdfSafeMap[i]; else imageOrUpload">
-    <div
-      class="d-flex flex-column justify-content-center h-100 align-items-center kt-avatar position-relative w-100"
-    >
-      <div
-        class="d-flex flex-column justify-content-center h-100 w-100 position-absolute view-img-overlay"
-      >
-        <div class="bg-white kt-avatar__upload" (click)="onRemovePhoto(i, $event)">
-          <i class="fa fa-times text-danger"></i>
-        </div>
-      </div>
-  
-      <a
-        [href]="pdfSafeMap[i]"
-        target="_blank"
-        rel="noopener"
-        class="d-flex flex-column justify-content-center align-items-center h-100 w-100"
-      >
-        <img
-          src="assets/Items/pdf-Icon.png"
-          alt="PDF"
-                    class="pdf-icon-img"
-        />
-        <span class="mt-2">{{ 'OpenPDF' | localize }}</span>
-      </a>
-    </div>
-  </ng-container>
-  
-                              
-                                  <ng-template #imageOrUpload>
-                                    <ng-container *ngIf="attachmentsSrcs[i]; else uploadSlot">
-                                      <app-image-upload
-                                        *ngIf="productImageCategory?.sycAttachmentCategory"
-                                        [sycAttachmentCategory]="productImageCategory?.sycAttachmentCategory"
-                                        [attachmentTypeCode]="imageAttachmentType"
-                                        [selectedOrientation]="selectedOrientation"
-                                        [image]="attachmentsSrcs[i]"
-                                        [showGuidelines]="true"
-                                        (imageBrowseDone)="
-                                          onImageBrowseDone(
-                                            $event,
-                                            productImageCategory?.sycAttachmentCategory,
-                                            i
-                                          )
-                                        "
-                                        (removeImage)="onRemoveImageFromUpload($event, i)"
-                                      >
-                                      </app-image-upload>
-                                    </ng-container>
-                              
-                                    <ng-template #uploadSlot>
-                                      <div class="image-wrapper upload " *ngIf="showUploadSlot(i)">
-                                        <app-image-upload
-                                          *ngIf="productImageCategory?.sycAttachmentCategory"
-                                          [sycAttachmentCategory]="productImageCategory?.sycAttachmentCategory"
-                                          [attachmentTypeCode]="imageAttachmentType"
-                                              [selectedOrientation]="selectedOrientation"
-                                          [image]="null"
-                                          [showGuidelines]="true"
-                                          (imageBrowseDone)="
-                                            onImageBrowseDone(
-                                              $event,
-                                              productImageCategory?.sycAttachmentCategory,
-                                              i
-                                            )
-                                          "
-                                          (removeImage)="onRemoveImageFromUpload($event, i)"
-                                        >
-                                        </app-image-upload>
-                                      </div>
-                                    </ng-template>
-                                  </ng-template>
-                                </div>
-                              </div>
-                              
-                              
-                       </div>
-                       
 
+                            <div class="col-12 item-photos-body"
+                                [ngClass]="{'item-photos-body--filled': hasFirstAttachmentSrc}">
+                                <div class="row">
+                                    <div class="image-wrapper mb-3" *ngFor="let i of displaySlots">
+
+                                        <!-- PDF / Excel preview -->
+                                        <ng-container *ngIf="pdfSafeMap[i] || excelFileMap[i]; else imageOrUpload">
+                                            <div class="d-flex flex-column align-items-center justify-content-center">
+                                                <img *ngIf="pdfSafeMap[i]" src="assets/Items/pdf-Icon.png"
+                                                    class="pdf-icon-img" alt="PDF" />
+
+                                                <i *ngIf="excelFileMap[i]" class="fas fa-file-excel text-success"
+                                                    style="font-size: 45px"></i>
+
+                                                <span *ngIf="excelFileMap[i]">{{ excelFileMap[i] }}</span>
+
+                                                <button type="button" class="btn btn-link"
+                                                    (click)="onRemovePhoto(i, $event)">
+                                                    {{ 'Remove' | localize }}
+                                                </button>
+                                            </div>
+                                        </ng-container>
+
+                                        <!-- Image preview / upload slot -->
+                                        <ng-template #imageOrUpload>
+                                            <ng-container *ngIf="attachmentsSrcs[i]; else uploadSlot">
+                                                <app-image-upload
+                                                    *ngIf="productImageCategory?.sycAttachmentCategory"
+                                                    [allowExcel]="true"
+                                                    [sycAttachmentCategory]="productImageCategory?.sycAttachmentCategory"
+                                                    [attachmentTypeCode]="imageAttachmentType"
+                                                    [selectedOrientation]="selectedOrientation"
+                                                    [image]="attachmentsSrcs[i]"
+                                                    [showGuidelines]="true"
+                                                    (imageBrowseDone)="onImageBrowseDone($event, productImageCategory?.sycAttachmentCategory, i)"
+                                                    (removeImage)="onRemoveImageFromUpload($event, i)">
+                                                </app-image-upload>
+                                            </ng-container>
+
+                                            <ng-template #uploadSlot>
+                                                <div class="image-wrapper upload" *ngIf="showUploadSlot(i)">
+                                                    <app-image-upload
+                                                        *ngIf="productImageCategory?.sycAttachmentCategory"
+                                                        [sycAttachmentCategory]="productImageCategory?.sycAttachmentCategory"
+                                                        [attachmentTypeCode]="imageAttachmentType"
+                                                        [selectedOrientation]="selectedOrientation"
+                                                        [image]="null"
+                                                        [showGuidelines]="true"
+                                                        (imageBrowseDone)="onImageBrowseDone($event, productImageCategory?.sycAttachmentCategory, i)"
+                                                        (removeImage)="onRemoveImageFromUpload($event, i)">
+                                                    </app-image-upload>
+                                                </div>
+                                            </ng-template>
+                                        </ng-template>
+                                    </div>
+                                </div>
+                            </div>
                         </div>
+
+                        <!-- Extra attributes -->
                         <div class="d-flex flex-column" *ngIf="extraAttributes?.length">
                             <div class="row"> <span class="required pl-2 pr-1">* </span><label
                                     for="AppEntity_Code">{{l("Extra Attributes")}}</label></div>
@@ -257,11 +213,12 @@
                                     <div>
                                         <div *ngIf="isSize && !isHost">
                                             <label>{{extraAttr.name | localize}}</label>
-                                            
                                         </div>
+
                                         <div class="d-flex align-items-center">
 
-                                            <div class="wide-drop-down d-flex flex-grow-1 "
+                                            <!-- Lookup: multi select -->
+                                            <div class="wide-drop-down d-flex flex-grow-1"
                                                 *ngIf="extraAttr?.lookupData && extraAttr?.acceptMultipleValues">
                                                 <div class="flex-grow-1 mr-1">
                                                     <p-multiSelect [options]="extraAttr.lookupData"
@@ -269,23 +226,22 @@
                                                         [(ngModel)]="extraAttr.selectedValues"
                                                         name="extraAttr_{{extraAttr.name}}"
                                                         [placeholder]="l('Select') + ' ' + extraAttr.name"
-                                                        (onChange)="multiValuesExtraAttributeOnChange($event,extraAttr)">
+                                                        (onChange)="multiValuesExtraAttributeOnChange($event, extraAttr)">
                                                     </p-multiSelect>
                                                 </div>
                                             </div>
 
-                                            <div class="wide-drop-down flex-grow-1 "
+                                            <!-- Lookup: single select -->
+                                            <div class="wide-drop-down flex-grow-1"
                                                 *ngIf="extraAttr?.lookupData && !extraAttr?.acceptMultipleValues">
-                                                <label class="pr-2">
-                                                    {{extraAttr.name| localize}}
-                                                </label>
+                                                <label class="pr-2">{{extraAttr.name | localize}}</label>
                                                 <div *ngIf="!isSize">
                                                     <p-dropdown [options]="extraAttr.lookupData"
                                                         [styleClass]="'w-100 custom-dropdown'"
                                                         [(ngModel)]="extraAttr.selectedValues"
                                                         name="extraAttr_{{extraAttr.name}}"
                                                         [placeholder]="l('Select') + ' ' + extraAttr.name"
-                                                        (onChange)="singleValueExtraAttributeOnChange($event,extraAttr)">
+                                                        (onChange)="singleValueExtraAttributeOnChange($event, extraAttr)">
                                                     </p-dropdown>
                                                 </div>
                                                 <div *ngIf="isSize && !isHost">
@@ -293,109 +249,101 @@
                                                         [(ngModel)]="extraAttr.selectedValues"
                                                         name="extraAttr_{{extraAttr.name}}"
                                                         [placeholder]="l('Select') + ' ' + extraAttr.name"
-                                                        (onChange)="singleValueExtraAttributeOnChange($event,extraAttr)">
+                                                        (onChange)="singleValueExtraAttributeOnChange($event, extraAttr)">
                                                     </p-dropdown>
                                                 </div>
                                             </div>
 
+                                            <!-- Boolean -->
                                             <div class="flex-grow-1"
-                                                *ngIf="extraAttr.dataType === 'boolean' || extraAttr.dataType === 'bit' ">
+                                                *ngIf="extraAttr.dataType === 'boolean' || extraAttr.dataType === 'bit'">
                                                 <div class="radio-inline mt-2">
-                                                    <label class="pr-2">
-                                                        {{extraAttr.name| localize}}
-                                                    </label>
+                                                    <label class="pr-2">{{extraAttr.name | localize}}</label>
                                                     <label class="radio radio-accent radio-primary mr-4"
                                                         for="extraAttr{{extraAttr.name}}_1">
                                                         <input type="radio"
-                                                            [disabled]="entityObjectType.code =='MARKETPLACESECTION'"
-                                                            (click)="notLookupExtraAttributeOnChange('true',extraAttr)"
+                                                            [disabled]="entityObjectType.code == 'MARKETPLACESECTION'"
+                                                            (click)="notLookupExtraAttributeOnChange('true', extraAttr)"
                                                             name="extraAttr_{{extraAttr.name}}"
                                                             id="extraAttr{{extraAttr.name}}_1" [value]="'true'"
                                                             [(ngModel)]="extraAttr.selectedValues" />
                                                         {{l("Yes")}}
-                                                        
                                                     </label>
                                                     <label class="radio radio-accent radio-primary"
                                                         for="extraAttr{{extraAttr.name}}_0">
                                                         <input type="radio"
-                                                            [disabled]="entityObjectType.code =='MARKETPLACESECTION'"
-                                                            (click)="notLookupExtraAttributeOnChange('false',extraAttr)"
+                                                            [disabled]="entityObjectType.code == 'MARKETPLACESECTION'"
+                                                            (click)="notLookupExtraAttributeOnChange('false', extraAttr)"
                                                             name="extraAttr_{{extraAttr.name}}"
                                                             id="extraAttr{{extraAttr.name}}_0" [value]="'false'"
                                                             [(ngModel)]="extraAttr.selectedValues">
                                                         {{l("No")}}
-                                                        
                                                     </label>
-                                                    <a *ngIf="extraAttr.selectedValues && entityObjectType.code !='MARKETPLACESECTION'"
+                                                    <a *ngIf="extraAttr.selectedValues && entityObjectType.code != 'MARKETPLACESECTION'"
                                                         class="ml-5 text-underline text-black-50"
-                                                        (click)="resetExtraAttributeSelectedValue(extraAttr)"> {{ 'Reset' | localize }}</a>
+                                                        (click)="resetExtraAttributeSelectedValue(extraAttr)">{{ 'Reset' | localize }}</a>
                                                 </div>
                                             </div>
-                                            <div class="flex-grow-1" *ngIf="extraAttr.dataType === 'Datetime' ">
-                                                <label>
-                                                    {{extraAttr.name| localize}}
-                                                </label>
+
+                                            <!-- Datetime -->
+                                            <div class="flex-grow-1" *ngIf="extraAttr.dataType === 'Datetime'">
+                                                <label>{{extraAttr.name | localize}}</label>
                                                 <input type="text"
-                                                    (keyup)="notLookupExtraAttributeOnChange($event.target.value,extraAttr)"
+                                                    (keyup)="notLookupExtraAttributeOnChange($event.target.value, extraAttr)"
                                                     name="{{extraAttr.name}}" autocomplete="off"
-                                                    placeholder="{{extraAttr.name| localize}}" class="form-control" bsDatepicker
+                                                    placeholder="{{extraAttr.name | localize}}" class="form-control" bsDatepicker
                                                     id="extraAttr{{extraAttr.name}}"
                                                     [(ngModel)]="extraAttr.selectedValues">
                                             </div>
-                                            <div class="flex-grow-1 mx-1" *ngIf="extraAttr.dataType === 'Numeric' ">
-                                                <label>
-                                                    {{extraAttr.name| localize}}
-                                                    
-                                                </label>
+
+                                            <!-- Numeric -->
+                                            <div class="flex-grow-1 mx-1" *ngIf="extraAttr.dataType === 'Numeric'">
+                                                <label>{{extraAttr.name | localize}}</label>
                                                 <input type="number"
-                                                    (keyup)="notLookupExtraAttributeOnChange($event.target.value,extraAttr)"
-                                                    name="{{extraAttr.name}}" placeholder="{{extraAttr.name| localize}}"
+                                                    (keyup)="notLookupExtraAttributeOnChange($event.target.value, extraAttr)"
+                                                    name="{{extraAttr.name}}" placeholder="{{extraAttr.name | localize}}"
                                                     class="form-control" id="extraAttr{{extraAttr.name}}"
                                                     [(ngModel)]="extraAttr.selectedValues">
                                             </div>
+
+                                            <!-- String (with optional legacy color picker) -->
                                             <div class="flex-grow-1 mx-2"
-                                                *ngIf="extraAttr.dataType === 'string' && !extraAttr.isLookup ">
-                                                <div class="row d-flex align-items-baseline justify-content-start ">
-                                                    <label>
-                                                        {{extraAttr.name| localize}}
-                                                    </label>
+                                                *ngIf="extraAttr.dataType === 'string' && !extraAttr.isLookup">
+                                                <div class="row d-flex align-items-baseline justify-content-start">
+                                                    <label>{{extraAttr.name | localize}}</label>
                                                     <input type="text"
-                                                        (keyup)="notLookupExtraAttributeOnChange($event.target.value,extraAttr)"
-                                                        name="{{extraAttr.name}}" placeholder="{{extraAttr.name| localize}}"
+                                                        (keyup)="notLookupExtraAttributeOnChange($event.target.value, extraAttr)"
+                                                        name="{{extraAttr.name}}" placeholder="{{extraAttr.name | localize}}"
                                                         class="form-control" id="extraAttr{{extraAttr.name}}"
                                                         [(ngModel)]="extraAttr.selectedValues">
-                                                    <div class="border rounded" class="w-25 "
-                                                        *ngIf="extraAttr.dataType === 'string' && !extraAttr.isLookup  ">
-                                                        <input (colorPickerChange)="onColorChange($event, extraAttr)"
+                                                    <div class="border rounded" class="w-25">
+                                                        <input (colorPickerChange)="notLookupExtraAttributeOnChange($event, extraAttr)"
                                                             *ngIf="extraAttr.name === 'Color HEXA Code' || extraAttr.name === 'Color HEX Code'"
-                                                            class="picker" 
+                                                            class="picker"
                                                             [(colorPicker)]="extraAttr.selectedValues"
                                                             [style.backgroundColor]="extraAttr.selectedValues"
                                                             [disabled]="extraAttr?.disabled" />
-                                                             </div>
+                                                    </div>
                                                 </div>
                                             </div>
 
-
+                                            <!-- Drop down list (static entries) -->
                                             <div class="flex-grow-1"
                                                 *ngIf="extraAttr.validEntries && extraAttr.dataType === 'dropDownList'">
-                                                <div class="row d-flex align-items-baseline justify-content-start ">
-                                                    <label class="pr-2">
-                                                        {{extraAttr.name| localize}}
-                                                    </label>
+                                                <div class="row d-flex align-items-baseline justify-content-start">
+                                                    <label class="pr-2">{{extraAttr.name | localize}}</label>
                                                     <p-dropdown [options]="dropdownOptions(extraAttr.validEntries)"
                                                         [styleClass]="'w-100 custom-dropdown'"
                                                         [(ngModel)]="extraAttr.selectedValues"
                                                         name="extraAttr_{{extraAttr.name}}"
                                                         [placeholder]="l('Select') + ' ' + extraAttr.name"
-                                                         [disabled]="isBlockTypeLocked(extraAttr) || extraAttr?.disabled"
-                                                        (onChange)="notLookupExtraAttributeOnChange($event.value,extraAttr)">
+                                                        [disabled]="isBlockTypeLocked(extraAttr) || extraAttr?.disabled"
+                                                        (onChange)="notLookupExtraAttributeOnChange($event.value, extraAttr)">
                                                     </p-dropdown>
-
                                                 </div>
                                             </div>
 
-
+                                            <!-- Add new lookup value -->
                                             <div *ngIf="isColor && isHost">
                                                 <a class="border rounded text-primary add-new-lookup-btn ml-3"
                                                     *ngIf="extraAttr.isLookup && extraAttr.allowAddNew"
@@ -404,30 +352,42 @@
                                                 </a>
                                             </div>
                                         </div>
+                                    </div>
 
+                                    <!-- Color extra attribute -->
+                                    <div class="flex-grow-1 w-100" *ngIf="extraAttr.dataType?.toLowerCase() === 'color'">
+                                        <label class="d-block mb-2">{{ extraAttr.name | localize }}</label>
+
+                                        <div class="d-flex align-items-center">
+                                            <input type="color" class="section-color-picker mr-3"
+                                                [value]="extraAttr.selectedValues || '#ffffff'"
+                                                [disabled]="extraAttr?.disabled"
+                                                (input)="onExtraAttributeColorChange($event, extraAttr)" />
+
+                                            <input type="text" class="form-control"
+                                                [ngModel]="extraAttr.selectedValues"
+                                                (ngModelChange)="onExtraAttributeColorValueChange($event, extraAttr)"
+                                                [ngModelOptions]="{standalone: true}"
+                                                placeholder="#FFFFFF" maxlength="7"
+                                                [disabled]="extraAttr?.disabled" />
+                                        </div>
                                     </div>
                                 </div>
                             </div>
                         </div>
-
-
-
-
                     </div>
-                    <div class="modal-footer">
+
+                    <div class="modal-footer pt-3">
                         <button [disabled]="saving" type="button" class="btn btn-default btn-gray modal-footer-btn modal-footer-btn--secondary" (click)="close()">{{l("Cancel")}}</button>
-                        <button type="submit" class="btn btn-primary blue  btn-blue btn-save modal-footer-btn modal-footer-btn--primary"
+                        <button type="submit" class="btn btn-primary blue btn-blue btn-save modal-footer-btn modal-footer-btn--primary"
                             [disabled]="!appEntityForm.form.valid || uploader.isUploading" [buttonBusy]="saving"
                             [busyText]="l('SavingWithThreeDot')"> <span>{{l("Save")}}</span></button>
                     </div>
-
                 </div>
             </div>
         </form>
-
     </div>
 </div>
-
 
 <confirm-modal-side *ngIf="displaySaveSideBar" [content1]="'SuccessfullySaved' | localize"
     [content2]="'The '+ entityObjectType.code +' you created is successfully saved You can create another one Or Back to the Lookups list.'"
