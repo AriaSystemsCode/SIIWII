@@ -262,6 +262,8 @@ namespace onetouch.AppItems
         {
             var stopwatch = new System.Diagnostics.Stopwatch();
             stopwatch.Start();
+            var tenantCurrency = await TenantManager.GetTenantCurrency();
+            var currencyCode = string.IsNullOrEmpty(tenantCurrency?.Code) ? "USD" : tenantCurrency.Code;
             #region prepare parameters
             using (UnitOfWorkManager.Current.DisableFilter(AbpDataFilters.MustHaveTenant, AbpDataFilters.MayHaveTenant))
             {
@@ -335,9 +337,6 @@ namespace onetouch.AppItems
                 #endregion
                 var filteredAppItems = _appItemRepository.GetAll().AsNoTracking().Include(z => z.EntityFk).ThenInclude(z => z.EntityCategories).ThenInclude(z => z.EntityObjectCategoryFk)
                     .Include(z => z.EntityFk).ThenInclude(z => z.EntityClassifications).ThenInclude(z => z.EntityObjectClassificationFk)
-                    //P-SII-20240425.0003,1 MMT 05/07/2024 - My Product page - product card margins and product price is 0[Start]
-                    .Include(z => z.ItemPricesFkList.Where(z => z.Code == "MSRP" && z.IsDefault))
-                    //P-SII-20240425.0003,1 MMT 05/07/2024 - My Product page - product card margins and product price is 0[End]
                     .Include(x => x.ItemSizeScaleHeadersFkList)
                     .AsSplitQuery()
                     .Select(x => new
@@ -345,7 +344,20 @@ namespace onetouch.AppItems
                         x.PublishedListingItemFkList,
                         x.TenantId,
                         x.Code,
-                        x.Price,
+                        Price = x.ItemPricesFkList
+                            .Where(price => (price.Code == "MSRP" || price.Code == "RRP") && price.CurrencyCode == currencyCode && price.Price != 0)
+                            .OrderBy(price => price.Code == "MSRP" ? 0 : 1)
+                            .Select(price => (decimal?)price.Price)
+                            .FirstOrDefault() ?? x.ParentFkList
+                                .Select(variation => variation.ItemPricesFkList
+                                    .Where(price => (price.Code == "MSRP" || price.Code == "RRP") && price.CurrencyCode == currencyCode)
+                                    .OrderBy(price => price.Price == 0)
+                                    .ThenBy(price => price.Code == "MSRP" ? 0 : 1)
+                                    .Select(price => (decimal?)price.Price)
+                                    .FirstOrDefault())
+                                .Where(price => price.HasValue && price.Value != 0)
+                                .OrderBy(price => price)
+                                .FirstOrDefault() ?? x.Price,
                         x.Name,
                         x.EntityFk.Notes,
                         x.Id,
@@ -360,10 +372,7 @@ namespace onetouch.AppItems
                         x.TenantOwner,
                         x.SSIN,
                         x.ItemSizeScaleHeadersFkList,
-                        x.ManufacturerCode,
-                        //P-SII-20240425.0003,1 MMT 05/07/2024 - My Product page - product card margins and product price is 0[Start]
-                        x.ItemPricesFkList
-                        //P-SII-20240425.0003,1 MMT 05/07/2024 - My Product page - product card margins and product price is 0[End]
+                        x.ManufacturerCode
 
                     })
                 .WhereIf(input.ArrtibuteFilters != null && input.ArrtibuteFilters.Count() > 0,
@@ -412,8 +421,7 @@ namespace onetouch.AppItems
                                        Code = d.Code,
                                        Name = d.Name,
                                        Description = d.EntityFk.Notes,
-                                       Price = d.ItemPricesFkList.Where(z => z.Code == "MSRP" && z.IsDefault).Select(z => (decimal?)z.Price).FirstOrDefault() ?? d.Price,
-                                       //P-SII-20240425.0003,1 MMT 05/07/2024 - My Product page - product card margins and product price is 0[End]
+                                       Price = d.Price,
                                        Id = d.Id,
 
                                        SSIN = d.SSIN,
@@ -448,8 +456,7 @@ namespace onetouch.AppItems
                                            Code = o.item.Code,
                                            Name = o.item.Name,
                                            Description = o.item.EntityFk.Notes,
-                                           Price = o.item.ItemPricesFkList.Where(z => z.Code == "MSRP" && z.IsDefault).Select(z => (decimal?)z.Price).FirstOrDefault() ?? o.item.Price,
-                                           //P-SII-20240425.0003,1 MMT 05/07/2024 - My Product page - product card margins and product price is 0[End]
+                                           Price = o.item.Price,
                                            Id = o.item.Id,
                                            ManufacturerCode = (o.item.ManufacturerCode == null && (o.item.TenantOwner == AbpSession.TenantId || o.item.TenantOwner == null || o.item.TenantOwner == 0) ? o.item.Code : o.item.ManufacturerCode),
                                            SSIN = o.item.SSIN,
@@ -478,8 +485,7 @@ namespace onetouch.AppItems
                                            Name = d.Name,
                                            Description = d.EntityFk.Notes,
                                            ManufacturerCode = (d.ManufacturerCode == null && (d.TenantOwner == AbpSession.TenantId || d.TenantOwner == 0 || d.TenantOwner == null) ? d.Code : d.ManufacturerCode),
-                                           Price = d.ItemPricesFkList.Where(z => z.Code == "MSRP" && z.IsDefault).Select(z => (decimal?)z.Price).FirstOrDefault() ?? d.Price,
-                                           //P-SII-20240425.0003,1 MMT 05/07/2024 - My Product page - product card margins and product price is 0[End]
+                                           Price = d.Price,
                                            Id = d.Id,
                                            //T-SII-20230618.0001,1 MMT 06/20/2023 Enhance Product browse page[Start]
                                            SSIN = d.SSIN,
@@ -618,8 +624,12 @@ namespace onetouch.AppItems
         {
             using (UnitOfWorkManager.Current.DisableFilter(AbpDataFilters.MustHaveTenant, AbpDataFilters.MayHaveTenant))
             {
+                var isRetailPrice = string.Equals(priceLevel, "MSRP", StringComparison.OrdinalIgnoreCase) ||
+                                    string.Equals(priceLevel, "RRP", StringComparison.OrdinalIgnoreCase);
                 List<AppItemAttributePriceDto> appItemAttributePriceDto = new List<AppItemAttributePriceDto>();
-                var appItems = await _appItemRepository.GetAll().Include(x => x.ItemPricesFkList.Where(s => s.Code == priceLevel && s.CurrencyCode == currencyCode))
+                var appItems = await _appItemRepository.GetAll()
+                    .Include(x => x.ItemPricesFkList.Where(s => s.CurrencyCode == currencyCode &&
+                        (isRetailPrice ? s.Code == "MSRP" || s.Code == "RRP" : s.Code == priceLevel)))
                     .Include(x => x.EntityFk).ThenInclude(x => x.EntityExtraData)
 
                     .Where(x => x.ParentId == appItemId).ToListAsync();
@@ -636,6 +646,10 @@ namespace onetouch.AppItems
                         var extraAttributes = item.EntityFk.EntityExtraData.Where(z => (item.EntityFk.EntityExtraData.Count() > 1 ? z.AttributeId != attributeId : z.AttributeId == attributeId) && z.AttributeValue != null).ToList();
                         if (extraAttributes != null && extraAttributes.Count > 0)
                         {
+                            var price = isRetailPrice
+                                ? GetRetailPrice(item.ItemPricesFkList, currencyCode)
+                                : item.ItemPricesFkList?.FirstOrDefault(x => x.CurrencyCode == currencyCode && x.Code == priceLevel)?.Price;
+
                             foreach (var extr in extraAttributes)
                             {
                                 if (extr.AttributeValue == null || extr.AttributeCode == null)
@@ -646,8 +660,7 @@ namespace onetouch.AppItems
                                     AppItemCode = item.Code,
                                     AttibuteCode = extr.AttributeCode,
                                     AttributeValue = extr.AttributeValue,
-                                    Price = item.ItemPricesFkList != null && item.ItemPricesFkList.Count > 0 &&
-                                          item.ItemPricesFkList.FirstOrDefault(x => x.CurrencyCode == currencyCode & x.Code == priceLevel) != null ? item.ItemPricesFkList.FirstOrDefault(x => x.CurrencyCode == currencyCode & x.Code == priceLevel).Price : 0
+                                    Price = price ?? 0
                                 });
                             }
                         }
@@ -767,24 +780,31 @@ namespace onetouch.AppItems
                     foreach (var item in output.AppItem.EntityAttachments)
                     { item.Url = imagesUrl + (appItem.TenantId.HasValue ? appItem.TenantId.ToString() : "-1") + @"/" + item.FileName; }
 
-                    if (appItem.ItemPricesFkList.Count != 0)
+                    var itemPrice = GetRetailPrice(appItem.ItemPricesFkList, currencyCode);
+                    if (itemPrice.HasValue)
                     {
-                        var msrpObj = appItem.ItemPricesFkList.Where(x => x.Code == "MSRP" & x.CurrencyCode == currencyCode).FirstOrDefault();
-                        if (msrpObj != null)
-                        {
-                            output.AppItem.MaxPrice = msrpObj.Price;  //output.AppItem.Price;
-                            output.AppItem.MinPrice = msrpObj.Price;
-                        }
+                        output.AppItem.MaxPrice = itemPrice.Value;
+                        output.AppItem.MinPrice = itemPrice.Value;
                     }
+                    var hasPrice = itemPrice.HasValue;
                     foreach (var prObj in varAppItems)
                     {
                         if (prObj.ItemPricesFkList.Count > 0)
                         {
-                            var itemPrice = prObj.ItemPricesFkList.Where(x => x.Code.ToUpper() == "MSRP" & x.CurrencyCode == currencyCode).Select(x => x.Price).FirstOrDefault();
-                            if (itemPrice != 0)
+                            var variationPrice = GetRetailPrice(prObj.ItemPricesFkList, currencyCode);
+                            if (variationPrice.HasValue && variationPrice.Value != 0)
                             {
-                                output.AppItem.MaxPrice = output.AppItem.MaxPrice > itemPrice ? output.AppItem.MaxPrice : itemPrice;
-                                output.AppItem.MinPrice = output.AppItem.MinPrice > itemPrice ? itemPrice : output.AppItem.MinPrice;
+                                if (!hasPrice)
+                                {
+                                    output.AppItem.MaxPrice = variationPrice.Value;
+                                    output.AppItem.MinPrice = variationPrice.Value;
+                                    hasPrice = true;
+                                }
+                                else
+                                {
+                                    output.AppItem.MaxPrice = output.AppItem.MaxPrice > variationPrice.Value ? output.AppItem.MaxPrice : variationPrice.Value;
+                                    output.AppItem.MinPrice = output.AppItem.MinPrice > variationPrice.Value ? variationPrice.Value : output.AppItem.MinPrice;
+                                }
                             }
                         }
                     }
@@ -1239,6 +1259,18 @@ namespace onetouch.AppItems
                 var elapsed_time = stopwatch.ElapsedMilliseconds;
                 return output;
             }
+        }
+
+        private static decimal? GetRetailPrice(IEnumerable<AppItemPrices> prices, string currencyCode)
+        {
+            return prices?
+                .Where(x => (string.Equals(x.Code, "MSRP", StringComparison.OrdinalIgnoreCase) ||
+                             string.Equals(x.Code, "RRP", StringComparison.OrdinalIgnoreCase)) &&
+                            x.CurrencyCode == currencyCode)
+                .OrderBy(x => x.Price == 0)
+                .ThenBy(x => string.Equals(x.Code, "MSRP", StringComparison.OrdinalIgnoreCase) ? 0 : 1)
+                .Select(x => (decimal?)x.Price)
+                .FirstOrDefault();
         }
 
         #region get class/category/depts by page objects/names

@@ -92,13 +92,18 @@ export class PricingHelpersService extends AppComponentBase {
     } as IAppItemPriceInfo) 
   }
   getPricingIndex(prices:AppItemPriceInfo[], level:string, currencyId?:number){
-        //return prices.findIndex(item=>item.code == level &&  (currencyId ? currencyId == item.currencyId : true) )
-    return prices.findIndex(item =>
-      (level == "RRP"
-        ? item.code == "RRP" || item.code == "MSRP"
-        : item.code == level) &&
-      (currencyId ? item.currencyId == currencyId : true)
+    const isRetailPrice = level === 'RRP' || level === 'MSRP';
+    const matches = prices.map((price, index) => ({ price, index })).filter(item =>
+      (isRetailPrice ? item.price.code === 'RRP' || item.price.code === 'MSRP' : item.price.code === level) &&
+      (currencyId ? item.price.currencyId == currencyId : true)
     );
+    if (isRetailPrice) {
+      matches.sort((first, second) =>
+        Number(first.price.price === 0) - Number(second.price.price === 0) ||
+        Number(second.price.code === 'MSRP') - Number(first.price.code === 'MSRP')
+      );
+    }
+    return matches[0]?.index ?? -1;
   }
   getDefaultPricingIndex(prices:AppItemPriceInfo[]){
    return this.getPricingIndex(prices,this.defaultLevel , this.tenantDefaultCurrency.value);
