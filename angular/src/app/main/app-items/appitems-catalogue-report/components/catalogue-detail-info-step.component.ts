@@ -27,7 +27,6 @@ export class CatalogueDetailInfoStepComponent extends AppComponentBase implement
   lineSheetColorPageSort: SelectItem[] = [];
   lineSheetColorPageSortLookup: LookupLabelDto[] = [];
   attachmentBaseUrl: string = AppConsts.attachmentBaseUrl;
-  localattachmentBaseUrl: string = "http://localhost" ;
   colorPageSort;
   detailPageSort;
   linesheetName;
@@ -136,18 +135,17 @@ export class CatalogueDetailInfoStepComponent extends AppComponentBase implement
   }
 
   onChangeBackground($event) {
-    let indx = this.backgroundsItems.findIndex(x => x.code == this.bKGround);
-    if (indx >= 0) {
-      this.bgImgSrc = this.attachmentBaseUrl + "/" + this.backgroundsItems[indx].attachmentName;
-    }
-    else {
+    const background = this.backgroundsItems?.find(x => x.code == this.bKGround);
+    if (!background) {
       this.bgImgSrc = '';
       this.setBgImageSrc();
+      this.printInfoParam.BKGround = '';
+      return;
     }
 
-    //this.printInfoParam.BKGround = this.attachmentBaseUrl + "/" + this.backgroundsItems[indx].attachmentName;
-    this.printInfoParam.BKGround = this.localattachmentBaseUrl + "/" + this.backgroundsItems[indx].attachmentName;
-    console.log(this.printInfoParam.BKGround) 
+    const imageUrl = this.attachmentBaseUrl + "/" + background.attachmentName;
+    this.bgImgSrc = imageUrl;
+    this.printInfoParam.BKGround = imageUrl;
   }
 
   setLinesheetName($event){
