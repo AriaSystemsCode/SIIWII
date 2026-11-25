@@ -26,12 +26,19 @@ namespace onetouch.AppDashboards.Dtos
         public virtual bool IsTheOwner { set; get; }
         public virtual string OwnerUserImg { set; get; }
         public virtual int SharingLevel { get; set; }
+        public virtual bool IsDefault { set; get; }
+        public virtual bool IsFavorite { get; set; }
     }
     public class GetAllDashboardsInput : PagedAndSortedResultRequestDto
     {
         public string Filter { get; set; }
         public DashboardFilterType SharingLevel { get; set; } = 0;
         public string? TimeZoneValue { get; set; }
+    }
+    public class GetAllFavoriteDashboardsOutputDto
+    { 
+        public string Title { get; set; }
+        public long Id { get; set; }
     }
     public enum DashboardFilterType
     {

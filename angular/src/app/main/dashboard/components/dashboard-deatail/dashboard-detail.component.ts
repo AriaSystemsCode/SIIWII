@@ -1,5 +1,5 @@
 import { ChangeDetectorRef, Component, ElementRef, HostListener, Injector, OnDestroy, OnInit, ViewChild } from '@angular/core';
-import { ActivatedRoute } from '@angular/router';
+import { ActivatedRoute, Router } from '@angular/router';
 import { MessageService } from 'primeng/api';
 import { SpreadsheetComponent } from '@syncfusion/ej2-angular-spreadsheet';
 import jsPDF from 'jspdf';
@@ -14,13 +14,12 @@ import { getWorkbookRoot } from '../../models/spreadsheet.utils';
 
 import { firstValueFrom } from 'rxjs';
 import * as moment from 'moment';
+import { Subscription } from 'rxjs';
+import { distinctUntilChanged, map } from 'rxjs/operators';
 
-import {
-    Chart,
-    AccumulationChart
-} from '@syncfusion/ej2-charts';
 import { HttpClient } from '@angular/common/http';
 import { L10n, setCulture } from '@syncfusion/ej2-base';
+
 interface ChartExportItem {
     svg: SVGSVGElement;
     w: number;
@@ -71,180 +70,257 @@ export class DashboardDetailComponent extends AppComponentBase implements OnInit
     drilldownTitle = '';
     drilldownRecords: any[] = [];
 
-    isArLang:boolean=false
-currentLang:string=''
+    isArLang: boolean = false;
+    currentLang: string = '';
 
-syncfusionLocale = 'en';
-syncfusionRtl = false;
-syncfusionLocaleReady = false;
-dashboardNotFound = false;
+    syncfusionLocale = 'en';
+    syncfusionRtl = false;
+    syncfusionLocaleReady = false;
+    dashboardNotFound = false;
+
+    dashboardList: any[] = [];
+
+    private routeSubscription?: Subscription;
+    private dashboardLoadSubscription?: Subscription;
+    private dashboardLoadVersion = 0;
+    private togglingFavourite = false;
+
     constructor(
         injector: Injector,
         private route: ActivatedRoute,
         private appDashboardService: AppDashboardServiceProxy,
         private refreshService: SpreadsheetRefreshService,
         private drilldown: DrilldownService,
-            private http: HttpClient,
+        private http: HttpClient,
+        private router: Router,
         private cdr: ChangeDetectorRef
     ) {
         super(injector);
     }
 
-   async ngOnInit(): Promise<void> {
-       this.currentLang = abp.utils.getCookieValue('Abp.Localization.CultureName')
-        this.currentLang == 'ar' || this.currentLang == 'ar-EG'  ? this.isArLang = true : this.isArLang = false
-    const routeId = Number(
-        this.route.snapshot.paramMap.get('id')
-    );
+    async ngOnInit(): Promise<void> {
 
-    if (routeId > 0) {
-        this.dashboardId = routeId;
+        this.currentLang =
+            abp.utils.getCookieValue('Abp.Localization.CultureName');
+
+        this.isArLang =
+            this.currentLang === 'ar' ||
+            this.currentLang === 'ar-EG';
+
+        await this.initializeSyncfusionLocale();
+
+        this.loadDashboardList();
+
+        this.routeSubscription = this.route.paramMap
+            .pipe(
+                map(params => Number(params.get('id'))),
+                distinctUntilChanged()
+            )
+            .subscribe(id => {
+
+                if (!id || id <= 0) {
+                    return;
+                }
+
+                this.dashboardId = id;
+
+                this.loadDashboard();
+            });
     }
 
-    await this.initializeSyncfusionLocale();
-
-    this.loadDashboard();
-}
-
     ngOnDestroy(): void {
+
+        this.dashboardLoadVersion++;
+
+        this.routeSubscription?.unsubscribe();
+        this.dashboardLoadSubscription?.unsubscribe();
+
         this.dashboardSheets = [];
+
         clearTimeout(this.resizeTimer);
-        this.layoutTimers.forEach(t => clearTimeout(t));
+
+        this.layoutTimers.forEach(timer => clearTimeout(timer));
+        this.layoutTimers = [];
     }
 
     private async initializeSyncfusionLocale(): Promise<void> {
 
-    this.syncfusionLocaleReady = false;
+        this.syncfusionLocaleReady = false;
 
-    const language =
-        abp.utils.getCookieValue('Abp.Localization.CultureName') ||
-        abp.localization.currentLanguage?.name ||
-        'en';
+        const language =
+            abp.utils.getCookieValue('Abp.Localization.CultureName') ||
+            abp.localization.currentLanguage?.name ||
+            'en';
 
-    const isArabic = language.toLowerCase().startsWith('ar');
+        const isArabic = language.toLowerCase().startsWith('ar');
 
-    this.currentLang = language;
-    this.isArLang = isArabic;
-    this.syncfusionRtl = isArabic;
+        this.currentLang = language;
+        this.isArLang = isArabic;
+        this.syncfusionRtl = isArabic;
 
-    if (isArabic) {
-        try {
+        if (isArabic) {
+            try {
 
-            const translations = await firstValueFrom(
-                this.http.get<any>('assets/syncfusion/ar.json')
-            );
+                const translations = await firstValueFrom(
+                    this.http.get<any>('assets/syncfusion/ar.json')
+                );
 
-            L10n.load(
-                translations.ar
-                    ? translations
-                    : { ar: translations }
-            );
+                L10n.load(
+                    translations.ar
+                        ? translations
+                        : { ar: translations }
+                );
 
-            setCulture('ar');
-            this.syncfusionLocale = 'ar';
+                setCulture('ar');
+                this.syncfusionLocale = 'ar';
 
-            console.log('[Dashboard] Syncfusion Arabic loaded');
+                console.log('[Dashboard] Syncfusion Arabic loaded');
 
-        } catch (error) {
+            } catch (error) {
 
-            console.error(
-                '[Dashboard] Failed to load Arabic localization:',
-                error
-            );
-
-            setCulture('en');
-
-            this.syncfusionLocale = 'en';
-            this.syncfusionRtl = false;
-        }
-
-    } else {
-
-        setCulture('en');
-        this.syncfusionLocale = 'en';
-
-    }
-
-    this.syncfusionLocaleReady = true;
-    this.cdr.detectChanges();
-}
-
-   loadDashboard(): void {
-    this.loading = true;
-    this.showMainSpinner();
-
-    this.dashboardNotFound = false;
-    this.dashboardWorkbookReady = false;
-    this.dashboardLoadError = '';
-    this.dashboardSheets = [];
-    this.dashboard = null;
-    this.saved = null;
-
-    this.appDashboardService
-        .getDashboardForView(this.dashboardId)
-        .subscribe({
-            next: (result: any) => {
-                try {
-                    const dashboard = result?.dashboard ?? result;
-
-                    // Dashboard does not exist
-                    if (!dashboard || Number(dashboard.id) === 0) {
-                        this.dashboardNotFound = true;
-                        this.dashboardWorkbookReady = false;
-                        this.dashboardSheets = [];
-                        return;
-                    }
-
-                    // Valid dashboard
-                    this.dashboard = dashboard;
-
-                    this.saved = this.parseSaved(
-                        this.dashboard?.spreadsheet
-                    );
-
-                    this.showWorkbook(this.saved);
-
-                } catch (error) {
-                    console.error(
-                        '[Dashboard] Load failed:',
-                        error
-                    );
-
-                    this.dashboardLoadError =
-                        error instanceof Error
-                            ? error.message
-                            : this.l('UnableToLoadDashboard');
-
-                    this.dashboardWorkbookReady = false;
-                    this.dashboardSheets = [];
-
-                } finally {
-                    this.loading = false;
-                    this.hideMainSpinner();
-                    this.cdr.detectChanges();
-                }
-            },
-
-            error: (error: any) => {
                 console.error(
-                    '[Dashboard] Dashboard API failed:',
+                    '[Dashboard] Failed to load Arabic localization:',
                     error
                 );
 
-                if (error?.status === 404) {
-                    this.dashboardNotFound = true;
-                } else {
-                    this.dashboardLoadError =
-                        this.l('UnableToLoadDashboard');
-                }
+                setCulture('en');
 
-                this.dashboardWorkbookReady = false;
-                this.loading = false;
-                this.hideMainSpinner();
-                this.cdr.detectChanges();
+                this.syncfusionLocale = 'en';
+                this.syncfusionRtl = false;
             }
-        });
-}
+
+        } else {
+
+            setCulture('en');
+            this.syncfusionLocale = 'en';
+
+        }
+
+        this.syncfusionLocaleReady = true;
+        this.cdr.detectChanges();
+    }
+
+    async loadDashboard(): Promise<void> {
+
+        const selectedId = this.dashboardId;
+        const version = ++this.dashboardLoadVersion;
+
+        this.dashboardLoadSubscription?.unsubscribe();
+
+        this.layoutTimers.forEach(timer => clearTimeout(timer));
+        this.layoutTimers = [];
+
+        clearTimeout(this.resizeTimer);
+
+        this.loading = true;
+        this.dashboardNotFound = false;
+        this.dashboardLoadError = '';
+        this.dashboardWorkbookReady = false;
+        this.dashboardHasCharts = false;
+
+        this.dashboardSheets = [];
+        this.dashboardActiveSheetIndex = 0;
+
+        this.dashboard = null;
+        this.saved = null;
+
+        this.drilldownVisible = false;
+        this.drilldownRecords = [];
+
+        this.showMainSpinner();
+
+        // Destroy previous Syncfusion Spreadsheet
+        this.cdr.detectChanges();
+
+        await new Promise<void>(resolve => setTimeout(resolve, 0));
+
+        if (version !== this.dashboardLoadVersion) {
+            return;
+        }
+
+        this.dashboardLoadSubscription = this.appDashboardService
+            .getDashboardForView(selectedId)
+            .subscribe({
+
+                next: (result: any) => {
+
+                    if (version !== this.dashboardLoadVersion) {
+                        return;
+                    }
+
+                    try {
+
+                        const dashboard = result?.dashboard ?? result;
+
+                        console.log('[Dashboard] Selected ID:', selectedId);
+                        console.log('[Dashboard] API response:', result);
+                        console.log('[Dashboard] Spreadsheet:', dashboard?.spreadsheet);
+
+                        // Catches undefined, null, empty DTO ({}), NaN and 0.
+                        if (!dashboard || !Number(dashboard.id)) {
+                            this.dashboardNotFound = true;
+                            return;
+                        }
+
+                        // Keep the title even if the workbook is missing.
+                        this.dashboard = dashboard;
+
+                        // Dashboard exists but has no saved spreadsheet yet.
+                        if (!dashboard.spreadsheet) {
+                            this.dashboardLoadError = this.l('DashboardHasNoContent');
+                            this.dashboardWorkbookReady = false;
+                            this.dashboardSheets = [];
+                            return;
+                        }
+
+                        const saved = this.parseSaved(dashboard.spreadsheet);
+
+                        this.saved = saved;
+
+                        this.showWorkbook(saved);
+
+                    } catch (error) {
+
+                        console.error('[Dashboard] Load failed:', error);
+
+                        this.dashboardLoadError = this.l('UnableToLoadDashboard');
+
+                        this.dashboardWorkbookReady = false;
+                        this.dashboardSheets = [];
+
+                    } finally {
+
+                        if (version === this.dashboardLoadVersion) {
+                            this.loading = false;
+                            this.hideMainSpinner();
+                            this.cdr.detectChanges();
+                        }
+                    }
+                },
+
+                error: error => {
+
+                    if (version !== this.dashboardLoadVersion) {
+                        return;
+                    }
+
+                    console.error('[Dashboard] API failed:', error);
+
+                    if (error?.status === 404) {
+                        this.dashboardNotFound = true;
+                    } else {
+                        this.dashboardLoadError =
+                            this.l('UnableToLoadDashboard');
+                    }
+
+                    this.dashboardWorkbookReady = false;
+                    this.loading = false;
+
+                    this.hideMainSpinner();
+                    this.cdr.detectChanges();
+                }
+            });
+    }
 
     private parseSaved(raw: any): SpreadsheetPayload {
         const saved = typeof raw === 'string' ? JSON.parse(raw) : raw;
@@ -418,7 +494,6 @@ dashboardNotFound = false;
     private updateRefreshInfo(state: SpreadsheetPayload): void {
         const user = this.appSession.user;
 
-
         const fullName = [
             user?.name,
             user?.surname
@@ -429,6 +504,7 @@ dashboardNotFound = false;
         state.lastRefreshDate = now;
         state.refreshedBy = `${fullName}`;
     }
+
     async refreshDashboard(): Promise<void> {
         if (this.refreshing || this.loading || !this.saved) {
             return;
@@ -491,15 +567,14 @@ dashboardNotFound = false;
             this.scheduleMobileLayout();
 
             this.notify.success(
-                  this.l('DashboardRefreshedSuccessfully')
+                this.l('DashboardRefreshedSuccessfully')
             );
-
 
         } catch (error) {
             console.error('[Dashboard] Refresh or save failed:', error);
-          this.notify.error(
-    this.l('DashboardRefreshFailed')
-);
+            this.notify.error(
+                this.l('DashboardRefreshFailed')
+            );
         } finally {
             this.refreshing = false;
             this.cdr.detectChanges();
@@ -509,7 +584,6 @@ dashboardNotFound = false;
     // =====================================================
     // DRILLDOWN
     // =====================================================
-
 
     onDashboardChartClick(event: MouseEvent): void {
         const result = this.drilldown.fromClick(event, {
@@ -524,9 +598,9 @@ dashboardNotFound = false;
         }
 
         if (!result.records.length) {
-         this.notify.warn(
-    this.l('NoMatchingSourceRecords')
-);
+            this.notify.warn(
+                this.l('NoMatchingSourceRecords')
+            );
             return;
         }
 
@@ -565,29 +639,277 @@ dashboardNotFound = false;
         return `${name}.pdf`;
     }
 
+    async exportDashboardPdf(): Promise<void> {
 
-  
-async exportDashboardPdf(): Promise<void> {
+        if (
+            this.exportingPdf ||
+            this.refreshing ||
+            this.loading ||
+            !this.dashboardWorkbookReady ||
+            !this.saved
+        ) {
+            return;
+        }
 
-    if (
-        this.exportingPdf ||
-        this.refreshing ||
-        this.loading ||
-        !this.dashboardWorkbookReady ||
-        !this.saved
-    ) {
-        return;
+        this.exportingPdf = true;
+
+        this.layoutTimers.forEach(timer => clearTimeout(timer));
+        this.layoutTimers = [];
+        clearTimeout(this.resizeTimer);
+
+        this.cdr.detectChanges();
+
+        try {
+            const sheets: any[] =
+                getWorkbookRoot(this.saved.workbookJson)?.sheets ?? [];
+
+            const index = this.findDashboardIndex(sheets);
+
+            if (index < 0) {
+                throw new Error('Dashboard sheet not found.');
+            }
+
+            const expectedCharts = this.collectCharts(sheets[index]).length;
+
+            const pdf = new jsPDF({
+                orientation: 'landscape',
+                unit: 'mm',
+                format: 'a4'
+            });
+
+            if (expectedCharts > 0) {
+                await this.addChartsToPdf(pdf, expectedCharts);
+            } else {
+                this.addDataTableToPdf(pdf, sheets[index]);
+            }
+
+            pdf.save(this.pdfFileName);
+
+        } catch (error) {
+            console.error('[Dashboard PDF] Export failed:', error);
+
+            this.notify.error(
+                this.l('DashboardPdfExportFailed')
+            );
+
+        } finally {
+            this.exportingPdf = false;
+            this.cdr.detectChanges();
+
+            // Restore responsive chart positioning after export.
+            this.scheduleMobileLayout();
+        }
     }
 
-    this.exportingPdf = true;
+    // ---------- charts ----------
 
-    this.layoutTimers.forEach(timer => clearTimeout(timer));
-    this.layoutTimers = [];
-    clearTimeout(this.resizeTimer);
+    private svgToPng(
+        svg: SVGSVGElement,
+        width: number,
+        height: number,
+        scale = 2
+    ): Promise<string> {
 
-    this.cdr.detectChanges();
+        return new Promise((resolve, reject) => {
+            const copy = svg.cloneNode(true) as SVGSVGElement;
 
-    try {
+            copy.setAttribute('xmlns', 'http://www.w3.org/2000/svg');
+            copy.setAttribute('width', String(width));
+            copy.setAttribute('height', String(height));
+
+            if (!copy.getAttribute('viewBox')) {
+                copy.setAttribute('viewBox', `0 0 ${width} ${height}`);
+            }
+
+            const xml = new XMLSerializer().serializeToString(copy);
+
+            const blob = new Blob([xml], {
+                type: 'image/svg+xml;charset=utf-8'
+            });
+
+            const url = URL.createObjectURL(blob);
+            const img = new Image();
+
+            img.onload = () => {
+                try {
+                    const canvas = document.createElement('canvas');
+
+                    canvas.width = Math.ceil(width * scale);
+                    canvas.height = Math.ceil(height * scale);
+
+                    const ctx = canvas.getContext('2d');
+
+                    if (!ctx) {
+                        throw new Error('Canvas context unavailable');
+                    }
+
+                    ctx.fillStyle = '#ffffff';
+                    ctx.fillRect(0, 0, canvas.width, canvas.height);
+
+                    ctx.scale(scale, scale);
+                    ctx.drawImage(img, 0, 0, width, height);
+
+                    resolve(canvas.toDataURL('image/png'));
+                } catch (error) {
+                    reject(error);
+                } finally {
+                    URL.revokeObjectURL(url);
+                }
+            };
+
+            img.onerror = () => {
+                URL.revokeObjectURL(url);
+                reject(new Error('Failed to convert chart SVG'));
+            };
+
+            img.src = url;
+        });
+    }
+
+    /** Reads every rendered chart currently in the dashboard (current on-screen position and size). */
+    private collectChartItems(): ChartExportItem[] {
+        const host = this.dashboardExportArea?.nativeElement;
+
+        if (!host) {
+            return [];
+        }
+
+        const overlays = Array.from(
+            host.querySelectorAll('.e-ss-overlay')
+        ) as HTMLElement[];
+
+        const items: ChartExportItem[] = [];
+
+        overlays.forEach((overlay) => {
+
+            // Supports normal charts and accumulation charts (Pie/Doughnut).
+            const chartEl = overlay.querySelector(
+                '.e-chart, .e-accumulationchart, .e-donut'
+            ) as HTMLElement | null;
+
+            if (!chartEl) {
+                return;
+            }
+
+            // Get the main chart SVG, avoiding nested decorative SVGs.
+            const svg = (
+                chartEl.querySelector('svg[id$="_svg"]') ||
+                chartEl.querySelector('svg')
+            ) as SVGSVGElement | null;
+
+            if (!svg) {
+                return;
+            }
+
+            const rect = svg.getBoundingClientRect();
+
+            const width = Math.round(rect.width);
+            const height = Math.round(rect.height);
+
+            if (width <= 0 || height <= 0) {
+                return;
+            }
+
+            // Check for actual chart drawing elements.
+            const hasContent = !!svg.querySelector(
+                'path, rect, circle, ellipse, polygon, polyline, text'
+            );
+
+            if (!hasContent) {
+                return;
+            }
+
+            // Chart position within the Dashboard sheet.
+            const left = parseFloat(overlay.style.left) || 0;
+            const top = parseFloat(overlay.style.top) || 0;
+
+            items.push({
+                svg,
+                w: width,
+                h: height,
+                left,
+                top
+            });
+        });
+
+        // Preserve chart layout order.
+        return items.sort(
+            (a, b) =>
+                (a.top - b.top) ||
+                (a.left - b.left)
+        );
+    }
+
+    /**
+     * Waits until all charts exist and have stopped changing
+     * (animations finished, no re-render in progress).
+     */
+    private async waitForChartsReady(
+        expected: number,
+        timeoutMs = 15000
+    ): Promise<ChartExportItem[]> {
+
+        const started = Date.now();
+        let previousSignature = '';
+        let stableCount = 0;
+
+        while (Date.now() - started < timeoutMs) {
+
+            const items = this.collectChartItems();
+
+            if (items.length === expected) {
+
+                const signature = items.map(item => {
+                    const svg = item.svg;
+
+                    return [
+                        item.w,
+                        item.h,
+                        item.left,
+                        item.top,
+                        new XMLSerializer().serializeToString(svg)
+                    ].join(':');
+                }).join('|');
+
+                if (signature === previousSignature) {
+                    stableCount++;
+                } else {
+                    stableCount = 0;
+                }
+
+                if (stableCount >= 3) {
+                    return items;
+                }
+
+                previousSignature = signature;
+
+            } else {
+                stableCount = 0;
+                previousSignature = '';
+            }
+
+            await new Promise<void>(
+                resolve => setTimeout(resolve, 300)
+            );
+        }
+
+        const actual = this.collectChartItems().length;
+
+        throw new Error(
+            `Dashboard charts not ready. Expected ${expected}, found ${actual}.`
+        );
+    }
+
+    private async addChartsToPdf(
+        pdf: jsPDF,
+        expectedCharts = 0
+    ): Promise<void> {
+        const host = this.dashboardExportArea?.nativeElement;
+
+        if (!host || !this.saved) {
+            throw new Error('Dashboard not ready.');
+        }
+
         const sheets: any[] =
             getWorkbookRoot(this.saved.workbookJson)?.sheets ?? [];
 
@@ -597,342 +919,84 @@ async exportDashboardPdf(): Promise<void> {
             throw new Error('Dashboard sheet not found.');
         }
 
-        const expectedCharts = this.collectCharts(sheets[index]).length;
+        const sheet = sheets[index];
+        const items = await this.waitForChartsReady(expectedCharts);
 
-        const pdf = new jsPDF({
-            orientation: 'landscape',
-            unit: 'mm',
-            format: 'a4'
-        });
+        const chartImages: string[] = [];
 
-        if (expectedCharts > 0) {
-            await this.addChartsToPdf(pdf, expectedCharts);
-        } else {
-            this.addDataTableToPdf(pdf, sheets[index]);
+        for (let i = 0; i < items.length; i++) {
+            const item = items[i];
+
+            const png = await this.svgToPng(
+                item.svg,
+                item.w,
+                item.h
+            );
+
+            chartImages.push(png);
         }
 
-        pdf.save(this.pdfFileName);
+        if (chartImages.length !== expectedCharts) {
+            throw new Error(
+                `PDF export incomplete: ${chartImages.length}/${expectedCharts} charts.`
+            );
+        }
 
-    } catch (error) {
-        console.error('[Dashboard PDF] Export failed:', error);
+        const margin = 8;
+        const pageW = pdf.internal.pageSize.getWidth() - margin * 2;
+        const pageH = pdf.internal.pageSize.getHeight() - margin * 2;
 
-        this.notify.error(
-            this.l('DashboardPdfExportFailed')
+        const layoutW = Math.max(
+            ...items.map(i => i.left + i.w)
         );
 
-    } finally {
-        this.exportingPdf = false;
-        this.cdr.detectChanges();
+        const maxH = Math.max(...items.map(i => i.h));
 
-        // Restore responsive chart positioning after export.
-        this.scheduleMobileLayout();
-    }
-}
-
-    // ---------- charts ----------
-
-private svgToPng(
-    svg: SVGSVGElement,
-    width: number,
-    height: number,
-    scale = 2
-): Promise<string> {
-
-    return new Promise((resolve, reject) => {
-        const copy = svg.cloneNode(true) as SVGSVGElement;
-
-        copy.setAttribute('xmlns', 'http://www.w3.org/2000/svg');
-        copy.setAttribute('width', String(width));
-        copy.setAttribute('height', String(height));
-
-        if (!copy.getAttribute('viewBox')) {
-            copy.setAttribute('viewBox', `0 0 ${width} ${height}`);
-        }
-
-        const xml = new XMLSerializer().serializeToString(copy);
-
-        const blob = new Blob([xml], {
-            type: 'image/svg+xml;charset=utf-8'
-        });
-
-        const url = URL.createObjectURL(blob);
-        const img = new Image();
-
-        img.onload = () => {
-            try {
-                const canvas = document.createElement('canvas');
-
-                canvas.width = Math.ceil(width * scale);
-                canvas.height = Math.ceil(height * scale);
-
-                const ctx = canvas.getContext('2d');
-
-                if (!ctx) {
-                    throw new Error('Canvas context unavailable');
-                }
-
-                ctx.fillStyle = '#ffffff';
-                ctx.fillRect(0, 0, canvas.width, canvas.height);
-
-                ctx.scale(scale, scale);
-                ctx.drawImage(img, 0, 0, width, height);
-
-                resolve(canvas.toDataURL('image/png'));
-            } catch (error) {
-                reject(error);
-            } finally {
-                URL.revokeObjectURL(url);
-            }
-        };
-
-        img.onerror = () => {
-            URL.revokeObjectURL(url);
-            reject(new Error('Failed to convert chart SVG'));
-        };
-
-        img.src = url;
-    });
-}
-
-
-    /** Reads every rendered chart currently in the dashboard (current on-screen position and size). */
- 
-private collectChartItems(): ChartExportItem[] {
-    const host = this.dashboardExportArea?.nativeElement;
-
-    if (!host) {
-        return [];
-    }
-
-    const overlays = Array.from(
-        host.querySelectorAll('.e-ss-overlay')
-    ) as HTMLElement[];
-
-    const items: ChartExportItem[] = [];
-
-    overlays.forEach((overlay) => {
-
-        // Supports normal charts and accumulation charts (Pie/Doughnut).
-        const chartEl = overlay.querySelector(
-            '.e-chart, .e-accumulationchart, .e-donut'
-        ) as HTMLElement | null;
-
-        if (!chartEl) {
-            return;
-        }
-
-        // Get the main chart SVG, avoiding nested decorative SVGs.
-        const svg = (
-            chartEl.querySelector('svg[id$="_svg"]') ||
-            chartEl.querySelector('svg')
-        ) as SVGSVGElement | null;
-
-        if (!svg) {
-            return;
-        }
-
-        const rect = svg.getBoundingClientRect();
-
-        const width = Math.round(rect.width);
-        const height = Math.round(rect.height);
-
-        if (width <= 0 || height <= 0) {
-            return;
-        }
-
-        // Check for actual chart drawing elements.
-        const hasContent = !!svg.querySelector(
-            'path, rect, circle, ellipse, polygon, polyline, text'
+        const k = Math.min(
+            pageW / layoutW,
+            0.35,
+            pageH / maxH
         );
 
-        if (!hasContent) {
-            return;
-        }
+        let pageStartY = 0;
 
-        // Chart position within the Dashboard sheet.
-        const left = parseFloat(overlay.style.left) || 0;
-        const top = parseFloat(overlay.style.top) || 0;
-
-        items.push({
-            svg,
-            w: width,
-            h: height,
-            left,
-            top
-        });
-    });
-
-    // Preserve chart layout order.
-    return items.sort(
-        (a, b) =>
-            (a.top - b.top) ||
-            (a.left - b.left)
-    );
-}
-
-    /**
-     * Waits until all charts exist and have stopped changing
-     * (animations finished, no re-render in progress).
-     */
-
-private async waitForChartsReady(
-    expected: number,
-    timeoutMs = 15000
-): Promise<ChartExportItem[]> {
-
-    const started = Date.now();
-    let previousSignature = '';
-    let stableCount = 0;
-
-    while (Date.now() - started < timeoutMs) {
-
-        const items = this.collectChartItems();
-
-        if (items.length === expected) {
-
-            const signature = items.map(item => {
-                const svg = item.svg;
-
-                return [
-                    item.w,
-                    item.h,
-                    item.left,
-                    item.top,
-                    new XMLSerializer().serializeToString(svg)
-                ].join(':');
-            }).join('|');
-
-            if (signature === previousSignature) {
-                stableCount++;
-            } else {
-                stableCount = 0;
-            }
-
-            if (stableCount >= 3) {
-                return items;
-            }
-
-            previousSignature = signature;
-
-        } else {
-            stableCount = 0;
-            previousSignature = '';
-        }
-
-        await new Promise<void>(
-            resolve => setTimeout(resolve, 300)
-        );
-    }
-
-    const actual = this.collectChartItems().length;
-
-    throw new Error(
-        `Dashboard charts not ready. Expected ${expected}, found ${actual}.`
-    );
-}
-
-
-   private async addChartsToPdf(
-    pdf: jsPDF,
-    expectedCharts = 0
-): Promise<void> {
-    const host = this.dashboardExportArea?.nativeElement;
-
-    if (!host || !this.saved) {
-        throw new Error('Dashboard not ready.');
-    }
-
-    const sheets: any[] =
-        getWorkbookRoot(this.saved.workbookJson)?.sheets ?? [];
-
-    const index = this.findDashboardIndex(sheets);
-
-    if (index < 0) {
-        throw new Error('Dashboard sheet not found.');
-    }
-
-    const sheet = sheets[index];
-    const items = await this.waitForChartsReady(expectedCharts);
-
-
-const chartImages: string[] = [];
-
-for (let i = 0; i < items.length; i++) {
-    const item = items[i];
-
-    const png = await this.svgToPng(
-        item.svg,
-        item.w,
-        item.h
-    );
-
-    chartImages.push(png);
-}
-
-if (chartImages.length !== expectedCharts) {
-    throw new Error(
-        `PDF export incomplete: ${chartImages.length}/${expectedCharts} charts.`
-    );
-}
-
-
-    const margin = 8;
-    const pageW = pdf.internal.pageSize.getWidth() - margin * 2;
-    const pageH = pdf.internal.pageSize.getHeight() - margin * 2;
-
-    const layoutW = Math.max(
-        ...items.map(i => i.left + i.w)
-    );
-
-    const maxH = Math.max(...items.map(i => i.h));
-
-    const k = Math.min(
-        pageW / layoutW,
-        0.35,
-        pageH / maxH
-    );
-
-    let pageStartY = 0;
-
-    // Draw the first page background.
-    this.drawDashboardBackground(
-        pdf, sheet, k, pageStartY,
-        margin, pageW, pageH
-    );
-
-    
-for (let i = 0; i < items.length; i++) {
-    const item = items[i];
-
-    const w = item.w * k;
-    const h = item.h * k;
-    const x = margin + item.left * k;
-
-    let y = item.top * k - pageStartY;
-
-    if (y + h > pageH) {
-        pdf.addPage();
-
-        pageStartY = item.top * k;
-        y = 0;
-
+        // Draw the first page background.
         this.drawDashboardBackground(
             pdf, sheet, k, pageStartY,
             margin, pageW, pageH
         );
+
+        for (let i = 0; i < items.length; i++) {
+            const item = items[i];
+
+            const w = item.w * k;
+            const h = item.h * k;
+            const x = margin + item.left * k;
+
+            let y = item.top * k - pageStartY;
+
+            if (y + h > pageH) {
+                pdf.addPage();
+
+                pageStartY = item.top * k;
+                y = 0;
+
+                this.drawDashboardBackground(
+                    pdf, sheet, k, pageStartY,
+                    margin, pageW, pageH
+                );
+            }
+
+            pdf.addImage(
+                chartImages[i],
+                'PNG',
+                x,
+                margin + y,
+                w,
+                h
+            );
+        }
     }
-
-    pdf.addImage(
-        chartImages[i],
-        'PNG',
-        x,
-        margin + y,
-        w,
-        h
-    );
-}
-
-}
 
     // ---------- data table (no charts) ----------
 
@@ -1125,147 +1189,224 @@ for (let i = 0; i < items.length; i++) {
         });
     }
 
-
     private drawDashboardBackground(
-    pdf: jsPDF,
-    sheet: any,
-    scale: number,
-    pageStartY: number,
-    margin: number,
-    pageW: number,
-    pageH: number
-): void {
-    const rows = sheet?.rows ?? [];
-    const columns = sheet?.columns ?? [];
+        pdf: jsPDF,
+        sheet: any,
+        scale: number,
+        pageStartY: number,
+        margin: number,
+        pageW: number,
+        pageH: number
+    ): void {
+        const rows = sheet?.rows ?? [];
+        const columns = sheet?.columns ?? [];
 
-    const defaultRowHeight = sheet?.standardHeight || 20;
-    const defaultColWidth = sheet?.standardWidth || 64;
+        const defaultRowHeight = sheet?.standardHeight || 20;
+        const defaultColWidth = sheet?.standardWidth || 64;
 
-    const rowPositions: number[] = [];
-    const colPositions: number[] = [];
+        const rowPositions: number[] = [];
+        const colPositions: number[] = [];
 
-    const getRowTop = (index: number): number => {
-        for (let i = rowPositions.length; i <= index; i++) {
-            rowPositions[i] = i === 0
-                ? 0
-                : rowPositions[i - 1] +
-                  (rows[i - 1]?.height ?? defaultRowHeight);
-        }
-        return rowPositions[index];
-    };
+        const getRowTop = (index: number): number => {
+            for (let i = rowPositions.length; i <= index; i++) {
+                rowPositions[i] = i === 0
+                    ? 0
+                    : rowPositions[i - 1] +
+                      (rows[i - 1]?.height ?? defaultRowHeight);
+            }
+            return rowPositions[index];
+        };
 
-    const getColLeft = (index: number): number => {
-        for (let i = colPositions.length; i <= index; i++) {
-            colPositions[i] = i === 0
-                ? 0
-                : colPositions[i - 1] +
-                  (columns[i - 1]?.width ?? defaultColWidth);
-        }
-        return colPositions[index];
-    };
+        const getColLeft = (index: number): number => {
+            for (let i = colPositions.length; i <= index; i++) {
+                colPositions[i] = i === 0
+                    ? 0
+                    : colPositions[i - 1] +
+                      (columns[i - 1]?.width ?? defaultColWidth);
+            }
+            return colPositions[index];
+        };
 
-    let rowIndex = 0;
+        let rowIndex = 0;
 
-    for (const row of rows) {
-        if (row?.index !== undefined) {
-            rowIndex = row.index;
-        }
+        for (const row of rows) {
+            if (row?.index !== undefined) {
+                rowIndex = row.index;
+            }
 
-        if (row?.hidden) {
+            if (row?.hidden) {
+                rowIndex++;
+                continue;
+            }
+
+            let colIndex = 0;
+
+            for (const cell of row?.cells ?? []) {
+                if (cell?.index !== undefined) {
+                    colIndex = cell.index;
+                }
+
+                const color = cell?.style?.backgroundColor;
+
+                if (!color || columns[colIndex]?.hidden) {
+                    colIndex++;
+                    continue;
+                }
+
+                const rgb = this.pdfColorToRgb(color);
+
+                if (!rgb) {
+                    colIndex++;
+                    continue;
+                }
+
+                const cellX = getColLeft(colIndex) * scale;
+                const cellY = getRowTop(rowIndex) * scale - pageStartY;
+
+                const cellW =
+                    (columns[colIndex]?.width ?? defaultColWidth) * scale;
+
+                const cellH =
+                    (row?.height ?? defaultRowHeight) * scale;
+
+                // Clip the cell to the current PDF page.
+                const left = Math.max(0, cellX);
+                const top = Math.max(0, cellY);
+                const right = Math.min(pageW, cellX + cellW);
+                const bottom = Math.min(pageH, cellY + cellH);
+
+                if (right > left && bottom > top) {
+                    pdf.setFillColor(rgb[0], rgb[1], rgb[2]);
+
+                    pdf.rect(
+                        margin + left,
+                        margin + top,
+                        right - left,
+                        bottom - top,
+                        'F'
+                    );
+                }
+
+                colIndex++;
+            }
+
             rowIndex++;
-            continue;
         }
-
-        let colIndex = 0;
-
-        for (const cell of row?.cells ?? []) {
-            if (cell?.index !== undefined) {
-                colIndex = cell.index;
-            }
-
-            const color = cell?.style?.backgroundColor;
-
-            if (!color || columns[colIndex]?.hidden) {
-                colIndex++;
-                continue;
-            }
-
-            const rgb = this.pdfColorToRgb(color);
-
-            if (!rgb) {
-                colIndex++;
-                continue;
-            }
-
-            const cellX = getColLeft(colIndex) * scale;
-            const cellY = getRowTop(rowIndex) * scale - pageStartY;
-
-            const cellW =
-                (columns[colIndex]?.width ?? defaultColWidth) * scale;
-
-            const cellH =
-                (row?.height ?? defaultRowHeight) * scale;
-
-            // Clip the cell to the current PDF page.
-            const left = Math.max(0, cellX);
-            const top = Math.max(0, cellY);
-            const right = Math.min(pageW, cellX + cellW);
-            const bottom = Math.min(pageH, cellY + cellH);
-
-            if (right > left && bottom > top) {
-                pdf.setFillColor(rgb[0], rgb[1], rgb[2]);
-
-                pdf.rect(
-                    margin + left,
-                    margin + top,
-                    right - left,
-                    bottom - top,
-                    'F'
-                );
-            }
-
-            colIndex++;
-        }
-
-        rowIndex++;
-    }
-}
-
-private pdfColorToRgb(
-    color: string
-): [number, number, number] | null {
-    const value = color.trim();
-
-    const hex = value.match(
-        /^#([0-9a-f]{3}|[0-9a-f]{6})$/i
-    );
-
-    if (hex) {
-        let code = hex[1];
-
-        if (code.length === 3) {
-            code = code.split('').map(c => c + c).join('');
-        }
-
-        return [
-            parseInt(code.substring(0, 2), 16),
-            parseInt(code.substring(2, 4), 16),
-            parseInt(code.substring(4, 6), 16)
-        ];
     }
 
-    const rgb = value.match(
-        /^rgb\(\s*(\d+)\s*,\s*(\d+)\s*,\s*(\d+)\s*\)$/i
-    );
+    private pdfColorToRgb(
+        color: string
+    ): [number, number, number] | null {
+        const value = color.trim();
 
-    if (rgb) {
-        return [
-            Number(rgb[1]),
-            Number(rgb[2]),
-            Number(rgb[3])
-        ];
+        const hex = value.match(
+            /^#([0-9a-f]{3}|[0-9a-f]{6})$/i
+        );
+
+        if (hex) {
+            let code = hex[1];
+
+            if (code.length === 3) {
+                code = code.split('').map(c => c + c).join('');
+            }
+
+            return [
+                parseInt(code.substring(0, 2), 16),
+                parseInt(code.substring(2, 4), 16),
+                parseInt(code.substring(4, 6), 16)
+            ];
+        }
+
+        const rgb = value.match(
+            /^rgb\(\s*(\d+)\s*,\s*(\d+)\s*,\s*(\d+)\s*\)$/i
+        );
+
+        if (rgb) {
+            return [
+                Number(rgb[1]),
+                Number(rgb[2]),
+                Number(rgb[3])
+            ];
+        }
+
+        return null;
     }
 
-    return null;
-}
+    // =====================================================
+    // NAVIGATION / DASHBOARD LIST / FAVOURITE
+    // =====================================================
+
+    backToBrowse(): void {
+        this.router.navigate(['/app/main/dashboards/my-dashboards']);
+    }
+
+    switchDashboard(item: any): void {
+
+        const selectedId = Number(item?.id);
+
+        if (
+            !selectedId ||
+            selectedId === this.dashboardId ||
+            this.loading ||
+            this.refreshing ||
+            this.exportingPdf
+        ) {
+            return;
+        }
+
+        this.router.navigate([
+            '/app/main/dashboards/dashboard-details',
+            selectedId
+        ]);
+    }
+
+    loadDashboardList(): void {
+        this.appDashboardService
+            .getAllFavoriteDashboards(
+                null,
+                0,
+                10
+            )
+            .subscribe({
+                next: result => {
+                    this.dashboardList = result?.items || [];
+                },
+                error: error => {
+                    console.error('Failed to load dashboards:', error);
+                }
+            });
+    }
+
+    toggleFavourite(): void {
+        if (!this.dashboard?.id || this.loading || this.togglingFavourite) {
+            return;
+        }
+
+        this.togglingFavourite = true;
+
+        this.appDashboardService
+            .setDashboardAsFavorite(this.dashboard.id)
+            .subscribe({
+                next: () => {
+                    this.dashboard.isFavourite =
+                        !this.dashboard.isFavourite;
+
+                    const item = this.dashboardList.find(
+                        x => x.id === this.dashboard.id
+                    );
+
+                    if (item) {
+                        item.isFavourite = this.dashboard.isFavourite;
+                    }
+
+                    this.togglingFavourite = false;
+                    this.cdr.detectChanges();
+                },
+                error: error => {
+                    console.error('Failed to update favourite:', error);
+                    this.togglingFavourite = false;
+                }
+            });
+    }
+    
 }

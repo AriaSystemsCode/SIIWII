@@ -117,7 +117,8 @@ export class DashboardBrowseComponent
         this.currentLang = abp.utils.getCookieValue('Abp.Localization.CultureName')
         this.currentLang == 'ar' || this.currentLang == 'ar-EG' ? this.isArabic = true : this.isArabic = false
         this.maxResultCount = this.primengTableHelper.defaultRecordsCountPerPage || 10;
-          this.setDashboardTitleValidation();
+
+        this.setDashboardTitleValidation();
         this.getDashboards();
         this.checkScreenSize();
         window.addEventListener('resize', this.checkScreenSize.bind(this));
@@ -320,56 +321,54 @@ export class DashboardBrowseComponent
             });
     }
 
-     goToLastDashboardPage(): void {
-    const pageSize =
-        this.maxResultCount > 0
-            ? this.maxResultCount
-            : this.primengTableHelper.defaultRecordsCountPerPage || 10;
+    goToLastDashboardPage(): void {
+        const pageSize =
+            this.maxResultCount > 0
+                ? this.maxResultCount
+                : this.primengTableHelper.defaultRecordsCountPerPage || 10;
 
-    this.appDashboardsAppService
-        .getAll(
-            this.filterText || null,
-            this.selectedDashboardFilter.value,
-             Intl.DateTimeFormat().resolvedOptions().timeZone,
-            this.sorting || null,
-            0,
-            1
-        )
-        .subscribe({
-            next: result => {
-                const totalRecords = result?.totalCount || 0;
+        this.appDashboardsAppService
+            .getAll(
+                this.filterText || null,
+                this.selectedDashboardFilter.value,
+                Intl.DateTimeFormat().resolvedOptions().timeZone,
+                this.sorting || null,
+                0,
+                1
+            )
+            .subscribe({
+                next: result => {
+                    const totalRecords = result?.totalCount || 0;
 
-                const lastPageIndex = Math.max(
-                    0,
-                    Math.ceil(totalRecords / pageSize) - 1
-                );
+                    const lastPageIndex = Math.max(
+                        0,
+                        Math.ceil(totalRecords / pageSize) - 1
+                    );
 
-                const lastPageFirst = lastPageIndex * pageSize;
+                    const lastPageFirst = lastPageIndex * pageSize;
 
-                this.skipCount = lastPageFirst;
-                this.maxResultCount = pageSize;
+                    this.skipCount = lastPageFirst;
+                    this.maxResultCount = pageSize;
 
-                if (this.paginator) {
-                    const currentPage = this.paginator.getPage();
+                    if (this.paginator) {
+                        const currentPage = this.paginator.getPage();
 
-                    if (currentPage !== lastPageIndex) {
-                        this.paginator.changePage(lastPageIndex);
+                        if (currentPage !== lastPageIndex) {
+                            this.paginator.changePage(lastPageIndex);
+                        } else {
+                            // Refresh even when already on the same page
+                            this.getDashboards();
+                        }
                     } else {
-                        // Refresh even when already on the same page
                         this.getDashboards();
                     }
-                } else {
+                },
+                error: error => {
+                    console.error('Failed to refresh dashboards:', error);
                     this.getDashboards();
                 }
-            },
-            error: error => {
-                console.error('Failed to refresh dashboards:', error);
-                this.getDashboards();
-            }
-        });
-}
-
-
+            });
+    }
 
     startRename(row: any): void {
         this.cancelCreate();
@@ -604,5 +603,73 @@ export class DashboardBrowseComponent
             row?.appEntitySharings?.length ?? 0
         );
     }
+  toggleFavourite(row: any, event?: Event): void {
+
+    event?.stopPropagation();
+
+    const isFavorite = row.isFavorite;
+
+    const request$ = isFavorite
+        ? this.appDashboardsAppService.removeFromFavoriteDashboards([row.id])
+        : this.appDashboardsAppService.setDashboardAsFavorite(row.id);
+
+    request$.subscribe({
+        next: () => {
+            row.isFavorite = !isFavorite;
+        },
+        error: error => {
+            console.error('Failed to update favourite:', error);
+        }
+    });
+}
+
+
+setDefaultDashboard(row: any, event: Event): void {
+    event.stopPropagation();
+
+    this.appDashboardsAppService
+        .markDashboardAsDefault(row.id)
+        .subscribe({
+            next: () => {
+
+                // Only one dashboard can be default
+                this.primengTableHelper.records.forEach(dashboard => {
+                    dashboard.isDefault =
+                        dashboard.id === row.id;
+                });
+
+                // Already favourite: no need to toggle
+                if (row.isFavourite) {
+                    return;
+                }
+
+                // Automatically add to favourites
+                this.appDashboardsAppService
+                    .setDashboardAsFavorite(row.id)
+                    .subscribe({
+                        next: () => {
+                            row.isFavourite = true;
+                        },
+                        error: error => {
+                            console.error(
+                                'Failed to add default dashboard to favourites:',
+                                error
+                            );
+                            this.notify.error(
+                                'Default dashboard saved, but adding to favourites failed.'
+                            );
+                        }
+                    });
+            },
+            error: error => {
+                console.error(
+                    'Failed to set default dashboard:',
+                    error
+                );
+            }
+        });
+}
+
+
 
 }

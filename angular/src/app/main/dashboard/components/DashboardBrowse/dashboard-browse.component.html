@@ -151,76 +151,120 @@
             <tr>
 
               <!-- Dashboard Name -->
-              <td>
+             
+<!-- Dashboard Name -->
+<td>
+    <div class="dashboard-title-cell">
 
-                <!-- Normal Mode -->
-                <a *ngIf="editingDashboardId !== row.id" class="dash-link" href="javascript:;"
-                  (click)="openDashboard(row)">
-                  {{ row?.title }}
-                </a>
+        <!-- Favourite -->
+        <button
+            type="button"
+            class="dashboard-icon-btn favourite-btn"
+            [class.is-favourite]="row.isFavorite"
+            [title]="row.isFavorite ? 'Remove Favourite' : 'Set Favourite'"
+            (click)="toggleFavourite(row, $event)">
+            <i
+                [class]="row.isFavorite ? 'fas fa-star' : 'far fa-star'">
+            </i>
+        </button>
 
-                <!-- Rename Mode -->
-                <div *ngIf="editingDashboardId === row.id" class="dashboard-name-edit d-flex align-items-center">
+        <!-- Dashboard Title -->
+        <a
+            *ngIf="editingDashboardId !== row.id"
+            class="dash-link dashboard-title-text"
+            href="javascript:;"
+            (click)="openDashboard(row)">
+            {{ row?.title }}
+        </a>
 
-                  <div class="dashboard-name-input-wrapper">
+        <!-- Rename Mode -->
+        <div
+            *ngIf="editingDashboardId === row.id"
+            class="dashboard-name-edit d-flex align-items-center">
 
-                    <input type="text" class="form-control" [(ngModel)]="editingDashboardName" minlength="9"
-                      maxlength="50" (ngModelChange)="onRenameDashboardNameChange($event)"
-                      [placeholder]="'DashboardName' | localize" (keyup.enter)="saveRename(row)"
-                      (keyup.escape)="cancelRename()" />
+            <div class="dashboard-name-input-wrapper">
+                <input
+                    type="text"
+                    class="form-control"
+                    [(ngModel)]="editingDashboardName"
+                    minlength="9"
+                    maxlength="50"
+                    (ngModelChange)="onRenameDashboardNameChange($event)"
+                    [placeholder]="'DashboardName' | localize"
+                    (keyup.enter)="saveRename(row)"
+                    (keyup.escape)="cancelRename()" />
 
-                    <small *ngIf="
-            renameDashboardNameTouched &&
-            !isDashboardNameValid(editingDashboardName)
-        " class="dashboard-character-count text-danger">
-                      {{ 'DashboardNameLengthValidation' | localize }}
-                    </small>
+                <small
+                    *ngIf="renameDashboardNameTouched &&
+                           !isDashboardNameValid(editingDashboardName)"
+                    class="dashboard-character-count text-danger">
+                    {{ 'DashboardNameLengthValidation' | localize }}
+                </small>
 
-                    <small *ngIf="renameDashboardTitleUsed" class="dashboard-character-count text-danger">
-                      {{ 'DashboardTitleUsedBefore' | localize }}
-                    </small>
+                <small
+                    *ngIf="renameDashboardTitleUsed"
+                    class="dashboard-character-count text-danger">
+                    {{ 'DashboardTitleUsedBefore' | localize }}
+                </small>
+            </div>
 
-                    <small *ngIf="checkingRenameDashboardTitle && !renameDashboardTitleUsed" class="text-muted">
-                      {{ 'CheckingDashboardTitle' | localize }}
-                    </small>
+            <button
+                type="button"
+                class="btn btn-sm btn-link text-success ml-1"
+                (click)="saveRename(row)">
+                <i class="fas fa-check"></i>
+            </button>
 
-                  </div>
+            <button
+                type="button"
+                class="btn btn-sm btn-link text-muted"
+                (click)="cancelRename()">
+                <i class="fas fa-times"></i>
+            </button>
+        </div>
 
-                  <button type="button" class="btn btn-sm btn-link text-success ml-1" [title]="'Save' | localize"
-                    [disabled]="
-        !isDashboardNameValid(editingDashboardName) ||
-        renameDashboardTitleUsed ||
-        checkingRenameDashboardTitle ||
-        savingRename
-    " (click)="saveRename(row)">
+        <!-- Right Icons -->
+        <div class="dashboard-title-actions">
 
-                    <i class="fas fa-check"></i>
-                  </button>
+            <!-- View Dashboard -->
+            <button
+                type="button"
+                class="dashboard-icon-btn"
+                title="View Dashboard"
+                (click)="openDashboard(row)">
+                <i class="fas fa-eye"></i>
+            </button>
 
-                  <!-- Cancel -->
-                  <button type="button" class="btn btn-sm btn-link text-muted" [title]="'Cancel' | localize"
-                    (click)="cancelRename()">
+            <!-- Set Default -->
+            <button
+                type="button"
+                class="dashboard-icon-btn default-btn"
+                [class.is-default]="row.isDefault"
+                [title]="row.isDefault ? 'Default Dashboard' : 'Set as Default'"
+                (click)="setDefaultDashboard(row, $event)">
+                <i
+                    [class]="row.isDefault ? 'fas fa-flag' : 'far fa-flag'">
+                </i>
+            </button>
 
-                    <i class="fas fa-times"></i>
-                  </button>
+        </div>
 
-                </div>
+    </div>
+</td>
 
-              </td>
 
               <!-- Owner -->
-              <td>
-                <div class="owner-cell d-flex align-items-center">
-                  <img [src]="attachmentBaseUrl +'/' + row?.ownerUserImg" alt="" srcset="" class="avatar avatar-sm stacked"
-                        (error)="onAvatarErr($event)" >
-                  <span class="owner-name ml-2">
-                    {{ row?.creatorUserName }}
-                  </span>
-                </div>
+              <td class="w-75px text-center">
+           
+                  <img [src]="attachmentBaseUrl +'/' + row?.ownerUserImg" [alt]="row?.creatorUserName" srcset="" class="avatar avatar-sm stacked"
+                        (error)="onAvatarErr($event)"      [pTooltip]="row?.creatorUserName" tooltipPosition="bottom"
+                        [tooltipEvent]="isSmallScreen ? 'focus' : 'hover'" [autoHide]="true" [showDelay]="100"
+                        [hideDelay]="100" [tabindex]="isSmallScreen ? 0 : null" >
+           
               </td>
 
               <!-- Spreadsheet -->
-              <td>
+              <td class="w-155">
 
                 <a *ngIf="row?.isEditable || row?.isTheOwner" class="text-unerline" href="javascript:;"
                   (click)="openSpreadsheet(row)">
@@ -236,7 +280,7 @@
               </td>
 
               <!-- Last Viewed -->
-              <td>
+              <td class="w-170">
 
                 <span *ngIf="row?.lastViewDate; else notViewed">
                   {{ row?.lastViewDate | momentFormat:'L' }}
@@ -250,13 +294,13 @@
               </td>
 
               <!-- Last Updated -->
-              <td>
+              <td class="w-170">
                 {{ row?.lastModificationDate | momentFormat:'L' }}
                 {{ row?.lastModificationDate | momentFormat:'h:mm a' }}
               </td>
 
               <!-- Sharing -->
-              <td>
+              <td class="w-100px">
                 <div class="sharing-wrap d-flex align-items-center">
                   <div class="avatar-stack">
 

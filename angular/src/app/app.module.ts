@@ -98,7 +98,7 @@ import { CdkStepperModule } from "@angular/cdk/stepper";
 import { ToastModule } from "primeng/toast";
 import { DropdownModule } from "primeng/dropdown";
 import { CheckboxModule } from 'primeng/checkbox';
-import { AppTransactionServiceProxy } from "@shared/service-proxies/service-proxies";
+import { AppDashboardServiceProxy, AppTransactionServiceProxy } from "@shared/service-proxies/service-proxies";
 import { NgSelectModule } from '@ng-select/ng-select';
 import { PostsModule } from './main/posts/posts.module';
 import { eventsModule } from './main/AppEvent/events.module';
@@ -230,6 +230,7 @@ import { OverALLRatingReviewsModule } from "./main/overallRating-reviews/overall
         UserNotificationHelper,
         ChatSignalrService,
          ExtraAttributeDataService,
+         AppDashboardServiceProxy, 
         {
             provide: PERFECT_SCROLLBAR_CONFIG,
             useValue: DEFAULT_PERFECT_SCROLLBAR_CONFIG,
