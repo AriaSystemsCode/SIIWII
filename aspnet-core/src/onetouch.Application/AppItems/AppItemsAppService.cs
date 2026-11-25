@@ -6512,6 +6512,18 @@ namespace onetouch.AppItems
                 }
             }
 
+            if (!string.IsNullOrWhiteSpace(itemExcelDto.SoldOutDate) &&
+                !string.Equals(itemExcelDto.SoldOutDate.Trim(), "1/1/1900 12:00:00 AM", StringComparison.OrdinalIgnoreCase) &&
+                !DateOnly.TryParse(itemExcelDto.SoldOutDate, out _))
+            {
+                returnList.Add(new ImportItemReturnDto
+                {
+                    RecordKey = itemExcelDto.Code,
+                    ErrorMessage = "Sold Out Date must be a valid date.",
+                    ErrorType = "Stopper"
+                });
+            }
+
             if (itemExcelDto.RecordType == "Item")
             {
                 if (!string.IsNullOrEmpty(itemExcelDto.SizeScaleName) && int.Parse(itemExcelDto.NoOfDimensions.ToString()) == 1
@@ -6647,6 +6659,18 @@ namespace onetouch.AppItems
                     }
                 }
 
+                if (!string.IsNullOrWhiteSpace(itemExcelDto.SoldOutDate) &&
+                    !string.Equals(itemExcelDto.SoldOutDate.Trim(), "1/1/1900 12:00:00 AM", StringComparison.OrdinalIgnoreCase) &&
+                    !DateOnly.TryParse(itemExcelDto.SoldOutDate, out _))
+                {
+                    returnList.Add(new ImportItemReturnDto
+                    {
+                        RecordKey = itemExcelDto.Code,
+                        ErrorMessage = "Sold Out Date must be a valid date.",
+                        ErrorType = "Stopper"
+                    });
+                }
+
                 if (itemExcelDto.RecordType == "Item")
                 {
                     if (!string.IsNullOrEmpty(itemExcelDto.SizeScaleName) && int.Parse(itemExcelDto.NoOfDimensions.ToString()) == 1
@@ -6686,16 +6710,19 @@ namespace onetouch.AppItems
                         });
 
                 }
-                var itemExists = _appItemRepository.GetAll().FirstOrDefault(x => x.Code.Replace(" ", string.Empty) == itemExcelDto.Code.Replace(" ", string.Empty) && x.ItemType == 0);
+                var existingItemId = await _appItemRepository.GetAll()
+                    .Where(x => x.Code.Replace(" ", string.Empty) == itemExcelDto.Code.Replace(" ", string.Empty) && x.ItemType == 0)
+                    .Select(x => (long?)x.Id)
+                    .FirstOrDefaultAsync();
 
-                if (itemExists != null)
+                if (existingItemId.HasValue)
                 {
                     returnList.Add(new ImportItemReturnDto
                     {
                         RecordKey = itemExcelDto.Code,
                         ErrorMessage = "Code :" + itemExcelDto.Code + " already exists!",
                         ErrorType = "Duplication",
-                        Id = itemExists.Id
+                        Id = existingItemId
                     });
 
                 }
@@ -7801,7 +7828,7 @@ namespace onetouch.AppItems
                 pendingLeanImportItems = 0;
             }
 
-            async Task SaveImportedItemLean(AppItem importedItem)
+            async Task SaveImportedItemLean(AppItem importedItem, HashSet<long> repricedVariationIds)
             {
                 if (importedItem.Id == 0)
                 {
@@ -7835,16 +7862,8 @@ namespace onetouch.AppItems
                 }
                 else
                 {
-                    var importedItemIds = new List<long> { importedItem.Id };
-                    if (importedItem.ParentFkList != null)
-                    {
-                        importedItemIds.AddRange(importedItem.ParentFkList
-                            .Where(z => z.Id != 0)
-                            .Select(z => z.Id));
-                    }
-
                     await x.AppItemPrices
-                        .Where(z => importedItemIds.Contains(z.AppItemId))
+                        .Where(z => z.AppItemId == importedItem.Id || repricedVariationIds.Contains(z.AppItemId))
                         .DeleteAsync();
 
                     appItemModifyList.Add(importedItem);
@@ -7872,19 +7891,18 @@ namespace onetouch.AppItems
             var existingParentsById = existingParentIds.Count == 0
                 ? new Dictionary<long, AppItem>()
                 : (await _appItemRepository.GetAll()
-                    //.AsNoTracking()
+                    // Reuse one instance per key in the detached graph before UpdateRange.
+                    .AsNoTrackingWithIdentityResolution()
                     .AsSplitQuery()
                     .Where(z => existingParentIds.Contains(z.Id) && z.ListingItemId == null)
                     .Include(z => z.EntityFk).ThenInclude(z => z.EntityCategories)
                     .Include(z => z.EntityFk).ThenInclude(z => z.EntityClassifications)
                     .Include(z => z.EntityFk).ThenInclude(z => z.EntityAttachments).ThenInclude(z => z.AttachmentFk)
                     .Include(z => z.EntityFk).ThenInclude(z => z.EntityExtraData)
-                    .Include(z => z.ItemPricesFkList)
                     .Include(z => z.ParentFkList).ThenInclude(z => z.EntityFk).ThenInclude(z => z.EntityExtraData)
                     .Include(z => z.ParentFkList).ThenInclude(z => z.EntityFk).ThenInclude(z => z.EntityCategories)
                     .Include(z => z.ParentFkList).ThenInclude(z => z.EntityFk).ThenInclude(z => z.EntityClassifications)
                     .Include(z => z.ParentFkList).ThenInclude(z => z.EntityFk).ThenInclude(z => z.EntityAttachments).ThenInclude(z => z.AttachmentFk)
-                    .Include(z => z.ParentFkList).ThenInclude(z => z.ItemPricesFkList)
                     .ToListAsync())
                     .ToDictionary(z => z.Id);
             var existingItemScaleHeadersByItemId = existingParentIds.Count == 0
@@ -8772,6 +8790,7 @@ namespace onetouch.AppItems
                 var childItems = childrenByParentCode.TryGetValue(excelDto.Code, out var children)
                     ? children
                     : new List<AppItemExcelDto>();
+                var repricedVariationIds = new HashSet<long>();
                 bool firstItem = false;
                 foreach (var item in childItems)
                 {
@@ -8782,6 +8801,7 @@ namespace onetouch.AppItems
                         if (itemExist != null)
                         {
                             appChildItem = itemExist;
+                            repricedVariationIds.Add(appChildItem.Id);
                             appChildItem.Description = excelDto.ProductDescription;
                             appChildItem.Price = decimal.Parse(excelDto.Price);
                             appChildItem.Name = excelDto.Name;
@@ -9134,7 +9154,7 @@ namespace onetouch.AppItems
                 if (appItem.ParentFkList != null && appItem.ParentFkList.Any())
                     importedParentsWithVariations.Add(appItem);
 
-                await SaveImportedItemLean(appItem);
+                await SaveImportedItemLean(appItem, repricedVariationIds);
             }
 
             await FlushLeanImportBatch();
@@ -9771,6 +9791,10 @@ namespace onetouch.AppItems
             IMappingExpression<ImportItemInputDto, AppItemExcelDto> mappingExpression;
 
             mappingExpression = CreateMap<ImportItemInputDto, AppItemExcelDto>();
+            mappingExpression.ForMember(dest => dest.SoldOutDate, act => act.MapFrom(src =>
+                string.IsNullOrWhiteSpace(src.SoldOutDate) || src.SoldOutDate == "1/1/1900 12:00:00 AM"
+                    ? default
+                    : DateOnly.Parse(src.SoldOutDate)));
             mappingExpression.ForMember(dest => dest.Id, act => act.MapFrom(src => 0));
             mappingExpression.ForMember(dest => dest.ProductType, act => act.MapFrom(src => src.ProductType.ToString()));
             mappingExpression.ForMember(dest => dest.RecordType, act => act.MapFrom(src => src.RecordType.ToString()));
@@ -9808,18 +9832,6 @@ namespace onetouch.AppItems
             mappingExpression.ForMember(dest => dest.PriceB, act => act.MapFrom(src => src.PriceB.ToString().TrimEnd()));
             mappingExpression.ForMember(dest => dest.PriceC, act => act.MapFrom(src => src.PriceC.ToString().TrimEnd()));
             mappingExpression.ForMember(dest => dest.PriceD, act => act.MapFrom(src => src.PriceD.ToString().TrimEnd()));
-            //mappingExpression.ForMember(dest => dest.SoldOutDate, act => act.MapFrom(src => DateOnly.Parse(src.SoldOutDate== "1/1/1900 12:00:00 AM"|| string.IsNullOrEmpty(src.StartShipDate) ? DateOnly. :src.SoldOutDate)));
-            //mappingExpression.ForMember(dest => dest.SoldOutDate, act => act.MapFrom(src => (string.IsNullOrEmpty(src.SoldOutDate) || src.SoldOutDate == "1/1/1900 12:00:00 AM") ? null : DateOnly.Parse(src.SoldOutDate)));
-            mappingExpression.ForMember(
-    dest => dest.SoldOutDate,
-    act => act.MapFrom(src =>
-        string.IsNullOrEmpty(src.SoldOutDate) ||
-        src.SoldOutDate == "1/1/1900 12:00:00 AM"
-            ? (DateOnly?)null
-            : DateOnly.Parse(src.SoldOutDate)
-    )
-);
-
 
 
         }
