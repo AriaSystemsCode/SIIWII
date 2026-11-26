@@ -548,10 +548,40 @@ namespace onetouch.AppDashboards
                 .Where(z => z.EntityFk.EntityObjectTypeId == dashboardObjectTypeId
                 && z.SharedUserId == AbpSession.UserId &&
                 z.EntityId == dashboardID).FirstOrDefaultAsync();
-            if (newDefaultDashboard != null && newDefaultDashboard.IsDefault == false)
+            if (newDefaultDashboard != null)
             {
-                newDefaultDashboard.IsDefault= true;
-                await _appEntitySharingRepository.UpdateAsync(newDefaultDashboard);
+                if (newDefaultDashboard.IsDefault == false)
+                {
+                    newDefaultDashboard.IsDefault = true;
+                    await _appEntitySharingRepository.UpdateAsync(newDefaultDashboard);
+                }
+
+            }
+            else
+            {
+                var dashboardObj = await _appEntityRepository.GetAll()
+                   .Where(z => z.EntityObjectTypeId == dashboardObjectTypeId
+                     && z.Id == dashboardID).FirstOrDefaultAsync();
+                if (dashboardObj != null)
+                {
+                    var sharing = new AppEntitySharings();
+                    sharing.SharedTenantId = AbpSession.TenantId;
+                    sharing.EntityId = dashboardID;
+                    sharing.SharedUserId = AbpSession.UserId;
+                    sharing.CanEdit = (dashboardObj != null 
+                        && dashboardObj.CreatorUserId == AbpSession.UserId);
+
+                    sharing.EntityCode = dashboardObj.Code;
+                    sharing.EntityObjectTypeCode = dashboardObj.EntityObjectTypeCode;
+                    var tenantObj = await TenantManager.GetByIdAsync(int.Parse(AbpSession.TenantId.ToString()));
+                    if (tenantObj != null)
+                        sharing.SharedTenantName = tenantObj.TenancyName;
+                    var userObj = await UserManager.GetUserByIdAsync(long.Parse(AbpSession.UserId.ToString()));
+                    if (userObj != null)
+                        sharing.SharedUserName = userObj.UserName;
+                    sharing.IsDefault = true;
+                    await _appEntitySharingRepository.InsertAsync(sharing);
+                }
             }
             await CurrentUnitOfWork.SaveChangesAsync();
 
@@ -640,6 +670,15 @@ namespace onetouch.AppDashboards
                 sharing.LastViewDate = DateTime.Now;
                 sharing.CanEdit = sharingAll != null ? sharingAll.CanEdit :
                     (dashboardObj != null && dashboardObj.CreatorUserId==AbpSession.UserId);
+
+                sharing.EntityCode = dashboardObj.Code;
+                sharing.EntityObjectTypeCode = dashboardObj.EntityObjectTypeCode;
+                var tenantObj = await TenantManager.GetByIdAsync(int.Parse(AbpSession.TenantId.ToString()));
+                if (tenantObj != null)
+                    sharing.SharedTenantName = tenantObj.TenancyName;
+                var userObj = await UserManager.GetUserByIdAsync(long.Parse(AbpSession.UserId.ToString()));
+                if (userObj != null)
+                    sharing.SharedUserName = userObj.UserName;
                 await _appEntitySharingRepository.InsertAsync(sharing);
             }
             await CurrentUnitOfWork.SaveChangesAsync();
