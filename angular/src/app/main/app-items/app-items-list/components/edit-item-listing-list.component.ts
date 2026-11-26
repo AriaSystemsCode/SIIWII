@@ -39,7 +39,6 @@ import { AppItemsBrowseModalComponent } from "../../app-items-browse/components/
 import { AppItemsBrowseInputs } from "../../app-items-browse/models/app-item-browse-inputs.model";
 import { MultiSelectionInfo } from "../../app-items-browse/models/multi-selection-info.model";
 import { AppitemListPublishService } from "../services/appitem-list-publish.service";
-import { PublishAppItemListingService } from "../../app-item-shared/services/publish-app-item-listing.service";
 
 @Component({
     selector: "app-edit-item-listing-list",
@@ -103,7 +102,6 @@ showSync: boolean = false;
         private _appitemListPublishService: AppitemListPublishService,
         private _appItemsServiceProxy: AppItemsServiceProxy,
         private _appItemSelectorsServiceProxy: AppItemSelectorsServiceProxy,
-        private _publishAppItemListingService: PublishAppItemListingService,
         private datePipe: DatePipe
     ) {
         super(injector, _location);
@@ -421,7 +419,11 @@ showSync: boolean = false;
         this._router.navigate([
             "app/main/linesheet/print",
             this.list.appItemsList.id,
-        ]);
+        ], {
+            queryParams: {
+                isMarketplaceList: !this.isRecordOwner,
+            },
+        });
     }
 
     checkPermissions() {
@@ -648,26 +650,15 @@ showSync: boolean = false;
         });
     }
     openShareProductListingModal() {
-        console.log(">> listing");
-        const listingId: number = this.listId;
-        const alreadyPublished: boolean = false;
+        const alreadyPublished: boolean = this.list.appItemsList.published;
         const successCallBack = () => {
             this.notify.success(this.l("PublishedSuccessfully"));
-            // this.eventTriggered.emit({
-            //     event: AppItemBrowseEvents.PublishListing,
-            //     data: true,
-            // });
         };
-        this._publishAppItemListingService.openProductListingSharingModal(
+        this._appitemListPublishService.openSharingModal(
             alreadyPublished,
-            listingId,
+            this.listId,
             successCallBack
         );
-        this._publishAppItemListingService.subscribersNumber =
-            this.list.numberOfSubscribers;
-        this._publishAppItemListingService.screen = 2;
-        this._publishAppItemListingService.productId = this.listId;
-        this._publishAppItemListingService.sharingStatus = this.list.appItemsList.sharingLevel;
     }
     btnLoader: boolean = false;
     syncProduct() {

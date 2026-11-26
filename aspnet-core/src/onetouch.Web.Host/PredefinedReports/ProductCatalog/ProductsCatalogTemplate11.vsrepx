@@ -60,7 +60,7 @@
         </Item1>
         <Item2 Ref="50" ControlType="SubBand" Name="SubBand2" PageBreak="AfterBand" HeightF="138.135788" Dpi="254">
           <Controls>
-            <Item1 Ref="51" ControlType="XRSubreport" Name="subreport2" SizeF="2156,113.747513" LocationFloat="0,10.6065874" Dpi="254">
+            <Item1 Ref="51" ControlType="XRSubreport" Name="subreport2" GenerateOwnPages="true" SizeF="2156,113.747513" LocationFloat="0,10.6065874" Dpi="254">
               <Scripts Ref="52" OnBeforePrint="subreport2_BeforePrint" />
             </Item1>
           </Controls>

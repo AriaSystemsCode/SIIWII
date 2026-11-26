@@ -548,33 +548,82 @@ export class MarketplaceProductsComponent
 
         this.getAllProducts();
     }
-    resetProducts($event) {
-       if (this.filters) {
+    // resetProducts($event) {
+    //    if (this.filters) {
+    //     this.filters.resetFilters();
+    // }
+    //     (this.seletedOption = { label: this.l("Public And Shared With Me"), value: 2 }),
+    //         (this.selectedCurrrency =
+    //             localStorage.getItem("currencyCode") == "undefined" || JSON.parse(localStorage.getItem("currencyCode")) === null
+    //                 ? this.tenantDefaultCurrency
+    //                 : JSON.parse(localStorage.getItem("currencyCode")));
+    //     this.currency =
+    //         localStorage.getItem("currencyCode") == "undefined" || JSON.parse(localStorage.getItem("currencyCode")) === null
+    //             ? this.tenantDefaultCurrency?.code
+    //             : JSON.parse(localStorage.getItem("currencyCode")).code;
+    //     this.tentantID = this.appSession?.tenant?.id;
+    //     this.selectedSort = { label: "Product Name", value: "name" };
+    //     this.searchInput = "";
+    //     this.paginator.changePageToFirst($event);
+    //     this.appItemListId = ''
+    //     this.selectedCategories = [];
+    //     this.brands = []
+    //     this.skipCount = 0;
+    //     this.maxResultCount = 12;
+    //     this.selectedDepartments = []
+    //     this.onlyAvialbleStock = undefined
+    //     localStorage.removeItem("productFilters");
+    //     this.getAllProducts();
+    // }
+    resetProducts($event?: any): void {
+
+    if (this.filters) {
         this.filters.resetFilters();
     }
-        (this.seletedOption = { label: this.l("Public And Shared With Me"), value: 2 }),
-            (this.selectedCurrrency =
-                localStorage.getItem("currencyCode") == "undefined" || JSON.parse(localStorage.getItem("currencyCode")) === null
-                    ? this.tenantDefaultCurrency
-                    : JSON.parse(localStorage.getItem("currencyCode")));
-        this.currency =
-            localStorage.getItem("currencyCode") == "undefined" || JSON.parse(localStorage.getItem("currencyCode")) === null
-                ? this.tenantDefaultCurrency?.code
-                : JSON.parse(localStorage.getItem("currencyCode")).code;
-        this.tentantID = this.appSession?.tenant?.id;
-        this.selectedSort = { label: "Product Name", value: "name" };
-        this.searchInput = "";
+
+    this.seletedOption = {
+        label: this.l("Public And Shared With Me"),
+        value: 2
+    };
+
+    // Reset currency to tenant default
+    const defaultCode = this.tenantDefaultCurrency?.code || 'USD';
+
+    this.selectedCurrrency =
+        this.currencies?.find(c => c.code === defaultCode)
+        || this.tenantDefaultCurrency
+        || { code: defaultCode };
+
+    this.currency = defaultCode;
+
+    // Save default currency to localStorage
+    localStorage.setItem("currencyCode", defaultCode);
+
+    this.tentantID = this.appSession?.tenant?.id;
+
+    this.selectedSort = {
+        label: this.l("ProductName"),
+        value: "name"
+    };
+
+    this.searchInput = "";
+
+    if (this.paginator) {
         this.paginator.changePageToFirst($event);
-        this.appItemListId = ''
-        this.selectedCategories = [];
-        this.brands = []
-        this.skipCount = 0;
-        this.maxResultCount = 12;
-        this.selectedDepartments = []
-        this.onlyAvialbleStock = undefined
-        localStorage.removeItem("productFilters");
-        this.getAllProducts();
     }
+
+    this.appItemListId = '';
+    this.selectedCategories = [];
+    this.brands = [];
+    this.skipCount = 0;
+    this.maxResultCount = 12;
+    this.selectedDepartments = [];
+    this.onlyAvialbleStock = undefined;
+
+    localStorage.removeItem("productFilters");
+
+    this.getAllProducts();
+}
     selectCategory(value: any) {
         this.appItemListId = null;
         if (this.filters) {

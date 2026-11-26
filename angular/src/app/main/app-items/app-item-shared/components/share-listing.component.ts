@@ -37,6 +37,8 @@ export class ShareListingComponent extends AppComponentBase implements OnInit {
     buttonText = this.l("ShareAndPublish");
     showCloseText = false;
     subscribers: number;
+    private initialSharingLevel: number;
+    private initialSharingRecipients = "";
     constructor(
         injector: Injector,
         public currentModalRef: BsModalRef,
@@ -61,11 +63,34 @@ export class ShareListingComponent extends AppComponentBase implements OnInit {
         this.publishItemOptions.sharingLevel = currentSharingLevel;
         this.PublishAppItemListingService.sharingStatus = currentSharingLevel;
 
-        if (this.publishItemOptions.itemSharing && this.publishItemOptions.itemSharing.length > 0) {
+        if (this.publishItemOptions.itemSharing !== undefined && this.publishItemOptions.itemSharing !== null) {
             this.PublishAppItemListingService.itemSharing = this.publishItemOptions.itemSharing;
         } else if (this.PublishAppItemListingService.itemSharing) {
             this.publishItemOptions.itemSharing = this.PublishAppItemListingService.itemSharing;
         }
+
+        this.initialSharingLevel = this.publishItemOptions.sharingLevel;
+        this.initialSharingRecipients = this.getSharingRecipientsKey(
+            this.publishItemOptions.itemSharing
+        );
+    }
+
+    private getSharingRecipientsKey(items: ItemSharingDto[]): string {
+        return (items || [])
+            .map((item) => {
+                if (item.sharedUserId) return `user:${item.sharedUserId}`;
+                if (item.sharedTenantId) return `tenant:${item.sharedTenantId}`;
+                return `email:${(item.sharedUserEMail || "").trim().toLowerCase()}`;
+            })
+            .sort()
+            .join("|");
+    }
+
+    get sharingOptionsChanged(): boolean {
+        if (!this.publishItemOptions) return false;
+        return this.publishItemOptions.sharingLevel !== this.initialSharingLevel ||
+            this.getSharingRecipientsKey(this.publishItemOptions.itemSharing) !==
+                this.initialSharingRecipients;
     }
 
     publishListing() {
@@ -114,25 +139,25 @@ export class ShareListingComponent extends AppComponentBase implements OnInit {
 
         const currentSharingStatus = this.PublishAppItemListingService.sharingStatus;
         const hasSubscribers = this.PublishAppItemListingService.subscribersNumber !== 0;
-
         this.showMainSpinner();
-        if (currentSharingStatus === 0 || currentSharingStatus === 3) {
+        if (currentSharingStatus === 0 || currentSharingStatus === 3 || this.sharingOptionsChanged) {
             if (this.PublishAppItemListingService.screen === 1) {
                 this.shareProdcut(SharingBody);
             } else {
                 this.shareProductList(productListSharingBody);
             }
         } else if (currentSharingStatus === 4) {
-            this.unhideProduct();
+            if (this.PublishAppItemListingService.screen === 1) this.unhideProduct();
+            else this.unhideProductList();
         } else if (hasSubscribers) {
-            this.hideProduct();
+            if (this.PublishAppItemListingService.screen === 1) this.hideProduct();
+            else this.hideProductList();
         } else if (this.PublishAppItemListingService.screen === 1) {
             this.makePrivate();
         } else {
             this.makeListPrivate();
         }
 
-        this.currentModalRef.hide();
     }
     unhideProduct() {
         this.appItemsServiceProxy
@@ -145,6 +170,22 @@ export class ShareListingComponent extends AppComponentBase implements OnInit {
             )
             .subscribe((res: any) => {
                 this.PublishAppItemListingService.sharingStatus = 1;
+                this.savingDone = true;
+                this.currentModalRef.hide();
+            });
+    }
+
+    unhideProductList() {
+        this.AppItemsListsServiceProxy.unHideItemList(this.PublishAppItemListingService.productId)
+            .pipe(finalize(() => {
+                this.saving = false;
+                this.hideMainSpinner();
+            }))
+            .subscribe(() => {
+                this.PublishAppItemListingService.sharingStatus =
+                    this.publishItemOptions.itemSharing.length > 0 ? 2 : 1;
+                this.savingDone = true;
+                this.currentModalRef.hide();
             });
     }
 
@@ -155,12 +196,13 @@ export class ShareListingComponent extends AppComponentBase implements OnInit {
                 finalize(() => {
                     this.saving = false;
                     this.hideMainSpinner();
-                    this.notify.success(this.l("shared Successfully"));
                 })
             )
             .subscribe((res: any) => {
                 this.PublishAppItemListingService.sharingStatus = sharingOptions.sharingLevel;
                 this.PublishAppItemListingService.itemSharing = sharingOptions.itemSharing;
+                this.savingDone = true;
+                this.currentModalRef.hide();
             });
     }
 
@@ -170,12 +212,13 @@ export class ShareListingComponent extends AppComponentBase implements OnInit {
                 finalize(() => {
                     this.saving = false;
                     this.hideMainSpinner();
-                    this.notify.success(this.l("shared Successfully"));
                 })
             )
             .subscribe((res: any) => {
                 this.PublishAppItemListingService.sharingStatus = sharingOptions.sharingLevel;
                 this.PublishAppItemListingService.itemSharing = sharingOptions.itemSharing;
+                this.savingDone = true;
+                this.currentModalRef.hide();
             });
     }
 
@@ -191,6 +234,8 @@ export class ShareListingComponent extends AppComponentBase implements OnInit {
             )
             .subscribe((res) => {
                 this.PublishAppItemListingService.sharingStatus = 3;
+                this.savingDone = true;
+                this.currentModalRef.hide();
             });
     }
 
@@ -207,6 +252,8 @@ export class ShareListingComponent extends AppComponentBase implements OnInit {
             )
             .subscribe((res) => {
                 this.PublishAppItemListingService.sharingStatus = 3;
+                this.savingDone = true;
+                this.currentModalRef.hide();
             });
     }
 
@@ -221,6 +268,21 @@ export class ShareListingComponent extends AppComponentBase implements OnInit {
             )
             .subscribe((res) => {
                 this.PublishAppItemListingService.sharingStatus = 4;
+                this.savingDone = true;
+                this.currentModalRef.hide();
+            });
+    }
+
+    hideProductList() {
+        this.AppItemsListsServiceProxy.hideItemList(this.PublishAppItemListingService.productId)
+            .pipe(finalize(() => {
+                this.saving = false;
+                this.hideMainSpinner();
+            }))
+            .subscribe(() => {
+                this.PublishAppItemListingService.sharingStatus = 4;
+                this.savingDone = true;
+                this.currentModalRef.hide();
             });
     }
 

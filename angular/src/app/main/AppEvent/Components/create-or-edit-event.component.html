@@ -207,28 +207,32 @@
                                 </div>
                                 <div class="row">
                                     <div class="col-5 mr-5">
-                                        <input
-                                            type="datetime"
-                                            bsDatepicker
-                                            id="fromDate"
-                                            #fromDateCtrl="ngModel"
-                                            [(ngModel)]="fromDate"
-                                            class="form-control"
-                                            name="fromDate"
-                                            [minDate]="minDate"
-                                            [placeholder]="
-                                                'Please Enter Start Date'
-                                            "
-                                            (ngModelChange)="
-                                                toDate < $event &&
-                                                    (toDate = $event)
-                                            "
-                                            [bsConfig]="bsConfig"
-                                            required
-                                        />
-                                        <validation-messages
-                                            [formCtrl]="fromDateCtrl"
-                                        ></validation-messages>
+                                      <p-calendar
+    inputId="fromDate"
+    name="fromDate"
+    #fromDateCtrl="ngModel"
+    [(ngModel)]="fromDate"
+    (ngModelChange)="onStartDateChange($event)"
+    [minDate]="minDate"
+    dateFormat="dd/mm/yy"
+    [showIcon]="true"
+    [readonlyInput]="true"
+    appendTo="body"
+    [autoZIndex]="true"
+    [baseZIndex]="20000"
+    [style]="{ width: '100%' }"
+    [inputStyle]="{ width: '100%', background: '#fff' }"
+    [panelStyle]="{
+        maxHeight: '80vh',
+        overflowY: 'auto'
+    }"
+    [placeholder]="'Please Enter Start Date' | localize"
+    required>
+</p-calendar>
+
+<validation-messages
+    [formCtrl]="fromDateCtrl">
+</validation-messages>
                                     </div>
 
                                     <div class="col-5">
@@ -264,24 +268,31 @@
                                 </div>
                                 <div class="row">
                                     <div class="col-5 mr-5">
-                                        <input
-                                            type="datetime"
-                                            bsDatepicker
-                                            id="toDate"
-                                            #toDateCtrl="ngModel"
-                                            [(ngModel)]="toDate"
-                                            class="form-control"
-                                            name="toDate"
-                                            [minDate]="fromDate"
-                                            [placeholder]="
-                                                'Please Enter End Date'
-                                            "
-                                            [bsConfig]="bsConfig"
-                                            required
-                                        />
-                                        <validation-messages
-                                            [formCtrl]="toDateCtrl"
-                                        ></validation-messages>
+                                    <p-calendar
+    inputId="toDate"
+    name="toDate"
+    #toDateCtrl="ngModel"
+    [(ngModel)]="toDate"
+    [minDate]="fromDate || minDate"
+    dateFormat="dd/mm/yy"
+    [showIcon]="true"
+    [readonlyInput]="true"
+    appendTo="body"
+    [autoZIndex]="true"
+    [baseZIndex]="20000"
+    [style]="{ width: '100%' }"
+    [inputStyle]="{ width: '100%', background: '#fff' }"
+    [panelStyle]="{
+        maxHeight: '80vh',
+        overflowY: 'auto'
+    }"
+    [placeholder]="'Please Enter End Date' | localize"
+    required>
+</p-calendar>
+
+<validation-messages
+    [formCtrl]="toDateCtrl">
+</validation-messages>
                                     </div>
 
                                     <div class="col-5">
@@ -361,16 +372,7 @@
                                                 (click)="selectAddress()"
                                             ></i>
                                         </div>
-                                      <!--   <div class="col-1">
-                                            <button
-                                                class="mapBtn btn btn-secondary"
-                                                [disabled]="eventAddress == ''"
-                                                [ngClass]="{
-                                                    disabled: eventAddress == ''
-                                                }"
-                                                (click)="showAddressOnMap()"
-                                            ></button>
-                                        </div> -->
+                                
                                         <input
                                             type="text"
                                             id="eventAddress"

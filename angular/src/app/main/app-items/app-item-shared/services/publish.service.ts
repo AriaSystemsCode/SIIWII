@@ -25,13 +25,11 @@ export class PublishService extends AppComponentBase {
             const modalRef: BsModalRef = this.bsModalService.show(ShareListingComponent, config)
             let subs: Subscription = this.bsModalService.onHidden.subscribe(() => {
                 const data: ShareListingComponent = modalRef.content
+                subs.unsubscribe()
                 if (data.savingDone) {
-                    subs.unsubscribe()
                     observer.next(data.publishItemOptions)
                 }
-                else {
-                    observer.error()
-                }
+                observer.complete()
             })
         })
     }

@@ -64,6 +64,7 @@ addressSelected =
     }
     show(branch: any, accountId: number): void {
         this.branchId = branch?.node?.data?.branch?.id
+         this.selectedAddressId = 0;
         this.spinnerService.show();
 
         this._accountsServiceProxy.getAllAccountAddresses(accountId).subscribe(result => {
@@ -85,13 +86,23 @@ addressSelected =
         })
     }
 
-    onChangeSearch(e) {
+    // onChangeSearch(e) {
 
-        if (e.target.value)
-            this.filteredAddresses = this.filterItems(this.addresses, e.target.value)
-        else
-            this.filteredAddresses = this.addresses
-    }
+    //     if (e.target.value)
+    //         this.filteredAddresses = this.filterItems(this.addresses, e.target.value)
+    //     else
+    //         this.filteredAddresses = this.addresses
+    // }
+    onChangeSearch(event: Event): void {
+    const query = (event.target as HTMLInputElement).value.trim();
+
+    this.filteredAddresses = query
+        ? this.filterItems(this.addresses || [], query)
+        : this.addresses || [];
+
+    this.selectedAddress = undefined;
+    this.selectedAddressId = 0;
+}
 
     onEmitButtonSaveYes(event) {
         if (event.value == 'yes' && event.type == 'deleteUsedAddress') {
@@ -114,29 +125,23 @@ addressSelected =
     //     this.spinnerService.hide();
     // }
 
-   selectAddress(): void {
+selectAddress(): void {
+    const address = this.filteredAddresses?.find(
+        item => Number(item.id) === Number(this.selectedAddressId)
+    );
 
-    if (!this.selectedAddress) {
+    if (!address) {
         return;
     }
 
-    const wasUpdated =
-        this.updatedAddressIds.includes(
-            this.selectedAddress.id
-        );
-
     this.addressSelected.emit({
-        address:
-            this.selectedAddress,
-
-        wasUpdated
+        address,
+        wasUpdated: this.updatedAddressIds.includes(address.id)
     });
 
     this.close();
-
     this.spinnerService.hide();
 }
-
     addNew(): void {
         this.addNewAddress.emit();
     }

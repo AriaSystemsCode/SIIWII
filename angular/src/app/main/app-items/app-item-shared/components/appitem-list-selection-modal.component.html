@@ -18,7 +18,7 @@
                     <h3 class="modal-title text-left">
                         <span> {{ l("MyLists") }}</span>
                     </h3>
-                    <button
+                    <button  style="position: absolute;top: 8px; width: 70px;" [ngStyle]="isArabic ? {'left':'0'} : {'right':'0'}"
                         type="button"
                         class="close modal-close-btn"
                         (click)="cancelSelection()"

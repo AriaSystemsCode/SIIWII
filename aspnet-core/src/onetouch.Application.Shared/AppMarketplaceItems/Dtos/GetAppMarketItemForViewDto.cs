@@ -144,6 +144,8 @@ namespace onetouch.AppMarketplaceItems.Dtos
     public class GetAppMarketplaceItemDto : EntityDto<long>
     {
 
+        public string SSIN { get; set; }
+
         [StringLength(AppItemConsts.MaxCodeLength, MinimumLength = AppItemConsts.MinCodeLength)]
         public string Code { get; set; }
 
