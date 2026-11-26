@@ -35,6 +35,7 @@ using onetouch.AppSiiwiiTransaction;
 using System.Security.Cryptography;
 using Microsoft.CodeAnalysis;
 using DevExpress.Data.Extensions;
+using Abp.Domain.Uow;
 
 namespace onetouch.Web.Services
 {
@@ -52,15 +53,18 @@ namespace onetouch.Web.Services
         private readonly IRepository<SycAttachmentCategory, long> _sycAttachmentCategoryRepository;
         //Iteration45[Start]
         private readonly IRepository<AppTransactionHeaders, long> _appTransactionHeadersRepository;
+        private IUnitOfWorkManager _unitOfWorkManager;
         //Iteration45[End]
         public CustomReportStorageWebExtension(IWebHostEnvironment env,
             IUserEmailer userEmailer
             , IRepository<AppAttachment, long> appAttachmentRepository
             , IRepository<AppEntityAttachment, long> appEntityAttachmentRepository
             , IRepository<SycAttachmentCategory, long> sycAttachmentCategoryRepository,
-            IRepository<AppTransactionHeaders, long> appTransactionHeadersRepository
+            IRepository<AppTransactionHeaders, long> appTransactionHeadersRepository,
+            IUnitOfWorkManager unitOfWorkManager
              )
         {
+            _unitOfWorkManager = unitOfWorkManager;
             ReportDirectory = Path.Combine(env.ContentRootPath, "Reports");
             if (!Directory.Exists(ReportDirectory))
             {
@@ -302,8 +306,15 @@ namespace onetouch.Web.Services
                         var transactionHeader = _appTransactionHeadersRepository.GetAll().Where(z => z.Id == long.Parse(transactionId)).FirstOrDefault();
                         if (transactionHeader != null)
                         {
-                            transactionHeader.OrderConfirmationTimeStamp = DateTime.UtcNow;
-                            _appTransactionHeadersRepository.Update(transactionHeader);
+                            
+                            using (_unitOfWorkManager.Current.DisableAuditing(
+    AbpAuditFields.LastModificationTime,
+    AbpAuditFields.LastModifierUserId))
+                            {
+                                transactionHeader.OrderConfirmationTimeStamp = DateTime.UtcNow;
+                                _appTransactionHeadersRepository.Update(transactionHeader);
+                                _unitOfWorkManager.Current.SaveChanges();
+                            }
                         }
                         //Iterqtion45[End]
 
