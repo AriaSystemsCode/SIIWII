@@ -1176,7 +1176,7 @@ namespace onetouch.AppSiiwiiTransaction
                         var conactBranch = await _appContactRepository.GetAll()
                         .Where(s => s.EntityFk.EntityObjectTypeId == branchEntityObjectTypeId && s.TenantId == AbpSession.TenantId &&
                         s.ParentId == contactCompany.Id).FirstOrDefaultAsync();
-                        
+
                         appTrans.AppTransactionContacts.Add(new AppTransactionContacts
                         {
                             ContactName = contact.Name,
@@ -1221,14 +1221,40 @@ namespace onetouch.AppSiiwiiTransaction
                                 ContactRole = ContactRoleEnum.SalesRep1.ToString(),
                                 CompanySSIN = contactCompany != null ? contactCompany.SSIN : null,
                                 CompanyName = contactCompany != null ? contactCompany.Name : null,
-                                BranchName = conactBranch != null? conactBranch.Name:null,
+                                BranchName = conactBranch != null ? conactBranch.Name : null,
+                                BranchSSIN = conactBranch != null ? conactBranch.SSIN : null
+                            });
+
+
+                        if (input.TransactionType == TransactionType.PurchaseOrder
+                            && input.EnteredByUserRole.Contains("I'm an Independent Buying Office"))
+                            appTrans.AppTransactionContacts.Add(new AppTransactionContacts
+                            {
+                                ContactName = contact.Name,
+                                ContactEmail = contact.EMailAddress,
+                                ContactSSIN = contact.SSIN,
+                                ContactPhoneTypeId = !string.IsNullOrEmpty(contact.Phone1Number) ? contact.Phone1TypeId :
+                               (!string.IsNullOrEmpty(contact.Phone2Number) ? contact.Phone2TypeId :
+                               (!string.IsNullOrEmpty(contact.Phone3Number) ? contact.Phone3TypeId : null)),
+                                ContactPhoneNumber = !string.IsNullOrEmpty(contact.Phone1Number) ? contact.Phone1Number :
+                               (!string.IsNullOrEmpty(contact.Phone2Number) ? contact.Phone2Number :
+                               (!string.IsNullOrEmpty(contact.Phone3Number) ? contact.Phone3Number : null)),
+                                ContactPhoneTypeName = !string.IsNullOrEmpty(contact.Phone1Number) ? contact.Phone1TypeName :
+                                (!string.IsNullOrEmpty(contact.Phone2Number) ? contact.Phone2TypeName :
+                                (!string.IsNullOrEmpty(contact.Phone3Number) ? contact.Phone3TypeName : null)),
+                                ContactAddressId = null,
+                                ContactAddressCode = null,
+                                ContactRole = ContactRoleEnum.BuyingOffice.ToString(),
+                                CompanySSIN = contactCompany != null ? contactCompany.SSIN : null,
+                                CompanyName = contactCompany != null ? contactCompany.Name : null,
+                                BranchName = conactBranch != null ? conactBranch.Name : null,
                                 BranchSSIN = conactBranch != null ? conactBranch.SSIN : null
                             });
 
                     }
 
 
-                }
+            }
                 //fix company code[start]
                 if (appTrans.AppTransactionContacts != null && appTrans.AppTransactionContacts.Count > 0)
                 {
