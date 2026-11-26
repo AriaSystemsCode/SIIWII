@@ -290,6 +290,7 @@ namespace onetouch.Web.Startup
             services.AddControllersWithViews(options =>
             {
                 options.Filters.Add(new AbpAutoValidateAntiforgeryTokenAttribute());
+                options.Filters.Add<ImportItemValidationNotificationFilter>();
             }).AddNewtonsoftJson();
 
             //services.AddMvc(options =>
