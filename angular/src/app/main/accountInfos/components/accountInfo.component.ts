@@ -1323,6 +1323,6 @@ export class AccountInfoComponent extends AppComponentBase implements OnInit, Af
     }
 
      ngOnDestroy(): void {
-    localStorage.removeItem('marketplaceAccountsBrowseState');
+    localStorage.removeItem('accountsBrowseState');
   }
 }

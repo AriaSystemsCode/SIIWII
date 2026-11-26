@@ -263,7 +263,7 @@ export class AppItemListListComponent extends AppComponentBase implements OnInit
         })
     }
      ngOnDestroy(): void {
-    localStorage.removeItem('marketplaceAccountsBrowseState');
+    localStorage.removeItem('accountsBrowseState');
   }
 
 }

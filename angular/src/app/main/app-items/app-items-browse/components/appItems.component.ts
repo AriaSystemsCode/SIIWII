@@ -645,6 +645,6 @@ showOverlay :boolean=false
     }
 
      ngOnDestroy(): void {
-    localStorage.removeItem('marketplaceAccountsBrowseState');
+    localStorage.removeItem('accountsBrowseState');
   }
 }

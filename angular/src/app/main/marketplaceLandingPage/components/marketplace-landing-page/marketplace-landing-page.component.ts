@@ -44,6 +44,8 @@ loginTenaneSsin:string
    this.getLoginAccountDataForView()
     localStorage.removeItem("productFilters");
     localStorage.removeItem("marketplaceAccountsBrowseState");
+    localStorage.removeItem("accountsBrowseState");
+    
     
     this.addLocal()
     this.pages = this.chunk(this.items, 9); // each page has 9 products
