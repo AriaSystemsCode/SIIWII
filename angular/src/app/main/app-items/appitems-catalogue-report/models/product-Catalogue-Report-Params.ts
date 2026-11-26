@@ -136,7 +136,7 @@ export class ProductCatalogueReportParams implements ProductCatalogueReportParam
        url += '&subject=' + this.subject
        url += '&body=' + this.body
        url += "&attachmentBaseUrl=" + this.attachmentBaseUrl
-       url += "&BKGround=" + this.BKGround
+       url += "&BKGround=" + encodeURIComponent(this.BKGround)
        url += "&ColorPageSort=" + this.ColorPageSort
        url += "&DetailPageSort=" + this.DetailPageSort
        url += "&DetailPageGroupByName=" + this.DetailPageGroupByName
