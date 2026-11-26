@@ -1496,7 +1496,8 @@ namespace onetouch.AppItems
             }
 
             var query = _appItemRepository.GetAll().Include(e => e.EntityFk).ThenInclude(e => e.EntityAttachments)
-                .Where(e => (e.SharingLevel == 1 || e.SharingLevel == 2)
+                .Where(e => e.TenantOwner == AbpSession.TenantId
+                    && (e.SharingLevel == 1 || e.SharingLevel == 2)
                     && (e.EntityId != input.EntityId)
                     && !exceptList.Contains(e.EntityId)
                     && (e.ParentId == 0 || e.ParentId == null)
