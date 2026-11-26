@@ -10525,23 +10525,24 @@ namespace onetouch.Accounts
                 var myTenantObject = await TenantManager.GetByIdAsync(int.Parse(AbpSession.TenantId.ToString()));
                 string tenancyName = myTenantObject.TenancyName;
 
-                var adminRole = await _roleManager.Roles
-                        .FirstOrDefaultAsync(r => r.TenantId == int.Parse(AbpSession.TenantId.ToString()) && r.Name == StaticRoleNames.Tenants.Admin);
+                //var adminRole = await _roleManager.Roles
+                //        .FirstOrDefaultAsync(r => r.TenantId == int.Parse(AbpSession.TenantId.ToString()) && r.Name == StaticRoleNames.Tenants.Admin);
 
-                Authorization.Users.User adminUser = null;
-                if (adminRole != null)
-                {
-                    var adminRoleId = adminRole.Id;
+                //Authorization.Users.User adminUser = null;
+                //if (adminRole != null)
+                //{
+                //    var adminRoleId = adminRole.Id;
 
-                    adminUser = await _userManager.Users
-                        .Where(u => u.TenantId == int.Parse(AbpSession.TenantId.ToString()))
-                        .Where(u => u.Roles.Any(r => r.RoleId == adminRoleId))
-                        .FirstOrDefaultAsync();
-                }
+                //    adminUser = await _userManager.Users
+                //        .Where(u => u.TenantId == int.Parse(AbpSession.TenantId.ToString()))
+                //        .Where(u => u.Roles.Any(r => r.RoleId == adminRoleId))
+                //        .FirstOrDefaultAsync();
+                //}
                 //var adminUser = await UserManager.FindByNameAsync("admin@" + tenancyName);
+                var adminUser = long.Parse(AbpSession.UserId.ToString());
                 if (adminUser != null)
                 {
-                    await _appNotifier.SendMessageAsync(new Abp.UserIdentifier(AbpSession.TenantId, adminUser.Id),
+                    await _appNotifier.SendMessageAsync(new Abp.UserIdentifier(AbpSession.TenantId, adminUser),
                         "Accounts imported successfully.",
                         Abp.Notifications.NotificationSeverity.Info, null);//new Abp.Domain.Entities.EntityIdentifier(typeof(AppContact), originalPublishContactFortCurrTenant.Id));
                 }
