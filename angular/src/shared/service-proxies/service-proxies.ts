@@ -14849,7 +14849,7 @@ export class AppItemsServiceProxy {
      * @param key (optional) 
      * @return Success
      */
-    syncSelectedProduct(key: string | undefined): Observable<number> {
+    syncSelectedProduct(key: string | undefined): Observable<string> {
         let url_ = this.baseUrl + "/api/services/app/AppItems/SyncSelectedProduct?";
         if (key === null)
             throw new Error("The parameter 'key' cannot be null.");
@@ -14872,14 +14872,14 @@ export class AppItemsServiceProxy {
                 try {
                     return this.processSyncSelectedProduct(response_ as any);
                 } catch (e) {
-                    return _observableThrow(e) as any as Observable<number>;
+                    return _observableThrow(e) as any as Observable<string>;
                 }
             } else
-                return _observableThrow(response_) as any as Observable<number>;
+                return _observableThrow(response_) as any as Observable<string>;
         }));
     }
 
-    protected processSyncSelectedProduct(response: HttpResponseBase): Observable<number> {
+    protected processSyncSelectedProduct(response: HttpResponseBase): Observable<string> {
         const status = response.status;
         const responseBlob =
             response instanceof HttpResponse ? response.body :

@@ -529,25 +529,19 @@ showOverlay :boolean=false
     }
     bulkSyncItems(){
         this.showMainSpinner()
-        let _result=0;
         this._appItemsServiceProxy
         .syncSelectedProduct(this.filterBody.selectorKey)
         .pipe(
             finalize(() => {
                 this.hideMainSpinner();
             }))
-        .subscribe((result) => {
-            _result = result;
-            if (_result === 0) {
-                this.notify.success(this.l(_result + " Item synced"));
-                this.reloadPage();
-                return;
-            }
-
+        .subscribe((message) => {
+            const hasFailures = / failed\.|could not be started/i.test(message ?? "");
+            const nothingToSync = message?.startsWith("No published products") ?? false;
             Swal.fire({
-                title: "",
-                text: _result?.toString() + " of " + this.multiSelectionInfo?.totalCount?.toString() + " products will be synced",
-                icon: "info",
+                title: hasFailures ? "Sync completed with errors" : nothingToSync ? "Nothing to sync" : "Sync completed",
+                text: message,
+                icon: hasFailures ? "warning" : nothingToSync ? "info" : "success",
                 confirmButtonText: "OK",
                 customClass: {
                     popup: "popup-class",
@@ -556,12 +550,11 @@ showOverlay :boolean=false
                     actions: "actions-class",
                     confirmButton: "confirm-button-class",
                 },
-            }).then((swalResult) => {
-                if (swalResult.isConfirmed) {
-                    this.notify.success(this.l(_result + " Item synced"));
-                }
+            }).then(() => {
+                this.reloadPage();
             });
-
+        }, () => {
+            // Unexpected request-level failures are displayed by the global HTTP handler.
             this.reloadPage();
         });
     }

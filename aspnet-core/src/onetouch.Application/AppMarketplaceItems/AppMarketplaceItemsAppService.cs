@@ -1220,24 +1220,28 @@ namespace onetouch.AppMarketplaceItems
                             if (!string.IsNullOrEmpty(variations) || varAppItems.Any())
                             {
                                 //MMT
-                                string firstAttributeId = "";
-                                var frstAttId = varAppItems.Select(x => x.EntityAttachments.Where(z => z.Attributes.Contains("=")).Select(a => a.Attributes)).FirstOrDefault();
-                                if (frstAttId != null & frstAttId.Count() > 0)
-                                    firstAttributeId = frstAttId.FirstOrDefault().ToString().Split("=")[0];
-
                             var firstItem = varAppItems.FirstOrDefault();
+                            if (firstItem == null)
+                                throw new InvalidOperationException("The Marketplace product has variation settings but no linked variations.");
+
+                            var imageAttribute = firstItem.EntityAttachments
+                                ?.FirstOrDefault(attachment => attachment.Attributes?.Contains("=") == true)?.Attributes;
+                            var hasImageAttribute = long.TryParse(imageAttribute?.Split('=')[0], out var imageAttributeId) &&
+                                firstItem.EntityExtraData.Any(attribute => attribute.AttributeId == imageAttributeId);
                             List<string> attributeValues = firstItem.EntityExtraData.OrderBy(z=>z.AttributeId).Select(x => x.EntityObjectTypeCode).Distinct().ToList();
                             List<string> attributeIDs = firstItem.EntityExtraData.OrderBy(z => z.AttributeId).Select(x => x.AttributeId.ToString()).Distinct().ToList();
-                            var firstAttributeID = firstItem.EntityExtraData.WhereIf(!string.IsNullOrEmpty(firstAttributeId),
-                                a => a.AttributeId == long.Parse(firstAttributeId)).Select(x => x.AttributeId)
+                            var firstAttributeID = firstItem.EntityExtraData.WhereIf(hasImageAttribute,
+                                a => a.AttributeId == imageAttributeId).Select(x => x.AttributeId)
                                 .FirstOrDefault().ToString();
                             var secondAttId = attributeIDs.FirstOrDefault(a => a != firstAttributeID.ToString());
-                            var firstAttributeValue = firstItem.EntityExtraData.WhereIf(!string.IsNullOrEmpty(firstAttributeId), a => a.AttributeId == long.Parse(firstAttributeId)).Select(x => x.EntityObjectTypeCode.ToString()).FirstOrDefault();
+                            var firstAttributeValue = firstItem.EntityExtraData.WhereIf(hasImageAttribute, a => a.AttributeId == imageAttributeId).Select(x => x.EntityObjectTypeCode).FirstOrDefault();
                             //var firstattributeValues1 = varAppItems.Select(x => x.EntityFk.EntityExtraData.Where(z => z.AttributeId == long.Parse(firstAttributeID1)).Select (z=> z.AttributeValue)).Distinct().ToList ();
                             var firstattributeValues = varAppItems.Select(x => x.EntityExtraData.Where(z => z.AttributeId == long.Parse(firstAttributeID))
                                                        .Select(z => z.AttributeValue)).Distinct().Select(a => a.FirstOrDefault()).Distinct().ToList();//.ToList().FirstOrDefault().Distinct().ToList();
                             int firstattributeValuesCount = firstattributeValues.Count();
-                            var firstattributeDefaultImages1 = varAppItems.Select(x => x.EntityAttachments.Where(z => z.Attributes.Contains(firstAttributeID) & z.IsDefault).Select(z => new { z.AttachmentFk.Attachment, z.Attributes })).ToList().Distinct().ToList().Distinct().ToList();
+                            var firstattributeDefaultImages1 = varAppItems.Select(x => x.EntityAttachments
+                                .Where(z => z.IsDefault && z.AttachmentFk != null && z.Attributes?.Contains(firstAttributeID) == true)
+                                .Select(z => new { z.AttachmentFk.Attachment, z.Attributes })).ToList().Distinct().ToList().Distinct().ToList();
                             var firstattributeDefaultImages = firstattributeDefaultImages1.Select(x => x.FirstOrDefault()).Distinct().ToList();
                             var secondAttributeValuesFor1st = new List<string>();
                             //xx
@@ -1383,7 +1387,7 @@ namespace onetouch.AppMarketplaceItems
                                                 extraDataSelectedValues.DefaultEntityAttachment.Url = imagesUrl + (tenantIdvar == null ? "-1" : tenantIdvar.ToString()) + @"/" + imgObj.Attachment.ToString();
                                             }
                                         }
-                                        if (codeItemVar.EntityAttachments != null && codeItemVar.EntityAttachments.Count() > 0)
+                                        if (codeItemVar?.EntityAttachments != null && codeItemVar.EntityAttachments.Count() > 0)
                                         {
                                             extraDataSelectedValues.EntityAttachments = new List<AppEntityAttachmentDto>();
                                             foreach (var attach in codeItemVar.EntityAttachments)
@@ -1818,7 +1822,11 @@ namespace onetouch.AppMarketplaceItems
                     }
                 }
             }
-            catch { throw new UserFriendlyException("This product has an issue. Please ask the product owner to re-share it."); }
+            catch (Exception ex)
+            {
+                Logger.Error($"Failed to load Marketplace product {input?.ItemId} (SSIN: {input?.ItemSSIN}).", ex);
+                throw new UserFriendlyException("This product has an issue. Please ask the product owner to re-share it.");
+            }
         }
         [AbpAllowAnonymous]
         //Iteration#49,1 MMT 09/28/2025 Allow unauthenticated user to view the product marketplace browse page[End]
