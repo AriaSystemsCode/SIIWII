@@ -530,6 +530,19 @@ namespace onetouch.AppDashboards
             { 
                 return await GetDashboardForView(defaultDashboard.EntityId);
             }
+            else
+            {
+                var firstDashboard = await _appEntitySharingRepository.GetAll()
+                .Where(z => z.EntityFk.EntityObjectTypeId == dashboardObjectTypeId
+                && z.SharedUserId == AbpSession.UserId).FirstOrDefaultAsync();
+                if (firstDashboard != null)
+                {
+                    firstDashboard.IsDefault = true;
+                    await _appEntitySharingRepository.UpdateAsync(firstDashboard);
+                    await CurrentUnitOfWork.SaveChangesAsync();
+                    return await GetDashboardForView(firstDashboard.EntityId);
+                }
+            }
             return null;
         }
         public async Task MarkDashboardAsDefault(long dashboardID)
@@ -605,7 +618,22 @@ namespace onetouch.AppDashboards
                 entity.EntityObjectTypeId = dashboardObjectTypeId;
                 var entityId = await _appEntitiesAppService.SaveEntity(entity);
                 await CurrentUnitOfWork.SaveChangesAsync();
-                //await UpdateViewDate(entityId);
+
+                var sharing = new AppEntitySharings();
+                sharing.SharedTenantId = AbpSession.TenantId;
+                sharing.EntityId = entityId;
+                sharing.SharedUserId = AbpSession.UserId;
+                sharing.CanEdit = true;
+                sharing.EntityCode = entity.Code;
+                sharing.EntityObjectTypeCode = entity.EntityObjectTypeCode;
+                var tenantObj = await TenantManager.GetByIdAsync(int.Parse(AbpSession.TenantId.ToString()));
+                if (tenantObj != null)
+                    sharing.SharedTenantName = tenantObj.TenancyName;
+                var userObj = await UserManager.GetUserByIdAsync(long.Parse(AbpSession.UserId.ToString()));
+                if (userObj != null)
+                    sharing.SharedUserName = userObj.UserName;
+                await _appEntitySharingRepository.InsertAsync(sharing);
+                await CurrentUnitOfWork.SaveChangesAsync();
 
             }
             else
