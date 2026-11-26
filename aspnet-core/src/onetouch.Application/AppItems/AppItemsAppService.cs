@@ -60,6 +60,7 @@ using System.Transactions;
 using System.Xml.Serialization;
 using ExtraAttribute = onetouch.AppItems.Dtos.ExtraAttribute;
 using onetouch.AppMarketplaceItems;
+using onetouch.AppMarketplaceItems.Dtos;
 using Z.EntityFramework.Plus;
 using static Microsoft.EntityFrameworkCore.DbLoggerCategory;
 using onetouch.AppMarketplaceItemLists;
@@ -130,6 +131,7 @@ namespace onetouch.AppItems
         private readonly IRepository<AppSizeScalesHeader, long> _appSizeScalesHeaderRepository;
         private readonly IRepository<AppMarketplaceItemSharings, long> _appMarketplaceItemSharing;
         private readonly IRepository<AppMarketplaceItems.AppMarketplaceItems, long> _appMarketplaceItem;
+        private readonly IAppMarketplaceItemsAppService _marketplaceItemsAppService;
         private readonly IRepository<AppMarketplaceItemPrices, long> _appMarketplaceItemPricesRepository;
         TimeZoneInfoAppService _timeZoneInfoAppService;
         private readonly IRepository<AppTransactionDetails, long> _appTransactionDetails;
@@ -181,6 +183,7 @@ namespace onetouch.AppItems
              IBackgroundJobManager backgroundJobManager,
              IAbpStartupConfiguration abpStartupConfiguration,
              IRepository<AppContact, long> appContactRepository,
+             IAppMarketplaceItemsAppService marketplaceItemsAppService,
              RoleManager roleManager,
              UserManager userManager,
              onetouch.Storage.ITempFileCacheManager productExportFileCache
@@ -200,6 +203,7 @@ namespace onetouch.AppItems
             _sycEntityObjectTypeRepository = sycEntityObjectTypeRepository;
             _appEntityAttachmentRepository = appEntityAttachment;
             _appMarketplaceItem = appMarketplaceItem;
+            _marketplaceItemsAppService = marketplaceItemsAppService;
             _appMarketplaceItemSharing = appMarketplaceItemSharing;
             _appMarketplaceItemPricesRepository = appMarketplaceItemPricesRepository;
             _syObjectRepository = syObjectRepository;
@@ -3273,7 +3277,7 @@ namespace onetouch.AppItems
         public async Task<string> SyncSelectedProduct(Guid key)
         {
             var timer = Stopwatch.StartNew();
-            List<long> itemIds;
+            List<AppItem> productsToSync;
             Dictionary<long, List<long>> publishedIds;
             try
             {
@@ -3290,9 +3294,8 @@ namespace onetouch.AppItems
                         publishedIds = await ResolvePublishedProductIds(selectedItems);
                         // An explicit sync must also repair legacy products whose timestamps
                         // were never advanced when their data changed, just like SyncProduct.
-                        itemIds = selectedItems.Where(item => publishedIds[item.Id].Count > 0)
-                            .Select(item => item.Id).ToList();
-                        Logger.Info($"Bulk sync selection: {selectedItems.Count} selected, {itemIds.Count} published products to sync.");
+                        productsToSync = selectedItems.Where(item => publishedIds[item.Id].Count > 0).ToList();
+                        Logger.Info($"Bulk sync selection: {selectedItems.Count} selected, {productsToSync.Count} published products to sync.");
                     }
                     await selectionUnitOfWork.CompleteAsync();
                 }
@@ -3300,16 +3303,17 @@ namespace onetouch.AppItems
             catch (Exception ex)
             {
                 Logger.Error("Failed to prepare the selected products for sync.", ex);
-                return $"Product sync could not be started: {ex.GetBaseException().Message}";
+                return "Product sync could not be started. Please retry the selection or contact support.";
             }
 
-            if (itemIds.Count == 0)
+            if (productsToSync.Count == 0)
                 return "No published products were found in the selection. Share products before syncing them.";
 
             long returnCount = 0;
             var failures = new List<string>();
-            foreach (var itemId in itemIds)
+            foreach (var product in productsToSync)
             {
+                var itemId = product.Id;
                 var itemTimer = Stopwatch.StartNew();
                 try
                 {
@@ -3325,8 +3329,9 @@ namespace onetouch.AppItems
                 }
                 catch (Exception ex)
                 {
-                    var reason = ex.GetBaseException().Message;
-                    failures.Add($"Product {itemId}: {reason}");
+                    var reason = ex is UserFriendlyException ? ex.Message : "An unexpected error occurred. Contact support if the problem persists.";
+                    var productCode = string.IsNullOrWhiteSpace(product.Code) ? product.SSIN : product.Code;
+                    failures.Add($"Product {productCode}: {reason}");
                     Logger.Error($"Failed to sync selected product {itemId} after {itemTimer.ElapsedMilliseconds} ms.", ex);
                 }
             }
@@ -3689,6 +3694,8 @@ namespace onetouch.AppItems
 
                     appItem.ItemSizeScaleHeadersFkList = await _appItemSizeScalesHeaderRepository.GetAll()
                         .Include(a => a.AppItemSizeScalesDetails).AsNoTracking().Where(a => a.AppItemId == input.AppItemId).ToListAsync();
+                    if (input.SyncProduct)
+                        ValidateProductVariationsForSync(appItem);
                     await EnsureBaseSizeScaleForSharing(appItem);
                     appItem.ItemPricesFkList = await _appItemPricesRepository.GetAll().AsNoTracking().Where(a => a.AppItemId == input.AppItemId).ToListAsync();
                     EnsureDefaultPrices(appItem.ItemPricesFkList);
@@ -3748,7 +3755,12 @@ namespace onetouch.AppItems
                         .Include(item => item.ItemPricesFkList)
                         .FirstOrDefaultAsync(item => item.Id == marketplaceItemId);
                     LogPhase("marketplace loaded");
+                    if (input.SyncProduct && marketplaceItem == null)
+                        throw new UserFriendlyException("The shared Marketplace product could not be found. Share the product before syncing it.");
+
                     var publishedRelatedItems = await ResolvePublishedRelatedItems(appItem);
+                    var publishedRelationships = MapPublishedRelationships(appItem.EntityFk.EntitiesRelationships,
+                        publishedRelatedItems, marketplaceItem?.Code ?? appItem.SSIN);
 
                     List<AppItemPrices> prefetchedPrices = null;
                     List<AppMarketplaceItems.AppMarketplaceItems> prefetchedChildren = null;
@@ -3779,8 +3791,8 @@ namespace onetouch.AppItems
                             if (publishedChild != null && PublicationMatches(x, child, publishedChild, appItem, marketplaceItem))
                                 currentVariationSsins.Add(child.SSIN);
                         }
-                        parentContentIsCurrent = PublicationMatches(x, appItem, marketplaceItem,
-                            publishedRelatedItems: publishedRelatedItems);
+                        parentContentIsCurrent = marketplaceItem.ParentId == marketplaceParentId &&
+                            PublicationMatches(x, appItem, marketplaceItem, desiredRelationships: publishedRelationships);
                         if (parentContentIsCurrent && currentVariationSsins.Count == appItem.ParentFkList.Count &&
                             prefetchedChildren.Count == appItem.ParentFkList.Count)
                         {
@@ -3794,6 +3806,7 @@ namespace onetouch.AppItems
                             }
                             if (x.ChangeTracker.HasChanges())
                                 await CurrentUnitOfWork.SaveChangesAsync();
+                            await ValidateMarketplaceProductAfterSync(appItem, marketplaceItem.Id);
                             LogPhase($"content verified current ({currentVariationSsins.Count} variations); no collection rebuild");
                             return;
                         }
@@ -3980,9 +3993,7 @@ namespace onetouch.AppItems
                                 clas.Id = 0;
                             }
                         }
-                        marketplaceItem.EntitiesRelationships = MapPublishedRelationships(
-                            appItem.EntityFk.EntitiesRelationships, publishedRelatedItems, marketplaceItem.Code);
-
+                        marketplaceItem.EntitiesRelationships = publishedRelationships;
 
                         if (!input.SyncProduct && marketplaceItem != null && publishedEntityId != 0)
                         {
@@ -4046,6 +4057,37 @@ namespace onetouch.AppItems
                     }
                     LogPhase("parent saved");
                     var publishedMarketplaceParentId = marketplaceItem.Id;
+                    async Task SaveVariationChangesAsync(Func<Task> saveChanges)
+                    {
+                        try
+                        {
+                            await saveChanges();
+                        }
+                        catch (DbUpdateException ex) when (ex.InnerException is Microsoft.Data.SqlClient.SqlException sqlException &&
+                            sqlException.Number == 547 &&
+                            sqlException.Message.Contains("FK_AppMarketplaceItems_AppMarketplaceItems_ParentId"))
+                        {
+                            var pendingMarketplaceItems = x.ChangeTracker.Entries<AppMarketplaceItems.AppMarketplaceItems>()
+                                .Where(entry => entry.State != EntityState.Unchanged && entry.State != EntityState.Detached)
+                                .Select(entry =>
+                                {
+                                    var parentId = entry.Property(item => item.ParentId);
+                                    return $"Id={entry.Entity.Id}, Code={entry.Entity.Code}, State={entry.State}, " +
+                                        $"ParentId={entry.Entity.ParentId?.ToString() ?? "NULL"}, " +
+                                        $"OriginalParentId={parentId.OriginalValue?.ToString() ?? "NULL"}, " +
+                                        $"ParentIdModified={parentId.IsModified}, " +
+                                        $"ParentFkId={entry.Entity.ParentFk?.Id.ToString() ?? "NULL"}";
+                                });
+                            var failedMarketplaceIds = ex.Entries
+                                .Where(entry => entry.Entity is AppMarketplaceItems.AppMarketplaceItems)
+                                .Select(entry => ((AppMarketplaceItems.AppMarketplaceItems)entry.Entity).Id);
+                            Logger.Error($"Sync/share of source item {input.AppItemId} failed while saving variations. " +
+                                $"Marketplace parent Id={publishedMarketplaceParentId}. " +
+                                $"Failed entry Ids=[{string.Join(", ", failedMarketplaceIds)}]. " +
+                                $"Pending marketplace rows=[{string.Join("; ", pendingMarketplaceItems)}].", ex);
+                            throw;
+                        }
+                    }
                     //Delete removed child items
                     if (marketplaceItem != null && publishedEntityId != 0 && children != null && children.Count > 0)  //&& marketplaceItem.ParentFkList != null
                     {
@@ -4059,7 +4101,7 @@ namespace onetouch.AppItems
 
                             await _appMarketplaceItemPricesRepository.DeleteAsync(x => toBeDeletedIds.Contains(x.AppMarketplaceItemId));
 
-                            await x.SaveChangesAsync();
+                            await SaveVariationChangesAsync(() => x.SaveChangesAsync());
                         }
                         //XX
                     }
@@ -4111,7 +4153,7 @@ namespace onetouch.AppItems
                         }
                     }
                     if (childrenToUpdate.Count > 0)
-                        await x.SaveChangesAsync();
+                        await SaveVariationChangesAsync(() => x.SaveChangesAsync());
                     x.ChangeTracker.Clear();
 
                     LogPhase("variations loaded and old collections removed");
@@ -4240,42 +4282,64 @@ namespace onetouch.AppItems
                             publishChild = await _appMarketplaceItem.UpdateAsync(publishChild);
                         }
                     }
-                    try
-                    {
-                        await CurrentUnitOfWork.SaveChangesAsync();
-                    }
-                    catch (DbUpdateException ex) when (ex.InnerException is Microsoft.Data.SqlClient.SqlException sqlException &&
-                        sqlException.Number == 547 &&
-                        sqlException.Message.Contains("FK_AppMarketplaceItems_AppMarketplaceItems_ParentId"))
-                    {
-                        var pendingMarketplaceItems = x.ChangeTracker.Entries<AppMarketplaceItems.AppMarketplaceItems>()
-                            .Where(entry => entry.State != EntityState.Unchanged && entry.State != EntityState.Detached)
-                            .Select(entry =>
-                            {
-                                var parentId = entry.Property(item => item.ParentId);
-                                return $"Id={entry.Entity.Id}, Code={entry.Entity.Code}, State={entry.State}, " +
-                                    $"ParentId={entry.Entity.ParentId?.ToString() ?? "NULL"}, " +
-                                    $"OriginalParentId={parentId.OriginalValue?.ToString() ?? "NULL"}, " +
-                                    $"ParentIdModified={parentId.IsModified}, " +
-                                    $"ParentFkId={entry.Entity.ParentFk?.Id.ToString() ?? "NULL"}";
-                            });
-                        var failedMarketplaceIds = ex.Entries
-                            .Where(entry => entry.Entity is AppMarketplaceItems.AppMarketplaceItems)
-                            .Select(entry => ((AppMarketplaceItems.AppMarketplaceItems)entry.Entity).Id);
-                        Logger.Error($"Sync/share of source item {input.AppItemId} failed while saving variations. " +
-                            $"Marketplace parent Id={marketplaceItem.Id}. " +
-                            $"Failed entry Ids=[{string.Join(", ", failedMarketplaceIds)}]. " +
-                            $"Pending marketplace rows=[{string.Join("; ", pendingMarketplaceItems)}].", ex);
-                        throw;
-                    }
+                    await SaveVariationChangesAsync(() => CurrentUnitOfWork.SaveChangesAsync());
                     x.ChangeTracker.Clear();
                     LogPhase("variations saved");
+                    if (input.SyncProduct)
+                        await ValidateMarketplaceProductAfterSync(appItem, marketplaceItem.Id);
                     //send notification to the users
 
                 }
             }
 
         }
+        private static void ValidateProductVariationsForSync(AppItem product)
+        {
+            if (product.ParentFkList.Count == 0 && !string.IsNullOrWhiteSpace(product.Variations))
+                throw new UserFriendlyException("The product has variation settings but no variation records. Correct the product before syncing.");
+
+            var variationSsins = new HashSet<string>(StringComparer.OrdinalIgnoreCase);
+            foreach (var variation in product.ParentFkList)
+            {
+                if (string.IsNullOrWhiteSpace(variation.SSIN) || !variationSsins.Add(variation.SSIN))
+                    throw new UserFriendlyException($"Variation {variation.Code} has a missing or duplicate SSIN. Correct the variation before syncing.");
+
+                if (variation.EntityFk?.EntityExtraData == null || !variation.EntityFk.EntityExtraData.Any(attribute =>
+                    attribute.AttributeId > 0 && (!string.IsNullOrWhiteSpace(attribute.AttributeValue) ||
+                    !string.IsNullOrWhiteSpace(attribute.AttributeCode) || attribute.AttributeValueId.HasValue)))
+                    throw new UserFriendlyException($"Variation {variation.Code} is missing its variation attributes. Correct the variation before syncing.");
+            }
+        }
+
+        private async Task ValidateMarketplaceProductAfterSync(AppItem source, long marketplaceItemId)
+        {
+            var publishedVariations = await _appMarketplaceItem.GetAll().AsNoTracking()
+                .Where(variation => variation.ParentId == marketplaceItemId)
+                .Select(variation => new { variation.SSIN, variation.Code }).ToListAsync();
+            var publishedSsins = new HashSet<string>(publishedVariations.SelectMany(variation =>
+                new[] { variation.SSIN, variation.Code }), StringComparer.OrdinalIgnoreCase);
+            if (publishedVariations.Count != source.ParentFkList.Count ||
+                source.ParentFkList.Any(variation => !publishedSsins.Contains(variation.SSIN)))
+                throw new UserFriendlyException("The Marketplace variations do not match the source product. Contact support if retrying does not resolve it.");
+
+            GetAppMarketplaceItemDetailForViewDto view;
+            try
+            {
+                view = await _marketplaceItemsAppService.GetMarketplaceAppItemForView(
+                    new GetAppMarketplaceItemWithPagedAttributesForViewInput { ItemId = marketplaceItemId });
+            }
+            catch (UserFriendlyException ex)
+            {
+                throw new UserFriendlyException("Marketplace could not load the synced product. Contact support if retrying does not resolve it.", ex);
+            }
+
+            if (view?.AppItem == null)
+                throw new UserFriendlyException("The Marketplace detail view returned no product after sync.");
+            if (source.ParentFkList.Count > 0 && view.AppItem.variations?.Any(attribute =>
+                attribute.selectedValues?.Any(value => !string.IsNullOrWhiteSpace(value.value)) == true) != true)
+                throw new UserFriendlyException("The synced variations could not be displayed in Marketplace. Check the product's variation values.");
+        }
+
         private static void CopyPublicationFiles(AppItem source, Action<string> copyFile)
         {
             foreach (var attachment in source.EntityFk.EntityAttachments ?? new List<AppEntityAttachment>())

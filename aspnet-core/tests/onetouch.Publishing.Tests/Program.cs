@@ -1,4 +1,5 @@
 using System.Reflection;
+using Abp.UI;
 using Microsoft.EntityFrameworkCore;
 using onetouch.AppEntities;
 using onetouch.AppItems;
@@ -12,6 +13,49 @@ CheckPublicationGraph(existing: false);
 CheckPublicationGraph(existing: true);
 PublicationComparisonChecks.Run();
 Console.WriteLine("PASS: first publication and resync attach multiple variations with independent attributes and correct owners.");
+CheckSyncSourceValidation();
+
+static void CheckSyncSourceValidation()
+{
+    var validate = typeof(AppItemsAppService).GetMethod("ValidateProductVariationsForSync", BindingFlags.NonPublic | BindingFlags.Static)!;
+    var product = new AppItem { ParentFkList = new List<AppItem>() };
+    validate.Invoke(null, new object[] { product });
+
+    product.Variations = "COLOR";
+    Reject("no variation records");
+
+    var variation = new AppItem { Code = "TOP01-BLACK-S" };
+    product.ParentFkList.Add(variation);
+    Reject("missing or duplicate SSIN");
+
+    variation.SSIN = "VAR-1";
+    Reject("missing its variation attributes");
+
+    variation.EntityFk = new AppEntity
+    {
+        EntityExtraData = new List<AppEntityExtraData> { new() { AttributeId = 1, AttributeValue = "Black" } }
+    };
+    validate.Invoke(null, new object[] { product });
+
+    product.ParentFkList.Add(new AppItem { Code = "TOP01-BLACK-M", SSIN = "var-1" });
+    Reject("missing or duplicate SSIN");
+    Console.WriteLine("PASS: sync accepts complete source variations without images and rejects incomplete or duplicate variations.");
+
+    void Reject(string expectedReason)
+    {
+        try
+        {
+            validate.Invoke(null, new object[] { product });
+        }
+        catch (TargetInvocationException ex) when (ex.InnerException is UserFriendlyException failure &&
+            failure.Message.Contains(expectedReason, StringComparison.Ordinal))
+        {
+            return;
+        }
+
+        throw new InvalidOperationException($"Expected sync validation to report {expectedReason}.");
+    }
+}
 
 static void CheckPublicationGraph(bool existing)
 {
