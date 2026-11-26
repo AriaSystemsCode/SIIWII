@@ -1,7 +1,7 @@
 <div bsModal #uploadStatus="bs-modal" class="modal fade" tabindex="-1" role="dialog" aria-labelledby="uploadStatus"
   aria-hidden="true" [config]="{backdrop: 'static'}">
-  <div class="modal-dialog modal-xl modalCenter">
-    <div class="modal-content">
+  <div class="modal-dialog modal-xl modalCenter upload-status-modal">
+    <div class="modal-content upload-status-modal">
       <div class="modal-header-custom">
         <h5 class="modal-title font-weight-bold">Import {{ImportTypes[importType]}} information</h5>
         <div>
@@ -453,13 +453,16 @@
                                       (click)="selectSuggestion(record, item)" class="dropdown-item pointer">
                                       {{item.displayName}}
                                     </li>
-                                  </ul>
+                                  </ul> 
                                 </ng-container>
 
                                 <input *ngIf="column.name === 'Price Currency Code'" type="text"
-                                  class="form-control link-parent-input force-uppercase"
-                                  [ngModel]="getRecordValue(record, 'priceCurrencyCode')"
-                                  (ngModelChange)="setRecordValue(record, 'priceCurrencyCode', $event?.toUpperCase())" />
+                                  class="form-control force-uppercase"
+                                  [ngModel]="getRecordValue(record, column.key)"
+                                  (ngModelChange)="setRecordValue(record, column.key, $event?.toUpperCase())"
+                                  [disabled]="record.recordType === 'Image' || !record._inAction"
+                                  [ngClass]="{ 'link-parent-input': record.recordType !== 'Image' && record._inAction }"
+                                  [ngStyle]="{ 'cursor': record.recordType === 'Image' || !record._inAction ? 'not-allowed' : 'text' }" />
 
 
 
