@@ -1,0 +1,105 @@
+<div class="filter-panel" [attr.dir]="isArabic ? 'rtl' : 'ltr'">
+
+    <!-- <div class="filter-panel__header">
+        <h5 class="filter-panel__title">{{ 'Filters' | localize }}</h5>
+        <button type="button" class="filter-panel__close" (click)="closed.emit()" [title]="'Close' | localize">
+            <i class="fa fa-times"></i>
+        </button>
+    </div> -->
+
+    <form class="filter-panel__body" autocomplete="off" [formGroup]="form" (keydown.enter)="$event.preventDefault()">
+
+        <!-- ================= HEADER FILTERS ================= -->
+        <ng-container *ngIf="mode === 'header'">
+
+            <div class="form-group">
+                <label for="SellerNameFilter">{{ l('SellerName') }}</label>
+                <input type="text" class="form-control" id="SellerNameFilter" formControlName="sellerNameFilter"
+                    (keyup)="onTyping()">
+            </div>
+
+            <div class="form-group">
+                <label for="BuyerNameFilter">{{ l('BuyerName') }}</label>
+                <input type="text" class="form-control" id="BuyerNameFilter" formControlName="buyerNameFilter"
+                    (keyup)="onTyping()">
+            </div>
+
+            <div class="form-group">
+                <label for="CodeFilter">{{ l('Code') }}</label>
+                <input type="text" class="form-control" id="CodeFilter" formControlName="codeFilter"
+                    (keyup)="onTyping()">
+            </div>
+
+            <div class="form-group">
+                <label for="referenceNumberFilter">{{ l('ReferenceNumber') }}</label>
+                <input type="text" class="form-control" id="referenceNumberFilter"
+                    formControlName="referenceNumberFilter" (keyup)="onTyping()">
+            </div>
+
+            <div class="form-group">
+                <label for="statusFilter">{{ l('Status') }}</label>
+                <p-dropdown [options]="statusOptions" (onChange)="emitNow()" [placeholder]="'Any' | localize"
+                    [showClear]="true" appendTo="body" styleClass="w-100" formControlName="statusFilter">
+                </p-dropdown>
+            </div>
+
+            <div class="form-group">
+                <label>{{ l('DateCreateRange') }}</label>
+                <input class="form-control m-input mb-2" id="MinCreateDateFilter" formControlName="minCreateDateFilter"
+                    type="datetime" bsDatepicker placeholder="{{ l('MinValue') }}" (focusout)="emitNow()">
+                <input class="form-control m-input" id="MaxCreateDateFilter" formControlName="maxCreateDateFilter"
+                    type="datetime" bsDatepicker placeholder="{{ l('MaxValue') }}" (focusout)="emitNow()">
+            </div>
+
+            <div class="form-group">
+                <label>{{ l('DateCompleteRange') }}</label>
+                <input class="form-control m-input mb-2" id="MinCompleteDateFilter"
+                    formControlName="minCompleteDateFilter" type="datetime" bsDatepicker
+                    placeholder="{{ l('MinValue') }}" (focusout)="emitNow()">
+                <input class="form-control m-input" id="MaxCompleteDateFilter"
+                    formControlName="maxCompleteDateFilter" type="datetime" bsDatepicker
+                    placeholder="{{ l('MaxValue') }}" (focusout)="emitNow()">
+            </div>
+
+        </ng-container>
+
+        <!-- ================= DETAILS FILTERS ================= -->
+        <ng-container *ngIf="mode === 'details'">
+
+            <div class="form-group">
+                <label for="transactionNumberFilter">{{ l('Transaction Number') }}</label>
+                <input type="text" class="form-control" id="transactionNumberFilter"
+                    formControlName="transactionNumberFilter" (keyup)="onTyping()">
+            </div>
+
+            <div class="form-group">
+                <label for="variationCodeFilter">{{ l('VariationCode') }}</label>
+                <input type="text" class="form-control" id="variationCodeFilter"
+                    formControlName="variationCodeFilter" (keyup)="onTyping()">
+            </div>
+
+            <div class="form-group">
+                <label>{{ l('Price Range') }}</label>
+                <input class="form-control m-input mb-2" id="minPrice" formControlName="minPrice" type="number"
+                    placeholder="{{ l('MinValue') }}" (keyup)="onTyping()" (change)="emitNow()">
+                <input class="form-control m-input" id="maxPrice" formControlName="maxPrice" type="number"
+                    placeholder="{{ l('MaxValue') }}" (keyup)="onTyping()" (change)="emitNow()">
+            </div>
+
+            <div class="form-group">
+                <label>{{ l('Amount Range') }}</label>
+                <input class="form-control m-input mb-2" id="minAmount" formControlName="minAmount" type="number"
+                    placeholder="{{ l('MinValue') }}" (keyup)="onTyping()" (change)="emitNow()">
+                <input class="form-control m-input" id="maxAmount" formControlName="maxAmount" type="number"
+                    placeholder="{{ l('MaxValue') }}" (keyup)="onTyping()" (change)="emitNow()">
+            </div>
+
+        </ng-container>
+    </form>
+
+    <!-- <div class="filter-panel__footer">
+        <button type="button" class="btn-clear" (click)="clear()">
+            <i class="flaticon2-reload"></i> {{ 'Clear' | localize }}
+        </button>
+    </div> -->
+</div>

@@ -66,6 +66,7 @@ import { CreateOrEditBuyerSellerContactInfoComponent } from './app-TransactionTa
 import { ViewBuyerSellerContactInfoComponent } from './app-TransactionTabsInfo/Components/buyer-seller-contact-info/view-buyer-seller-contact-info/view-buyer-seller-contact-info.component';
 import { CreateOrEditSalesRepInfoComponent } from './app-TransactionTabsInfo/Components/salesRep-info/create-or-edit-salesRep-info/create-or-edit-sales-rep-info.component';
 import { ViewSalesRepInfoComponent } from './app-TransactionTabsInfo/Components/salesRep-info/view-salesRep-info/view-sales-rep-info.component';
+import { TransactionsFilterComponent } from './appTransactions/transactions-filter/transactions-filter.component';
 
 @NgModule({
     declarations: [
@@ -86,7 +87,8 @@ import { ViewSalesRepInfoComponent } from './app-TransactionTabsInfo/Components/
         ShareTransactionTabComponent,
         CreateOrEditExtraDataComponent,
         ViewExtraDataComponent,
-        CreateTransactionModal
+        CreateTransactionModal,
+        TransactionsFilterComponent
     ],
     imports: [
         CommonModule,

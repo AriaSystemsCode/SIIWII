@@ -22,8 +22,9 @@ export class AppTransactionsBrowseComponent extends AppComponentBase implements 
     @ViewChild("shoppingCartModal", { static: true }) shoppingCartModal: TransactionInformationComponent;
     @ViewChild('dataTable', { static: true }) dataTable;
     @ViewChild('paginator', { static: true }) paginator: Paginator;
+    @ViewChild('detailPaginator', { static: true }) detailPaginator: Paginator;
     @ViewChild('dataDetailTable', { static: true }) dataDetailTable;
-    
+
     filterForm: FormGroup;
     pageMainFilters;
     showMainFiltersOptions = true;
@@ -39,7 +40,9 @@ export class AppTransactionsBrowseComponent extends AppComponentBase implements 
     filterTransType: SelectItem[] = [];
     filterStatus: SelectItem[] = [];
     loading: boolean = false;
-    advancedFiltersAreShown = false;
+
+    // advanced filters side panel (hidden by default)
+    filtersPanelOpen = false;
 
     sellerNameFilter = '';
     buyerNameFilter = '';
@@ -68,11 +71,11 @@ export class AppTransactionsBrowseComponent extends AppComponentBase implements 
     rowsPerPage: number = 10;
     sortField: string | undefined;
     sortOrder: number | undefined;
-    isAmountReset :boolean
-    isReset :boolean
-    isTypeReset :boolean
-  currentLang: string
-  isArabic: boolean
+    isAmountReset: boolean
+    isReset: boolean
+    isTypeReset: boolean
+    currentLang: string
+    isArabic: boolean
 
     constructor(
         injector: Injector,
@@ -87,8 +90,8 @@ export class AppTransactionsBrowseComponent extends AppComponentBase implements 
 
     }
     ngOnInit(): void {
-            this.currentLang = abp.utils.getCookieValue('Abp.Localization.CultureName')
-    this.currentLang == 'ar' || this.currentLang == 'ar-EG' ? this.isArabic = true : this.isArabic = false
+        this.currentLang = abp.utils.getCookieValue('Abp.Localization.CultureName')
+        this.isArabic = this.currentLang == 'ar' || this.currentLang == 'ar-EG';
         setTimeout(() => {
             this.showHeader = true;
             this.cdr.detectChanges();
@@ -101,6 +104,43 @@ export class AppTransactionsBrowseComponent extends AppComponentBase implements 
     ngOnChanges(): void {
         this.initFilterForm();
 
+    }
+
+    // ───────────── Filters panel ─────────────
+    toggleFilters() {
+        this.filtersPanelOpen = !this.filtersPanelOpen;
+    }
+
+    /** called by the filter component whenever a filter value changes */
+    onAdvancedFilterChange() {
+        if (this.showHeader) {
+            this.getAppTransactions();
+        } else if (this.showDetails) {
+            // go back to first page when filters change
+            if (this.page !== 0) {
+                this.page = 0;
+                this.detailPaginator?.changePage(0); // triggers getVariationDetail via onPageChange
+            } else {
+                this.getVariationDetail();
+            }
+        }
+    }
+
+    // ───────────── Tabs ─────────────
+    showHeaderTab() {
+        this.showDetails = false;
+        this.showHeader = true;
+        this.filterText = '';
+        this.initFilterForm();
+        this.getAppTransactions();
+    }
+
+    showDetailsTab() {
+        this.showHeader = false;
+        this.showDetails = true;
+        this.filterText = '';
+        this.initFilterForm();
+        this.getVariationDetail();
     }
 
 
@@ -181,26 +221,23 @@ export class AppTransactionsBrowseComponent extends AppComponentBase implements 
 
         const filters = this.filterForm.value;
         this.loading = true;
-        // filters.transTypeFilter = filters.transTypeFilter.toUpperCase().toString().replace(/ /g, "")
         this._appTransactionServiceProxy.getAll(
-            false,0,undefined,filters.search,
+            false, 0, undefined, filters.search,
             filters.codeFilter, undefined,
-            filters.mainFilterType?.id,filters.minCreateDateFilter
+            filters.mainFilterType?.id, filters.minCreateDateFilter
             , filters.maxCreateDateFilter,
-            
+
             filters.minCompleteDateFilter,
             filters.maxCompleteDateFilter,
-            filters.sellerNameFilter, undefined, filters.buyerNameFilter, undefined, filters.statusFilter == null ? undefined: filters.statusFilter, false,
-            undefined,undefined,filters.referenceNumberFilter,
+            filters.sellerNameFilter, undefined, filters.buyerNameFilter, undefined, filters.statusFilter == null ? undefined : filters.statusFilter, false,
+            undefined, undefined, filters.referenceNumberFilter,
             this.primengTableHelper.getSorting(this.dataTable),
             skipCount,
             maxResultCount,
-            // this.dataTable.filters
         ).subscribe(result => {
             this.loading = false;
             this.primengTableHelper.totalRecordsCount = result.totalCount;
             this.primengTableHelper.records = result.items;
-            // console.log(result.items,'dataaaaaaaaaaaaaaaaaaa')
             this.primengTableHelper.hideLoadingIndicator();
         });
     }
@@ -332,9 +369,6 @@ export class AppTransactionsBrowseComponent extends AppComponentBase implements 
             );
     }
 
-
-
-
     closeModal($event) {
         this.display = false;
         this.reloadPage();
@@ -350,41 +384,38 @@ export class AppTransactionsBrowseComponent extends AppComponentBase implements 
             this.getAppTransactions();
     }
 
-
     onSearch(event: KeyboardEvent): void {
         event.preventDefault(); // Prevent form submission if inside a form
         event.stopPropagation(); // Prevent triggering other handlers
         this.getAppTransactions();
         this.getVariationDetail();
     }
-    resetSort(event: MouseEvent ,field:string) {
-        event.stopPropagation(); 
-      if (this.sortField === 'amount' && field == 'amount') {
-        this.sortField = null;
-        this.sortOrder = null;
-        this.isAmountReset = true
+    resetSort(event: MouseEvent, field: string) {
+        event.stopPropagation();
+        if (this.sortField === 'amount' && field == 'amount') {
+            this.sortField = null;
+            this.sortOrder = null;
+            this.isAmountReset = true
 
-      }else if (this.sortField === 'price' && field == 'price'){
-        this.sortField = null;
-        this.sortOrder = null;
-      this.isReset = true
+        } else if (this.sortField === 'price' && field == 'price') {
+            this.sortField = null;
+            this.sortOrder = null;
+            this.isReset = true
 
-      }else if (this.sortField === 'transactionType' && field == 'transactionType'){
-        this.sortField = null;
-        this.sortOrder = null;
-      this.isTypeReset = true
+        } else if (this.sortField === 'transactionType' && field == 'transactionType') {
+            this.sortField = null;
+            this.sortOrder = null;
+            this.isTypeReset = true
 
-      }
+        }
 
-      
-      
-      this.getVariationDetail()
-      if (this.dataDetailTable) {
-        this.dataDetailTable.sortField = null;
-        this.dataDetailTable.sortOrder = null;
-        this.dataDetailTable._sort(); // Force sort reset
-      }
+        this.getVariationDetail()
+        if (this.dataDetailTable) {
+            this.dataDetailTable.sortField = null;
+            this.dataDetailTable.sortOrder = null;
+            this.dataDetailTable._sort();
+        }
     }
-    
+
 
 }

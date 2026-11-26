@@ -183,12 +183,6 @@
     width: 20px;
 }
 
-.spanStyle {
-    line-height: 40px;
-    padding: 0 15px 0 15px;
-}
-
-
 .w-160 {
     width: 160px
 }
@@ -198,14 +192,16 @@
 }
 
 .tabsSec {
-    gap: 10px; margin-left: 10px;
+    gap: 10px;
+    margin-left: 10px;
 }
+
 .h-48 {
     height: 48px;
 }
 
 .kt-form {
-     border-bottom: solid 2px #e5e2e2;
+    border-bottom: solid 2px #e5e2e2;
 }
 
 
@@ -218,7 +214,192 @@
     white-space: pre-wrap;
 }
 
-    .alignStart{
-    text-align: start !important ;
+.alignStart {
+    text-align: start !important;
+}
+
+// ───────────────────────────────────────────────
+// Layout with advanced filters side panel
+// EN  → panel on the LEFT
+// AR  → panel on the RIGHT
+// direction is set explicitly so it works whether or not
+// the whole page is already RTL.
+// ───────────────────────────────────────────────
+.browse-layout {
+    display: flex;
+    align-items: flex-start;
+    gap: 20px;
+    direction: ltr;
+
+    >* {
+        direction: ltr;
     }
 
+    &.is-ar {
+        flex-direction: row-reverse;
+
+        >* {
+            direction: rtl;
+        }
+    }
+}
+
+.filter-side {
+    flex: 0 0 300px;
+    max-width: 300px;
+}
+
+.browse-content {
+    flex: 1 1 auto;
+    min-width: 0; // lets the tables scroll instead of overflowing
+}
+
+// toggle icon in the toolbar
+.filter-toggle-btn {
+   
+    transition: background-color .15s ease;
+
+    border-radius: 6px !important;
+    border: 1px solid #EBEBEB !important;
+    background: #FFF !important;
+    box-shadow: 1px 1px 6px 0px rgba(22, 22, 22, 0.05)
+    // &.active {
+    //     background: #4A0D4A !important;
+
+    //     i {
+    //         color: #fff !important;
+    //     }
+    // }
+}
+
+.resetBtn {
+        border-radius: 6px !important;
+    border: 1px solid #EBEBEB !important;
+    background: #FFF !important;
+    color: #4A0D4A;
+}
+
+// backdrop is only used on mobile (overlay mode)
+.filter-backdrop {
+    display: none;
+}
+
+// ───────────────────────────────────────────────
+// TABLET (768px – 991px): panel stays at the side but narrower
+// ───────────────────────────────────────────────
+@media (min-width: 768px) and (max-width: 991.98px) {
+    .browse-layout {
+        gap: 12px;
+    }
+
+    .filter-side {
+        flex: 0 0 230px;
+        max-width: 230px;
+    }
+
+    .filter-side ::ng-deep .filter-panel {
+        padding: 12px;
+    }
+}
+
+// ───────────────────────────────────────────────
+// MOBILE (< 768px): panel becomes a bottom sheet
+// slides up from the bottom like an iOS sheet
+// ───────────────────────────────────────────────
+@media (max-width: 767.98px) {
+
+    .filter-backdrop {
+        display: block;
+        position: fixed;
+        inset: 0;
+        background: rgba(27, 16, 27, 0.45);
+        z-index: 1040;
+        animation: filterFadeIn .2s ease;
+    }
+
+    // iOS-style bottom sheet (same for EN and AR)
+    .filter-side {
+        position: fixed;
+        left: 0;
+        right: 0;
+        bottom: 0;
+        width: 96%;
+        margin: auto;
+        max-width: none;
+        max-height: 85vh;
+        z-index: 1050;
+        display: flex;
+        flex-direction: column;
+        background: #fff;
+        border-radius: 16px 16px 0 0;
+        box-shadow: 0 -6px 24px rgba(0, 0, 0, 0.2);
+        overflow: hidden;
+        animation: filterSlideUp .3s cubic-bezier(.32, .72, 0, 1);
+
+        // grabber handle
+        &::before {
+            content: '';
+            flex: 0 0 auto;
+            width: 40px;
+            height: 5px;
+            margin: 8px auto 0;
+            border-radius: 3px;
+            background: #D1D1D6;
+        }
+    }
+
+    // panel fills the sheet: header fixed, fields scroll, footer fixed
+    .filter-side ::ng-deep app-transactions-filter {
+        display: flex;
+        flex-direction: column;
+        flex: 1 1 auto;
+        min-height: 0;
+    }
+
+    .filter-side ::ng-deep .filter-panel {
+        display: flex;
+        flex-direction: column;
+        flex: 1 1 auto;
+        min-height: 0;
+        border: none;
+        border-radius: 0;
+        box-shadow: none;
+    }
+
+    .filter-side ::ng-deep .filter-panel__body {
+        flex: 1 1 auto;
+        overflow-y: auto;
+        -webkit-overflow-scrolling: touch;
+        overscroll-behavior: contain;
+    }
+
+    .filter-side ::ng-deep .filter-panel__footer {
+        flex: 0 0 auto;
+        background: #fff;
+        // keeps the button clear of the iPhone home indicator
+        padding-bottom: calc(8px + env(safe-area-inset-bottom, 0px));
+    }
+
+    // content takes the full width since the panel is out of the flow
+    .browse-layout,
+    .browse-layout.is-ar {
+        display: block;
+    }
+}
+
+@keyframes filterFadeIn {
+    from { opacity: 0; }
+    to   { opacity: 1; }
+}
+
+@keyframes filterSlideUp {
+    from { transform: translateY(100%); }
+    to   { transform: translateY(0); }
+}
+
+@media (prefers-reduced-motion: reduce) {
+    .filter-backdrop,
+    .filter-side {
+        animation: none !important;
+    }
+}
